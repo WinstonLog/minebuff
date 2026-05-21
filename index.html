@@ -316,7 +316,6 @@
             gap: 8px;
         }
 
-        /* ============ ВЫПАДАЮЩИЕ СПИСКИ ============ */
         .dropdown-section {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 28px;
@@ -385,7 +384,6 @@
             border-radius: 10px;
         }
 
-        /* ============ ЭЛЕМЕНТЫ ДОСТИЖЕНИЙ И ЗАДАНИЙ ============ */
         .achievement-item,
         .quest-item {
             display: flex;
@@ -429,7 +427,6 @@
             border-radius: 20px;
         }
 
-        /* ============ ИСТОРИЯ КАРТ ============ */
         .history {
             background: #051016b3;
             border-radius: 28px;
@@ -453,7 +450,6 @@
             color: white;
         }
 
-        /* ============ ТОП ИГРОКОВ ============ */
         .top-panel {
             text-align: center;
             display: flex;
@@ -467,6 +463,7 @@
             width: 100%;
             list-style: none;
             margin-top: 10px;
+            margin-bottom: 15px;
         }
 
         .top-list li {
@@ -484,7 +481,21 @@
             border: 1px solid #ffcc66;
         }
 
-        /* ============ ПОДВАЛ ============ */
+        .player-rank {
+            background: #1a2a2f;
+            border-radius: 30px;
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 13px;
+            text-align: center;
+            border: 1px solid #ffcc66;
+        }
+
+        .player-rank span {
+            color: #ffcc66;
+            font-weight: bold;
+        }
+
         .footer {
             margin-top: 16px;
             text-align: center;
@@ -512,7 +523,6 @@
             text-decoration: none;
         }
 
-        /* ============ МОДАЛЬНЫЕ ОКНА ============ */
         .modal {
             display: none;
             position: fixed;
@@ -604,7 +614,6 @@
             color: white;
         }
 
-        /* ============ МОДАЛЬНОЕ ОКНО ВВОДА ИМЕНИ ============ */
         .name-modal {
             display: none;
             position: fixed;
@@ -665,7 +674,6 @@
             width: 100%;
         }
 
-        /* ============ УВЕДОМЛЕНИЯ ============ */
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -706,7 +714,6 @@
             }
         }
 
-        /* ============ АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ ============ */
         @media (max-width: 480px) {
             .app-wrapper {
                 padding: 8px;
@@ -754,7 +761,6 @@
 </head>
 <body>
     <div class="app-wrapper">
-        <!-- Вкладки -->
         <div class="tabs">
             <div class="tab-btn active" data-tab="mine">⛏️ ШАХТА</div>
             <div class="tab-btn" data-tab="profile">🏆 ПРОФИЛЬ</div>
@@ -840,7 +846,6 @@
                     </div>
                 </div>
 
-                <!-- Достижения -->
                 <div class="dropdown-section">
                     <div class="dropdown-header">
                         <div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div>
@@ -849,7 +854,6 @@
                     <div class="dropdown-content" id="achievementsContent"></div>
                 </div>
 
-                <!-- Ежедневные задания -->
                 <div class="dropdown-section">
                     <div class="dropdown-header">
                         <div class="dropdown-title">📋 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ <span id="questsProgress">(0/4)</span></div>
@@ -860,7 +864,7 @@
             </div>
         </div>
 
-        <!-- Панель Топа -->
+        <!-- Панель Топа (с местом игрока) -->
         <div class="tab-panel" id="topPanel">
             <div class="top-panel game-panel">
                 <div style="font-weight: bold; font-size: 18px;">🏆 ТОП ИГРОКОВ</div>
@@ -868,11 +872,16 @@
                 <ul class="top-list" id="topList">
                     <li style="justify-content: center; opacity: 0.5;">Загрузка...</li>
                 </ul>
+                
+                <!-- Блок с местом игрока (показывается даже если не в топе) -->
+                <div id="playerRankBlock" class="player-rank" style="display: none;">
+                    📊 Ваше место в топе: <span id="playerRank">—</span>
+                </div>
+                
                 <button id="forceSyncBtn" style="margin-top: 15px; background: #3a6b58; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 11px; cursor: pointer;">🔄 Синхронизация</button>
             </div>
         </div>
 
-        <!-- Подвал -->
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
             <div style="margin-top: 8px;">
@@ -885,7 +894,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно повышения уровня -->
     <div class="modal" id="levelModal">
         <div class="modal-content">
             <div class="modal-title">⭐ ПОВЫШЕНИЕ УРОВНЯ</div>
@@ -901,7 +909,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно ввода имени -->
     <div class="name-modal" id="nameModal">
         <div class="name-modal-content">
             <div class="name-modal-title">🌟 ДОБРО ПОЖАЛОВАТЬ!</div>
@@ -913,7 +920,6 @@
 
     <script>
         (function() {
-            // ============ НАСТРОЙКИ ============
             let supabaseClient = null;
             let syncInProgress = false;
 
@@ -949,7 +955,6 @@
                 'E': 'linear-gradient(135deg, #a17654, #7b5338)'
             };
 
-            // ============ ИГРОВЫЕ ПЕРЕМЕННЫЕ ============
             let _ore = 0;
             let _diamonds = 0;
             let _level = 1;
@@ -964,7 +969,6 @@
             let _quests = {};
             let _lastQuestReset = null;
 
-            // ============ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ============
             function getLevelUpCost(level) {
                 return Math.floor(40 + (level - 1) * 12 + Math.pow(level, 1.4));
             }
@@ -1003,7 +1007,6 @@
                 setTimeout(() => toast.remove(), 2000);
             }
 
-            // ============ СОХРАНЕНИЕ И ЗАГРУЗКА ============
             function saveGame() {
                 const saveData = {
                     ore: _ore,
@@ -1049,12 +1052,10 @@
                     _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                 }
 
-                // Инициализация достижений
                 for (const a of achievementsList) {
                     if (_achievements[a.id] === undefined) _achievements[a.id] = false;
                 }
 
-                // Сброс заданий в новый день
                 const now = new Date();
                 if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
                     for (const q of questsList) {
@@ -1079,7 +1080,6 @@
                 checkAchievements();
             }
 
-            // ============ МОДАЛЬНОЕ ОКНО ИМЕНИ ============
             function showNameModal() {
                 const modal = document.getElementById('nameModal');
                 document.getElementById('playerNameInput').value = "";
@@ -1098,7 +1098,6 @@
                 };
             }
 
-            // ============ ДОСТИЖЕНИЯ И ЗАДАНИЯ ============
             function checkAchievements() {
                 let any = false;
                 for (const a of achievementsList) {
@@ -1203,7 +1202,6 @@
                 }).join('');
             }
 
-            // ============ ЕЖЕДНЕВНЫЙ СБРОС ============
             function checkDailyReset() {
                 const today = new Date().toDateString();
                 const lastReset = localStorage.getItem('minebuff_last_reset');
@@ -1225,7 +1223,6 @@
                 }
             }
 
-            // ============ КАРТЫ ============
             function addCardToHistory(rank) {
                 _cardHistory.unshift({ text: `🎴 Карта ранга ${rank}`, rank: rank });
                 if (_cardHistory.length > 30) _cardHistory.pop();
@@ -1248,7 +1245,6 @@
                 return _cardHistory.map((item, idx) => `${idx + 1}. ${item.text}`).join('\n') || "— нет карт —";
             }
 
-            // ============ ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ============
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
                 document.getElementById('diamondValue').innerText = Math.floor(_diamonds);
@@ -1288,7 +1284,7 @@
                 updateQuestsUI();
             }
 
-            // ============ ДЕЙСТВИЯ ИГРОКА ============
+            // ============ ОСНОВНЫЕ ДЕЙСТВИЯ ИГРОКА ============
             window.mineOre = function() {
                 if (_strikesDone >= _strikesLimit) {
                     showToast("⛔ Лимит ударов", "#ff8c6e");
@@ -1394,7 +1390,7 @@
                 showToast("✅ Текст скопирован! Отправьте скриншот", "#aaffdd");
             };
 
-            // ============ SUPABASE ============
+            // ============ SUPABASE С ФУНКЦИЕЙ ОПРЕДЕЛЕНИЯ МЕСТА ============
             async function syncToSupabase() {
                 if (syncInProgress || !supabaseClient || !_playerId || !_playerName) return;
                 syncInProgress = true;
@@ -1416,18 +1412,25 @@
                     return;
                 }
                 try {
-                    const { data } = await supabaseClient
+                    // Загружаем всех игроков для определения места
+                    const { data: allPlayers } = await supabaseClient
                         .from('leaderboard')
                         .select('username, level, player_id')
-                        .order('level', { ascending: false })
-                        .limit(20);
+                        .order('level', { ascending: false });
                     
                     const container = document.getElementById('topList');
-                    if (!data || !data.length) {
+                    const rankBlock = document.getElementById('playerRankBlock');
+                    const rankSpan = document.getElementById('playerRank');
+                    
+                    if (!allPlayers || !allPlayers.length) {
                         container.innerHTML = '<li style="justify-content:center;opacity:0.5;">Пока никого</li>';
+                        if (rankBlock) rankBlock.style.display = 'none';
                         return;
                     }
-                    container.innerHTML = data.slice(0, 10).map((player, idx) => {
+                    
+                    // Показываем топ-10
+                    const top10 = allPlayers.slice(0, 10);
+                    container.innerHTML = top10.map((player, idx) => {
                         const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1) + '.';
                         const isCurrent = player.player_id === _playerId;
                         return `<li class="${isCurrent ? 'current-player' : ''}">
@@ -1435,6 +1438,28 @@
                             <span>⭐ Ур.${player.level}</span>
                         </li>`;
                     }).join('');
+                    
+                    // Определяем место текущего игрока
+                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
+                    if (playerIndex !== -1) {
+                        const playerRank = playerIndex + 1;
+                        rankSpan.innerText = `${playerRank} место (${_level} уровень)`;
+                        rankBlock.style.display = 'block';
+                        
+                        // Если игрок не в топ-10, добавляем его внизу списка
+                        if (playerIndex >= 10) {
+                            const playerData = allPlayers[playerIndex];
+                            const extraHtml = `
+                                <li class="current-player" style="margin-top: 10px; border-top: 1px solid #ffcc66;">
+                                    <span>📌 ${playerRank}. ${escapeHtml(playerData.username.slice(0, 15))}</span>
+                                    <span>⭐ Ур.${playerData.level}</span>
+                                </li>
+                            `;
+                            container.insertAdjacentHTML('beforeend', extraHtml);
+                        }
+                    } else {
+                        rankBlock.style.display = 'none';
+                    }
                 } catch(e) {
                     console.warn(e);
                 }
@@ -1456,7 +1481,6 @@
                 document.head.appendChild(script);
             }
 
-            // ============ ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ============
             function initDropdowns() {
                 document.querySelectorAll('.dropdown-section').forEach(dropdown => {
                     const header = dropdown.querySelector('.dropdown-header');
@@ -1489,7 +1513,6 @@
                 });
             }
 
-            // ============ НАЗНАЧЕНИЕ ОБРАБОТЧИКОВ ============
             document.getElementById('pickaxeBtn').onclick = () => window.mineOre();
             document.getElementById('bonusBtn').onclick = () => window.claimBonus();
             document.getElementById('toDiamondsBtn').onclick = () => window.exchangeOreToDiamonds();
@@ -1509,7 +1532,6 @@
                 if (e.target === document.getElementById('levelModal')) window.closeModal();
             };
 
-            // ============ ЗАПУСК ============
             initTabs();
             initDropdowns();
             loadGame();
