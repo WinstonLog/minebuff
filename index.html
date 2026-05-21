@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MineBuff — Шахта судьбы</title>
+    <title>MineBuff — Шахта судьбы | PvP Реальные игроки</title>
     <style>
         * {
             margin: 0;
@@ -31,40 +31,102 @@
             padding: 12px;
         }
 
-        .tabs {
+        .header {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 16px;
             position: sticky;
-            top: 12px;
+            top: 0;
             z-index: 100;
-            background: transparent;
-        }
-
-        .tab-btn {
-            flex: 1;
             background: rgba(8, 18, 28, 0.95);
             backdrop-filter: blur(12px);
+            padding: 10px 16px;
+            border-radius: 60px;
             border: 1px solid rgba(80, 140, 180, 0.3);
-            padding: 12px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .burger-menu {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+        }
+
+        .burger-line {
+            width: 24px;
+            height: 2px;
+            background: #ffcc66;
+            border-radius: 2px;
+        }
+
+        .side-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            justify-content: flex-end;
+        }
+
+        .side-menu.show {
+            display: flex;
+        }
+
+        .side-menu-content {
+            width: 70%;
+            max-width: 280px;
+            height: 100%;
+            background: linear-gradient(135deg, #0f1a1f, #071217);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 1px solid #ffcc66;
+        }
+
+        .side-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a6b58;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
             border-radius: 40px;
+            cursor: pointer;
             font-weight: bold;
             font-size: 16px;
-            color: #9bbfd0;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .tab-btn.active {
+        .menu-item.active {
             background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            color: white;
-            border-color: #ffcc66;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .tab-btn:active {
-            transform: scale(0.97);
+            border: 1px solid #ffcc66;
         }
 
         .tab-panel {
@@ -75,9 +137,7 @@
             display: block;
         }
 
-        .game-panel,
-        .top-panel,
-        .profile-panel {
+        .game-panel, .top-panel, .profile-panel, .exchange-panel, .pvp-panel {
             background: rgba(8, 18, 28, 0.8);
             backdrop-filter: blur(12px);
             border-radius: 40px;
@@ -310,18 +370,130 @@
             border: none;
             cursor: pointer;
             margin: 10px 0;
+        }
+
+        .history {
+            background: #051016b3;
+            border-radius: 28px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .history-item {
+            display: block;
+            margin: 5px 0;
+            padding: 6px 10px;
+            border-radius: 25px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .cards-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+            justify-content: center;
+        }
+
+        .card-badge {
+            background: #1a2a2f;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card-badge.A { background: #5a1a1a; }
+        .card-badge.P { background: #102b4e; }
+        .card-badge.G { background: #1c4620; }
+        .card-badge.B { background: #3a1e52; }
+        .card-badge.C { background: #b8a35c; color: #1a1a1a; }
+        .card-badge.D { background: #6e8f9e; }
+        .card-badge.E { background: #a17654; }
+
+        .exchange-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .exchange-card {
+            background: linear-gradient(135deg, #1a2a2f, #0f1a1f);
+            border-radius: 28px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid rgba(255, 204, 102, 0.3);
+        }
+
+        .exchange-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .exchange-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 2;
+        }
+
+        .exchange-arrows {
+            display: flex;
+            align-items: center;
             gap: 8px;
+            font-size: 14px;
+        }
+
+        .exchange-from {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+
+        .exchange-to {
+            background: rgba(255, 204, 102, 0.2);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #ffcc66;
+        }
+
+        .exchange-count {
+            font-size: 12px;
+            color: #88aacc;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .exchange-action {
+            background: linear-gradient(135deg, #3a6b58, #1e3e31);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         .dropdown-section {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 28px;
             margin-bottom: 12px;
-            overflow: visible;
-            position: relative;
+            overflow: hidden;
         }
 
         .dropdown-header {
@@ -331,11 +503,6 @@
             padding: 12px 16px;
             cursor: pointer;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 28px;
-        }
-
-        .dropdown-header:active {
-            background: rgba(0, 0, 0, 0.5);
         }
 
         .dropdown-title {
@@ -360,110 +527,29 @@
             overflow-y: hidden;
             transition: max-height 0.3s ease-out;
             background: rgba(8, 18, 28, 0.95);
-            border-radius: 0 0 28px 28px;
         }
 
         .dropdown-content.open {
             max-height: 400px;
             padding: 12px;
-            margin-top: 4px;
             overflow-y: auto;
         }
 
-        .dropdown-content::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .dropdown-content::-webkit-scrollbar-track {
-            background: #1a2a2f;
-            border-radius: 10px;
-        }
-
-        .dropdown-content::-webkit-scrollbar-thumb {
-            background: #ffcc66;
-            border-radius: 10px;
-        }
-
-        .achievement-item,
-        .quest-item {
+        .achievement-item, .quest-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            background: #0f1a1fcc;
-            border-radius: 20px;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .achievement-info,
-        .quest-info {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        .achievement-name,
-        .quest-name {
-            font-size: 13px;
-            font-weight: bold;
-            word-break: break-word;
-        }
-
-        .achievement-desc,
-        .quest-desc {
-            font-size: 10px;
-            opacity: 0.7;
-            word-break: break-word;
-        }
-
-        .achievement-reward,
-        .quest-reward {
-            font-size: 11px;
-            color: #aaffdd;
-            white-space: nowrap;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-
-        .history {
-            background: #051016b3;
-            border-radius: 28px;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 12px;
-        }
-
-        .history-title {
-            font-size: 12px;
-            margin-bottom: 6px;
-        }
-
-        .history-item {
-            display: block;
+            padding: 8px 12px;
             margin: 5px 0;
-            padding: 6px 10px;
+            background: #0f1a1fcc;
             border-radius: 25px;
             font-size: 12px;
-            color: white;
-        }
-
-        .top-panel {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 15px;
         }
 
         .top-list {
             width: 100%;
             list-style: none;
             margin-top: 10px;
-            margin-bottom: 15px;
         }
 
         .top-list li {
@@ -491,9 +577,104 @@
             border: 1px solid #ffcc66;
         }
 
-        .player-rank span {
-            color: #ffcc66;
+        .pvp-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pvp-card {
+            flex: 1;
+            background: #0f1a1fcc;
+            border-radius: 28px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .pvp-elo {
+            font-size: 24px;
             font-weight: bold;
+            color: #ffcc66;
+        }
+
+        .find-battle-btn {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            width: 100%;
+            padding: 16px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 15px 0;
+        }
+
+        .find-battle-btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .leave-queue-btn {
+            background: #5a3a2a;
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .battle-history {
+            background: #051016b3;
+            border-radius: 28px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .battle-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #0f1a1fcc;
+            border-radius: 25px;
+            font-size: 12px;
+        }
+
+        .battle-item.win {
+            border-left: 3px solid #44ff44;
+        }
+
+        .battle-item.lose {
+            border-left: 3px solid #ff4444;
+        }
+
+        .loading-battle {
+            text-align: center;
+            padding: 30px;
+            background: #071217cc;
+            border-radius: 40px;
+            margin: 15px 0;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #3a6b58;
+            border-top-color: #ffcc66;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .footer {
@@ -523,25 +704,25 @@
             text-decoration: none;
         }
 
-        .modal {
+        .modal, .chest-modal, .battle-result-modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(8px);
-            z-index: 2000;
+            z-index: 300;
             justify-content: center;
             align-items: center;
         }
 
-        .modal.show {
+        .modal.show, .chest-modal.show, .battle-result-modal.show {
             display: flex;
         }
 
-        .modal-content {
+        .modal-content, .chest-content {
             background: linear-gradient(135deg, #1e2e2f, #0f1a1f);
             border-radius: 48px;
             padding: 24px 20px;
@@ -549,21 +730,9 @@
             max-width: 340px;
             text-align: center;
             border: 2px solid #ffcc66;
-            animation: modalPop 0.2s ease-out;
         }
 
-        @keyframes modalPop {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .modal-title {
+        .modal-title, .chest-title {
             font-size: 26px;
             font-weight: bold;
             color: #ffcc66;
@@ -614,64 +783,10 @@
             color: white;
         }
 
-        .name-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(8px);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .name-modal.show {
-            display: flex;
-        }
-
-        .name-modal-content {
-            background: linear-gradient(135deg, #1e2e2f, #0f1a1f);
-            border-radius: 48px;
-            padding: 30px 24px;
-            width: 90%;
-            max-width: 340px;
-            text-align: center;
-            border: 2px solid #ffcc66;
-        }
-
-        .name-modal-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffcc66;
-            margin-bottom: 20px;
-        }
-
-        .name-modal input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 40px;
-            border: none;
-            background: #2a3a2a;
-            color: white;
-            font-size: 16px;
-            text-align: center;
+        .chest-icon {
+            font-size: 60px;
             margin: 15px 0;
-            outline: none;
-        }
-
-        .name-modal button {
-            background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            width: 100%;
         }
 
         .toast-notification {
@@ -690,99 +805,60 @@
             pointer-events: none;
             animation: toastFade 2s ease forwards;
             text-align: center;
-            border-left: 3px solid #ffcc66;
             max-width: 90vw;
-            white-space: normal;
         }
 
         @keyframes toastFade {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            15% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            85% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
 
         @media (max-width: 480px) {
-            .app-wrapper {
-                padding: 8px;
-            }
-
-            .game-panel,
-            .top-panel,
-            .profile-panel {
-                padding: 12px;
-            }
-
-            .pickaxe-btn {
-                width: 130px;
-                height: 130px;
-            }
-
-            .pickaxe-icon {
-                font-size: 45px;
-            }
-
-            .stat-value {
-                font-size: 16px;
-            }
-
-            .tab-btn {
-                padding: 10px;
-                font-size: 12px;
-            }
-
-            .dropdown-content.open {
-                max-height: 350px;
-            }
-
-            .achievement-info,
-            .quest-info {
-                min-width: 120px;
-            }
-
-            .achievement-name,
-            .quest-name {
-                font-size: 12px;
-            }
+            .app-wrapper { padding: 8px; }
+            .pickaxe-btn { width: 130px; height: 130px; }
+            .pickaxe-icon { font-size: 45px; }
+            .stat-value { font-size: 16px; }
+            .exchange-card { flex-direction: column; text-align: center; }
+            .exchange-info { justify-content: center; }
+            .exchange-action { width: 100%; }
+            .pvp-stats { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="app-wrapper">
-        <div class="tabs">
-            <div class="tab-btn active" data-tab="mine">⛏️ ШАХТА</div>
-            <div class="tab-btn" data-tab="profile">🏆 ПРОФИЛЬ</div>
-            <div class="tab-btn" data-tab="top">🌍 ТОП</div>
+        <div class="header">
+            <div class="logo">⛏️ MINEBUFF</div>
+            <div class="burger-menu" id="burgerMenu">
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+            </div>
         </div>
 
-        <!-- Панель Шахты -->
+        <div class="side-menu" id="sideMenu">
+            <div class="side-menu-content">
+                <div class="side-menu-header">
+                    <div class="side-menu-logo">⛏️ MINEBUFF</div>
+                    <div class="close-menu" id="closeMenu">✕</div>
+                </div>
+                <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
+                <div class="menu-item" data-tab="profile">🏆 Профиль</div>
+                <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
+                <div class="menu-item" data-tab="pvp">⚔️ PvP Арена</div>
+                <div class="menu-item" data-tab="top">🌍 Топ</div>
+            </div>
+        </div>
+
+        <!-- Шахта -->
         <div class="tab-panel active" id="minePanel">
             <div class="game-panel">
                 <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-label">⛏️ РУДА</div>
-                        <div class="stat-value" id="oreValue">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">💎 АЛМАЗЫ</div>
-                        <div class="stat-value" id="diamondValue">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">⭐ УРОВЕНЬ</div>
-                        <div class="stat-value" id="levelValue">1</div>
-                    </div>
+                    <div class="stat-card"><div class="stat-label">⛏️ РУДА</div><div class="stat-value" id="oreValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">💎 АЛМАЗЫ</div><div class="stat-value" id="diamondValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">⭐ УРОВЕНЬ</div><div class="stat-value" id="levelValue">1</div></div>
                 </div>
 
                 <div class="player-info">
@@ -798,9 +874,7 @@
                     </div>
                 </div>
 
-                <div class="strikes-counter">
-                    💥 УДАРОВ: <span id="strikesDone">0</span> / <span id="strikesLimit">100</span>
-                </div>
+                <div class="strikes-counter">💥 УДАРОВ: <span id="strikesDone">0</span> / <span id="strikesLimit">100</span></div>
 
                 <div class="bonus-block" id="bonusBlock">
                     <span class="bonus-title">🎁 БОНУС +5 💎</span>
@@ -815,10 +889,9 @@
                     <div class="exchange-buttons">
                         <button class="ex-btn" id="toDiamondsBtn">⛏️ ОБМЕНЯТЬ (100→1💎)</button>
                     </div>
-                    <div style="font-size: 10px; text-align:center; margin-top:6px;">100⛏️ = 1💎</div>
                 </div>
 
-                <button class="level-up-btn" id="levelUpBtn">📈 ПОВЫСИТЬ УРОВЕНЬ (1 раз в сутки)</button>
+                <button class="level-up-btn" id="levelUpBtn">📈 ПОВЫСИТЬ УРОВЕНЬ</button>
                 <button class="claim-card-btn" id="claimCardBtn">📸 ПОЛУЧИТЬ КАРТУ</button>
 
                 <div class="history">
@@ -828,69 +901,79 @@
             </div>
         </div>
 
-        <!-- Панель Профиля -->
+        <!-- Профиль -->
         <div class="tab-panel" id="profilePanel">
             <div class="profile-panel">
-                <div class="stats" style="margin-bottom: 16px;">
-                    <div class="stat-card">
-                        <div class="stat-label">⭐ УРОВЕНЬ</div>
-                        <div class="stat-value" id="profileLevel">1</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">💎 АЛМАЗЫ</div>
-                        <div class="stat-value" id="profileDiamonds">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">🎴 КАРТ</div>
-                        <div class="stat-value" id="profileCards">0</div>
-                    </div>
+                <div class="stats">
+                    <div class="stat-card"><div class="stat-label">⭐ УРОВЕНЬ</div><div class="stat-value" id="profileLevel">1</div></div>
+                    <div class="stat-card"><div class="stat-label">💎 АЛМАЗЫ</div><div class="stat-value" id="profileDiamonds">0</div></div>
+                    <div class="stat-card"><div class="stat-label">🎴 КАРТ</div><div class="stat-value" id="profileCards">0</div></div>
                 </div>
-
+                <div class="cards-stats" id="cardsStats"></div>
+                
                 <div class="dropdown-section">
-                    <div class="dropdown-header">
-                        <div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div>
-                        <div class="dropdown-arrow">▼</div>
-                    </div>
+                    <div class="dropdown-header"><div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content" id="achievementsContent"></div>
                 </div>
 
                 <div class="dropdown-section">
-                    <div class="dropdown-header">
-                        <div class="dropdown-title">📋 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ <span id="questsProgress">(0/4)</span></div>
-                        <div class="dropdown-arrow">▼</div>
-                    </div>
+                    <div class="dropdown-header"><div class="dropdown-title">📋 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ <span id="questsProgress">(0/4)</span></div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content" id="questsContent"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Панель Топа (с местом игрока) -->
+        <!-- Обменник -->
+        <div class="tab-panel" id="exchangePanel">
+            <div class="exchange-panel">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🔄 ОБМЕННИК КАРТ</div>
+                <div style="font-size: 12px; text-align: center; margin-bottom: 16px; opacity: 0.7;">Обменивай 3 карты одного ранга на 1 карту выше</div>
+                <div class="cards-stats" id="exchangeCardsStats"></div>
+                <div class="exchange-grid" id="exchangeGrid"></div>
+            </div>
+        </div>
+
+        <!-- PvP Арена -->
+        <div class="tab-panel" id="pvpPanel">
+            <div class="pvp-panel">
+                <div class="pvp-stats">
+                    <div class="pvp-card"><div>🏆 РЕЙТИНГ (ELO)</div><div class="pvp-elo" id="pvpElo">1000</div></div>
+                    <div class="pvp-card"><div>⚔️ ПОБЕД / ПОРАЖ.</div><div class="pvp-elo" id="pvpWLRatio">0/0</div></div>
+                    <div class="pvp-card"><div>🔥 СТРИК ПОБЕД</div><div class="pvp-elo" id="pvpStreak">0</div></div>
+                </div>
+                <div class="pvp-card" style="margin-bottom: 15px;"><div>💎 СТАВКА</div><div class="pvp-elo" style="font-size: 18px;">1 алмаз → победитель получает 2</div></div>
+                <button class="find-battle-btn" id="findBattleBtn">⚔️ НАЙТИ ПРОТИВНИКА (1💎)</button>
+                <button class="leave-queue-btn" id="leaveQueueBtn" style="display: none;">🚪 ПОКИНУТЬ ОЧЕРЕДЬ</button>
+                <div id="battleLoading" style="display: none;" class="loading-battle"><div class="loading-spinner"></div><div>Поиск соперника...</div><div style="font-size: 12px; margin-top: 10px;">⚡ Игроков в очереди: <span id="queueCount">0</span></div></div>
+                <div class="battle-history"><div class="history-title">📜 ИСТОРИЯ БОЁВ</div><div id="battleHistoryContainer">—</div></div>
+            </div>
+        </div>
+
+        <!-- Топ -->
         <div class="tab-panel" id="topPanel">
             <div class="top-panel game-panel">
                 <div style="font-weight: bold; font-size: 18px;">🏆 ТОП ИГРОКОВ</div>
                 <div style="font-size: 11px; opacity: 0.7;">По уровню</div>
-                <ul class="top-list" id="topList">
-                    <li style="justify-content: center; opacity: 0.5;">Загрузка...</li>
-                </ul>
-                
-                <!-- Блок с местом игрока (показывается даже если не в топе) -->
-                <div id="playerRankBlock" class="player-rank" style="display: none;">
-                    📊 Ваше место в топе: <span id="playerRank">—</span>
-                </div>
-                
-                <button id="forceSyncBtn" style="margin-top: 15px; background: #3a6b58; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 11px; cursor: pointer;">🔄 Синхронизация</button>
+                <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
+                <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место в топе: <span id="playerRank">—</span></div>
+                <div class="total-players" id="totalPlayersCount"></div>
+                <button id="forceSyncBtn" style="margin-top: 15px; background: #3a6b58; border: none; padding: 6px 12px; border-radius: 30px; color: white; cursor: pointer;">🔄 Синхронизация</button>
             </div>
         </div>
 
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
-            <div style="margin-top: 8px;">
-                <a href="https://yoomoney.ru/to/4100119003253255" target="_blank" class="support-link">❤️ ПОДДЕРЖАТЬ</a>
-            </div>
-            <div style="margin-top: 12px; font-size: 10px; opacity: 0.6; border-top: 1px solid #3a6b58; padding-top: 10px;">
-                ⚠️ Данный проект является фанатским и не связан с mangabuff.ru<br>
-                Все карты выдаются от лица @b_loody
-            </div>
+            <div><a href="https://yoomoney.ru/to/4100119003253255" target="_blank" class="support-link">❤️ ПОДДЕРЖАТЬ</a></div>
+        </div>
+    </div>
+
+    <!-- Модалки -->
+    <div class="chest-modal" id="chestModal">
+        <div class="chest-content">
+            <div class="chest-title">🎁 ВАМ ВЫПАЛ СУНДУК!</div>
+            <div class="chest-icon" id="chestIcon">📦</div>
+            <div class="chest-reward" id="chestReward">❓ Нажми на сундук, чтобы открыть</div>
+            <button class="ex-btn" id="openChestBtn" style="width:100%;">ОТКРЫТЬ СУНДУК</button>
         </div>
     </div>
 
@@ -909,19 +992,50 @@
         </div>
     </div>
 
-    <div class="name-modal" id="nameModal">
-        <div class="name-modal-content">
-            <div class="name-modal-title">🌟 ДОБРО ПОЖАЛОВАТЬ!</div>
-            <div style="font-size: 14px; opacity: 0.8;">Введите ваше имя:</div>
-            <input type="text" id="playerNameInput" placeholder="Ваше имя" maxlength="20">
-            <button id="saveNameBtn">ПОДТВЕРДИТЬ</button>
+    <div class="battle-result-modal" id="battleResultModal">
+        <div class="modal-content">
+            <div class="modal-title" id="battleResultTitle">⚔️ БИТВА</div>
+            <div id="battleResultText"></div>
+            <div id="battleReward" style="margin: 15px 0; font-size: 18px;"></div>
+            <button class="modal-btn close" id="closeBattleResultBtn">ЗАКРЫТЬ</button>
+        </div>
+    </div>
+
+    <div class="modal" id="nameModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">🌟 ДОБРО ПОЖАЛОВАТЬ!</div>
+            <input type="text" id="playerNameInput" placeholder="Ваше имя" style="width:100%; padding:14px; border-radius:40px; border:none; background:#2a3a2a; color:white; margin:15px 0;">
+            <button id="saveNameBtn" style="background:linear-gradient(135deg,#3a6b58,#1e3e31); border:none; padding:12px; border-radius:40px; color:white; font-weight:bold; width:100%;">ПОДТВЕРДИТЬ</button>
         </div>
     </div>
 
     <script>
         (function() {
+            // ============ SUPABASE ============
             let supabaseClient = null;
-            let syncInProgress = false;
+            let isInQueue = false;
+            let searchInterval = null;
+            
+            // ============ ОСНОВНЫЕ ПЕРЕМЕННЫЕ ============
+            const rankNames = ['E', 'D', 'C', 'B', 'G', 'P', 'A'];
+            const rankGradients = {
+                'A': 'linear-gradient(135deg, #5a1a1a, #3a0808)',
+                'P': 'linear-gradient(135deg, #102b4e, #061b33)',
+                'G': 'linear-gradient(135deg, #1c4620, #0c2a0f)',
+                'B': 'linear-gradient(135deg, #3a1e52, #22113a)',
+                'C': 'linear-gradient(135deg, #b8a35c, #8b763a)',
+                'D': 'linear-gradient(135deg, #6e8f9e, #4b6878)',
+                'E': 'linear-gradient(135deg, #a17654, #7b5338)'
+            };
+
+            const exchangeRules = [
+                { from: 'E', to: 'D', need: 3 },
+                { from: 'D', to: 'C', need: 3 },
+                { from: 'C', to: 'B', need: 3 },
+                { from: 'B', to: 'G', need: 3 },
+                { from: 'G', to: 'P', need: 3 },
+                { from: 'P', to: 'A', need: 3 }
+            ];
 
             const achievementsList = [
                 { id: 'level_5', name: 'Новичок', desc: '5 уровень', reward: 3 },
@@ -945,159 +1059,237 @@
                 { id: 'daily_card', name: 'Удача', desc: 'Получить карту', target: 1, reward: 4 }
             ];
 
-            const rankGradients = {
-                'A': 'linear-gradient(135deg, #5a1a1a, #3a0808)',
-                'P': 'linear-gradient(135deg, #102b4e, #061b33)',
-                'G': 'linear-gradient(135deg, #1c4620, #0c2a0f)',
-                'B': 'linear-gradient(135deg, #3a1e52, #22113a)',
-                'C': 'linear-gradient(135deg, #b8a35c, #8b763a)',
-                'D': 'linear-gradient(135deg, #6e8f9e, #4b6878)',
-                'E': 'linear-gradient(135deg, #a17654, #7b5338)'
-            };
+            // Игровые переменные
+            let _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0, _strikesLimit = 100;
+            let _lastBonusDate = null, _lastUpgradeDate = null, _cardHistory = [];
+            let _playerId = null, _playerName = null;
+            let _achievements = {}, _quests = {}, _lastQuestReset = null;
+            
+            // PvP переменные
+            let _pvpElo = 1000, _pvpWins = 0, _pvpLosses = 0, _pvpStreak = 0;
+            let _battleHistory = [];
+            let _pendingChest = null;
 
-            let _ore = 0;
-            let _diamonds = 0;
-            let _level = 1;
-            let _strikesDone = 0;
-            let _strikesLimit = 100;
-            let _lastBonusDate = null;
-            let _lastUpgradeDate = null;
-            let _cardHistory = [];
-            let _playerId = null;
-            let _playerName = null;
-            let _achievements = {};
-            let _quests = {};
-            let _lastQuestReset = null;
+            // ============ ВСПОМОГАТЕЛЬНЫЕ ============
+            function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+            function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
+            function getRandomRank() { if (Math.random() * 1000 < 5) return null; const r = Math.random() * 100; if (r < 1) return 'A'; if (r < 2) return 'P'; if (r < 3) return 'G'; if (r < 11) return 'B'; if (r < 19) return 'C'; if (r < 39) return 'D'; return 'E'; }
+            function getOrePerClick() { let bonus = Math.floor(_level / 10); return Math.floor(Math.random() * (6 + bonus - (3 + bonus) + 1) + (3 + bonus)); }
+            function getLevelUpCost(level) { return Math.floor(40 + (level - 1) * 12 + Math.pow(level, 1.4)); }
+            function getCardCounts() { const c = { 'A':0,'P':0,'G':0,'B':0,'C':0,'D':0,'E':0 }; for (const card of _cardHistory) if (card.rank && c[card.rank] !== undefined) c[card.rank]++; return c; }
 
-            function getLevelUpCost(level) {
-                return Math.floor(40 + (level - 1) * 12 + Math.pow(level, 1.4));
-            }
-
-            function getOrePerClick() {
-                let bonus = Math.floor(_level / 10);
-                let minOre = 3 + bonus;
-                let maxOre = 6 + bonus;
-                return Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
-            }
-
-            function getRandomRank() {
-                if (Math.random() * 1000 < 5) return null;
-                const rand = Math.random() * 100;
-                if (rand < 1) return 'A';
-                if (rand < 2) return 'P';
-                if (rand < 3) return 'G';
-                if (rand < 11) return 'B';
-                if (rand < 19) return 'C';
-                if (rand < 39) return 'D';
-                return 'E';
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            function showToast(msg, color) {
-                const toast = document.createElement('div');
-                toast.className = 'toast-notification';
-                toast.textContent = msg;
-                toast.style.borderLeftColor = color || '#ffcc66';
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 2000);
-            }
-
-            function saveGame() {
-                const saveData = {
-                    ore: _ore,
-                    diamonds: _diamonds,
-                    level: _level,
-                    strikesDone: _strikesDone,
-                    strikesLimit: _strikesLimit,
-                    lastBonusDate: _lastBonusDate ? _lastBonusDate.toISOString() : null,
-                    lastUpgradeDate: _lastUpgradeDate ? _lastUpgradeDate.toISOString() : null,
-                    cardHistory: _cardHistory,
-                    playerId: _playerId,
-                    playerName: _playerName,
-                    achievements: _achievements,
-                    quests: _quests,
-                    lastQuestReset: _lastQuestReset
-                };
-                localStorage.setItem('minebuff_save', JSON.stringify(saveData));
-                if (supabaseClient && _playerId && _playerName && !syncInProgress) syncToSupabase();
-            }
-
-            function loadGame() {
-                const saved = localStorage.getItem('minebuff_save');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        _ore = Math.min(data.ore || 0, 10000000);
-                        _diamonds = Math.min(data.diamonds || 0, 100000);
-                        _level = Math.min(data.level || 1, 1000);
-                        _strikesDone = data.strikesDone || 0;
-                        _strikesLimit = Math.min(data.strikesLimit || 100, 10000);
-                        if (data.lastBonusDate) _lastBonusDate = new Date(data.lastBonusDate);
-                        if (data.lastUpgradeDate) _lastUpgradeDate = new Date(data.lastUpgradeDate);
-                        _cardHistory = data.cardHistory ? data.cardHistory.slice(0, 30) : [];
-                        _playerId = data.playerId;
-                        _playerName = data.playerName;
-                        _achievements = data.achievements || {};
-                        _quests = data.quests || {};
-                        _lastQuestReset = data.lastQuestReset;
-                    } catch(e) {}
+            // ============ СУНДУК ============
+            function checkChest() {
+                if (_pendingChest) return;
+                if (Math.random() < 0.02) {
+                    _pendingChest = { isOpened: false };
+                    document.getElementById('chestModal').classList.add('show');
                 }
+            }
 
-                if (!_playerId) {
-                    _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-                }
-
-                for (const a of achievementsList) {
-                    if (_achievements[a.id] === undefined) _achievements[a.id] = false;
-                }
-
-                const now = new Date();
-                if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
-                    for (const q of questsList) {
-                        _quests[q.id] = { current: 0, completed: false };
-                    }
-                    _lastQuestReset = now.toISOString();
+            function openChest() {
+                if (!_pendingChest || _pendingChest.isOpened) return;
+                const isLegendary = Math.random() < 0.1;
+                let reward = {};
+                if (isLegendary) {
+                    const legendaryRewards = [
+                        { type: 'diamonds', amount: 50, text: '💎 50 алмазов!' },
+                        { type: 'ore', amount: 1000, text: '⛏️ 1000 руды!' },
+                        { type: 'card', rank: 'A', text: '🎴 КАРТА РАНГА A!' }
+                    ];
+                    reward = legendaryRewards[Math.floor(Math.random() * legendaryRewards.length)];
                 } else {
-                    for (const q of questsList) {
-                        if (!_quests[q.id]) _quests[q.id] = { current: 0, completed: false };
-                    }
+                    const normalRewards = [
+                        { type: 'diamonds', amount: 5, text: '💎 5 алмазов' },
+                        { type: 'diamonds', amount: 10, text: '💎 10 алмазов' },
+                        { type: 'ore', amount: 50, text: '⛏️ 50 руды' },
+                        { type: 'ore', amount: 100, text: '⛏️ 100 руды' },
+                        { type: 'card', rank: 'D', text: '🎴 Карта ранга D' },
+                        { type: 'card', rank: 'C', text: '🎴 Карта ранга C' }
+                    ];
+                    reward = normalRewards[Math.floor(Math.random() * normalRewards.length)];
                 }
-
-                if (!_playerName || _playerName === "Игрок") {
-                    showNameModal();
-                } else {
-                    document.getElementById('playerName').innerText = _playerName;
-                    document.getElementById('playerId').innerText = _playerId.slice(-12);
+                _pendingChest = { ...reward, isOpened: true };
+                if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💰 +${reward.amount} алмазов!`, "#ffcc66"); }
+                else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); }
+                else if (reward.type === 'card') {
+                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank });
+                    showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966");
                 }
+                document.getElementById('chestIcon').innerHTML = reward.text.includes('💎') ? '💎' : (reward.text.includes('⛏️') ? '⛏️' : '🎴');
+                document.getElementById('chestReward').innerHTML = reward.text;
+                saveGame(); updateUI();
+                setTimeout(() => { document.getElementById('chestModal').classList.remove('show'); _pendingChest = null; }, 2000);
+            }
 
-                checkDailyReset();
+            // ============ PVP С РЕАЛЬНЫМИ ИГРОКАМИ ============
+            async function joinQueue() {
+                if (!supabaseClient) { showToast("⏳ Подключение к серверу...", "#ffaa88"); return; }
+                if (_diamonds < 1) { showToast("❌ Нужен 1 алмаз для ставки!", "#ff8888"); return; }
+                if (isInQueue) return;
+                
+                // Снимаем 1 алмаз
+                _diamonds -= 1;
+                saveGame();
                 updateUI();
-                checkAchievements();
+                
+                isInQueue = true;
+                document.getElementById('findBattleBtn').style.display = 'none';
+                document.getElementById('leaveQueueBtn').style.display = 'block';
+                document.getElementById('battleLoading').style.display = 'block';
+                
+                // Добавляем в очередь
+                await supabaseClient.from('pvp_queue').insert({
+                    player_id: _playerId,
+                    username: _playerName,
+                    elo: _pvpElo,
+                    created_at: new Date().toISOString()
+                });
+                
+                updateQueueCount();
+                
+                // Запускаем поиск соперника
+                if (searchInterval) clearInterval(searchInterval);
+                searchInterval = setInterval(async () => {
+                    if (!isInQueue) {
+                        clearInterval(searchInterval);
+                        searchInterval = null;
+                        return;
+                    }
+                    
+                    const { data } = await supabaseClient
+                        .from('pvp_queue')
+                        .select('*')
+                        .neq('player_id', _playerId)
+                        .order('created_at', { ascending: true })
+                        .limit(1);
+                    
+                    if (data && data.length > 0) {
+                        const opponent = data[0];
+                        // Удаляем обоих из очереди
+                        await supabaseClient.from('pvp_queue').delete().eq('player_id', _playerId);
+                        await supabaseClient.from('pvp_queue').delete().eq('player_id', opponent.player_id);
+                        clearInterval(searchInterval);
+                        searchInterval = null;
+                        startBattleWith(opponent);
+                    }
+                }, 2000);
+            }
+            
+            async function updateQueueCount() {
+                if (!supabaseClient) return;
+                const { count } = await supabaseClient.from('pvp_queue').select('*', { count: 'exact', head: true });
+                document.getElementById('queueCount').innerText = count || 0;
+            }
+            
+            async function leaveQueue() {
+                if (!isInQueue) return;
+                
+                isInQueue = false;
+                if (searchInterval) {
+                    clearInterval(searchInterval);
+                    searchInterval = null;
+                }
+                
+                // Удаляем из очереди в Supabase
+                try {
+                    await supabaseClient.from('pvp_queue').delete().eq('player_id', _playerId);
+                    showToast("✅ Вы покинули очередь. Алмаз возвращён?", "#aaffdd");
+                } catch(e) {
+                    console.warn("Ошибка при выходе из очереди:", e);
+                }
+                
+                // Возвращаем алмаз (если не нашли соперника)
+                _diamonds += 1;
+                saveGame();
+                updateUI();
+                
+                document.getElementById('findBattleBtn').style.display = 'block';
+                document.getElementById('leaveQueueBtn').style.display = 'none';
+                document.getElementById('battleLoading').style.display = 'none';
+            }
+            
+            async function startBattleWith(opponent) {
+                isInQueue = false;
+                document.getElementById('battleLoading').style.display = 'none';
+                document.getElementById('findBattleBtn').style.display = 'block';
+                document.getElementById('leaveQueueBtn').style.display = 'none';
+                
+                // Симуляция боя (шанс победы зависит от разницы ELO)
+                const winChance = 1 / (1 + Math.pow(10, (opponent.elo - _pvpElo) / 400));
+                const isWin = Math.random() < winChance;
+                const eloChange = Math.round(32 * (isWin ? 1 - winChance : 0 - winChance));
+                
+                if (isWin) {
+                    _pvpWins++; _pvpStreak++; _pvpElo = Math.max(100, _pvpElo + Math.abs(eloChange));
+                    _diamonds += 2; // +2 алмаза (1 свой вернулся + 1 выигрыш)
+                    _battleHistory.unshift({ result: 'win', opponent: opponent.username, eloChange: `+${Math.abs(eloChange)}`, reward: '+2💎' });
+                    showBattleResult('ПОБЕДА! 🎉', `Вы победили ${opponent.username}!`, '+2💎 (выигрыш)');
+                } else {
+                    _pvpLosses++; _pvpStreak = 0; _pvpElo = Math.max(100, _pvpElo - Math.abs(eloChange));
+                    _battleHistory.unshift({ result: 'lose', opponent: opponent.username, eloChange: `-${Math.abs(eloChange)}`, reward: '-1💎' });
+                    showBattleResult('ПОРАЖЕНИЕ... 💀', `Вы проиграли ${opponent.username}!`, '-1💎 (ставка проиграна)');
+                }
+                
+                if (_battleHistory.length > 20) _battleHistory.pop();
+                saveGame(); updatePVPUI(); updateUI();
+            }
+            
+            function showBattleResult(title, text, reward) {
+                document.getElementById('battleResultTitle').innerHTML = title;
+                document.getElementById('battleResultText').innerHTML = text;
+                document.getElementById('battleReward').innerHTML = reward;
+                document.getElementById('battleResultModal').classList.add('show');
+            }
+            
+            function updatePVPUI() {
+                document.getElementById('pvpElo').innerText = Math.floor(_pvpElo);
+                document.getElementById('pvpWLRatio').innerText = `${_pvpWins}/${_pvpLosses}`;
+                document.getElementById('pvpStreak').innerText = _pvpStreak;
+                const container = document.getElementById('battleHistoryContainer');
+                if (!_battleHistory.length) container.innerHTML = '<span style="opacity:0.6;">— нет боёв —</span>';
+                else container.innerHTML = _battleHistory.map(b => `<div class="battle-item ${b.result}"><span>⚔️ vs ${b.result === 'win' ? '🏆' : '💀'} ${escapeHtml(b.opponent)}</span><span class="battle-reward">${b.eloChange} ${b.reward}</span></div>`).join('');
             }
 
-            function showNameModal() {
-                const modal = document.getElementById('nameModal');
-                document.getElementById('playerNameInput').value = "";
-                modal.classList.add('show');
-
-                document.getElementById('saveNameBtn').onclick = () => {
-                    let newName = document.getElementById('playerNameInput').value.trim();
-                    if (!newName) newName = "Игрок_" + _playerId.slice(-6);
-                    if (newName.length > 20) newName = newName.slice(0, 20);
-                    _playerName = newName;
-                    saveGame();
-                    document.getElementById('playerName').innerText = _playerName;
-                    modal.classList.remove('show');
-                    showToast(`👤 Добро пожаловать, ${_playerName}!`, "#aaffdd");
-                    if (supabaseClient) syncToSupabase();
-                };
+            // ============ ОБМЕН КАРТ ============
+            function performExchange(rule) {
+                const counts = getCardCounts();
+                if (counts[rule.from] < rule.need) { showToast(`❌ Нужно ${rule.need} карт ${rule.from}!`, "#ff8888"); return; }
+                let removed = 0;
+                const newHistory = [];
+                for (const card of _cardHistory) {
+                    if (card.rank === rule.from && removed < rule.need) { removed++; continue; }
+                    newHistory.push(card);
+                }
+                _cardHistory = newHistory;
+                _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🔄 Обмен: ${rule.need}x${rule.from} → ${rule.to}`, rank: rule.to });
+                saveGame(); updateUI();
+                showToast(`✅ Обмен выполнен! +1 карта ${rule.to}`, "#aaffdd");
+            }
+            
+            function updateExchangeGrid() {
+                const container = document.getElementById('exchangeGrid');
+                if (!container) return;
+                const counts = getCardCounts();
+                container.innerHTML = exchangeRules.map(rule => {
+                    const available = counts[rule.from] || 0;
+                    return `<div class="exchange-card ${available < rule.need ? 'disabled' : ''}" data-exchange="${rule.from}to${rule.to}">
+                        <div class="exchange-info"><div class="exchange-arrows"><span class="exchange-from">${rule.need}x ${rule.from}</span><span>→</span><span class="exchange-to">1x ${rule.to}</span></div><div class="exchange-count">📊 есть: ${available}/${rule.need}</div></div>
+                        <button class="exchange-action" ${available < rule.need ? 'disabled' : ''}>ОБМЕНЯТЬ</button>
+                    </div>`;
+                }).join('');
+                document.querySelectorAll('[data-exchange]').forEach(card => {
+                    const exchangeId = card.getAttribute('data-exchange');
+                    const rule = exchangeRules.find(r => `${r.from}to${r.to}` === exchangeId);
+                    const btn = card.querySelector('.exchange-action');
+                    if (rule && btn) btn.onclick = () => performExchange(rule);
+                });
             }
 
+            // ============ ОСНОВНАЯ ЛОГИКА ============
+            function addCardToHistory(rank) { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${rank}`, rank }); if (_cardHistory.length > 30) _cardHistory.pop(); updateUI(); saveGame(); showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966"); checkAchievements(); updateQuestProgress('daily_card', 1); }
+            function addNoCardToHistory() { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `❌ Карта не выпала (0.5%)`, rank: null }); if (_cardHistory.length > 30) _cardHistory.pop(); updateUI(); saveGame(); showToast(`❌ Не повезло...`, "#ff8888"); }
+            
             function checkAchievements() {
                 let any = false;
                 for (const a of achievementsList) {
@@ -1115,136 +1307,53 @@
                         else if (a.id === 'diamonds_50') completed = _diamonds >= 50;
                         else if (a.id === 'diamonds_200') completed = _diamonds >= 200;
                         else if (a.id === 'strikes_500') completed = _strikesDone >= 500;
-                        
-                        if (completed) {
-                            _achievements[a.id] = true;
-                            _diamonds += a.reward;
-                            any = true;
-                            showToast(`🏆 ${a.name}! +${a.reward}💎`, "#ffcc66");
-                        }
+                        if (completed) { _achievements[a.id] = true; _diamonds += a.reward; any = true; showToast(`🏆 ${a.name}! +${a.reward}💎`, "#ffcc66"); }
                     }
                 }
-                if (any) {
-                    saveGame();
-                    updateUI();
-                }
+                if (any) { saveGame(); updateUI(); }
                 updateAchievementsUI();
             }
-
+            
             function checkQuests() {
                 let any = false;
-                for (const q of questsList) {
-                    if (!_quests[q.id].completed && _quests[q.id].current >= q.target) {
-                        _quests[q.id].completed = true;
-                        _diamonds += q.reward;
-                        any = true;
-                        showToast(`📋 ${q.name} выполнено! +${q.reward}💎`, "#aaffdd");
-                    }
-                }
-                if (any) {
-                    saveGame();
-                    updateUI();
-                }
+                for (const q of questsList) if (!_quests[q.id]?.completed && _quests[q.id]?.current >= q.target) { _quests[q.id].completed = true; _diamonds += q.reward; any = true; showToast(`📋 ${q.name} выполнено! +${q.reward}💎`, "#aaffdd"); }
+                if (any) { saveGame(); updateUI(); }
                 updateQuestsUI();
             }
-
-            function updateQuestProgress(id, val) {
-                if (_quests[id] && !_quests[id].completed) {
-                    _quests[id].current += val;
-                    checkQuests();
-                    saveGame();
-                    updateUI();
-                }
-            }
-
+            
+            function updateQuestProgress(id, val) { if (_quests[id] && !_quests[id].completed) { _quests[id].current += val; checkQuests(); saveGame(); updateUI(); } }
+            
             function updateAchievementsUI() {
-                const container = document.getElementById('achievementsContent');
-                if (!container) return;
-
-                let done = 0;
-                for (const a of achievementsList) if (_achievements[a.id]) done++;
+                const c = document.getElementById('achievementsContent'); if (!c) return;
+                let done = achievementsList.filter(a => _achievements[a.id]).length;
                 document.getElementById('achievementsCount').innerHTML = `(${done}/${achievementsList.length})`;
-
-                container.innerHTML = achievementsList.map(a => `
-                    <div class="achievement-item">
-                        <div class="achievement-info">
-                            <div class="achievement-name">${a.name} ${_achievements[a.id] ? '✅' : '🔒'}</div>
-                            <div class="achievement-desc">${a.desc}</div>
-                        </div>
-                        <div class="achievement-reward">+${a.reward}💎</div>
-                    </div>
-                `).join('');
+                c.innerHTML = achievementsList.map(a => `<div class="achievement-item"><div><div>${a.name} ${_achievements[a.id] ? '✅' : '🔒'}</div><div style="font-size:10px;opacity:0.7;">${a.desc}</div></div><div>+${a.reward}💎</div></div>`).join('');
             }
-
+            
             function updateQuestsUI() {
-                const container = document.getElementById('questsContent');
-                if (!container) return;
-
-                let done = 0;
-                for (const q of questsList) if (_quests[q.id]?.completed) done++;
+                const c = document.getElementById('questsContent'); if (!c) return;
+                let done = questsList.filter(q => _quests[q.id]?.completed).length;
                 document.getElementById('questsProgress').innerHTML = `(${done}/${questsList.length})`;
-
-                container.innerHTML = questsList.map(q => {
-                    const cur = _quests[q.id]?.current || 0;
-                    const pct = Math.min(100, Math.floor(cur / q.target * 100));
-                    return `
-                        <div class="quest-item">
-                            <div class="quest-info">
-                                <div class="quest-name">${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div>
-                                <div class="quest-desc">${q.desc} (${cur}/${q.target})</div>
-                                <div style="background:#2a3a2a; border-radius:20px; height:4px; margin-top:5px;">
-                                    <div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div>
-                                </div>
-                            </div>
-                            <div class="quest-reward">+${q.reward}💎</div>
-                        </div>
-                    `;
-                }).join('');
+                c.innerHTML = questsList.map(q => { const cur = _quests[q.id]?.current || 0; const pct = Math.min(100, Math.floor(cur / q.target * 100)); return `<div class="quest-item"><div><div>${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div><div>${q.desc} (${cur}/${q.target})</div><div style="background:#2a3a2a; border-radius:20px; height:4px; width:100%; margin-top:5px;"><div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div></div></div><div>+${q.reward}💎</div></div>`; }).join('');
             }
-
+            
             function checkDailyReset() {
                 const today = new Date().toDateString();
                 const lastReset = localStorage.getItem('minebuff_last_reset');
-                if (lastReset !== today) {
-                    _strikesDone = 0;
-                    _strikesLimit = 100;
-                    localStorage.setItem('minebuff_last_reset', today);
-                    saveGame();
-                }
+                if (lastReset !== today) { _strikesDone = 0; _strikesLimit = 100; localStorage.setItem('minebuff_last_reset', today); saveGame(); }
                 if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
-
                 const levelBtn = document.getElementById('levelUpBtn');
-                if (levelBtn) {
-                    if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) {
-                        levelBtn.classList.add('disabled');
-                    } else {
-                        levelBtn.classList.remove('disabled');
-                    }
+                if (levelBtn) { if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) levelBtn.classList.add('disabled'); else levelBtn.classList.remove('disabled'); }
+                
+                const now = new Date();
+                if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
+                    for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
+                    _lastQuestReset = now.toISOString();
+                    saveGame();
+                    updateQuestsUI();
                 }
             }
-
-            function addCardToHistory(rank) {
-                _cardHistory.unshift({ text: `🎴 Карта ранга ${rank}`, rank: rank });
-                if (_cardHistory.length > 30) _cardHistory.pop();
-                updateUI();
-                saveGame();
-                showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966");
-                checkAchievements();
-                updateQuestProgress('daily_card', 1);
-            }
-
-            function addNoCardToHistory() {
-                _cardHistory.unshift({ text: `❌ Карта не выпала (0.5%)`, rank: null });
-                if (_cardHistory.length > 30) _cardHistory.pop();
-                updateUI();
-                saveGame();
-                showToast(`❌ Не повезло...`, "#ff8888");
-            }
-
-            function getFormattedHistory() {
-                return _cardHistory.map((item, idx) => `${idx + 1}. ${item.text}`).join('\n') || "— нет карт —";
-            }
-
+            
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
                 document.getElementById('diamondValue').innerText = Math.floor(_diamonds);
@@ -1254,98 +1363,146 @@
                 document.getElementById('profileLevel').innerText = _level;
                 document.getElementById('profileDiamonds').innerText = Math.floor(_diamonds);
                 document.getElementById('profileCards').innerText = _cardHistory.length;
-
-                const maxSlider = Math.min(_ore, 10000);
+                const maxS = Math.min(_ore, 10000);
                 const slider = document.getElementById('exchangeSlider');
-                slider.max = maxSlider;
-                if (slider.value > maxSlider) slider.value = maxSlider;
-                document.getElementById('exchangeAmount').innerText = slider.value;
-
+                if (slider) { slider.max = maxS; if (slider.value > maxS) slider.value = maxS; document.getElementById('exchangeAmount').innerText = slider.value; }
                 const today = new Date().toDateString();
                 const bonusBlock = document.getElementById('bonusBlock');
-                if (_lastBonusDate && _lastBonusDate.toDateString() === today) {
-                    bonusBlock.classList.add('hidden');
-                } else {
-                    bonusBlock.classList.remove('hidden');
-                }
-
+                if (bonusBlock) { if (_lastBonusDate && _lastBonusDate.toDateString() === today) bonusBlock.classList.add('hidden'); else bonusBlock.classList.remove('hidden'); }
                 const historyContainer = document.getElementById('historyContainer');
                 if (historyContainer) {
-                    if (!_cardHistory.length) {
-                        historyContainer.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
-                    } else {
-                        historyContainer.innerHTML = _cardHistory.map(item => `
-                            <div class="history-item" style="background: ${rankGradients[item.rank] || '#3a2a2a'};">${escapeHtml(item.text)}</div>
-                        `).join('');
-                    }
+                    if (!_cardHistory.length) historyContainer.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
+                    else historyContainer.innerHTML = _cardHistory.map(i => `<div class="history-item" style="background: ${rankGradients[i.rank] || '#3a2a2a'};">${escapeHtml(i.text)}</div>`).join('');
                 }
-
-                updateAchievementsUI();
-                updateQuestsUI();
+                const counts = getCardCounts();
+                const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
+                if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
+                if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
+                updateExchangeGrid();
+                updatePVPUI();
             }
-
-            // ============ ОСНОВНЫЕ ДЕЙСТВИЯ ИГРОКА ============
-            window.mineOre = function() {
-                if (_strikesDone >= _strikesLimit) {
-                    showToast("⛔ Лимит ударов", "#ff8c6e");
-                    return;
+            
+            function saveGame() {
+                const saveData = {
+                    ore: _ore, diamonds: _diamonds, level: _level, strikesDone: _strikesDone, strikesLimit: _strikesLimit,
+                    lastBonusDate: _lastBonusDate?.toISOString(), lastUpgradeDate: _lastUpgradeDate?.toISOString(),
+                    cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
+                    pvpElo: _pvpElo, pvpWins: _pvpWins, pvpLosses: _pvpLosses, pvpStreak: _pvpStreak, battleHistory: _battleHistory,
+                    achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset
+                };
+                localStorage.setItem('minebuff_save', JSON.stringify(saveData));
+                if (supabaseClient && _playerId && _playerName) syncToSupabase();
+            }
+            
+            function loadGame() {
+                const saved = localStorage.getItem('minebuff_save');
+                if (saved) {
+                    try {
+                        const d = JSON.parse(saved);
+                        _ore = d.ore || 0; _diamonds = d.diamonds || 0; _level = d.level || 1;
+                        _strikesDone = d.strikesDone || 0; _strikesLimit = d.strikesLimit || 100;
+                        if (d.lastBonusDate) _lastBonusDate = new Date(d.lastBonusDate);
+                        if (d.lastUpgradeDate) _lastUpgradeDate = new Date(d.lastUpgradeDate);
+                        _cardHistory = d.cardHistory || []; _playerId = d.playerId; _playerName = d.playerName;
+                        _pvpElo = d.pvpElo || 1000; _pvpWins = d.pvpWins || 0; _pvpLosses = d.pvpLosses || 0;
+                        _pvpStreak = d.pvpStreak || 0; _battleHistory = d.battleHistory || [];
+                        _achievements = d.achievements || {}; _quests = d.quests || {}; _lastQuestReset = d.lastQuestReset;
+                    } catch(e) {}
                 }
-                const gain = getOrePerClick();
-                _ore += gain;
-                _strikesDone++;
-                showToast(`⛏️ +${gain} руды`, "#ffdd99");
-                saveGame();
-                updateUI();
-                updateQuestProgress('daily_mine', gain);
-                updateQuestProgress('daily_strikes', 1);
+                if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                for (const a of achievementsList) if (_achievements[a.id] === undefined) _achievements[a.id] = false;
+                const now = new Date();
+                if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
+                    for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
+                    _lastQuestReset = now.toISOString();
+                } else { for (const q of questsList) if (!_quests[q.id]) _quests[q.id] = { current: 0, completed: false }; }
+                if (!_playerName || _playerName === "Игрок") showNameModal();
+                else { document.getElementById('playerName').innerText = _playerName; document.getElementById('playerId').innerText = _playerId.slice(-12); }
+                checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
+            }
+            
+            function showNameModal() {
+                const modal = document.getElementById('nameModal');
+                modal.style.display = 'flex';
+                document.getElementById('saveNameBtn').onclick = () => {
+                    let newName = document.getElementById('playerNameInput').value.trim();
+                    if (!newName) newName = "Игрок_" + _playerId.slice(-6);
+                    if (newName.length > 20) newName = newName.slice(0, 20);
+                    _playerName = newName; saveGame();
+                    document.getElementById('playerName').innerText = _playerName;
+                    document.getElementById('playerId').innerText = _playerId.slice(-12);
+                    modal.style.display = 'none';
+                    showToast(`👤 Добро пожаловать, ${_playerName}!`, "#aaffdd");
+                    if (supabaseClient) syncToSupabase();
+                };
+            }
+            
+            // ============ SUPABASE ============
+            async function syncToSupabase() {
+                if (!supabaseClient || !_playerId || !_playerName) return;
+                try { await supabaseClient.from('leaderboard').upsert({ player_id: _playerId, username: _playerName, level: _level, diamonds: _diamonds, updated_at: new Date().toISOString() }, { onConflict: 'player_id' }); } catch(e) {}
+            }
+            
+            async function loadTopFromSupabase() {
+                if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
+                try {
+                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id').order('level', { ascending: false });
+                    const container = document.getElementById('topList');
+                    const rankBlock = document.getElementById('playerRankBlock');
+                    const rankSpan = document.getElementById('playerRank');
+                    const totalSpan = document.getElementById('totalPlayersCount');
+                    if (!data || !data.length) { container.innerHTML = '<li>Пока никого</li>'; if (rankBlock) rankBlock.style.display = 'none'; if (totalSpan) totalSpan.innerText = 'Всего: 0'; return; }
+                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${data.length}`;
+                    const top10 = data.slice(0, 10);
+                    container.innerHTML = top10.map((p, i) => { const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.'; const isCurrent = p.player_id === _playerId; return `<li class="${isCurrent ? 'current-player' : ''}"><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`; }).join('');
+                    const playerIndex = data.findIndex(p => p.player_id === _playerId);
+                    if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.)`; rankBlock.style.display = 'block'; }
+                    else rankBlock.style.display = 'none';
+                } catch(e) { console.warn(e); }
+            }
+            
+            function initSupabase() {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                s.onload = () => {
+                    supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4');
+                    setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); }, 500);
+                    setInterval(() => { if (isInQueue) updateQueueCount(); }, 3000);
+                };
+                document.head.appendChild(s);
+            }
+            
+            function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
+            
+            // ============ СОБЫТИЯ ============
+            window.mineOre = function() {
+                if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
+                const gain = getOrePerClick(); _ore += gain; _strikesDone++;
+                showToast(`⛏️ +${gain} руды`, "#ffdd99"); saveGame(); updateUI();
+                updateQuestProgress('daily_mine', gain); updateQuestProgress('daily_strikes', 1);
                 checkAchievements();
-                
-                const btn = document.getElementById('pickaxeBtn');
-                btn.style.transform = 'scale(0.92)';
-                setTimeout(() => btn.style.transform = '', 90);
+                document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
+                setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
+                checkChest();
             };
-
+            
             window.claimBonus = function() {
                 const today = new Date().toDateString();
-                if (_lastBonusDate && _lastBonusDate.toDateString() === today) {
-                    showToast("❗ Бонус уже получен", "#ffaa88");
-                    return;
-                }
-                _diamonds += 5;
-                _lastBonusDate = new Date();
-                saveGame();
-                updateUI();
-                showToast("💎 +5 АЛМАЗОВ", "#aaffdd");
-                checkAchievements();
+                if (_lastBonusDate && _lastBonusDate.toDateString() === today) { showToast("❗ Бонус уже получен", "#ffaa88"); return; }
+                _diamonds += 5; _lastBonusDate = new Date(); saveGame(); updateUI(); showToast("💎 +5 АЛМАЗОВ", "#aaffdd"); checkAchievements();
             };
-
+            
             window.exchangeOreToDiamonds = function() {
-                let amount = parseInt(document.getElementById('exchangeSlider').value);
-                if (amount <= 0) {
-                    showToast("Выберите количество", "#ffaa88");
-                    return;
-                }
-                const gain = Math.floor(amount / 100);
-                if (gain && _ore >= gain * 100) {
-                    _ore -= gain * 100;
-                    _diamonds += gain;
-                    showToast(`💎 +${gain} алмаз(а)`, "#aaffdd");
-                    document.getElementById('exchangeSlider').value = 0;
-                    document.getElementById('exchangeAmount').innerText = 0;
-                    saveGame();
-                    updateUI();
-                    checkAchievements();
-                } else {
-                    showToast("Нужно минимум 100 руды", "#ffaa88");
-                }
+                let amt = parseInt(document.getElementById('exchangeSlider').value);
+                if (amt <= 0) { showToast("Выберите количество", "#ffaa88"); return; }
+                const gain = Math.floor(amt / 100);
+                if (gain && _ore >= gain * 100) { _ore -= gain * 100; _diamonds += gain; showToast(`💎 +${gain} алмаз(а)`, "#aaffdd"); document.getElementById('exchangeSlider').value = 0; document.getElementById('exchangeAmount').innerText = 0; saveGame(); updateUI(); checkAchievements(); }
+                else showToast("Нужно минимум 100 руды", "#ffaa88");
             };
-
+            
             window.showLevelUpModal = function() {
                 const today = new Date().toDateString();
-                if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) {
-                    showToast("⏰ Только 1 раз в сутки!", "#ffaa88");
-                    return;
-                }
+                if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) { showToast("⏰ Только 1 раз в сутки!", "#ffaa88"); return; }
                 const cost = getLevelUpCost(_level);
                 document.getElementById('modalCurrentLevel').innerText = _level;
                 document.getElementById('modalNextLevel').innerText = _level + 1;
@@ -1353,193 +1510,74 @@
                 document.getElementById('modalDiamonds').innerText = _diamonds;
                 document.getElementById('levelModal').classList.add('show');
             };
-
+            
             window.performUpgrade = function() {
                 const cost = getLevelUpCost(_level);
                 if (_diamonds >= cost) {
-                    _diamonds -= cost;
-                    _level++;
-                    _lastUpgradeDate = new Date();
+                    _diamonds -= cost; _level++; _lastUpgradeDate = new Date();
                     updateQuestProgress('daily_upgrade', 1);
-                    const newRank = getRandomRank();
-                    if (newRank) addCardToHistory(newRank);
-                    else addNoCardToHistory();
-                    saveGame();
-                    updateUI();
-                    showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
+                    const r = getRandomRank();
+                    if (r) addCardToHistory(r); else addNoCardToHistory();
+                    saveGame(); updateUI(); showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
                     if (supabaseClient) syncToSupabase();
                     checkAchievements();
-                } else {
-                    showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
-                }
+                } else showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
                 document.getElementById('levelModal').classList.remove('show');
             };
-
-            window.closeModal = function() {
-                document.getElementById('levelModal').classList.remove('show');
-            };
-
+            
+            window.closeModal = () => document.getElementById('levelModal').classList.remove('show');
+            window.closeBattleResult = () => document.getElementById('battleResultModal').classList.remove('show');
             window.openTelegram = function() {
-                if (!_playerName) {
-                    showToast("⚠️ Укажите имя!", "#ffaa88");
-                    return;
-                }
-                const message = `🎴 ЗАПРОС КАРТЫ 🎴\n👤 ${_playerName}\n🆔 ${_playerId}\n⭐ Уровень ${_level}\n💎 ${_diamonds} алмазов\n📜 История:\n${getFormattedHistory()}`;
-                window.open(`https://t.me/+JGrSP24ks2wxODIy?text=${encodeURIComponent(message)}`, '_blank');
-                navigator.clipboard.writeText(message);
-                showToast("✅ Текст скопирован! Отправьте скриншот", "#aaffdd");
+                if (!_playerName) { showToast("⚠️ Укажите имя!", "#ffaa88"); return; }
+                const msg = `🎴 ЗАПРОС КАРТЫ 🎴\n👤 ${_playerName}\n🆔 ${_playerId}\n⭐ Уровень ${_level}\n💎 ${_diamonds} алмазов\n📜 Последние карты: ${_cardHistory.slice(0,3).map(c=>c.text).join(', ')}`;
+                window.open(`https://t.me/b_loody?text=${encodeURIComponent(msg)}`, '_blank');
+                showToast("✅ Отправьте скриншот в Telegram!", "#aaffdd");
             };
-
-            // ============ SUPABASE С ФУНКЦИЕЙ ОПРЕДЕЛЕНИЯ МЕСТА ============
-            async function syncToSupabase() {
-                if (syncInProgress || !supabaseClient || !_playerId || !_playerName) return;
-                syncInProgress = true;
-                try {
-                    await supabaseClient.from('leaderboard').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        level: _level,
-                        diamonds: _diamonds,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                } catch(e) {}
-                syncInProgress = false;
-            }
-
-            async function loadTopFromSupabase() {
-                if (!supabaseClient) {
-                    setTimeout(loadTopFromSupabase, 500);
-                    return;
-                }
-                try {
-                    // Загружаем всех игроков для определения места
-                    const { data: allPlayers } = await supabaseClient
-                        .from('leaderboard')
-                        .select('username, level, player_id')
-                        .order('level', { ascending: false });
-                    
-                    const container = document.getElementById('topList');
-                    const rankBlock = document.getElementById('playerRankBlock');
-                    const rankSpan = document.getElementById('playerRank');
-                    
-                    if (!allPlayers || !allPlayers.length) {
-                        container.innerHTML = '<li style="justify-content:center;opacity:0.5;">Пока никого</li>';
-                        if (rankBlock) rankBlock.style.display = 'none';
-                        return;
-                    }
-                    
-                    // Показываем топ-10
-                    const top10 = allPlayers.slice(0, 10);
-                    container.innerHTML = top10.map((player, idx) => {
-                        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1) + '.';
-                        const isCurrent = player.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}">
-                            <span>${medal} ${escapeHtml(player.username.slice(0, 15))}</span>
-                            <span>⭐ Ур.${player.level}</span>
-                        </li>`;
-                    }).join('');
-                    
-                    // Определяем место текущего игрока
-                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) {
-                        const playerRank = playerIndex + 1;
-                        rankSpan.innerText = `${playerRank} место (${_level} уровень)`;
-                        rankBlock.style.display = 'block';
-                        
-                        // Если игрок не в топ-10, добавляем его внизу списка
-                        if (playerIndex >= 10) {
-                            const playerData = allPlayers[playerIndex];
-                            const extraHtml = `
-                                <li class="current-player" style="margin-top: 10px; border-top: 1px solid #ffcc66;">
-                                    <span>📌 ${playerRank}. ${escapeHtml(playerData.username.slice(0, 15))}</span>
-                                    <span>⭐ Ур.${playerData.level}</span>
-                                </li>
-                            `;
-                            container.insertAdjacentHTML('beforeend', extraHtml);
-                        }
-                    } else {
-                        rankBlock.style.display = 'none';
-                    }
-                } catch(e) {
-                    console.warn(e);
-                }
-            }
-
-            function initSupabase() {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-                script.onload = () => {
-                    supabaseClient = window.supabase.createClient(
-                        'https://eixtvvioqolqeveellvn.supabase.co',
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4'
-                    );
-                    setTimeout(() => {
-                        syncToSupabase();
-                        loadTopFromSupabase();
-                    }, 500);
+            window.joinPvP = () => joinQueue();
+            window.leavePvPQueue = () => leaveQueue();
+            window.openChest = () => openChest();
+            
+            // Меню
+            const burger = document.getElementById('burgerMenu');
+            const sideMenu = document.getElementById('sideMenu');
+            const closeMenu = document.getElementById('closeMenu');
+            const menuItems = document.querySelectorAll('.menu-item');
+            burger.onclick = () => sideMenu.classList.add('show');
+            closeMenu.onclick = () => sideMenu.classList.remove('show');
+            sideMenu.onclick = (e) => { if (e.target === sideMenu) sideMenu.classList.remove('show'); };
+            menuItems.forEach(item => {
+                item.onclick = () => {
+                    const tab = item.dataset.tab;
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    let panelId = tab === 'mine' ? 'minePanel' : tab === 'profile' ? 'profilePanel' : tab === 'exchange' ? 'exchangePanel' : tab === 'pvp' ? 'pvpPanel' : 'topPanel';
+                    document.getElementById(panelId).classList.add('active');
+                    sideMenu.classList.remove('show');
+                    if (tab === 'top') loadTopFromSupabase();
+                    if (tab === 'exchange') updateExchangeGrid();
                 };
-                document.head.appendChild(script);
-            }
-
-            function initDropdowns() {
-                document.querySelectorAll('.dropdown-section').forEach(dropdown => {
-                    const header = dropdown.querySelector('.dropdown-header');
-                    const content = dropdown.querySelector('.dropdown-content');
-                    const arrow = header.querySelector('.dropdown-arrow');
-                    header.onclick = () => {
-                        content.classList.toggle('open');
-                        arrow.classList.toggle('open');
-                    };
-                });
-            }
-
-            function initTabs() {
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-                        
-                        const targetTab = btn.dataset.tab;
-                        if (targetTab === 'mine') {
-                            document.getElementById('minePanel').classList.add('active');
-                        } else if (targetTab === 'profile') {
-                            document.getElementById('profilePanel').classList.add('active');
-                        } else {
-                            document.getElementById('topPanel').classList.add('active');
-                            loadTopFromSupabase();
-                        }
-                    };
-                });
-            }
-
+            });
+            
             document.getElementById('pickaxeBtn').onclick = () => window.mineOre();
             document.getElementById('bonusBtn').onclick = () => window.claimBonus();
             document.getElementById('toDiamondsBtn').onclick = () => window.exchangeOreToDiamonds();
             document.getElementById('levelUpBtn').onclick = () => window.showLevelUpModal();
             document.getElementById('modalCloseBtn').onclick = () => window.closeModal();
             document.getElementById('modalUpgradeBtn').onclick = () => window.performUpgrade();
-            document.getElementById('forceSyncBtn').onclick = () => {
-                syncToSupabase();
-                loadTopFromSupabase();
-                showToast("✅ Синхронизация", "#aaffdd");
-            };
+            document.getElementById('forceSyncBtn').onclick = () => { syncToSupabase(); loadTopFromSupabase(); showToast("✅ Синхронизация", "#aaffdd"); };
             document.getElementById('claimCardBtn').onclick = () => window.openTelegram();
-            document.getElementById('exchangeSlider').oninput = (e) => {
-                document.getElementById('exchangeAmount').innerText = e.target.value;
-            };
-            document.getElementById('levelModal').onclick = (e) => {
-                if (e.target === document.getElementById('levelModal')) window.closeModal();
-            };
-
-            initTabs();
+            document.getElementById('findBattleBtn').onclick = () => window.joinPvP();
+            document.getElementById('leaveQueueBtn').onclick = () => window.leavePvPQueue();
+            document.getElementById('openChestBtn').onclick = () => window.openChest();
+            document.getElementById('closeBattleResultBtn').onclick = () => window.closeBattleResult();
+            document.getElementById('exchangeSlider').oninput = (e) => document.getElementById('exchangeAmount').innerText = e.target.value;
+            document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
+            
             initDropdowns();
             loadGame();
             initSupabase();
-            setInterval(() => {
-                checkDailyReset();
-                updateUI();
-            }, 30000);
+            setInterval(() => { checkDailyReset(); updateUI(); }, 30000);
         })();
     </script>
 </body>
