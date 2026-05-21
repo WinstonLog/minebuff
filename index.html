@@ -75,7 +75,7 @@
             display: block;
         }
 
-        .game-panel, .top-panel {
+        .game-panel, .top-panel, .profile-panel {
             background: rgba(8, 18, 28, 0.8);
             backdrop-filter: blur(12px);
             border-radius: 40px;
@@ -292,12 +292,114 @@
             margin: 10px 0;
         }
 
+        .level-up-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .claim-card-btn {
+            background: linear-gradient(135deg, #7a5a2a, #5a3a1a);
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dropdown-section {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 28px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-header:active {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-title {
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .dropdown-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .dropdown-content.open {
+            max-height: 400px;
+            padding: 12px;
+        }
+
+        .achievement-item, .quest-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f1a1fcc;
+            border-radius: 20px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .achievement-info, .quest-info {
+            flex: 1;
+        }
+
+        .achievement-name, .quest-name {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .achievement-desc, .quest-desc {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        .achievement-reward, .quest-reward {
+            font-size: 11px;
+            color: #aaffdd;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
         .history {
             background: #051016b3;
             border-radius: 28px;
             padding: 10px;
             max-height: 200px;
             overflow-y: auto;
+            margin-top: 12px;
         }
 
         .history-title {
@@ -516,13 +618,6 @@
             width: 100%;
         }
 
-        .name-modal .error-message {
-            color: #ff8888;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -552,11 +647,11 @@
 
         @media (max-width: 480px) {
             .app-wrapper { padding: 8px; }
-            .game-panel, .top-panel { padding: 12px; }
+            .game-panel, .top-panel, .profile-panel { padding: 12px; }
             .pickaxe-btn { width: 130px; height: 130px; }
             .pickaxe-icon { font-size: 45px; }
             .stat-value { font-size: 16px; }
-            .tab-btn { padding: 10px; font-size: 14px; }
+            .tab-btn { padding: 10px; font-size: 12px; }
         }
     </style>
 </head>
@@ -564,7 +659,8 @@
 <div class="app-wrapper">
     <div class="tabs">
         <div class="tab-btn active" data-tab="mine">⛏️ ШАХТА</div>
-        <div class="tab-btn" data-tab="top">🏆 ТОП</div>
+        <div class="tab-btn" data-tab="profile">🏆 ПРОФИЛЬ</div>
+        <div class="tab-btn" data-tab="top">🌍 ТОП</div>
     </div>
 
     <div class="tab-panel active" id="minePanel">
@@ -608,7 +704,11 @@
                 <div style="font-size: 10px; text-align:center; margin-top:6px;">100⛏️ = 1💎</div>
             </div>
 
-            <button class="level-up-btn" id="levelUpBtn">📈 ПОВЫСИТЬ УРОВЕНЬ</button>
+            <button class="level-up-btn" id="levelUpBtn">📈 ПОВЫСИТЬ УРОВЕНЬ (1 раз в сутки)</button>
+
+            <button class="claim-card-btn" id="claimCardBtn">
+                📸 ПОЛУЧИТЬ КАРТУ
+            </button>
 
             <div class="history">
                 <div class="history-title">📜 ИСТОРИЯ КАРТ</div>
@@ -617,23 +717,45 @@
         </div>
     </div>
 
+    <div class="tab-panel" id="profilePanel">
+        <div class="profile-panel">
+            <div class="stats" style="margin-bottom: 16px;">
+                <div class="stat-card"><div class="stat-label">⭐ УРОВЕНЬ</div><div class="stat-value" id="profileLevel">1</div></div>
+                <div class="stat-card"><div class="stat-label">💎 АЛМАЗЫ</div><div class="stat-value" id="profileDiamonds">0</div></div>
+                <div class="stat-card"><div class="stat-label">🎴 КАРТ</div><div class="stat-value" id="profileCards">0</div></div>
+            </div>
+
+            <div class="dropdown-section">
+                <div class="dropdown-header">
+                    <div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div>
+                    <div class="dropdown-arrow">▼</div>
+                </div>
+                <div class="dropdown-content" id="achievementsContent"></div>
+            </div>
+
+            <div class="dropdown-section">
+                <div class="dropdown-header">
+                    <div class="dropdown-title">📋 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ <span id="questsProgress">(0/4)</span></div>
+                    <div class="dropdown-arrow">▼</div>
+                </div>
+                <div class="dropdown-content" id="questsContent"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="tab-panel" id="topPanel">
         <div class="top-panel game-panel">
             <div style="font-weight: bold; font-size: 18px;">🏆 ТОП ИГРОКОВ</div>
             <div style="font-size: 11px; opacity: 0.7;">По уровню</div>
-            <ul class="top-list" id="topList">
-                <li style="justify-content: center; opacity: 0.5;">Загрузка топа...</li>
-            </ul>
-            <div style="font-size: 10px; opacity: 0.5; margin-top: 10px;">⚡ Данные синхронизируются с облаком</div>
-            <button id="forceSyncBtn" style="margin-top: 15px; background: #3a6b58; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 11px; cursor: pointer;">🔄 Принудительная синхронизация</button>
+            <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
+            <button id="forceSyncBtn" style="margin-top: 15px; background: #3a6b58; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 11px; cursor: pointer;">🔄 Синхронизация</button>
         </div>
     </div>
 
     <div class="footer">
         <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
-        <div style="margin-top: 8px;">
-            <a href="https://yoomoney.ru/to/4100119003253255" target="_blank" class="support-link">❤️ ПОДДЕРЖАТЬ</a>
-        </div>
+        <div style="margin-top: 8px;"><a href="https://yoomoney.ru/to/4100119003253255" target="_blank" class="support-link">❤️ ПОДДЕРЖАТЬ</a></div>
+        <div style="margin-top: 12px; font-size: 10px; opacity: 0.6; border-top: 1px solid #3a6b58; padding-top: 10px;">⚠️ Данный проект является фанатским и не связан с mangabuff.ru<br>Все карты выдаются от лица @b_loody</div>
     </div>
 </div>
 
@@ -655,306 +777,55 @@
 <div class="name-modal" id="nameModal">
     <div class="name-modal-content">
         <div class="name-modal-title">🌟 ДОБРО ПОЖАЛОВАТЬ!</div>
-        <div style="font-size: 14px; opacity: 0.8;">Введите ваше имя для топа:</div>
+        <div style="font-size: 14px; opacity: 0.8;">Введите ваше имя:</div>
         <input type="text" id="playerNameInput" placeholder="Ваше имя" maxlength="20">
-        <div class="error-message" id="nameError">⚠️ Это имя уже занято! Выберите другое.</div>
         <button id="saveNameBtn">ПОДТВЕРДИТЬ</button>
     </div>
 </div>
 
 <script>
-    // ============ СЕКРЕТНЫЙ АДМИН-КЛЮЧ ============
-    const ADMIN_SECRET_KEY = "MineBuffAdmin2024";
-    
-    // ============ SUPABASE КОНФИГ ============
-    const SUPABASE_URL = 'https://eixtvvioqolqeveellvn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4';
-
-    // ============ ВСЯ ЛОГИКА ============
     (function() {
-        let isAdmin = false;
         let supabaseClient = null;
-        let isSavingName = false;
+        let syncInProgress = false;
         
-        const rankGradients = {
-            'A': 'linear-gradient(135deg, #5a1a1a, #3a0808)',
-            'P': 'linear-gradient(135deg, #102b4e, #061b33)',
-            'G': 'linear-gradient(135deg, #1c4620, #0c2a0f)',
-            'B': 'linear-gradient(135deg, #3a1e52, #22113a)',
-            'C': 'linear-gradient(135deg, #b8a35c, #8b763a)',
-            'D': 'linear-gradient(135deg, #6e8f9e, #4b6878)',
-            'E': 'linear-gradient(135deg, #a17654, #7b5338)'
-        };
-
-        let _ore = 0;
-        let _diamonds = 0;
-        let _level = 1;
-        let _strikesDone = 0;
-        let _strikesLimit = 100;
-        let _lastBonusDate = null;
-        let _cardHistory = [];
-        let _playerId = null;
-        let _playerName = null;
-
-        // ============ ПРОВЕРКА УНИКАЛЬНОСТИ ИМЕНИ ============
-        async function isNameTaken(name) {
-            if (!supabaseClient) return false;
-            try {
-                const { data, error } = await supabaseClient
-                    .from('leaderboard')
-                    .select('username')
-                    .eq('username', name);
-                
-                if (error) throw error;
-                // Имя занято, если есть запись И это не наш текущий игрок
-                return data && data.length > 0 && data[0].username !== _playerName;
-            } catch(e) {
-                console.warn("Ошибка проверки имени:", e);
-                return false;
-            }
-        }
-
-        // ============ ПОДКЛЮЧЕНИЕ К SUPABASE ============
-        function initSupabase() {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-            script.onload = () => {
-                const { createClient } = window.supabase;
-                supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-                console.log("✅ Supabase клиент инициализирован");
-                setTimeout(() => {
-                    if (_playerId && _playerName) {
-                        syncToSupabase();
-                    }
-                    loadTopFromSupabase();
-                }, 1000);
-            };
-            script.onerror = () => {
-                console.warn("❌ Не удалось загрузить Supabase библиотеку");
-                document.getElementById('topList').innerHTML = '<li style="justify-content: center; opacity: 0.5;">⚠️ Ошибка подключения к Supabase</li>';
-            };
-            document.head.appendChild(script);
-        }
-
-        async function syncToSupabase() {
-            if (!supabaseClient || !_playerId || !_playerName) return;
-            try {
-                const { error } = await supabaseClient
-                    .from('leaderboard')
-                    .upsert({ 
-                        player_id: _playerId, 
-                        username: _playerName, 
-                        level: _level, 
-                        diamonds: _diamonds,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                if (error) console.warn("Ошибка синхронизации:", error);
-                else console.log("☁️ Синхронизация успешна");
-            } catch(e) { console.warn("Ошибка синхронизации:", e); }
-        }
-
-        async function forceSyncToSupabase() {
-            await syncToSupabase();
-            await loadTopFromSupabase();
-            showToast("✅ Данные синхронизированы!", "#aaffdd");
-        }
-
-        async function loadTopFromSupabase() {
-            if (!supabaseClient) {
-                setTimeout(() => loadTopFromSupabase(), 500);
-                return;
-            }
-            try {
-                const { data, error } = await supabaseClient
-                    .from('leaderboard')
-                    .select('username, level, diamonds, player_id')
-                    .order('level', { ascending: false })
-                    .limit(20);
-                if (error) throw error;
-                updateTopUI(data || []);
-            } catch(e) {
-                console.warn('Load top error:', e);
-                document.getElementById('topList').innerHTML = '<li style="justify-content: center; opacity: 0.5;">⚠️ Ошибка загрузки топа</li>';
-            }
-        }
-
-        function updateTopUI(players) {
-            const container = document.getElementById('topList');
-            if (!players || players.length === 0) {
-                container.innerHTML = '<li style="justify-content: center; opacity: 0.5;">Пока нет игроков</li>';
-                return;
-            }
-            container.innerHTML = players.slice(0, 10).map((p, idx) => {
-                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx+1}.`;
-                const isCurrent = p.player_id === _playerId;
-                return `<li class="${isCurrent ? 'current-player' : ''}">
-                    <span>${medal} ${escapeHtml(p.username.substring(0, 15))}</span>
-                    <span>⭐ Ур. ${p.level}</span>
-                </li>`;
-            }).join('');
-        }
-
-        // ============ АДМИН-ФУНКЦИИ ============
-        window.activateAdmin = function(key) {
-            if (key === ADMIN_SECRET_KEY) {
-                isAdmin = true;
-                document.getElementById('adminBadge').style.display = 'inline-block';
-                console.log("%c✅ АДМИН-РЕЖИМ АКТИВИРОВАН!", "color: #00ff00;");
-                console.log("Доступны: addOre(N), addDiamonds(N), setLevel(N), getStats(), resetDaily()");
-                showToast("🔓 Админ-режим активирован!", "#00ff88");
-            } else {
-                console.log("%c❌ Неверный ключ!", "color: #ff0000;");
-            }
-        };
+        // ============ УМЕНЬШЕННЫЕ НАГРАДЫ ============
+        const achievementsList = [
+            { id: 'level_5', name: 'Новичок', desc: '5 уровень', reward: 3 },
+            { id: 'level_10', name: 'Шахтёр', desc: '10 уровень', reward: 5 },
+            { id: 'level_25', name: 'Профи', desc: '25 уровень', reward: 8 },
+            { id: 'level_50', name: 'Мастер', desc: '50 уровень', reward: 12 },
+            { id: 'cards_5', name: 'Коллекционер', desc: '5 карт', reward: 2 },
+            { id: 'cards_15', name: 'Знаток карт', desc: '15 карт', reward: 4 },
+            { id: 'cards_30', name: 'Мастер карт', desc: '30 карт', reward: 7 },
+            { id: 'ore_1000', name: 'Золотая жила', desc: '1000 руды', reward: 3 },
+            { id: 'ore_10000', name: 'Богач', desc: '10000 руды', reward: 8 },
+            { id: 'diamonds_50', name: 'Блеск', desc: '50 алмазов', reward: 2 },
+            { id: 'diamonds_200', name: 'Сияние', desc: '200 алмазов', reward: 5 },
+            { id: 'strikes_500', name: 'Трудяга', desc: '500 ударов', reward: 3 }
+        ];
         
-        window.addOre = function(amount) {
-            if (!isAdmin) return;
-            if (amount > 0) { _ore += amount; saveGame(); updateUI(); showToast(`💰 +${amount} руды`, "#ffcc66"); }
-        };
+        // Ежедневные задания с маленькими наградами
+        const questsList = [
+            { id: 'daily_mine', name: 'Добыча', desc: '300 руды', target: 300, reward: 3 },
+            { id: 'daily_upgrade', name: 'Развитие', desc: 'Повысить уровень', target: 1, reward: 2 },
+            { id: 'daily_strikes', name: 'Активность', desc: '40 ударов', target: 40, reward: 2 },
+            { id: 'daily_card', name: 'Удача', desc: 'Получить карту', target: 1, reward: 4 }
+        ];
         
-        window.addDiamonds = function(amount) {
-            if (!isAdmin) return;
-            if (amount > 0) { _diamonds += amount; saveGame(); updateUI(); showToast(`💎 +${amount} алмазов`, "#aaffdd"); }
-        };
-        
-        window.setLevel = function(newLevel) {
-            if (!isAdmin) return;
-            if (newLevel >= 1 && newLevel <= 1000) { _level = newLevel; saveGame(); updateUI(); showToast(`⭐ Уровень ${newLevel}`, "#ffcc66"); syncToSupabase(); }
-        };
-        
-        window.getStats = function() {
-            if (!isAdmin) return;
-            console.log("📊 СТАТИСТИКА:", { имя: _playerName, руда: _ore, алмазы: _diamonds, уровень: _level, удары: `${_strikesDone}/${_strikesLimit}` });
-        };
-        
-        window.resetDaily = function() {
-            if (!isAdmin) return;
-            _strikesDone = 0; _strikesLimit = 100; saveGame(); updateUI(); showToast("🔄 Лимит сброшен", "#ffcc66");
-        };
-        
-        window.forceSync = function() {
-            if (!isAdmin) return;
-            forceSyncToSupabase();
-        };
-
-        // ============ СОХРАНЕНИЕ ============
-        function saveGame() {
-            const saveData = {
-                ore: _ore,
-                diamonds: _diamonds,
-                level: _level,
-                strikesDone: _strikesDone,
-                strikesLimit: _strikesLimit,
-                lastBonusDate: _lastBonusDate ? _lastBonusDate.toISOString() : null,
-                cardHistory: _cardHistory,
-                playerId: _playerId,
-                playerName: _playerName
-            };
-            localStorage.setItem('minebuff_save', JSON.stringify(saveData));
-            if (supabaseClient && _playerId && _playerName && !isSavingName) {
-                syncToSupabase();
-            }
+        // Стоимость уровня УВЕЛИЧЕНА
+        function getLevelUpCost(level) {
+            return Math.floor(40 + (level - 1) * 12 + Math.pow(level, 1.4));
         }
-
-        function loadGame() {
-            const saved = localStorage.getItem('minebuff_save');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (typeof data.ore === 'number') _ore = Math.min(data.ore, 10000000);
-                    if (typeof data.diamonds === 'number') _diamonds = Math.min(data.diamonds, 100000);
-                    if (typeof data.level === 'number') _level = Math.min(data.level, 1000);
-                    if (typeof data.strikesDone === 'number') _strikesDone = data.strikesDone;
-                    if (typeof data.strikesLimit === 'number') _strikesLimit = Math.min(data.strikesLimit, 10000);
-                    if (data.lastBonusDate) _lastBonusDate = new Date(data.lastBonusDate);
-                    if (Array.isArray(data.cardHistory)) _cardHistory = data.cardHistory.slice(0, 30);
-                    if (data.playerId) _playerId = data.playerId;
-                    if (data.playerName) _playerName = data.playerName;
-                } catch(e) {}
-            }
-            
-            if (!_playerId) {
-                _playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                saveGame();
-            }
-            
-            if (!_playerName || _playerName === "Игрок" || _playerName === "—") {
-                showNameModal();
-            } else {
-                document.getElementById('playerName').textContent = _playerName;
-                document.getElementById('playerId').textContent = _playerId.substr(-12);
-            }
-            
-            checkDailyReset();
-            updateUI();
+        
+        // Добыча за клик УМЕНЬШЕНА
+        function getOrePerClick() {
+            let bonus = Math.floor(_level / 10);
+            let minOre = 3 + bonus;
+            let maxOre = 6 + bonus;
+            return Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
         }
-
-        function showNameModal() {
-            const modal = document.getElementById('nameModal');
-            const input = document.getElementById('playerNameInput');
-            const errorDiv = document.getElementById('nameError');
-            input.value = "";
-            errorDiv.style.display = 'none';
-            modal.classList.add('show');
-            
-            // Убираем старый обработчик и вешаем новый
-            const saveBtn = document.getElementById('saveNameBtn');
-            const newSaveBtn = saveBtn.cloneNode(true);
-            saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-            
-            newSaveBtn.onclick = async () => {
-                if (isSavingName) return;
-                
-                let newName = input.value.trim();
-                if (newName.length === 0) {
-                    errorDiv.textContent = "⚠️ Имя не может быть пустым!";
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-                if (newName.length > 20) newName = newName.substring(0, 20);
-                
-                // Проверка на занятость имени
-                errorDiv.style.display = 'none';
-                isSavingName = true;
-                newSaveBtn.textContent = "ПРОВЕРКА...";
-                newSaveBtn.disabled = true;
-                
-                const taken = await isNameTaken(newName);
-                
-                if (taken && _playerName !== newName) {
-                    errorDiv.textContent = "⚠️ Это имя уже занято! Выберите другое.";
-                    errorDiv.style.display = 'block';
-                    newSaveBtn.textContent = "ПОДТВЕРДИТЬ";
-                    newSaveBtn.disabled = false;
-                    isSavingName = false;
-                    return;
-                }
-                
-                _playerName = newName;
-                saveGame();
-                document.getElementById('playerName').textContent = _playerName;
-                modal.classList.remove('show');
-                showToast(`👤 Добро пожаловать, ${_playerName}!`, "#aaffdd");
-                
-                if (supabaseClient) {
-                    await syncToSupabase();
-                    await loadTopFromSupabase();
-                }
-                
-                newSaveBtn.textContent = "ПОДТВЕРДИТЬ";
-                newSaveBtn.disabled = false;
-                isSavingName = false;
-            };
-            
-            // Ввод с клавиатуры (Enter)
-            input.onkeypress = (e) => {
-                if (e.key === 'Enter') {
-                    newSaveBtn.click();
-                }
-            };
-        }
-
-        // ============ ИГРОВАЯ ЛОГИКА ============
+        
+        // Шанс карты (0.5% не выпадает)
         function getRandomRank() {
             if (Math.random() * 1000 < 5) return null;
             const rand = Math.random() * 100;
@@ -966,227 +837,329 @@
             if (rand < 39) return 'D';
             return 'E';
         }
-
-        function getOrePerClick() {
-            let bonus = Math.floor(_level / 5);
-            let minOre = 5 + bonus;
-            let maxOre = 9 + bonus;
-            return Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
+        
+        const rankGradients = {
+            'A': 'linear-gradient(135deg, #5a1a1a, #3a0808)',
+            'P': 'linear-gradient(135deg, #102b4e, #061b33)',
+            'G': 'linear-gradient(135deg, #1c4620, #0c2a0f)',
+            'B': 'linear-gradient(135deg, #3a1e52, #22113a)',
+            'C': 'linear-gradient(135deg, #b8a35c, #8b763a)',
+            'D': 'linear-gradient(135deg, #6e8f9e, #4b6878)',
+            'E': 'linear-gradient(135deg, #a17654, #7b5338)'
+        };
+        
+        let _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0, _strikesLimit = 100;
+        let _lastBonusDate = null, _lastUpgradeDate = null, _cardHistory = [];
+        let _playerId = null, _playerName = null;
+        let _achievements = {}, _quests = {}, _lastQuestReset = null;
+        
+        function saveGame() {
+            localStorage.setItem('minebuff_save', JSON.stringify({
+                ore: _ore, diamonds: _diamonds, level: _level,
+                strikesDone: _strikesDone, strikesLimit: _strikesLimit,
+                lastBonusDate: _lastBonusDate?.toISOString(), lastUpgradeDate: _lastUpgradeDate?.toISOString(),
+                cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
+                achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset
+            }));
+            if (supabaseClient && _playerId && _playerName && !syncInProgress) syncToSupabase();
         }
-
-        function getLevelUpCost(level) {
-            return Math.floor(30 + (level - 1) * 8 + Math.pow(level, 1.3));
-        }
-
-        function checkDailyReset() {
-            const now = new Date();
-            const todayStr = now.toDateString();
-            const lastReset = localStorage.getItem('minebuff_last_reset');
-            if (lastReset !== todayStr) {
-                _strikesDone = 0;
-                _strikesLimit = 100;
-                localStorage.setItem('minebuff_last_reset', todayStr);
-                saveGame();
+        
+        function loadGame() {
+            const saved = localStorage.getItem('minebuff_save');
+            if (saved) {
+                try {
+                    const d = JSON.parse(saved);
+                    _ore = Math.min(d.ore || 0, 10000000);
+                    _diamonds = Math.min(d.diamonds || 0, 100000);
+                    _level = Math.min(d.level || 1, 1000);
+                    _strikesDone = d.strikesDone || 0;
+                    _strikesLimit = Math.min(d.strikesLimit || 100, 10000);
+                    if (d.lastBonusDate) _lastBonusDate = new Date(d.lastBonusDate);
+                    if (d.lastUpgradeDate) _lastUpgradeDate = new Date(d.lastUpgradeDate);
+                    _cardHistory = d.cardHistory?.slice(0, 30) || [];
+                    _playerId = d.playerId;
+                    _playerName = d.playerName;
+                    _achievements = d.achievements || {};
+                    _quests = d.quests || {};
+                    _lastQuestReset = d.lastQuestReset;
+                } catch(e) {}
             }
-            if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
-        }
-
-        function showToast(msg, color) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = msg;
-            toast.style.borderLeftColor = color || '#ffcc66';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-        }
-
-        function updateUI() {
-            document.getElementById('oreValue').textContent = Math.floor(_ore);
-            document.getElementById('diamondValue').textContent = Math.floor(_diamonds);
-            document.getElementById('levelValue').textContent = _level;
-            document.getElementById('strikesDone').textContent = _strikesDone;
-            document.getElementById('strikesLimit').textContent = _strikesLimit;
+            if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
             
-            const maxSlider = Math.min(_ore, 10000);
-            const slider = document.getElementById('exchangeSlider');
-            slider.max = maxSlider;
-            if (slider.value > maxSlider) slider.value = maxSlider;
-            document.getElementById('exchangeAmount').textContent = slider.value;
+            // Инициализация достижений
+            for (const a of achievementsList) if (_achievements[a.id] === undefined) _achievements[a.id] = false;
             
+            // Сброс заданий в новый день
             const now = new Date();
-            const todayStr = now.toDateString();
-            const bonusBlock = document.getElementById('bonusBlock');
-            if (_lastBonusDate && _lastBonusDate.toDateString() === todayStr) {
-                bonusBlock.classList.add('hidden');
+            if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
+                for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
+                _lastQuestReset = now.toISOString();
             } else {
-                bonusBlock.classList.remove('hidden');
+                for (const q of questsList) if (!_quests[q.id]) _quests[q.id] = { current: 0, completed: false };
             }
             
-            updateHistoryUI();
+            if (!_playerName || _playerName === "Игрок") showNameModal();
+            else { document.getElementById('playerName').innerText = _playerName; document.getElementById('playerId').innerText = _playerId.slice(-12); }
+            
+            checkDailyReset();
+            updateUI();
+            checkAchievements();
         }
-
-        function updateHistoryUI() {
-            const container = document.getElementById('historyContainer');
-            if (!container) return;
-            if (_cardHistory.length === 0) {
-                container.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
-                return;
+        
+        function showNameModal() {
+            const modal = document.getElementById('nameModal');
+            document.getElementById('playerNameInput').value = "";
+            modal.classList.add('show');
+            document.getElementById('saveNameBtn').onclick = () => {
+                let newName = document.getElementById('playerNameInput').value.trim();
+                if (!newName) newName = "Игрок_" + _playerId.slice(-6);
+                if (newName.length > 20) newName = newName.slice(0, 20);
+                _playerName = newName;
+                saveGame();
+                document.getElementById('playerName').innerText = _playerName;
+                modal.classList.remove('show');
+                showToast(`👤 Добро пожаловать, ${_playerName}!`, "#aaffdd");
+                if (supabaseClient) syncToSupabase();
+            };
+        }
+        
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastReset = localStorage.getItem('minebuff_last_reset');
+            if (lastReset !== today) { _strikesDone = 0; _strikesLimit = 100; localStorage.setItem('minebuff_last_reset', today); saveGame(); }
+            if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
+            
+            const levelBtn = document.getElementById('levelUpBtn');
+            if (levelBtn) {
+                if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) levelBtn.classList.add('disabled');
+                else levelBtn.classList.remove('disabled');
             }
-            container.innerHTML = _cardHistory.map(item => {
-                if (item.rank && rankGradients[item.rank]) {
-                    return `<div class="history-item" style="background: ${rankGradients[item.rank]};">${escapeHtml(item.text)}</div>`;
+        }
+        
+        function checkAchievements() {
+            let any = false;
+            for (const a of achievementsList) {
+                if (!_achievements[a.id]) {
+                    let completed = false;
+                    if (a.id === 'level_5') completed = _level >= 5;
+                    else if (a.id === 'level_10') completed = _level >= 10;
+                    else if (a.id === 'level_25') completed = _level >= 25;
+                    else if (a.id === 'level_50') completed = _level >= 50;
+                    else if (a.id === 'cards_5') completed = _cardHistory.length >= 5;
+                    else if (a.id === 'cards_15') completed = _cardHistory.length >= 15;
+                    else if (a.id === 'cards_30') completed = _cardHistory.length >= 30;
+                    else if (a.id === 'ore_1000') completed = _ore >= 1000;
+                    else if (a.id === 'ore_10000') completed = _ore >= 10000;
+                    else if (a.id === 'diamonds_50') completed = _diamonds >= 50;
+                    else if (a.id === 'diamonds_200') completed = _diamonds >= 200;
+                    else if (a.id === 'strikes_500') completed = _strikesDone >= 500;
+                    if (completed) { _achievements[a.id] = true; _diamonds += a.reward; any = true; showToast(`🏆 ${a.name}! +${a.reward}💎`, "#ffcc66"); }
                 }
-                return `<div class="history-item" style="background: #3a2a2a;">${escapeHtml(item.text)}</div>`;
+            }
+            if (any) { saveGame(); updateUI(); }
+            updateAchievementsUI();
+        }
+        
+        function checkQuests() {
+            let any = false;
+            for (const q of questsList) {
+                if (!_quests[q.id].completed && _quests[q.id].current >= q.target) {
+                    _quests[q.id].completed = true;
+                    _diamonds += q.reward;
+                    any = true;
+                    showToast(`📋 ${q.name} выполнено! +${q.reward}💎`, "#aaffdd");
+                }
+            }
+            if (any) { saveGame(); updateUI(); }
+            updateQuestsUI();
+        }
+        
+        function updateQuestProgress(id, val) {
+            if (_quests[id] && !_quests[id].completed) { _quests[id].current += val; checkQuests(); saveGame(); updateUI(); }
+        }
+        
+        function updateAchievementsUI() {
+            const c = document.getElementById('achievementsContent');
+            if (!c) return;
+            let done = 0;
+            for (const a of achievementsList) if (_achievements[a.id]) done++;
+            document.getElementById('achievementsCount').innerHTML = `(${done}/${achievementsList.length})`;
+            c.innerHTML = achievementsList.map(a => `<div class="achievement-item"><div><div class="achievement-name">${a.name} ${_achievements[a.id] ? '✅' : '🔒'}</div><div class="achievement-desc">${a.desc}</div></div><div class="achievement-reward">+${a.reward}💎</div></div>`).join('');
+        }
+        
+        function updateQuestsUI() {
+            const c = document.getElementById('questsContent');
+            if (!c) return;
+            let done = 0;
+            for (const q of questsList) if (_quests[q.id]?.completed) done++;
+            document.getElementById('questsProgress').innerHTML = `(${done}/${questsList.length})`;
+            c.innerHTML = questsList.map(q => {
+                const cur = _quests[q.id]?.current || 0;
+                const pct = Math.min(100, Math.floor(cur / q.target * 100));
+                return `<div class="quest-item"><div><div class="quest-name">${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div><div class="quest-desc">${q.desc} (${cur}/${q.target})</div><div style="background:#2a3a2a; border-radius:20px; height:4px; margin-top:5px;"><div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div></div></div><div class="quest-reward">+${q.reward}💎</div></div>`;
             }).join('');
         }
-
+        
+        function updateUI() {
+            document.getElementById('oreValue').innerText = Math.floor(_ore);
+            document.getElementById('diamondValue').innerText = Math.floor(_diamonds);
+            document.getElementById('levelValue').innerText = _level;
+            document.getElementById('strikesDone').innerText = _strikesDone;
+            document.getElementById('strikesLimit').innerText = _strikesLimit;
+            document.getElementById('profileLevel').innerText = _level;
+            document.getElementById('profileDiamonds').innerText = Math.floor(_diamonds);
+            document.getElementById('profileCards').innerText = _cardHistory.length;
+            const maxS = Math.min(_ore, 10000);
+            const slider = document.getElementById('exchangeSlider');
+            slider.max = maxS;
+            if (slider.value > maxS) slider.value = maxS;
+            document.getElementById('exchangeAmount').innerText = slider.value;
+            
+            const today = new Date().toDateString();
+            const bonusBlock = document.getElementById('bonusBlock');
+            if (_lastBonusDate && _lastBonusDate.toDateString() === today) bonusBlock.classList.add('hidden');
+            else bonusBlock.classList.remove('hidden');
+            
+            const container = document.getElementById('historyContainer');
+            if (container) {
+                if (!_cardHistory.length) container.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
+                else container.innerHTML = _cardHistory.map(i => `<div class="history-item" style="background: ${rankGradients[i.rank] || '#3a2a2a'};">${escapeHtml(i.text)}</div>`).join('');
+            }
+            updateAchievementsUI(); updateQuestsUI();
+        }
+        
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function showToast(msg, color) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = msg; t.style.borderLeftColor = color || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
+        
         function addCardToHistory(rank) {
-            _cardHistory.unshift({ text: `🎴 Вы получили карту ранга ${rank}`, rank: rank });
+            _cardHistory.unshift({ text: `🎴 Карта ранга ${rank}`, rank });
             if (_cardHistory.length > 30) _cardHistory.pop();
-            updateHistoryUI();
-            saveGame();
-            showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966");
+            updateUI(); saveGame(); showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966");
+            checkAchievements(); updateQuestProgress('daily_card', 1);
         }
-
-        function addNoCardToHistory() {
-            _cardHistory.unshift({ text: `❌ Карта не выпала (0.5% шанс)`, rank: null });
-            if (_cardHistory.length > 30) _cardHistory.pop();
-            updateHistoryUI();
-            saveGame();
-            showToast(`❌ Карта не выпала...`, "#ff8888");
+        function addNoCardToHistory() { _cardHistory.unshift({ text: `❌ Карта не выпала (0.5%)`, rank: null }); if (_cardHistory.length > 30) _cardHistory.pop(); updateUI(); saveGame(); showToast(`❌ Не повезло...`, "#ff8888"); }
+        
+        function getFormattedHistory() { return _cardHistory.map((i, idx) => `${idx+1}. ${i.text}`).join('\n') || "— нет карт —"; }
+        window.openTelegram = function() {
+            if (!_playerName) { showToast("⚠️ Укажите имя!", "#ffaa88"); return; }
+            const msg = `🎴 ЗАПРОС КАРТЫ 🎴\n👤 ${_playerName}\n🆔 ${_playerId}\n⭐ Уровень ${_level}\n💎 ${_diamonds} алмазов\n📜 История:\n${getFormattedHistory()}`;
+            window.open(`https://t.me/+JGrSP24ks2wxODIy?text=${encodeURIComponent(msg)}`, '_blank');
+            navigator.clipboard.writeText(msg);
+            showToast("✅ Текст скопирован! Отправьте скриншот", "#aaffdd");
+        };
+        
+        // ============ SUPABASE ============
+        async function syncToSupabase() {
+            if (syncInProgress || !supabaseClient || !_playerId || !_playerName) return;
+            syncInProgress = true;
+            try { await supabaseClient.from('leaderboard').upsert({ player_id: _playerId, username: _playerName, level: _level, diamonds: _diamonds, updated_at: new Date().toISOString() }, { onConflict: 'player_id' }); } catch(e) {}
+            syncInProgress = false;
         }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        async function loadTopFromSupabase() {
+            if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
+            try {
+                const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id').order('level', { ascending: false }).limit(20);
+                const container = document.getElementById('topList');
+                if (!data?.length) { container.innerHTML = '<li style="justify-content:center;opacity:0.5;">Пока никого</li>'; return; }
+                container.innerHTML = data.slice(0,10).map((p,i) => `<li class="${p.player_id === _playerId ? 'current-player' : ''}"><span>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1+'.'} ${escapeHtml(p.username.slice(0,15))}</span><span>⭐ Ур.${p.level}</span></li>`).join('');
+            } catch(e) { console.warn(e); }
         }
-
-        // ============ ПУБЛИЧНЫЕ ДЕЙСТВИЯ ============
+        
+        function initSupabase() {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+            s.onload = () => { supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4'); setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); }, 500); };
+            document.head.appendChild(s);
+        }
+        
+        // ============ ДЕЙСТВИЯ ============
         window.mineOre = function() {
-            checkDailyReset();
-            if (_strikesDone >= _strikesLimit) {
-                showToast("⛔ Лимит ударов на сегодня", "#ff8c6e");
-                return;
-            }
+            if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
             const gain = getOrePerClick();
-            _ore += gain;
-            _strikesDone++;
+            _ore += gain; _strikesDone++;
             showToast(`⛏️ +${gain} руды`, "#ffdd99");
-            saveGame();
-            updateUI();
-            const btn = document.getElementById('pickaxeBtn');
-            btn.style.transform = 'scale(0.92)';
-            setTimeout(() => btn.style.transform = '', 90);
+            saveGame(); updateUI();
+            updateQuestProgress('daily_mine', gain);
+            updateQuestProgress('daily_strikes', 1);
+            checkAchievements();
+            document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
+            setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
         };
-
+        
         window.claimBonus = function() {
-            const now = new Date();
-            const todayStr = now.toDateString();
-            if (_lastBonusDate && _lastBonusDate.toDateString() === todayStr) {
-                showToast("❗ Бонус уже получен сегодня", "#ffaa88");
-                return;
-            }
-            _diamonds += 5;
-            _lastBonusDate = now;
-            saveGame();
-            updateUI();
-            showToast("💎 +5 АЛМАЗОВ", "#aaffdd");
+            const today = new Date().toDateString();
+            if (_lastBonusDate && _lastBonusDate.toDateString() === today) { showToast("❗ Бонус уже получен", "#ffaa88"); return; }
+            _diamonds += 5; _lastBonusDate = new Date(); saveGame(); updateUI(); showToast("💎 +5 АЛМАЗОВ", "#aaffdd"); checkAchievements();
         };
-
+        
         window.exchangeOreToDiamonds = function() {
-            let amount = parseInt(document.getElementById('exchangeSlider').value);
-            if (amount <= 0) { showToast("Выбери количество", "#ffaa88"); return; }
-            const gain = Math.floor(amount / 100);
-            if (gain > 0 && _ore >= gain * 100) {
-                _ore -= gain * 100;
-                _diamonds += gain;
-                showToast(`💎 +${gain} алмаз(а)`, "#aaffdd");
-                document.getElementById('exchangeSlider').value = 0;
-                document.getElementById('exchangeAmount').textContent = 0;
-                saveGame();
-                updateUI();
-            } else {
-                showToast("Нужно минимум 100 руды", "#ffaa88");
-            }
+            let amt = parseInt(document.getElementById('exchangeSlider').value);
+            if (amt <= 0) { showToast("Выберите количество", "#ffaa88"); return; }
+            const gain = Math.floor(amt / 100);
+            if (gain && _ore >= gain * 100) { _ore -= gain * 100; _diamonds += gain; showToast(`💎 +${gain} алмаз(а)`, "#aaffdd"); document.getElementById('exchangeSlider').value = 0; document.getElementById('exchangeAmount').innerText = 0; saveGame(); updateUI(); checkAchievements(); }
+            else showToast("Нужно минимум 100 руды", "#ffaa88");
         };
-
+        
         window.showLevelUpModal = function() {
+            const today = new Date().toDateString();
+            if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) { showToast("⏰ Только 1 раз в сутки!", "#ffaa88"); return; }
             const cost = getLevelUpCost(_level);
-            document.getElementById('modalCurrentLevel').textContent = _level;
-            document.getElementById('modalNextLevel').textContent = _level + 1;
-            document.getElementById('modalCost').textContent = cost;
-            document.getElementById('modalDiamonds').textContent = _diamonds;
+            document.getElementById('modalCurrentLevel').innerText = _level;
+            document.getElementById('modalNextLevel').innerText = _level + 1;
+            document.getElementById('modalCost').innerText = cost;
+            document.getElementById('modalDiamonds').innerText = _diamonds;
             document.getElementById('levelModal').classList.add('show');
         };
-
+        
         window.performUpgrade = function() {
             const cost = getLevelUpCost(_level);
             if (_diamonds >= cost) {
-                _diamonds -= cost;
-                _level++;
-                const newRank = getRandomRank();
-                if (newRank) addCardToHistory(newRank);
-                else addNoCardToHistory();
-                saveGame();
-                updateUI();
-                showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
-                document.getElementById('levelModal').classList.remove('show');
-                syncToSupabase();
-                loadTopFromSupabase();
-            } else {
-                showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
-                document.getElementById('levelModal').classList.remove('show');
-            }
-        };
-
-        window.closeModal = function() {
+                _diamonds -= cost; _level++; _lastUpgradeDate = new Date();
+                updateQuestProgress('daily_upgrade', 1);
+                const r = getRandomRank();
+                if (r) addCardToHistory(r); else addNoCardToHistory();
+                saveGame(); updateUI(); showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
+                if (supabaseClient) syncToSupabase();
+                checkAchievements();
+            } else showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
             document.getElementById('levelModal').classList.remove('show');
         };
-
-        // ============ ВКЛАДКИ ============
-        function initTabs() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const targetTab = tab.dataset.tab;
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    document.getElementById('minePanel').classList.remove('active');
-                    document.getElementById('topPanel').classList.remove('active');
-                    if (targetTab === 'mine') {
-                        document.getElementById('minePanel').classList.add('active');
-                    } else {
-                        document.getElementById('topPanel').classList.add('active');
-                        loadTopFromSupabase();
-                    }
-                });
+        
+        window.closeModal = () => document.getElementById('levelModal').classList.remove('show');
+        
+        function initDropdowns() {
+            document.querySelectorAll('.dropdown-section').forEach(d => {
+                const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow');
+                h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); };
             });
         }
-
-        // ============ ЗАПУСК ============
-        document.getElementById('pickaxeBtn').addEventListener('click', () => window.mineOre());
-        document.getElementById('bonusBtn').addEventListener('click', () => window.claimBonus());
-        document.getElementById('toDiamondsBtn').addEventListener('click', () => window.exchangeOreToDiamonds());
-        document.getElementById('levelUpBtn').addEventListener('click', () => window.showLevelUpModal());
-        document.getElementById('modalCloseBtn').addEventListener('click', () => window.closeModal());
-        document.getElementById('modalUpgradeBtn').addEventListener('click', () => window.performUpgrade());
-        document.getElementById('forceSyncBtn').addEventListener('click', () => forceSyncToSupabase());
-        document.getElementById('exchangeSlider').addEventListener('input', (e) => {
-            document.getElementById('exchangeAmount').textContent = e.target.value;
-        });
-        document.getElementById('levelModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('levelModal')) window.closeModal();
-        });
-
-        initTabs();
-        loadGame();
-        initSupabase();
         
-        setInterval(() => {
-            checkDailyReset();
-            updateUI();
-        }, 30000);
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById(btn.dataset.tab === 'mine' ? 'minePanel' : btn.dataset.tab === 'profile' ? 'profilePanel' : 'topPanel').classList.add('active');
+                    if (btn.dataset.tab === 'top') loadTopFromSupabase();
+                };
+            });
+        }
+        
+        document.getElementById('pickaxeBtn').onclick = () => window.mineOre();
+        document.getElementById('bonusBtn').onclick = () => window.claimBonus();
+        document.getElementById('toDiamondsBtn').onclick = () => window.exchangeOreToDiamonds();
+        document.getElementById('levelUpBtn').onclick = () => window.showLevelUpModal();
+        document.getElementById('modalCloseBtn').onclick = () => window.closeModal();
+        document.getElementById('modalUpgradeBtn').onclick = () => window.performUpgrade();
+        document.getElementById('forceSyncBtn').onclick = () => { syncToSupabase(); loadTopFromSupabase(); showToast("✅ Синхронизация", "#aaffdd"); };
+        document.getElementById('claimCardBtn').onclick = () => window.openTelegram();
+        document.getElementById('exchangeSlider').oninput = (e) => document.getElementById('exchangeAmount').innerText = e.target.value;
+        document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
+        
+        initTabs(); initDropdowns(); loadGame(); initSupabase();
+        setInterval(() => { checkDailyReset(); updateUI(); }, 30000);
+        console.log("%c🔐 АДМИН: activateAdmin('MineBuffAdmin2024')", "color:#ffaa00");
     })();
 </script>
 </body>
