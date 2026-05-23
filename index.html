@@ -1830,19 +1830,37 @@
             function showRewardModal(rewardData) {
                 document.getElementById('rewardPlace').innerText = rewardData.place;
                 document.getElementById('rewardStrikes').innerHTML = `🔥 Ударов: ${rewardData.strikes}`;
-                document.getElementById('rewardDetails').innerHTML = `
-                    <span>💎 +${rewardData.diamonds} алмазов</span><br>
-                    <span>🎴 +1 карта ранга ${rewardData.cardRank}</span>
-                `;
+                
+                // Проверяем, есть ли карта в награде
+                const hasCard = rewardData.cardRank && rewardData.cardRank !== null;
+                
+                if (hasCard) {
+                    document.getElementById('rewardDetails').innerHTML = `
+                        <span>💎 +${rewardData.diamonds} алмазов</span><br>
+                        <span>🎴 +1 карта ранга ${rewardData.cardRank}</span>
+                    `;
+                } else {
+                    document.getElementById('rewardDetails').innerHTML = `
+                        <span>💎 +${rewardData.diamonds} алмазов</span>
+                    `;
+                }
+                
                 document.getElementById('rewardModal').classList.add('show');
                 
                 const claimBtn = document.getElementById('claimRewardBtn');
                 const newClaimBtn = claimBtn.cloneNode(true);
                 claimBtn.parentNode.replaceChild(newClaimBtn, claimBtn);
+                
                 newClaimBtn.onclick = () => {
                     _diamonds += rewardData.diamonds;
-                    addCardToHistory(rewardData.cardRank);
-                    showToast(`🏆 Вы получили награду за ${rewardData.place} место! +${rewardData.diamonds}💎 и карта ${rewardData.cardRank}!`, "#ffcc66");
+                    
+                    if (hasCard) {
+                        addCardToHistory(rewardData.cardRank);
+                        showToast(`🏆 Вы получили награду за ${rewardData.place} место! +${rewardData.diamonds}💎 и карта ${rewardData.cardRank}!`, "#ffcc66");
+                    } else {
+                        showToast(`🏆 Вы получили награду за ${rewardData.place} место! +${rewardData.diamonds}💎`, "#ffcc66");
+                    }
+                    
                     document.getElementById('rewardModal').classList.remove('show');
                     saveGame();
                     updateUI();
@@ -1875,7 +1893,7 @@
                                 place: reward.place,
                                 strikes: player.weekly_strikes,
                                 diamonds: reward.diamonds,
-                                cardRank: reward.card
+                                cardRank: reward.card || null
                             };
                             saveGame();
                         }
