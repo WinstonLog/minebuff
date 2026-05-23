@@ -1421,8 +1421,12 @@
                             if (index !== -1) {
                                 _cardHistory.splice(index, 1);
                                 showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
-                                needUpdate = true;
+                            } else {
+                                // Карты нет — просто логируем и отмечаем как выполненное
+                                console.log(`⚠️ Попытка списать карту ${action.card_rank}, но у игрока её нет`);
+                                showToast(`⚠️ Карта ${action.card_rank} не найдена (уже списана?)`, "#ffaa88");
                             }
+                            needUpdate = true; // В любом случае отмечаем как выполненное
                         }
                         else if (action.action_type === 'add_card') {
                             addCardToHistory(action.card_rank);
