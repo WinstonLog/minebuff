@@ -2680,9 +2680,19 @@
 
             window.mineOre = function() {
                 if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
-                const gain = getOrePerClick(); _ore += gain; _strikesDone++;
-                showToast(`⛏️ +${gain} руды`, "#ffdd99"); saveGame(); updateUI();
-                updateQuestProgress('daily_mine', gain); updateQuestProgress('daily_strikes', 1);
+                const gain = getOrePerClick(); 
+                _ore += gain; 
+                _strikesDone++;
+                
+                if (!isChestAvailable()) { 
+                    _chestStrikesCounter++; 
+                }
+                
+                showToast(`⛏️ +${gain} руды`, "#ffdd99"); 
+                saveGame(); 
+                updateUI();
+                updateQuestProgress('daily_mine', gain); 
+                updateQuestProgress('daily_strikes', 1);
                 checkAchievements();
                 document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
                 setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
