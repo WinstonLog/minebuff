@@ -2468,6 +2468,16 @@
                         .from('weekly_strikes')
                         .select('username, weekly_strikes, player_id, updated_at');
                     
+                    // Для ссылок нужно также получать mb_link из leaderboard
+                    const { data: leaderboardData } = await supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, mb_link');
+                    
+                    const mbLinks = {};
+                    if (leaderboardData) {
+                        leaderboardData.forEach(p => { mbLinks[p.player_id] = p.mb_link; });
+                    }
+                    
                     const container = document.getElementById('weeklyTopList');
                     const rankBlock = document.getElementById('weeklyPlayerRankBlock');
                     const rankSpan = document.getElementById('weeklyPlayerRank');
@@ -2514,14 +2524,18 @@
                             const targetPlayerName = li.getAttribute('data-player-name');
                             const targetPlayerStrikes = li.getAttribute('data-player-strikes');
                             
+                            const playerMbLink = mbLinks[targetPlayerId];
+                            
                             if (targetPlayerId === _playerId) {
-                                if (_mbProfileLink) {
-                                    showProfileLinkModalForPlayer(_mbProfileLink, _playerName);
-                                } else {
-                                    showToast("🔗 Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
-                                }
+                                // ЭТО ТЕКУЩИЙ ИГРОК
+                                showToast(`👋 Это вы, ${_playerName}! ${_weeklyStrikes} ударов за неделю`, "#ffcc66");
                             } else {
-                                showToast(`👤 ${targetPlayerName} — ${targetPlayerStrikes} ударов за неделю`, "#aaffdd");
+                                // ЭТО ДРУГОЙ ИГРОК
+                                if (playerMbLink) {
+                                    showProfileLinkModalForPlayer(playerMbLink, targetPlayerName);
+                                } else {
+                                    showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
+                                }
                             }
                         };
                     });
@@ -2647,9 +2661,10 @@
                         username: _playerName,
                         level: _level,
                         diamonds: _diamonds,
+                        mb_link: _mbProfileLink || null,
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
-                } catch(e) {}
+                } catch(e) { console.warn('syncToSupabase error:', e); }
             }
             
             async function loadTopFromSupabase() {
@@ -2657,7 +2672,7 @@
                 try {
                     const { data } = await supabaseClient
                         .from('leaderboard')
-                        .select('username, level, player_id, updated_at')
+                        .select('username, level, player_id, updated_at, mb_link')
                         .order('level', { ascending: false })
                         .order('updated_at', { ascending: true });
                     
@@ -2707,14 +2722,18 @@
                             const targetPlayerName = li.getAttribute('data-player-name');
                             const targetPlayerLevel = li.getAttribute('data-player-level');
                             
+                            const playerData = data.find(p => p.player_id === targetPlayerId);
+                            
                             if (targetPlayerId === _playerId) {
-                                if (_mbProfileLink) {
-                                    showProfileLinkModalForPlayer(_mbProfileLink, _playerName);
-                                } else {
-                                    showToast("🔗 Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
-                                }
+                                // ЭТО ТЕКУЩИЙ ИГРОК
+                                showToast(`👋 Это вы, ${_playerName}! Уровень ${_level}`, "#ffcc66");
                             } else {
-                                showToast(`👤 ${targetPlayerName} — уровень ${targetPlayerLevel}`, "#aaffdd");
+                                // ЭТО ДРУГОЙ ИГРОК
+                                if (playerData && playerData.mb_link) {
+                                    showProfileLinkModalForPlayer(playerData.mb_link, targetPlayerName);
+                                } else {
+                                    showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
+                                }
                             }
                         };
                     });
