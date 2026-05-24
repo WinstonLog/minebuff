@@ -2285,7 +2285,7 @@
                         player_id: _playerId,
                         username: _playerName,
                         weekly_strikes: _weeklyStrikes,
-                        updated_at: new Date().toISOString()
+                        updated_at: new Date().toISOString() 
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('Weekly sync error:', e); }
             }
@@ -2295,8 +2295,9 @@
                 try {
                     const { data } = await supabaseClient
                         .from('weekly_strikes')
-                        .select('username, weekly_strikes, player_id')
+                        .select('username, weekly_strikes, player_id, updated_at')
                         .order('weekly_strikes', { ascending: false })
+                        .order('updated_at', { ascending: true })  
                         .limit(20);
                     
                     const container = document.getElementById('weeklyTopList');
@@ -2321,7 +2322,14 @@
                         </li>`;
                     }).join('');
                     
-                    const playerIndex = data.findIndex(p => p.player_id === _playerId);
+                    // Сортируем полный список для определения места (по ударам, потом по времени)
+                    const allPlayers = [...data];
+                    allPlayers.sort((a, b) => {
+                        if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
+                        return new Date(a.updated_at) - new Date(b.updated_at);
+                    });
+                    
+                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) {
                         rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов)`;
                         rankBlock.style.display = 'block';
