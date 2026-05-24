@@ -2448,24 +2448,63 @@
             
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
-                try { await supabaseClient.from('leaderboard').upsert({ player_id: _playerId, username: _playerName, level: _level, diamonds: _diamonds, updated_at: new Date().toISOString() }, { onConflict: 'player_id' }); } catch(e) {}
+                try {
+                    await supabaseClient.from('leaderboard').upsert({
+                        player_id: _playerId,
+                        username: _playerName,
+                        level: _level,
+                        diamonds: _diamonds,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id' });
+                } catch(e) {}
             }
             
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
-                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id').order('level', { ascending: false });
+                    const { data } = await supabaseClient
+                        .from('leaderboard')
+                        .select('username, level, player_id, updated_at')
+                        .order('level', { ascending: false })
+                        .order('updated_at', { ascending: true })
+                        .limit(20);
+                    
                     const container = document.getElementById('topList');
                     const rankBlock = document.getElementById('playerRankBlock');
                     const rankSpan = document.getElementById('playerRank');
                     const totalSpan = document.getElementById('totalPlayersCount');
-                    if (!data || !data.length) { container.innerHTML = '<li>Пока никого</li>'; if (rankBlock) rankBlock.style.display = 'none'; if (totalSpan) totalSpan.innerText = 'Всего: 0'; return; }
+                    
+                    if (!data || !data.length) {
+                        container.innerHTML = '<li>Пока никого</li>';
+                        if (rankBlock) rankBlock.style.display = 'none';
+                        if (totalSpan) totalSpan.innerText = 'Всего: 0';
+                        return;
+                    }
                     if (totalSpan) totalSpan.innerText = `👥 Всего: ${data.length}`;
                     const top10 = data.slice(0, 10);
-                    container.innerHTML = top10.map((p, i) => { const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.'; const isCurrent = p.player_id === _playerId; return `<li class="${isCurrent ? 'current-player' : ''}"><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`; }).join('');
-                    const playerIndex = data.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.)`; rankBlock.style.display = 'block'; }
-                    else rankBlock.style.display = 'none';
+                    container.innerHTML = top10.map((p, i) => {
+                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
+                        const isCurrent = p.player_id === _playerId;
+                        return `<li class="${isCurrent ? 'current-player' : ''}">
+                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                            <span>⭐ Ур.${p.level}</span>
+                        </li>`;
+                    }).join('');
+                    
+                    // Сортируем полный список для определения места
+                    const allPlayers = [...data];
+                    allPlayers.sort((a, b) => {
+                        if (a.level !== b.level) return b.level - a.level;
+                        return new Date(a.updated_at) - new Date(b.updated_at);
+                    });
+                    
+                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
+                    if (playerIndex !== -1) {
+                        rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.)`;
+                        rankBlock.style.display = 'block';
+                    } else {
+                        rankBlock.style.display = 'none';
+                    }
                 } catch(e) { console.warn(e); }
             }
             
