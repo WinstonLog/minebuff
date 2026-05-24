@@ -2880,7 +2880,7 @@
             }
 
             async function startBattle() {
-                if (_level < 1) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
+                if (_level < 5) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
                 
                 const opponent = await findOpponent();
                 if (!opponent) return;
@@ -3047,7 +3047,7 @@
                 try {
                     const { data } = await supabaseClient.from('pvp_rating').select('*').eq('player_id', _playerId).single();
                     if (data) {
-                        _pvpRating = data.rating || 1000;
+                        _pvpRating = data.rating || 0;
                         _pvpWins = data.wins || 0;
                         _pvpLosses = data.losses || 0;
                         _pvpDraws = data.draws || 0;
