@@ -3682,104 +3682,185 @@
                     }
                 } catch(e) { console.warn('loadPvPData error:', e); }
             }
-
-            // Получить текущего сезонного босса на основе времени года
+            
             function getSeasonalBossByDate() {
                 const now = new Date();
                 const month = now.getMonth() + 1;
                 
-                // Весна (март, апрель, май)
                 if (month >= 3 && month <= 5) {
                     return {
                         id: 'spring',
                         name: '🌸 Весенний Элементаль',
                         icon: '🌸',
-                        rank: 'V',
                         baseHp: 50000,
                         rewardDiamonds: { 1: 50, 2: 30, 3: 15 },
                         rewardCards: { 1: 'V', 2: 'V', 3: 'V' }
                     };
                 }
-                // Лето (июнь, июль, август)
                 if (month >= 6 && month <= 8) {
                     return {
                         id: 'summer',
                         name: '☀️ Летний Феникс',
                         icon: '☀️',
-                        rank: 'L',
                         baseHp: 60000,
                         rewardDiamonds: { 1: 50, 2: 30, 3: 15 },
                         rewardCards: { 1: 'L', 2: 'L', 3: 'L' }
                     };
                 }
-                // Осень (сентябрь, октябрь, ноябрь)
                 if (month >= 9 && month <= 11) {
                     return {
                         id: 'autumn',
                         name: '🍂 Урожайный Страж',
                         icon: '🍂',
-                        rank: 'H',
                         baseHp: 45000,
                         rewardDiamonds: { 1: 40, 2: 25, 3: 10 },
                         rewardCards: { 1: 'H', 2: 'H', 3: 'H' }
                     };
                 }
-                // Зима (декабрь, январь, февраль)
                 return {
                     id: 'winter',
                     name: '❄️ Ледяной Гигант',
                     icon: '❄️',
-                    rank: 'N',
                     baseHp: 70000,
                     rewardDiamonds: { 1: 60, 2: 35, 3: 20 },
                     rewardCards: { 1: 'N', 2: 'N', 3: 'N' }
                 };
             }
 
-            // Инициализация или загрузка сезонного босса
             async function initSeasonalBoss() {
                 if (!supabaseClient) return;
                 
                 const currentSeason = getSeasonalBossByDate();
                 
                 try {
-                    // Пытаемся загрузить текущего босса из БД
-                    const { data } = await supabaseClient
+                    // Ищем активного босса в БД
+                    let { data: bossData } = await supabaseClient
                         .from('seasonal_boss')
                         .select('*')
                         .eq('season_id', currentSeason.id)
-                        .order('created_at', { ascending: false })
-                        .limit(1);
+                        .eq('is_active', true)
+                        .single();
                     
-                    if (data && data.length > 0) {
-                        const boss = data[0];
-                        _seasonalBoss = {
-                            ...currentSeason,
-                            currentHp: boss.current_hp,
-                            maxHp: boss.max_hp,
-                            killedBy: boss.killed_by,
-                            killedAt: boss.killed_at
+                    if (!bossData) {
+                        // Создаём нового босса
+                        const newBoss = {
+                            season_id: currentSeason.id,
+                            boss_name: currentSeason.name,
+                            boss_icon: currentSeason.icon,
+                            max_hp: currentSeason.baseHp,
+                            current_hp: currentSeason.baseHp,
+                            is_active: true,
+                            killed_by: null,
+                            killed_at: null,
+                            damage_top: [],
+                            created_at: new Date().toISOString()
                         };
-                        _seasonalBossDamageTop = boss.damage_top || [];
                         
-                        // Если босс мёртв и прошло больше 24 часов — возрождаем
-                        if (boss.current_hp <= 0 && boss.killed_at) {
-                            const killedDate = new Date(boss.killed_at);
-                            const now = new Date();
-                            const hoursSinceKill = (now - killedDate) / (1000 * 60 * 60);
-                            if (hoursSinceKill >= 24) {
-                                await resetSeasonalBoss();
-                            }
-                        }
-                    } else {
-                        await resetSeasonalBoss();
+                        const { data: inserted } = await supabaseClient
+                            .from('seasonal_boss')
+                            .insert(newBoss)
+                            .select()
+                            .single();
+                        
+                        bossData = inserted;
                     }
+                    
+                    // Проверяем, не мёртв ли босс уже больше 24 часов
+                    if (bossData.current_hp <= 0 && bossData.killed_at) {
+                        const killedDate = new Date(bossData.killed_at);
+                        const now = new Date();
+                        const hoursSinceKill = (now - killedDate) / (1000 * 60 * 60);
+                        if (hoursSinceKill >= 24) {
+                            // Возрождаем босса
+                            await supabaseClient
+                                .from('seasonal_boss')
+                                .update({
+                                    current_hp: currentSeason.baseHp,
+                                    is_active: true,
+                                    killed_by: null,
+                                    killed_at: null,
+                                    damage_top: []
+                                })
+                                .eq('id', bossData.id);
+                            
+                            bossData.current_hp = currentSeason.baseHp;
+                            bossData.is_active = true;
+                            bossData.killed_by = null;
+                            bossData.killed_at = null;
+                            bossData.damage_top = [];
+                        }
+                    }
+                    
+                    _seasonalBoss = {
+                        id: bossData.id,
+                        season_id: bossData.season_id,
+                        name: bossData.boss_name,
+                        icon: bossData.boss_icon,
+                        currentHp: bossData.current_hp,
+                        maxHp: bossData.max_hp,
+                        killedBy: bossData.killed_by,
+                        killedAt: bossData.killed_at,
+                        rewardDiamonds: currentSeason.rewardDiamonds,
+                        rewardCards: currentSeason.rewardCards
+                    };
+                    
+                    _seasonalBossDamageTop = bossData.damage_top || [];
+                    
+                    // Загружаем личный урон игрока
+                    const { data: playerDamage } = await supabaseClient
+                        .from('seasonal_boss_damage')
+                        .select('total_damage')
+                        .eq('boss_id', _seasonalBoss.id)
+                        .eq('player_id', _playerId)
+                        .single();
+                    
+                    _mySeasonalBossDamage = playerDamage?.total_damage || 0;
+                    
+                    // Загружаем количество убийств
+                    const { data: killData } = await supabaseClient
+                        .from('seasonal_boss_kills')
+                        .select('count')
+                        .eq('player_id', _playerId)
+                        .single();
+                    
+                    _seasonalBossKillCount = killData?.count || 0;
+                    
                 } catch(e) {
                     console.warn('initSeasonalBoss error:', e);
-                    await resetSeasonalBoss();
                 }
                 
                 updateSeasonalBossUI();
+                
+                // Подписываемся на обновления босса в реальном времени
+                subscribeToBossUpdates();
+            }
+
+            let bossSubscription = null;
+
+            function subscribeToBossUpdates() {
+                if (bossSubscription) return;
+                if (!supabaseClient) return;
+                
+                bossSubscription = supabaseClient
+                    .channel('seasonal_boss_updates')
+                    .on('postgres_changes', 
+                        { event: 'UPDATE', schema: 'public', table: 'seasonal_boss' },
+                        (payload) => {
+                            const updatedBoss = payload.new;
+                            if (updatedBoss.id === _seasonalBoss?.id) {
+                                _seasonalBoss.currentHp = updatedBoss.current_hp;
+                                _seasonalBoss.killedBy = updatedBoss.killed_by;
+                                _seasonalBoss.killedAt = updatedBoss.killed_at;
+                                _seasonalBossDamageTop = updatedBoss.damage_top || [];
+                                updateSeasonalBossUI();
+                                
+                                if (updatedBoss.current_hp <= 0 && updatedBoss.killed_at) {
+                                    showToast(`💀 ${_seasonalBoss.name} ПОВЕРЖЕН! Возродится через 24 часа 💀`, "#ff4444");
+                                }
+                            }
+                        }
+                    )
+                    .subscribe();
             }
 
             // Создать нового сезонного босса
@@ -3810,16 +3891,15 @@
                 updateSeasonalBossUI();
             }
 
-            // Атаковать сезонного босса
             async function attackSeasonalBoss() {
                 if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return; }
                 if (_level < 3) { showToast("❌ Босс доступен с 3 уровня!", "#ff8888"); return; }
                 
-                // Проверка кулдауна (30 секунд между атаками)
+                // Проверка кулдауна (30 секунд)
                 if (_lastSeasonalBossAttack) {
                     const secondsSinceLast = (Date.now() - new Date(_lastSeasonalBossAttack).getTime()) / 1000;
                     if (secondsSinceLast < 30) {
-                        showToast(`⏳ Следующая атака через ${Math.ceil(30 - secondsSinceLast)} секунд`, "#ffaa88");
+                        showToast(`⏳ Следующая атака через ${Math.ceil(30 - secondsSinceLast)} сек`, "#ffaa88");
                         return;
                     }
                 }
@@ -3829,53 +3909,44 @@
                     return;
                 }
                 
-                // Расчёт урона: базовый + бонус от карт
+                // Расчёт урона
                 const topCards = getTop3Cards();
-                let cardBonus = 0;
-                if (topCards.length > 0) {
-                    cardBonus = topCards.reduce((sum, c) => sum + c.power, 0);
-                }
-                
-                // Случайный урон от 50 до 150 + бонус от карт
+                const cardBonus = topCards.reduce((sum, c) => sum + c.power, 0);
                 const baseDamage = Math.floor(Math.random() * 100) + 50;
                 const totalDamage = baseDamage + cardBonus;
                 
-                _seasonalBoss.currentHp -= totalDamage;
-                _mySeasonalBossDamage += totalDamage;
                 _lastSeasonalBossAttack = new Date().toISOString();
                 
-                // Обновляем топ урона
-                const playerIndex = _seasonalBossDamageTop.findIndex(p => p.player_id === _playerId);
-                if (playerIndex !== -1) {
-                    _seasonalBossDamageTop[playerIndex].damage += totalDamage;
-                } else {
-                    _seasonalBossDamageTop.push({
-                        player_id: _playerId,
-                        player_name: _playerName,
-                        damage: totalDamage
-                    });
-                }
-                _seasonalBossDamageTop.sort((a, b) => b.damage - a.damage);
-                _seasonalBossDamageTop = _seasonalBossDamageTop.slice(0, 20);
+                // Вызываем RPC функцию для нанесения урона (атомарно)
+                const { data: result, error } = await supabaseClient.rpc('deal_damage_to_boss', {
+                    p_boss_id: _seasonalBoss.id,
+                    p_player_id: _playerId,
+                    p_player_name: _playerName,
+                    p_damage: totalDamage
+                });
                 
-                // Сохраняем в БД
-                if (supabaseClient) {
-                    await supabaseClient.from('seasonal_boss')
-                        .update({ 
-                            current_hp: Math.max(0, _seasonalBoss.currentHp),
-                            damage_top: _seasonalBossDamageTop
-                        })
-                        .eq('season_id', _seasonalBoss.id);
+                if (error) {
+                    console.error('Attack error:', error);
+                    showToast("❌ Ошибка атаки", "#ff8888");
+                    return;
                 }
                 
-                showToast(`⚔️ Вы нанесли ${totalDamage} урона боссу! (база ${baseDamage} + карты ${cardBonus})`, "#ffcc66");
-                updateSeasonalBossUI();
+                _mySeasonalBossDamage += totalDamage;
+                showToast(`⚔️ Вы нанесли ${totalDamage} урона! (база ${baseDamage} + карты ${cardBonus})`, "#ffcc66");
+                
+                // Проверяем, убил ли босса
+                if (result && result.boss_killed) {
+                    _seasonalBossKillCount++;
+                    showToast(`🏆 ВЫ УБИЛИ БОССА! +${result.reward_diamonds}💎 и карта ${result.reward_card}!`, "#ffdd99");
+                    
+                    if (result.reward_card) addCardToHistory(result.reward_card);
+                    if (result.reward_diamonds) _diamonds += result.reward_diamonds;
+                    saveGame();
+                    updateUI();
+                }
+                
                 saveGame();
-                
-                // Проверка смерти босса
-                if (_seasonalBoss.currentHp <= 0) {
-                    await onSeasonalBossDeath();
-                }
+                updateSeasonalBossUI();
             }
 
             // Смерть сезонного босса
@@ -3936,7 +4007,6 @@
                 return history ? JSON.parse(history) : [];
             }
 
-            // Обновить UI сезонного босса
             function updateSeasonalBossUI() {
                 if (!_seasonalBoss) return;
                 
@@ -3950,22 +4020,22 @@
                     <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
                         <span style="font-size: 32px;">${_seasonalBoss.icon}</span>
                         <span style="font-size: 20px; font-weight: bold;">${_seasonalBoss.name}</span>
-                        <span style="font-size: 20px;">${_seasonalBoss.icon}</span>
+                        <span style="font-size: 32px;">${_seasonalBoss.icon}</span>
                     </div>
-                    <div class="boss-hp">❤️ HP: <span id="seasonalBossHp">${Math.max(0, _seasonalBoss.currentHp)}</span> / <span id="seasonalBossMaxHp">${_seasonalBoss.maxHp}</span></div>
-                    <div class="boss-hp-bar"><div class="boss-hp-fill" id="seasonalBossHpFill" style="width: ${hpPercent}%;"></div></div>
+                    <div class="boss-hp">❤️ HP: <span id="seasonalBossHp">${_seasonalBoss.currentHp.toLocaleString()}</span> / <span id="seasonalBossMaxHp">${_seasonalBoss.maxHp.toLocaleString()}</span></div>
+                    <div class="boss-hp-bar"><div class="boss-hp-fill" id="seasonalBossHpFill" style="width: ${Math.max(0, Math.min(100, hpPercent))}%;"></div></div>
                     <div class="seasonal-boss-stats" style="display: flex; justify-content: space-between; margin: 10px 0; gap: 10px;">
                         <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🎴 Награда за 1 место</div>
-                            <div style="font-size: 14px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[1]}💎 + карта ${_seasonalBoss.rewardCards[1]}</div>
+                            <div style="font-size: 10px;">🥇 1 место</div>
+                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[1]}💎 + ${_seasonalBoss.rewardCards[1]}</div>
                         </div>
                         <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🎴 Награда за 2 место</div>
-                            <div style="font-size: 14px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[2]}💎 + карта ${_seasonalBoss.rewardCards[2]}</div>
+                            <div style="font-size: 10px;">🥈 2 место</div>
+                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[2]}💎 + ${_seasonalBoss.rewardCards[2]}</div>
                         </div>
                         <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🎴 Награда за 3 место</div>
-                            <div style="font-size: 14px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[3]}💎 + карта ${_seasonalBoss.rewardCards[3]}</div>
+                            <div style="font-size: 10px;">🥉 3 место</div>
+                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[3]}💎 + ${_seasonalBoss.rewardCards[3]}</div>
                         </div>
                     </div>
                     ${isDead ? `<div style="background: #ff4444cc; border-radius: 20px; padding: 8px; text-align: center; margin-top: 8px;">
@@ -3973,11 +4043,11 @@
                         Возродится через 24 часа
                     </div>` : ''}
                     <div style="font-size: 11px; text-align: center; margin-top: 8px; opacity: 0.6;">
-                        💡 Кулдаун атаки: 30 секунд | Урон зависит от силы ваших ТОП-3 карт
+                        💡 Кулдаун атаки: 30 сек | Урон: 50-150 + сила ваших ТОП-3 карт
                     </div>
                 `;
                 
-                // Обновляем топ урона
+                // Топ урона
                 const topContainer = document.getElementById('seasonalBossTopList');
                 if (topContainer) {
                     if (!_seasonalBossDamageTop.length) {
@@ -3987,34 +4057,20 @@
                             const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
                             const isCurrent = p.player_id === _playerId;
                             return `<li class="${isCurrent ? 'current-player' : ''}">
-                                <span>${medal} ${escapeHtml(p.player_name || 'Аноним')}</span>
-                                <span>⚔️ ${p.damage}</span>
+                                <span>${medal} ${escapeHtml((p.player_name || 'Аноним').slice(0, 15))}</span>
+                                <span>⚔️ ${p.damage.toLocaleString()}</span>
                             </li>`;
                         }).join('');
                     }
                 }
                 
-                // Обновляем мой урон
+                // Мой урон
                 const myDamageEl = document.getElementById('seasonalBossMyDamage');
-                if (myDamageEl) myDamageEl.innerText = _mySeasonalBossDamage;
+                if (myDamageEl) myDamageEl.innerText = _mySeasonalBossDamage.toLocaleString();
                 
-                // Обновляем количество убийств
+                // Количество убийств
                 const killCountEl = document.getElementById('seasonalBossKillCount');
                 if (killCountEl) killCountEl.innerText = _seasonalBossKillCount;
-                
-                // Обновляем историю
-                const historyContainer = document.getElementById('seasonalBossHistoryList');
-                if (historyContainer) {
-                    const history = getSeasonalBossHistory();
-                    if (!history.length) {
-                        historyContainer.innerHTML = '<li style="justify-content:center;">— Нет истории —</li>';
-                    } else {
-                        historyContainer.innerHTML = history.slice(0, 10).map(h => {
-                            const date = new Date(h.date).toLocaleDateString();
-                            return `<li><span>${date} — ${h.boss}</span><span>🏆 ${h.place} место (+${h.rewardDiamonds}💎 +${h.rewardCard})</span></li>`;
-                        }).join('');
-                    }
-                }
             }
 
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
