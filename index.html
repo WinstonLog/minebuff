@@ -1960,13 +1960,23 @@
             async function checkAdminCommands() {
                 if (!supabaseClient) return;
                 try {
-                    const { data } = await supabaseClient.from('admin_actions').select('*').eq('target_player_id', _playerId).eq('status', 'pending');
+                    const { data } = await supabaseClient
+                        .from('admin_actions')
+                        .select('*')
+                        .eq('target_player_id', _playerId)
+                        .eq('status', 'pending');
+                    
                     for (const action of data || []) {
                         let needUpdate = false;
+                        
                         if (action.action_type === 'remove_card') {
                             const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
-                            if (index !== -1) { _cardHistory.splice(index, 1); showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888"); }
-                            else showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
+                            if (index !== -1) {
+                                _cardHistory.splice(index, 1);
+                                showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
+                            } else {
+                                showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
+                            }
                             needUpdate = true;
                         }
                         else if (action.action_type === 'add_card') {
@@ -1974,17 +1984,28 @@
                             showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
                             needUpdate = true;
                         }
+                        // ========== НОВЫЙ ТИП: ВЫДАЧА АЛМАЗОВ ==========
+                        else if (action.action_type === 'add_diamonds') {
+                            const amount = action.amount || 0;
+                            _diamonds += amount;
+                            showToast(`💎 Администратор выдал ${amount} алмазов!`, "#ffd966");
+                            needUpdate = true;
+                        }
+                        // ==============================================
+                        
                         if (needUpdate) {
-                            await supabaseClient.from('admin_actions').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', action.id);
-                            saveGame(); updateUI();
-                            setTimeout(() => {
-                                const counts = getCardCounts();
-                                const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
-                                if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
-                                if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
-                            }, 100);
+                            await supabaseClient
+                                .from('admin_actions')
+                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .eq('id', action.id);
+                            
+                            saveGame();
+                            updateUI();
                         } else {
-                            await supabaseClient.from('admin_actions').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', action.id);
+                            await supabaseClient
+                                .from('admin_actions')
+                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .eq('id', action.id);
                         }
                     }
                 } catch(e) { console.warn('Check admin commands error:', e); }
@@ -2683,7 +2704,7 @@
                 const gain = getOrePerClick(); 
                 _ore += gain; 
                 _strikesDone++;
-                
+
                 if (!isChestAvailable()) { 
                     _chestStrikesCounter++; 
                 }
