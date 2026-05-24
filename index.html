@@ -2819,7 +2819,8 @@
                 if (rating >= 500) return { name: 'Серебряный гребень', icon: '⚪', color: '#cccccc', bonus: 15 };
                 if (rating >= 250) return { name: 'Медный бастион', icon: '🟠', color: '#ffaa66', bonus: 10 };
                 if (rating >= 100) return { name: 'Каменный рубеж', icon: '⚙️', color: '#aaaaaa', bonus: 5 };
-                return { name: 'Песчаная жила', icon: '🟫', color: '#aa8866', bonus: 0 };
+                if (rating >= 50) return { name: 'Песчаная жила', icon: '🟫', color: '#aa8866', bonus: 2 };
+                return { name: 'Новичок', icon: '🌱', color: '#88aa88', bonus: 0 };  // 0-49 рейтинга
             }
 
             async function findOpponent() {
