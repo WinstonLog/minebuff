@@ -1290,19 +1290,19 @@
                 
                 <div class="stats">
                     <div class="stat-card"><div class="stat-label">🏆 Лига</div><div class="stat-value"><span id="arenaLeagueIcon">🟫</span> <span id="arenaLeagueName">Песчаная жила</span></div></div>
-                    <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">1000</div></div>
+                    <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">0</div></div>
                 </div>
                 
                 <div class="stats">
-                    <div class="stat-card"><div class="stat-label">✅ Побед</div><div class="stat-value" id="arenaWinsValue">0</div></div>
-                    <div class="stat-card"><div class="stat-label">❌ Поражений</div><div class="stat-value" id="arenaLossesValue">0</div></div>
-                    <div class="stat-card"><div class="stat-label">🤝 Ничьих</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">✅</div><div class="stat-value" id="arenaWinsValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">❌</div><div class="stat-value" id="arenaLossesValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
                 </div>
                 
                 <div class="strikes-counter">⚔️ ДУЭЛИ СЕГОДНЯ: <span id="arenaDuelsToday">0</span> / 3</div>
                 
                 <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
-                <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button>
+<!--                 <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button> -->
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
@@ -1595,7 +1595,7 @@
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
 
-            let _pvpRating = 1000;
+            let _pvpRating = 0;
             let _pvpWins = 0;
             let _pvpLosses = 0;
             let _pvpDraws = 0;
