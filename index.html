@@ -2428,36 +2428,13 @@
             async function syncWeeklyStrikes() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    // Получаем текущую запись
-                    const { data: existing } = await supabaseClient
-                        .from('weekly_strikes')
-                        .select('weekly_strikes')
-                        .eq('player_id', _playerId)
-                        .single();
-                    
-                    if (existing) {
-                        // Обновляем updated_at ТОЛЬКО если ударов стало БОЛЬШЕ
-                        let updatedAtValue = existing.updated_at;
-                        if (_weeklyStrikes > existing.weekly_strikes) {
-                            updatedAtValue = new Date().toISOString();
-                        }
-                        
-                        await supabaseClient
-                            .from('weekly_strikes')
-                            .update({
-                                weekly_strikes: _weeklyStrikes,
-                                updated_at: updatedAtValue
-                            })
-                            .eq('player_id', _playerId);
-                    } else {
-                        // Создаём новую запись
-                        await supabaseClient.from('weekly_strikes').insert({
-                            player_id: _playerId,
-                            username: _playerName,
-                            weekly_strikes: _weeklyStrikes,
-                            updated_at: new Date().toISOString()
-                        });
-                    }
+                    await supabaseClient.from('weekly_strikes').upsert({
+                        player_id: _playerId,
+                        username: _playerName,
+                        weekly_strikes: _weeklyStrikes,
+                        mb_link: _mbProfileLink || null,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('Weekly sync error:', e); }
             }
 
@@ -2466,17 +2443,7 @@
                 try {
                     const { data } = await supabaseClient
                         .from('weekly_strikes')
-                        .select('username, weekly_strikes, player_id, updated_at');
-                    
-                    // Для ссылок нужно также получать mb_link из leaderboard
-                    const { data: leaderboardData } = await supabaseClient
-                        .from('leaderboard')
-                        .select('player_id, mb_link');
-                    
-                    const mbLinks = {};
-                    if (leaderboardData) {
-                        leaderboardData.forEach(p => { mbLinks[p.player_id] = p.mb_link; });
-                    }
+                        .select('username, weekly_strikes, player_id, updated_at, mb_link');
                     
                     const container = document.getElementById('weeklyTopList');
                     const rankBlock = document.getElementById('weeklyPlayerRankBlock');
@@ -2502,7 +2469,7 @@
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-strikes="${p.weekly_strikes}">
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-strikes="${p.weekly_strikes}" data-mb-link="${p.mb_link || ''}">
                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
                             <span>💥 ${p.weekly_strikes}</span>
                         </li>`;
@@ -2516,6 +2483,7 @@
                         rankBlock.style.display = 'none';
                     }
                     
+                    // ОБРАБОТЧИК КЛИКА
                     document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
                         li.onclick = (e) => {
@@ -2523,16 +2491,15 @@
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
                             const targetPlayerStrikes = li.getAttribute('data-player-strikes');
-                            
-                            const playerMbLink = mbLinks[targetPlayerId];
+                            const targetMbLink = li.getAttribute('data-mb-link');
                             
                             if (targetPlayerId === _playerId) {
                                 // ЭТО ТЕКУЩИЙ ИГРОК
                                 showToast(`👋 Это вы, ${_playerName}! ${_weeklyStrikes} ударов за неделю`, "#ffcc66");
                             } else {
                                 // ЭТО ДРУГОЙ ИГРОК
-                                if (playerMbLink) {
-                                    showProfileLinkModalForPlayer(playerMbLink, targetPlayerName);
+                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') {
+                                    showProfileLinkModalForPlayer(targetMbLink, targetPlayerName);
                                 } else {
                                     showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
                                 }
@@ -2656,6 +2623,7 @@
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
+                    // Обновляем leaderboard
                     await supabaseClient.from('leaderboard').upsert({
                         player_id: _playerId,
                         username: _playerName,
@@ -2664,9 +2632,18 @@
                         mb_link: _mbProfileLink || null,
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
+                    
+                    // Обновляем weekly_strikes (добавляем mb_link)
+                    await supabaseClient.from('weekly_strikes').upsert({
+                        player_id: _playerId,
+                        username: _playerName,
+                        weekly_strikes: _weeklyStrikes,
+                        mb_link: _mbProfileLink || null,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
             }
-            
+                        
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
@@ -2700,7 +2677,7 @@
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}">
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}">
                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
                             <span>⭐ Ур.${p.level}</span>
                         </li>`;
@@ -2714,6 +2691,7 @@
                         rankBlock.style.display = 'none';
                     }
                     
+                    // ОБРАБОТЧИК КЛИКА
                     document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
                         li.onclick = (e) => {
@@ -2721,16 +2699,15 @@
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
                             const targetPlayerLevel = li.getAttribute('data-player-level');
-                            
-                            const playerData = data.find(p => p.player_id === targetPlayerId);
+                            const targetMbLink = li.getAttribute('data-mb-link');
                             
                             if (targetPlayerId === _playerId) {
                                 // ЭТО ТЕКУЩИЙ ИГРОК
                                 showToast(`👋 Это вы, ${_playerName}! Уровень ${_level}`, "#ffcc66");
                             } else {
                                 // ЭТО ДРУГОЙ ИГРОК
-                                if (playerData && playerData.mb_link) {
-                                    showProfileLinkModalForPlayer(playerData.mb_link, targetPlayerName);
+                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') {
+                                    showProfileLinkModalForPlayer(targetMbLink, targetPlayerName);
                                 } else {
                                     showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
                                 }
