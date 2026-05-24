@@ -2392,84 +2392,113 @@
             async function syncWeeklyStrikes() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    await supabaseClient.from('weekly_strikes').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        weekly_strikes: _weeklyStrikes,
-                        updated_at: new Date().toISOString() 
-                    }, { onConflict: 'player_id' });
+                    // Получаем текущую запись
+                    const { data: existing } = await supabaseClient
+                        .from('weekly_strikes')
+                        .select('weekly_strikes')
+                        .eq('player_id', _playerId)
+                        .single();
+                    
+                    if (existing) {
+                        // Обновляем updated_at ТОЛЬКО если ударов стало БОЛЬШЕ
+                        let updatedAtValue = existing.updated_at;
+                        if (_weeklyStrikes > existing.weekly_strikes) {
+                            updatedAtValue = new Date().toISOString();
+                        }
+                        
+                        await supabaseClient
+                            .from('weekly_strikes')
+                            .update({
+                                weekly_strikes: _weeklyStrikes,
+                                updated_at: updatedAtValue
+                            })
+                            .eq('player_id', _playerId);
+                    } else {
+                        // Создаём новую запись
+                        await supabaseClient.from('weekly_strikes').insert({
+                            player_id: _playerId,
+                            username: _playerName,
+                            weekly_strikes: _weeklyStrikes,
+                            updated_at: new Date().toISOString()
+                        });
+                    }
                 } catch(e) { console.warn('Weekly sync error:', e); }
             }
-            
+
             async function loadWeeklyTop() {
-                    if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
-                    try {
-                        // Загружаем ВСЕХ игроков
-                        const { data } = await supabaseClient
-                            .from('weekly_strikes')
-                            .select('username, weekly_strikes, player_id, updated_at')
-                            .order('weekly_strikes', { ascending: false })
-                            .order('updated_at', { ascending: true });
-                        
-                        const container = document.getElementById('weeklyTopList');
-                        const rankBlock = document.getElementById('weeklyPlayerRankBlock');
-                        const rankSpan = document.getElementById('weeklyPlayerRank');
-                        const totalSpan = document.getElementById('weeklyTotalPlayersCount');
-                        
-                        if (!data || !data.length) {
-                            container.innerHTML = '<li>Пока никого</li>';
-                            if (rankBlock) rankBlock.style.display = 'none';
-                            if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
-                            return;
+                if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
+                try {
+                    // Загружаем ВСЕХ игроков
+                    const { data } = await supabaseClient
+                        .from('weekly_strikes')
+                        .select('username, weekly_strikes, player_id, updated_at');
+                    
+                    const container = document.getElementById('weeklyTopList');
+                    const rankBlock = document.getElementById('weeklyPlayerRankBlock');
+                    const rankSpan = document.getElementById('weeklyPlayerRank');
+                    const totalSpan = document.getElementById('weeklyTotalPlayersCount');
+                    
+                    if (!data || !data.length) {
+                        container.innerHTML = '<li>Пока никого</li>';
+                        if (rankBlock) rankBlock.style.display = 'none';
+                        if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
+                        return;
+                    }
+                    
+                    // СОРТИРОВКА: сначала по ударам (↓), потом по времени ДОСТИЖЕНИЯ (↑)
+                    const sorted = [...data];
+                    sorted.sort((a, b) => {
+                        if (a.weekly_strikes !== b.weekly_strikes) {
+                            return b.weekly_strikes - a.weekly_strikes;
                         }
-                        
-                        // Сортируем (удары по убыванию, при равных - по времени обновления)
-                        const sorted = [...data];
-                        sorted.sort((a, b) => {
-                            if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
-                            return new Date(a.updated_at) - new Date(b.updated_at);
-                        });
-                        
-                        if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
-                        
-                        // Показываем топ-10
-                        const top10 = sorted.slice(0, 10);
-                        container.innerHTML = top10.map((p, i) => {
-                            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
-                            const isCurrent = p.player_id === _playerId;
-                            return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
-                                <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                                <span>💥 ${p.weekly_strikes}</span>
-                            </li>`;
-                        }).join('');
-                        
-                        // Определяем место текущего игрока
-                        const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
-                        if (playerIndex !== -1) {
-                            rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов) из ${sorted.length}`;
-                            rankBlock.style.display = 'block';
-                        } else {
-                            rankBlock.style.display = 'none';
-                        }
-                        
-                        // Добавляем обработчики кликов
-                        document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
-                            li.style.cursor = 'pointer';
-                            li.onclick = (e) => {
-                                e.stopPropagation();
-                                const targetPlayerId = li.getAttribute('data-player-id');
-                                const targetPlayerName = li.getAttribute('data-player-name');
-                                if (targetPlayerId === _playerId) {
-                                    showToast("Это вы! 👋", "#ffcc66");
-                                    return;
+                        // Чем СТАРШЕ updated_at — тем выше (кто первый достиг)
+                        return new Date(a.updated_at) - new Date(b.updated_at);
+                    });
+                    
+                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
+                    
+                    // Показываем топ-10
+                    const top10 = sorted.slice(0, 10);
+                    container.innerHTML = top10.map((p, i) => {
+                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
+                        const isCurrent = p.player_id === _playerId;
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
+                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                            <span>💥 ${p.weekly_strikes}</span>
+                        </li>`;
+                    }).join('');
+                    
+                    // Определяем место текущего игрока
+                    const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
+                    if (playerIndex !== -1) {
+                        rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов) из ${sorted.length}`;
+                        rankBlock.style.display = 'block';
+                    } else {
+                        rankBlock.style.display = 'none';
+                    }
+                    
+                    // Добавляем обработчики кликов
+                    document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
+                        li.style.cursor = 'pointer';
+                        li.onclick = (e) => {
+                            e.stopPropagation();
+                            const targetPlayerId = li.getAttribute('data-player-id');
+                            const targetPlayerName = li.getAttribute('data-player-name');
+                            if (targetPlayerId === _playerId) {
+                                if (_mbProfileLink) {
+                                    showProfileLinkModalForPlayer(_mbProfileLink, _playerName);
+                                } else {
+                                    showToast("Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
                                 }
-                                const strikes = li.querySelector('span:last-child').innerText;
-                                showToast(`👤 ${targetPlayerName} — ${strikes} ударов за неделю`, "#aaffdd");
-                            };
-                        });
-                        
-                    } catch(e) { console.warn('loadWeeklyTop error:', e); }
-                }
+                                return;
+                            }
+                            const strikes = li.querySelector('span:last-child').innerText;
+                            showToast(`👤 ${targetPlayerName} — ${strikes} ударов за неделю`, "#aaffdd");
+                        };
+                    });
+                    
+                } catch(e) { console.warn('loadWeeklyTop error:', e); }
+            }
             
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
