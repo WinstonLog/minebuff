@@ -1148,11 +1148,12 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
+                <div class="menu-item" data-tab="arena">⚔️ Арена<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
                 <div class="menu-item" data-tab="combinedTop">🏆 Топ игроков<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="settings">⚙️ Настройки<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
         </div>
 
@@ -1277,6 +1278,40 @@
                     <ul class="weekly-top-list" id="weeklyTopList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
                     <div id="weeklyPlayerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="weeklyPlayerRank">—</span></div>
                     <div class="total-players" id="weeklyTotalPlayersCount"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- АРЕНА (PvP) -->
+        <div class="tab-panel" id="arenaPanel">
+            <div class="game-panel">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">⚔️ PvP АРЕНА</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Сражайся с другими игроками!</div>
+                
+                <div class="stats">
+                    <div class="stat-card"><div class="stat-label">🏆 Лига</div><div class="stat-value"><span id="arenaLeagueIcon">🟫</span> <span id="arenaLeagueName">Песчаная жила</span></div></div>
+                    <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">1000</div></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card"><div class="stat-label">✅ Побед</div><div class="stat-value" id="arenaWinsValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">❌ Поражений</div><div class="stat-value" id="arenaLossesValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">🤝 Ничьих</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
+                </div>
+                
+                <div class="strikes-counter">⚔️ ДУЭЛИ СЕГОДНЯ: <span id="arenaDuelsToday">0</span> / 3</div>
+                
+                <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
+                <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content"><ul class="weekly-top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
+                    💡 Победа +15 рейтинга, поражение -15, ничья 0<br>
+<!--                     🎴 Сила карт: A=10, P=9, G=8, B=7, C=6, D=5, E=4, ивентовые=12 -->
                 </div>
             </div>
         </div>
@@ -1559,6 +1594,14 @@
             let _pendingWeeklyReward = null;
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
+
+            let _pvpRating = 1000;
+            let _pvpWins = 0;
+            let _pvpLosses = 0;
+            let _pvpDraws = 0;
+            let _pvpDuelsToday = 0;
+            let _pvpLastDuelDate = null;
+            let _pvpHistory = [];
             
             // НОВОЕ: привязанная ссылка на профиль МБ
             let _mbProfileLink = null; // храним ID (число/строку)
@@ -1741,6 +1784,9 @@
                 }
                 document.querySelectorAll('.particle').forEach(p => p.remove());
             }
+
+            // ============ Арена PvP ============
+
 
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
             function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
@@ -2536,6 +2582,7 @@
                 updateExchangeGrid();
                 updatePickaxeVisual();
                 updateMiningInProfile();
+                updateArenaUI();
             }
             
             function saveGame() {
@@ -2549,7 +2596,16 @@
                     weeklyStrikes: _weeklyStrikes, lastWeeklyReset: _lastWeeklyReset,
                     pendingWeeklyReward: _pendingWeeklyReward,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
-                    mbProfileLink: _mbProfileLink // НОВОЕ
+                    mbProfileLink: _mbProfileLink, 
+
+                    pvpRating: _pvpRating,
+                    pvpWins: _pvpWins,
+                    pvpLosses: _pvpLosses,
+                    pvpDraws: _pvpDraws,
+                    pvpDuelsToday: _pvpDuelsToday,
+                    pvpLastDuelDate: _pvpLastDuelDate,
+                    pvpHistory: _pvpHistory
+
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) {
@@ -2577,7 +2633,16 @@
                         _pendingWeeklyReward = d.pendingWeeklyReward || null;
                         _calendarClaimed = d.calendarClaimed || {};
                         _lastCalendarDate = d.lastCalendarDate;
-                        _mbProfileLink = d.mbProfileLink || null; // НОВОЕ
+                        _mbProfileLink = d.mbProfileLink || null;
+
+                        _pvpRating = d.pvpRating || 1000;
+                        _pvpWins = d.pvpWins || 0;
+                        _pvpLosses = d.pvpLosses || 0;
+                        _pvpDraws = d.pvpDraws || 0;
+                        _pvpDuelsToday = d.pvpDuelsToday || 0;
+                        _pvpLastDuelDate = d.pvpLastDuelDate;
+                        _pvpHistory = d.pvpHistory || [];
+
                     } catch(e) {}
                 }
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -2592,7 +2657,9 @@
                 checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
                 loadSettings();    
                 applyTheme(getCurrentTheme());
-                updateProfileLinkUI(); // НОВОЕ
+                updateProfileLinkUI();
+                loadPvPData();
+                updateTopCardsInDB();
                 
                 if (_pendingWeeklyReward) {
                     setTimeout(() => {
@@ -2641,6 +2708,8 @@
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
+                syncPvPToSupabase();
+                updateTopCardsInDB();
             }
                         
             async function loadTopFromSupabase() {
@@ -2727,6 +2796,268 @@
                 document.head.appendChild(s);
             }
             
+            function getCardPower(rank) {
+                const powers = {
+                    'A': 10, 'P': 9, 'G': 8, 'B': 7, 'C': 6, 'D': 5, 'E': 4,
+                    'V': 12, 'L': 12, 'H': 12, 'N': 12
+                };
+                return powers[rank] || 3;
+            }
+
+            function getTop3Cards() {
+                const cards = [..._cardHistory].filter(c => c.rank);
+                const sorted = cards.sort((a, b) => getCardPower(b.rank) - getCardPower(a.rank));
+                return sorted.slice(0, 3).map(c => ({ rank: c.rank, power: getCardPower(c.rank) }));
+            }
+
+            function getLeagueByRating(rating) {
+                if (rating >= 6000) return { name: 'Звёздный рудник', icon: '✨', color: '#ffaa66', bonus: 75 };
+                if (rating >= 4000) return { name: 'Мифриловый трон', icon: '🌀', color: '#88aaff', bonus: 50 };
+                if (rating >= 2750) return { name: 'Алмазный престол', icon: '💎', color: '#88ffff', bonus: 40 };
+                if (rating >= 1750) return { name: 'Платиновый синклит', icon: '🔹', color: '#aaffaa', bonus: 30 };
+                if (rating >= 1000) return { name: 'Золотая цитадель', icon: '🟡', color: '#ffcc66', bonus: 20 };
+                if (rating >= 500) return { name: 'Серебряный гребень', icon: '⚪', color: '#cccccc', bonus: 15 };
+                if (rating >= 250) return { name: 'Медный бастион', icon: '🟠', color: '#ffaa66', bonus: 10 };
+                if (rating >= 100) return { name: 'Каменный рубеж', icon: '⚙️', color: '#aaaaaa', bonus: 5 };
+                return { name: 'Песчаная жила', icon: '🟫', color: '#aa8866', bonus: 0 };
+            }
+
+            async function findOpponent() {
+                if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return null; }
+                
+                // Проверка лимита дуэлей
+                const today = new Date().toDateString();
+                if (_pvpLastDuelDate !== today) {
+                    _pvpDuelsToday = 0;
+                    _pvpLastDuelDate = today;
+                    saveGame();
+                }
+                
+                if (_pvpDuelsToday >= 3) {
+                    showToast("❌ Лимит дуэлей на сегодня (3). Купите дополнительную за 5💎", "#ffaa88");
+                    return null;
+                }
+                
+                // Ищем реальных игроков (не себя)
+                const { data } = await supabaseClient
+                    .from('leaderboard')
+                    .select('player_id, username, level, diamonds, top_cards')
+                    .neq('player_id', _playerId)
+                    .limit(50);
+                
+                if (!data || data.length === 0) {
+                    showToast("❌ Нет доступных соперников", "#ff8888");
+                    return null;
+                }
+                
+                // Фильтруем тех, у кого есть карты
+                const validOpponents = data.filter(p => {
+                    try {
+                        const cards = JSON.parse(p.top_cards || '[]');
+                        return cards.length >= 1;
+                    } catch { return false; }
+                });
+                
+                if (validOpponents.length === 0) {
+                    showToast("❌ Нет соперников с картами", "#ff8888");
+                    return null;
+                }
+                
+                // Выбираем случайного соперника
+                const randomIndex = Math.floor(Math.random() * validOpponents.length);
+                return validOpponents[randomIndex];
+            }
+
+            async function updateTopCardsInDB() {
+                if (!supabaseClient || !_playerId) return;
+                const topCards = getTop3Cards();
+                await supabaseClient.from('leaderboard').upsert({
+                    player_id: _playerId,
+                    username: _playerName,
+                    top_cards: JSON.stringify(topCards),
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'player_id' });
+            }
+
+            async function startBattle() {
+                if (_level < 1) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
+                
+                const opponent = await findOpponent();
+                if (!opponent) return;
+                
+                // Мои карты
+                const myCards = getTop3Cards();
+                if (myCards.length === 0) { showToast("❌ У вас нет карт для боя!", "#ff8888"); return; }
+                const myPower = myCards.reduce((sum, c) => sum + c.power, 0);
+                
+                // Карты соперника (из БД или генерируем случайные)
+                let opponentCards = [];
+                let opponentPower = 0;
+                
+                try {
+                    const savedCards = JSON.parse(opponent.top_cards || '[]');
+                    if (savedCards.length > 0) {
+                        opponentCards = savedCards;
+                        opponentPower = savedCards.reduce((sum, c) => sum + c.power, 0);
+                    } else {
+                        // Генерируем случайные карты
+                        const randomRanks = ['E', 'D', 'C', 'B', 'G', 'P', 'A'];
+                        const rank = randomRanks[Math.floor(Math.random() * randomRanks.length)];
+                        opponentCards = [{ rank: rank, power: getCardPower(rank) }];
+                        opponentPower = getCardPower(rank);
+                    }
+                } catch { opponentPower = 5; }
+                
+                // Результат боя
+                let result = '';
+                let ratingChange = 0;
+                
+                if (myPower > opponentPower) {
+                    result = 'win';
+                    ratingChange = 15;
+                    _pvpWins++;
+                    showToast(`🎉 ПОБЕДА! +${ratingChange} рейтинга`, "#aaffdd");
+                } else if (myPower < opponentPower) {
+                    result = 'loss';
+                    ratingChange = -15;
+                    _pvpLosses++;
+                    showToast(`💔 ПОРАЖЕНИЕ! ${ratingChange} рейтинга`, "#ffaaaa");
+                } else {
+                    result = 'draw';
+                    ratingChange = 0;
+                    _pvpDraws++;
+                    showToast(`🤝 НИЧЬЯ! Рейтинг не изменился`, "#ffcc66");
+                }
+                
+                // Обновляем рейтинг
+                _pvpRating += ratingChange;
+                if (_pvpRating < 0) _pvpRating = 0;
+                _pvpDuelsToday++;
+                _pvpHistory.unshift({
+                    opponent: opponent.username,
+                    result: result,
+                    ratingChange: ratingChange,
+                    date: new Date().toISOString()
+                });
+                if (_pvpHistory.length > 20) _pvpHistory.pop();
+                
+                // Сохраняем
+                saveGame();
+                updateUI();
+                updateArenaUI();
+                syncPvPToSupabase();
+                
+                // Показываем детали боя
+                showBattleResultModal(opponent.username, myPower, opponentPower, result, ratingChange);
+            }
+
+            function showBattleResultModal(opponentName, myPower, opponentPower, result, ratingChange) {
+                const modalHtml = `
+                    <div class="modal-content" style="max-width: 320px;">
+                        <div class="modal-header">
+                            <div class="modal-icon">⚔️</div>
+                            <div class="modal-title">РЕЗУЛЬТАТ БОЯ</div>
+                        </div>
+                        <div class="modal-body">
+                            <div style="margin-bottom: 16px;">Противник: <strong>${escapeHtml(opponentName)}</strong></div>
+                            <div class="stat-row"><span>💪 Ваша сила:</span><span>${myPower}</span></div>
+                            <div class="stat-row"><span>💀 Сила врага:</span><span>${opponentPower}</span></div>
+                            <div class="stat-row" style="background: ${result === 'win' ? '#2a4a2a' : result === 'loss' ? '#4a2a2a' : '#2a2a4a'}">
+                                <span>🏆 Результат:</span>
+                                <span>${result === 'win' ? 'ПОБЕДА' : result === 'loss' ? 'ПОРАЖЕНИЕ' : 'НИЧЬЯ'}</span>
+                            </div>
+                            <div class="stat-row"><span>📈 Изменение рейтинга:</span><span>${ratingChange > 0 ? '+' : ''}${ratingChange}</span></div>
+                            <div class="reward-preview"><span>⭐ Текущий рейтинг: ${_pvpRating}</span></div>
+                        </div>
+                        <div class="modal-buttons"><button class="modal-btn close" id="battleResultCloseBtn">ЗАКРЫТЬ</button></div>
+                    </div>
+                `;
+                
+                const modalDiv = document.createElement('div');
+                modalDiv.className = 'modal show';
+                modalDiv.style.display = 'flex';
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                
+                modalDiv.querySelector('#battleResultCloseBtn').onclick = () => modalDiv.remove();
+                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+            }
+
+            async function syncPvPToSupabase() {
+                if (!supabaseClient || !_playerId || !_playerName) return;
+                try {
+                    const league = getLeagueByRating(_pvpRating);
+                    await supabaseClient.from('pvp_rating').upsert({
+                        player_id: _playerId,
+                        username: _playerName,
+                        rating: _pvpRating,
+                        wins: _pvpWins,
+                        losses: _pvpLosses,
+                        draws: _pvpDraws,
+                        duels_today: _pvpDuelsToday,
+                        last_duel_date: _pvpLastDuelDate,
+                        league_name: league.name,
+                        league_icon: league.icon,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id' });
+                } catch(e) { console.warn('syncPvP error:', e); }
+            }
+
+            function updateArenaUI() {
+                const league = getLeagueByRating(_pvpRating);
+                document.getElementById('arenaLeagueIcon').innerText = league.icon;
+                document.getElementById('arenaLeagueName').innerText = league.name;
+                document.getElementById('arenaRatingValue').innerText = _pvpRating;
+                document.getElementById('arenaWinsValue').innerText = _pvpWins;
+                document.getElementById('arenaLossesValue').innerText = _pvpLosses;
+                document.getElementById('arenaDrawsValue').innerText = _pvpDraws;
+                document.getElementById('arenaDuelsToday').innerText = `${_pvpDuelsToday}/3`;
+                
+                // История боёв
+                const historyContainer = document.getElementById('arenaHistoryList');
+                if (historyContainer) {
+                    if (!_pvpHistory.length) {
+                        historyContainer.innerHTML = '<li style="justify-content:center;">— Нет боёв —</li>';
+                    } else {
+                        historyContainer.innerHTML = _pvpHistory.slice(0, 10).map(h => {
+                            const date = new Date(h.date).toLocaleDateString();
+                            const resultText = h.result === 'win' ? '✅ Победа' : h.result === 'loss' ? '❌ Поражение' : '🤝 Ничья';
+                            return `<li><span>${date} vs ${escapeHtml(h.opponent)}</span><span>${resultText} ${h.ratingChange > 0 ? '+' : ''}${h.ratingChange}</span></li>`;
+                        }).join('');
+                    }
+                }
+            }
+
+            function buyExtraDuel() {
+                const cost = 5;
+                if (_diamonds >= cost) {
+                    _diamonds -= cost;
+                    _pvpDuelsToday = Math.max(0, _pvpDuelsToday - 1);
+                    saveGame();
+                    updateUI();
+                    updateArenaUI();
+                    showToast(`✅ Куплена дополнительная дуэль! Осталось ${_pvpDuelsToday}/3`, "#aaffdd");
+                } else {
+                    showToast(`❌ Нужно ${cost} алмазов для дополнительной дуэли`, "#ff8888");
+                }
+            }
+
+            async function loadPvPData() {
+                if (!supabaseClient || !_playerId) return;
+                try {
+                    const { data } = await supabaseClient.from('pvp_rating').select('*').eq('player_id', _playerId).single();
+                    if (data) {
+                        _pvpRating = data.rating || 1000;
+                        _pvpWins = data.wins || 0;
+                        _pvpLosses = data.losses || 0;
+                        _pvpDraws = data.draws || 0;
+                        _pvpDuelsToday = data.duels_today || 0;
+                        _pvpLastDuelDate = data.last_duel_date;
+                        updateArenaUI();
+                    }
+                } catch(e) { console.warn('loadPvPData error:', e); }
+            }
+
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
 
             function initCombinedTopTabs() {
@@ -2861,6 +3192,7 @@
                     else if (tab === 'calendar') panelId = 'calendarPanel';
                     else if (tab === 'combinedTop') panelId = 'combinedTopPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
+                    else if (tab === 'arena') panelId = 'arenaPanel';
                     
                     if (panelId) {
                         document.getElementById(panelId).classList.add('active');
@@ -2889,6 +3221,7 @@
                     if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
+                    if (tab === 'arena') { updateArenaUI(); loadPvPData(); }
                 };
             });
             
@@ -2907,6 +3240,8 @@
             document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
+            document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
+            document.getElementById('arenaBuyDuelBtn')?.addEventListener('click', () => buyExtraDuel());
             
             initDropdowns();
             initCombinedTopTabs();
