@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MineBuff — Шахта судьбы</title>
     <style>
-        /* ВСЕ СТИЛИ ОСТАЛИСЬ БЕЗ ИЗМЕНЕНИЙ */
         * {
             margin: 0;
             padding: 0;
@@ -138,7 +137,7 @@
             display: block;
         }
 
-        .game-panel, .top-panel, .profile-panel, .exchange-panel, .weekly-top-panel {
+        .game-panel, .top-panel, .profile-panel, .exchange-panel {
             background: rgba(8, 18, 28, 0.8);
             backdrop-filter: blur(12px);
             border-radius: 40px;
@@ -458,13 +457,10 @@
             font-weight: bold;
         }
 
-
-        /* Сезонные ранги */
         .card-badge.V { background: linear-gradient(135deg, #ff69b4, #ffc0cb); color: white; text-shadow: 0 0 2px #8b1a4a; }
         .card-badge.L { background: linear-gradient(135deg, #5bc0ff, #a8e4ff); color: white; text-shadow: 0 0 2px #004466; }
         .card-badge.H { background: linear-gradient(135deg, #ff6600, #ffaa44); color: white; text-shadow: 0 0 2px #4a1a00; }
         .card-badge.N { background: linear-gradient(135deg, #e63946, #ff8a8a); color: white; text-shadow: 0 0 2px #660000; }
-
         .card-badge.A { background: #5a1a1a; }
         .card-badge.P { background: #102b4e; }
         .card-badge.G { background: #1c4620; }
@@ -601,13 +597,13 @@
             font-size: 12px;
         }
 
-        .top-list, .weekly-top-list {
+        .top-list {
             width: 100%;
             list-style: none;
             margin-top: 10px;
         }
 
-        .top-list li, .weekly-top-list li {
+        .top-list li {
             display: flex;
             justify-content: space-between;
             background: #0f1a1fcc;
@@ -619,12 +615,12 @@
             transition: 0.1s;
         }
 
-        .top-list li:active, .weekly-top-list li:active {
+        .top-list li:active {
             transform: scale(0.98);
             background: #3a6b58cc;
         }
 
-        .top-list .current-player, .weekly-top-list .current-player {
+        .top-list .current-player {
             background: #3a6b58cc;
             border: 1px solid #ffcc66;
         }
@@ -637,15 +633,6 @@
             font-size: 13px;
             text-align: center;
             border: 1px solid #ffcc66;
-        }
-
-        .weekly-reset-info {
-            background: #1a2a2f;
-            border-radius: 30px;
-            padding: 8px 15px;
-            margin: 10px 0;
-            font-size: 12px;
-            text-align: center;
         }
 
         .calendar-panel {
@@ -758,7 +745,6 @@
             border-radius: 40px;
         }
 
-        /* Анимация падающих частиц */
         .particle {
             position: fixed;
             pointer-events: none;
@@ -769,25 +755,10 @@
         }
 
         @keyframes fall {
-            0% {
-                opacity: 0;
-                transform: translateY(-200px) rotate(0deg);
-            }
-            5% {
-                opacity: 1;
-            }
-            95% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(calc(100vh + 200px)) rotate(360deg);
-            }
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.2); }
+            0% { opacity: 0; transform: translateY(-200px) rotate(0deg); }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(calc(100vh + 200px)) rotate(360deg); }
         }
 
         .switch {
@@ -835,40 +806,6 @@
             transform: translateX(26px);
         }
 
-        /* Топы */
-        .top-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 60px;
-            padding: 4px;
-        }
-        .top-tab-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.1s;
-            background: transparent;
-            color: #9bbfd0;
-            border: none;
-        }
-        .top-tab-btn.active {
-            background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            color: #ffcc66;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        .top-content {
-            display: none;
-        }
-        .top-content.active {
-            display: block;
-        }
-
         .footer {
             margin-top: 16px;
             text-align: center;
@@ -896,7 +833,7 @@
             text-decoration: none;
         }
 
-        .modal, .chest-modal, .pickaxe-modal, .reward-modal, .profile-link-modal {
+        .modal, .chest-modal, .pickaxe-modal, .profile-link-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -910,11 +847,11 @@
             align-items: center;
         }
 
-        .modal.show, .chest-modal.show, .pickaxe-modal.show, .reward-modal.show, .profile-link-modal.show {
+        .modal.show, .chest-modal.show, .pickaxe-modal.show, .profile-link-modal.show {
             display: flex;
         }
 
-        .modal-content, .chest-content, .pickaxe-content, .reward-content, .profile-link-content {
+        .modal-content, .chest-content, .pickaxe-content, .profile-link-content {
             background: linear-gradient(145deg, #1e2e2f 0%, #0f1a1f 100%);
             border-radius: 56px;
             padding: 0;
@@ -928,36 +865,30 @@
         }
 
         @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .modal-header, .chest-header, .pickaxe-header, .reward-header, .profile-link-header {
+        .modal-header, .chest-header, .pickaxe-header, .profile-link-header {
             background: linear-gradient(135deg, #ffcc66 0%, #ffaa33 100%);
             padding: 20px;
             text-align: center;
         }
 
-        .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title, .reward-header .reward-title, .profile-link-header .profile-link-title {
+        .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title, .profile-link-header .profile-link-title {
             font-size: 20px;
             font-weight: 800;
             color: #1a1a2e;
             letter-spacing: 1px;
         }
 
-        .modal-header .modal-icon, .chest-header .chest-icon, .pickaxe-header .pickaxe-icon, .reward-header .reward-icon, .profile-link-header .profile-link-icon {
+        .modal-header .modal-icon, .chest-header .chest-icon, .pickaxe-header .pickaxe-icon, .profile-link-header .profile-link-icon {
             font-size: 48px;
             margin-bottom: 8px;
             display: block;
         }
 
-        .modal-body, .chest-body, .pickaxe-body, .reward-body, .profile-link-body {
+        .modal-body, .chest-body, .pickaxe-body, .profile-link-body {
             padding: 24px 20px;
         }
 
@@ -1020,13 +951,13 @@
             font-weight: bold;
         }
 
-        .modal-buttons, .pickaxe-buttons, .reward-buttons {
+        .modal-buttons, .pickaxe-buttons {
             display: flex;
             gap: 12px;
             margin-top: 20px;
         }
 
-        .modal-btn, .pickaxe-btn-modal, .chest-btn, .reward-btn {
+        .modal-btn, .pickaxe-btn-modal, .chest-btn {
             flex: 1;
             padding: 14px;
             border-radius: 60px;
@@ -1038,13 +969,13 @@
             text-transform: uppercase;
         }
 
-        .modal-btn.upgrade, .pickaxe-btn-modal.upgrade, .reward-btn.claim {
+        .modal-btn.upgrade, .pickaxe-btn-modal.upgrade {
             background: linear-gradient(135deg, #ffcc66, #ffaa33);
             color: #1a1a2e;
             box-shadow: 0 4px 15px rgba(255,170,51,0.3);
         }
 
-        .modal-btn.close, .pickaxe-btn-modal.close, .chest-btn, .reward-btn.close {
+        .modal-btn.close, .pickaxe-btn-modal.close, .chest-btn {
             background: linear-gradient(135deg, #3a6b58, #1e3e31);
             color: white;
         }
@@ -1083,13 +1014,12 @@
             .exchange-card { flex-direction: column; text-align: center; }
             .exchange-info { justify-content: center; }
             .exchange-action { width: 100%; }
-            .modal-content, .chest-content, .pickaxe-content, .reward-content { width: 92%; }
-            .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title, .reward-header .reward-title { font-size: 20px; }
+            .modal-content, .chest-content, .pickaxe-content { width: 92%; }
+            .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title { font-size: 20px; }
             .stat-row { padding: 8px 12px; }
             .stat-value { font-size: 16px; }
         }
 
-        /* Стили для привязки профиля */
         .profile-link-section {
             background: #071217cc;
             border-radius: 32px;
@@ -1129,7 +1059,6 @@
             text-decoration: none;
         }
 
-        /* Боевая арена */
         .battle-modal-overlay {
             position: fixed;
             top: 0;
@@ -1334,12 +1263,12 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
-                <div class="menu-item" data-tab="calendar">📅 Календарь <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="calendar">📅 Календарь</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
-                <div class="menu-item" data-tab="arena">⚔️ Арена<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="arena">⚔️ Арена</div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
-                <div class="menu-item" data-tab="combinedTop">🏆 Топ игроков<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="info">📚 Инфо<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
+                <div class="menu-item" data-tab="info">📚 Инфо</div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
         </div>
@@ -1420,7 +1349,6 @@
                     <div class="dropdown-content" id="questsContent"></div>
                 </div>
 
-                <!-- Блок привязки профиля MangaBuff -->
                 <div class="profile-link-section" id="profileLinkSection">
                     <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div>
                     <div id="profileLinkStatus"></div>
@@ -1443,29 +1371,15 @@
             </div>
         </div>
 
-        <!-- ТОП ИГРОКОВ -->
-        <div class="tab-panel" id="combinedTopPanel">
+        <!-- ТОП ИГРОКОВ (только уровни) -->
+        <div class="tab-panel" id="topPanel">
             <div class="top-panel game-panel">
                 <div style="font-weight: bold; font-size: 18px; text-align: center;">🏆 ТОП ИГРОКОВ</div>
                 <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Лучшие игроки MINEBUFF</div>
                 
-                <div class="top-tabs">
-                    <button class="top-tab-btn" id="topLevelsTabBtn">⭐ ТОП УРОВНЕЙ</button>
-                    <button class="top-tab-btn" id="topStrikesTabBtn">💥 ТОП УДАРОВ</button>
-                </div>
-                
-                <div id="topLevelsContent" class="top-content active">
-                    <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
-                    <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="playerRank">—</span></div>
-                    <div class="total-players" id="totalPlayersCount"></div>
-                </div>
-                
-                <div id="topStrikesContent" class="top-content">
-                    <div class="weekly-reset-info" id="weeklyResetInfo">⏳ Сброс: воскресенье, 23:59</div>
-                    <ul class="weekly-top-list" id="weeklyTopList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
-                    <div id="weeklyPlayerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="weeklyPlayerRank">—</span></div>
-                    <div class="total-players" id="weeklyTotalPlayersCount"></div>
-                </div>
+                <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
+                <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="playerRank">—</span></div>
+                <div class="total-players" id="totalPlayersCount"></div>
             </div>
         </div>
 
@@ -1486,18 +1400,15 @@
                     <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
                 </div>
                 
-<!--                 <div class="strikes-counter">⚔️ ДУЭЛИ БЕЗ ЛИМИТА: <span id="arenaDuelsToday">∞</span></div> -->
-                
                 <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content"><ul class="weekly-top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
+                    <div class="dropdown-content"><ul class="top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
                 </div>
                 
                 <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    💡 Победа +15 рейтинга, поражение -15, ничья 0<br>
-<!--                     🎴 Сила карт: A=10, P=9, G=8, B=7, C=6, D=5, E=4, ивентовые=12 -->
+                    💡 Победа +15 рейтинга, поражение -15, ничья 0
                 </div>
             </div>
         </div>
@@ -1566,7 +1477,7 @@
                             • <strong>Доступ:</strong> с 5 уровня и 3+ карт<br>
                             • <strong>Бой:</strong> 3 раунда, ваши ТОП-3 карты против карт соперника<br>
                             • <strong>Рейтинг:</strong> победа +15, поражение -15, ничья 0<br>
-                            • <strong>Лиги:</strong> рейтинг определяет вашу лигу и бонус к добыче
+                            • <strong>Лиги:</strong> рейтинг определяет вашу лигу
                         </div>
                     </div>
                 </div>
@@ -1613,28 +1524,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для награды за топ -->
-    <div class="reward-modal" id="rewardModal">
-        <div class="reward-content">
-            <div class="reward-header">
-                <div class="reward-icon">🏆</div>
-                <div class="reward-title">ПОЗДРАВЛЯЕМ!</div>
-            </div>
-            <div class="reward-body">
-                <div style="font-size: 16px; margin-bottom: 15px;">Вы заняли <strong id="rewardPlace">1</strong> место в <strong>ЕЖЕНЕДЕЛЬНОМ ТОПЕ УДАРОВ!</strong></div>
-                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;" id="rewardStrikes">🔥 Ударов: 0</div>
-                <div class="reward-preview" id="rewardDetails">
-                    <span>💎 +0 алмазов</span><br>
-                    <span>🎴 +1 карта ранга ?</span>
-                </div>
-            </div>
-            <div class="reward-buttons" style="padding: 0 20px 20px 20px;">
-                <button class="reward-btn claim" id="claimRewardBtn">ЗАБРАТЬ НАГРАДУ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- КРАСИВОЕ МОДАЛЬНОЕ ОКНО ДЛЯ СУНДУКА -->
     <div class="chest-modal" id="chestModal">
         <div class="chest-content">
             <div class="chest-header">
@@ -1648,7 +1537,6 @@
         </div>
     </div>
 
-    <!-- Модалка уровня -->
     <div class="modal" id="levelModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1686,7 +1574,6 @@
         </div>
     </div>
 
-    <!-- Модалка кирки -->
     <div class="pickaxe-modal" id="pickaxeModal">
         <div class="pickaxe-content">
             <div class="pickaxe-header">
@@ -1723,7 +1610,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для профиля MangaBuff -->
     <div class="profile-link-modal" id="profileLinkModal">
         <div class="profile-link-content">
             <div class="profile-link-header">
@@ -1740,7 +1626,6 @@
         </div>
     </div>
 
-    <!-- Модалка имени -->
     <div class="modal" id="nameModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -1848,9 +1733,6 @@
             let _pickaxeLevel = 1;
             let _chestStrikesCounter = 0;
             let _lastChestDate = null;
-            let _weeklyStrikes = 0;
-            let _lastWeeklyReset = null;
-            let _pendingWeeklyReward = null;
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
 
@@ -1858,16 +1740,12 @@
             let _pvpWins = 0;
             let _pvpLosses = 0;
             let _pvpDraws = 0;
-            let _pvpDuelsToday = 0;
-            let _pvpLastDuelDate = null;
             let _pvpHistory = [];
             let battleAnimationInterval = null;
             let battleModalDiv = null;
             
-            // НОВОЕ: привязанная ссылка на профиль МБ
-            let _mbProfileLink = null; // храним ID (число/строку)
+            let _mbProfileLink = null;
 
-            // ============ НАСТРОЙКИ ============
             let _particlesEnabled = true;
 
             function loadSettings() {
@@ -1909,7 +1787,6 @@
                 }
             }
 
-            // ============ СЕЗОННЫЕ ТЕМЫ ============
             function getCurrentTheme() {
                 const now = new Date();
                 const month = now.getMonth() + 1;
@@ -1920,19 +1797,7 @@
                 if (month >= 6 && month <= 8) return 'summer';
                 if (month >= 3 && month <= 5) return 'spring';
                 if (month === 9 || month === 10) return 'autumn';
-                
                 return 'default';
-            }
-            
-            function getSeasonIcon(theme) {
-                switch(theme) {
-                    case 'winter': return '❄️';
-                    case 'halloween': return '🎃';
-                    case 'summer': return '☀️';
-                    case 'spring': return '🌸';
-                    case 'autumn': return '🍂';
-                    default: return '⛏';
-                }
             }
             
             function applyTheme(theme) {
@@ -1974,7 +1839,6 @@
                 }
             }
 
-            // ============ ЧАСТИЦЫ НА ФОНЕ ============
             let particleInterval = null;
 
             function startParticles(theme) {
@@ -1984,29 +1848,12 @@
                 let intervalTime = 0;
                 
                 switch(theme) {
-                    case 'winter':
-                        particleChar = '❄️';
-                        intervalTime = 600;
-                        break;
-                    case 'halloween':
-                        particleChar = '🦇';
-                        intervalTime = 1200;
-                        break;
-                    case 'summer':
-                        particleChar = '✨';
-                        intervalTime = 800;
-                        break;
-                    case 'spring':
-                        particleChar = '🌸';
-                        intervalTime = 700;
-                        break;
-                    case 'autumn':
-                        particleChar = '🍂';
-                        intervalTime = 750;
-                        break;
-                    default:
-                        particleChar = '';
-                        intervalTime = 0;
+                    case 'winter': particleChar = '❄️'; intervalTime = 600; break;
+                    case 'halloween': particleChar = '🦇'; intervalTime = 1200; break;
+                    case 'summer': particleChar = '✨'; intervalTime = 800; break;
+                    case 'spring': particleChar = '🌸'; intervalTime = 700; break;
+                    case 'autumn': particleChar = '🍂'; intervalTime = 750; break;
+                    default: particleChar = ''; intervalTime = 0;
                 }
                 
                 if (intervalTime === 0) return;
@@ -2015,7 +1862,6 @@
                     const particle = document.createElement('div');
                     particle.className = 'particle';
                     particle.textContent = particleChar;
-                    
                     particle.style.left = Math.random() * 100 + '%';
                     const size = Math.random() * 12 + 8;
                     particle.style.fontSize = size + 'px';
@@ -2025,17 +1871,11 @@
                     const delay = Math.random() * 2;
                     particle.style.animationDelay = delay + 's';
                     particle.style.top = '-50px';
-                    
                     document.body.appendChild(particle);
-                    
-                    setTimeout(() => {
-                        if (particle && particle.remove) particle.remove();
-                    }, 15000);
+                    setTimeout(() => { if (particle && particle.remove) particle.remove(); }, 15000);
                 }
                 
-                particleInterval = setInterval(() => {
-                    createParticle();
-                }, intervalTime);
+                particleInterval = setInterval(() => { createParticle(); }, intervalTime);
             }
 
             function stopParticles() {
@@ -2045,9 +1885,6 @@
                 }
                 document.querySelectorAll('.particle').forEach(p => p.remove());
             }
-
-            // ============ Арена PvP ============
-
 
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
             function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
@@ -2107,67 +1944,39 @@
             }
             
             function getLevelUpCost(level) { 
-                if (level < 5) {
-                    return Math.floor(10 + level * 5);
-                } else {
-                    return Math.floor(35 + (level - 1) * 8 + Math.pow(level, 1.2));
-                }
+                if (level < 5) return Math.floor(10 + level * 5);
+                else return Math.floor(35 + (level - 1) * 8 + Math.pow(level, 1.2));
             }
-            function getPickaxeUpgradeCost(level) { 
-                return Math.floor(30 + (level - 1) * 15); 
-            }
+            function getPickaxeUpgradeCost(level) { return Math.floor(30 + (level - 1) * 15); }
 
             function getCardCounts() { 
-                const c = { 
-                    'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0,
-                    'V':0, 'L':0, 'H':0, 'N':0
-                }; 
+                const c = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 }; 
                 for (const card of _cardHistory) {
                     if (card.rank && c[card.rank] !== undefined) c[card.rank]++; 
                 }
                 return c; 
             }
 
-            // НОВОЕ: проверка админ-команд
             async function checkAdminCommands() {
                 if (!supabaseClient) return;
-                
                 try {
-                    const { data } = await supabaseClient
-                        .from('admin_actions')
-                        .select('*')
-                        .eq('target_player_id', _playerId)
-                        .eq('status', 'pending');
-                    
+                    const { data } = await supabaseClient.from('admin_actions').select('*').eq('target_player_id', _playerId).eq('status', 'pending');
                     for (const action of data || []) {
                         let needUpdate = false;
-                        
                         if (action.action_type === 'remove_card') {
                             const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
-                            if (index !== -1) {
-                                _cardHistory.splice(index, 1);
-                                showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
-                            } else {
-                                console.log(`⚠️ Попытка списать карту ${action.card_rank}, но у игрока её нет`);
-                                showToast(`⚠️ Карта ${action.card_rank} не найдена (уже списана?)`, "#ffaa88");
-                            }
+                            if (index !== -1) { _cardHistory.splice(index, 1); showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888"); }
+                            else showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
                             needUpdate = true;
                         }
                         else if (action.action_type === 'add_card') {
                             addCardToHistory(action.card_rank);
-                            showToast(`🎁 Администратор выдал вам карту ${action.card_rank}!`, "#aaffdd");
+                            showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
                             needUpdate = true;
                         }
-                        
                         if (needUpdate) {
-                            await supabaseClient
-                                .from('admin_actions')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
-                                .eq('id', action.id);
-                            
-                            saveGame();
-                            updateUI();
-                            
+                            await supabaseClient.from('admin_actions').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', action.id);
+                            saveGame(); updateUI();
                             setTimeout(() => {
                                 const counts = getCardCounts();
                                 const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
@@ -2175,36 +1984,19 @@
                                 if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
                             }, 100);
                         } else {
-                            await supabaseClient
-                                .from('admin_actions')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
-                                .eq('id', action.id);
+                            await supabaseClient.from('admin_actions').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', action.id);
                         }
                     }
                 } catch(e) { console.warn('Check admin commands error:', e); }
             }
 
-            // НОВОЕ: функции для привязки профиля МБ
             function updateProfileLinkUI() {
                 const section = document.getElementById('profileLinkSection');
                 if (!section) return;
-                
                 if (_mbProfileLink) {
-                    section.innerHTML = `
-                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРОФИЛЬ ПРИВЯЗАН</div>
-                        <div style="background: #0f1a1f; border-radius: 30px; padding: 8px;">
-                            <a href="https://mangabuff.ru/users/${_mbProfileLink}" target="_blank" style="color: #ffcc66; text-decoration: none; font-size: 14px;">
-                                📎 mangabuff.ru/users/${_mbProfileLink}
-                            </a>
-                        </div>
-                        <div class="profile-link-info" style="margin-top: 8px;">✅ Привязан навсегда</div>
-                    `;
+                    section.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРОФИЛЬ ПРИВЯЗАН</div><div style="background: #0f1a1f; border-radius: 30px; padding: 8px;"><a href="https://mangabuff.ru/users/${_mbProfileLink}" target="_blank" style="color: #ffcc66; text-decoration: none; font-size: 14px;">📎 mangabuff.ru/users/${_mbProfileLink}</a></div><div class="profile-link-info" style="margin-top: 8px;">✅ Привязан навсегда</div>`;
                 } else {
-                    section.innerHTML = `
-                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div>
-                        <button class="profile-link-btn" id="openProfileLinkModalBtn">ПРИВЯЗАТЬ</button>
-                        <div class="profile-link-info">Привяжите профиль, чтобы другие могли открыть его в топе</div>
-                    `;
+                    section.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div><button class="profile-link-btn" id="openProfileLinkModalBtn">ПРИВЯЗАТЬ</button><div class="profile-link-info">Привяжите профиль, чтобы другие могли открыть его в топе</div>`;
                     const btn = document.getElementById('openProfileLinkModalBtn');
                     if (btn) btn.onclick = () => document.getElementById('profileLinkModal').classList.add('show');
                 }
@@ -2219,148 +2011,16 @@
             }
             
             function showProfileLinkModalForPlayer(playerMbLink, playerName) {
-                if (!playerMbLink) {
-                    showToast(`❌ У игрока ${playerName} не привязан профиль MB`, "#ffaa88");
-                    return;
-                }
-                // Модальное окно с выбором: открыть или закрыть
-                const modalHtml = `
-                    <div class="profile-link-content" style="max-width: 300px;">
-                        <div class="profile-link-header">
-                            <div class="profile-link-title">🔗 ПРОФИЛЬ ИГРОКА</div>
-                        </div>
-                        <div class="profile-link-body">
-                            <div style="margin-bottom: 16px;">Игрок: <strong>${escapeHtml(playerName)}</strong></div>
-                            <div style="margin-bottom: 16px;">Привязан профиль: <strong>${playerMbLink}</strong></div>
-                            <div class="modal-buttons" style="gap: 12px;">
-                                <button class="modal-btn close" id="profileLinkCancelBtn">ЗАКРЫТЬ</button>
-                                <button class="modal-btn upgrade" id="profileLinkOpenBtn">ОТКРЫТЬ</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                if (!playerMbLink) { showToast(`❌ У игрока ${playerName} не привязан профиль MB`, "#ffaa88"); return; }
+                const modalHtml = `<div class="profile-link-content" style="max-width: 300px;"><div class="profile-link-header"><div class="profile-link-title">🔗 ПРОФИЛЬ ИГРОКА</div></div><div class="profile-link-body"><div style="margin-bottom: 16px;">Игрок: <strong>${escapeHtml(playerName)}</strong></div><div style="margin-bottom: 16px;">Привязан профиль: <strong>${playerMbLink}</strong></div><div class="modal-buttons" style="gap: 12px;"><button class="modal-btn close" id="profileLinkCancelBtn">ЗАКРЫТЬ</button><button class="modal-btn upgrade" id="profileLinkOpenBtn">ОТКРЫТЬ</button></div></div></div>`;
                 const modalDiv = document.createElement('div');
                 modalDiv.className = 'profile-link-modal show';
                 modalDiv.style.display = 'flex';
                 modalDiv.innerHTML = modalHtml;
                 document.body.appendChild(modalDiv);
-                
                 modalDiv.querySelector('#profileLinkCancelBtn').onclick = () => modalDiv.remove();
-                modalDiv.querySelector('#profileLinkOpenBtn').onclick = () => {
-                    window.open(`https://mangabuff.ru/users/${playerMbLink}`, '_blank');
-                    modalDiv.remove();
-                };
+                modalDiv.querySelector('#profileLinkOpenBtn').onclick = () => { window.open(`https://mangabuff.ru/users/${playerMbLink}`, '_blank'); modalDiv.remove(); };
                 modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
-            }
-
-            function checkWeeklyReset() {
-                const now = new Date();
-                const currentWeekStart = getWeekStartDate(now);
-                if (!_lastWeeklyReset || new Date(_lastWeeklyReset) < currentWeekStart) {
-                    giveWeeklyRewards();
-                    _weeklyStrikes = 0;
-                    _lastWeeklyReset = now.toISOString();
-                    saveGame();
-                }
-            }
-            
-            function getWeekStartDate(date) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = (day === 0 ? 7 : day) - 1;
-                d.setDate(d.getDate() - diff);
-                d.setHours(0, 0, 0, 0);
-                return d;
-            }
-            
-            function checkPendingReward() {
-                if (_pendingWeeklyReward) {
-                    showRewardModal(_pendingReward);
-                    _pendingWeeklyReward = null;
-                    saveGame();
-                }
-            }
-            
-            function showRewardModal(rewardData) {
-                document.getElementById('rewardPlace').innerText = rewardData.place;
-                document.getElementById('rewardStrikes').innerHTML = `🔥 Ударов: ${rewardData.strikes}`;
-                
-                const hasCard = rewardData.cardRank && rewardData.cardRank !== null;
-                
-                if (hasCard) {
-                    document.getElementById('rewardDetails').innerHTML = `
-                        <span>💎 +${rewardData.diamonds} алмазов</span><br>
-                        <span>🎴 +1 карта ранга ${rewardData.cardRank}</span>
-                    `;
-                } else {
-                    document.getElementById('rewardDetails').innerHTML = `
-                        <span>💎 +${rewardData.diamonds} алмазов</span>
-                    `;
-                }
-                
-                document.getElementById('rewardModal').classList.add('show');
-                
-                const claimBtn = document.getElementById('claimRewardBtn');
-                const newClaimBtn = claimBtn.cloneNode(true);
-                claimBtn.parentNode.replaceChild(newClaimBtn, claimBtn);
-                
-                newClaimBtn.onclick = () => {
-                    _diamonds += rewardData.diamonds;
-                    
-                    if (hasCard) {
-                        addCardToHistory(rewardData.cardRank);
-                        showToast(`🏆 Вы получили награду за ${rewardData.place} место! +${rewardData.diamonds}💎 и карта ${rewardData.cardRank}!`, "#ffcc66");
-                    } else {
-                        showToast(`🏆 Вы получили награду за ${rewardData.place} место! +${rewardData.diamonds}💎`, "#ffcc66");
-                    }
-                    
-                    document.getElementById('rewardModal').classList.remove('show');
-                    saveGame();
-                    updateUI();
-                };
-            }
-            
-            async function giveWeeklyRewards() {
-                if (!supabaseClient) return;
-                try {
-                    const { data } = await supabaseClient
-                        .from('weekly_strikes')
-                        .select('player_id, username, weekly_strikes')
-                        .order('weekly_strikes', { ascending: false });
-                    
-                    if (!data || data.length === 0) return;
-                    
-                    for (let i = 0; i < data.length; i++) {
-                        const player = data[i];
-                        let reward = null;
-                        
-                        if (i === 0) reward = { diamonds: 20, card: 'A', place: '1' };
-                        else if (i === 1) reward = { diamonds: 15, card: 'P', place: '2' };
-                        else if (i === 2) reward = { diamonds: 10, card: 'G', place: '3' };
-                        else if (i < 10) reward = { diamonds: 5, place: `${i+1}` };
-                        else if (i < 50) reward = { diamonds: 2, place: `${i+1}` };
-                        else reward = { diamonds: 1, place: `${i+1}` };
-                        
-                        if (player.player_id === _playerId) {
-                            _pendingWeeklyReward = {
-                                place: reward.place,
-                                strikes: player.weekly_strikes,
-                                diamonds: reward.diamonds,
-                                cardRank: reward.card || null
-                            };
-                            saveGame();
-                        }
-                        
-                        await supabaseClient
-                            .from('weekly_strikes')
-                            .update({ reward_given: true, reward_claimed_at: new Date().toISOString() })
-                            .eq('player_id', player.player_id);
-                    }
-                    
-                    await supabaseClient.from('weekly_strikes').delete().neq('player_id', 'none');
-                    checkPendingReward();
-                    
-                } catch(e) { console.warn('Weekly rewards error:', e); }
             }
             
             function checkChestReset() {
@@ -2373,9 +2033,7 @@
                 }
             }
             
-            function isChestAvailable() {
-                return _chestStrikesCounter >= 100;
-            }
+            function isChestAvailable() { return _chestStrikesCounter >= 100; }
             
             function checkChest() {
                 if (_pendingChest) return;
@@ -2387,7 +2045,6 @@
 
             function openChest() {
                 if (!_pendingChest || _pendingChest.isOpened) return;
-                
                 const isLegendary = Math.random() < 0.1;
                 let reward = {};
                 if (isLegendary) {
@@ -2408,25 +2065,12 @@
                     ];
                     reward = normalRewards[Math.floor(Math.random() * normalRewards.length)];
                 }
-                
                 _pendingChest = { ...reward, isOpened: true };
-                
-                if (reward.type === 'diamonds') { 
-                    _diamonds += reward.amount; 
-                    showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); 
-                } else if (reward.type === 'ore') { 
-                    _ore += reward.amount; 
-                    showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); 
-                } else if (reward.type === 'card') {
-                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank });
-                    showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966");
-                }
-                
+                if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); } 
+                else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); } 
+                else if (reward.type === 'card') { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank }); showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966"); }
                 _chestStrikesCounter = 0;
-                saveGame(); 
-                updateUI();
-                checkAchievements();
-                
+                saveGame(); updateUI(); checkAchievements();
                 document.getElementById('chestModal').classList.remove('show');
                 _pendingChest = null;
             }
@@ -2442,8 +2086,7 @@
                 }
                 _cardHistory = newHistory;
                 _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🔄 Обмен: ${rule.need}x${rule.from} → ${rule.to}`, rank: rule.to });
-                saveGame(); updateUI();
-                checkAchievements();
+                saveGame(); updateUI(); checkAchievements();
                 showToast(`✅ Обмен выполнен! +1 карта ${rule.to}`, "#aaffdd");
             }
             
@@ -2453,31 +2096,16 @@
                 const counts = getCardCounts();
                 container.innerHTML = exchangeRules.map(rule => {
                     const available = counts[rule.from] || 0;
-                    return `<div class="exchange-card ${available < rule.need ? 'disabled' : ''}">
-                        <div class="exchange-info"><div class="exchange-arrows"><span class="exchange-from">${rule.need}x ${rule.from}</span><span>→</span><span class="exchange-to">1x ${rule.to}</span></div><div class="exchange-count">📊 есть: ${available}/${rule.need}</div></div>
-                        <button class="exchange-action" ${available < rule.need ? 'disabled' : ''} onclick="window.performExchangeWrapper({from:'${rule.from}',to:'${rule.to}',need:${rule.need}})">ОБМЕНЯТЬ</button>
-                    </div>`;
+                    return `<div class="exchange-card ${available < rule.need ? 'disabled' : ''}"><div class="exchange-info"><div class="exchange-arrows"><span class="exchange-from">${rule.need}x ${rule.from}</span><span>→</span><span class="exchange-to">1x ${rule.to}</span></div><div class="exchange-count">📊 есть: ${available}/${rule.need}</div></div><button class="exchange-action" ${available < rule.need ? 'disabled' : ''} onclick="window.performExchangeWrapper({from:'${rule.from}',to:'${rule.to}',need:${rule.need}})">ОБМЕНЯТЬ</button></div>`;
                 }).join('');
             }
-            
             window.performExchangeWrapper = performExchange;
 
             function addCardToHistory(rank) { 
                 _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${rank}`, rank }); 
                 if (_cardHistory.length > 30) _cardHistory.pop(); 
-                updateUI(); 
-                saveGame(); 
-                showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966"); 
-                checkAchievements(); 
-                updateQuestProgress('daily_card', 1); 
-            }
-            
-            function addNoCardToHistory() { 
-                _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `❌ Карта не выпала (0.5%)`, rank: null }); 
-                if (_cardHistory.length > 30) _cardHistory.pop(); 
-                updateUI(); 
-                saveGame(); 
-                showToast(`❌ Не повезло...`, "#ff8888"); 
+                updateUI(); saveGame(); showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966"); 
+                checkAchievements(); updateQuestProgress('daily_card', 1); 
             }
             
             function showPickaxeModal() {
@@ -2499,22 +2127,9 @@
             
             function performPickaxeUpgrade() {
                 const cost = getPickaxeUpgradeCost(_pickaxeLevel);
-                if (_pickaxeLevel >= 5) {
-                    showToast("🔧 Кирка уже максимального уровня!", "#ff8888");
-                    document.getElementById('pickaxeModal').classList.remove('show');
-                    return;
-                }
-                if (_diamonds >= cost) {
-                    _diamonds -= cost;
-                    _pickaxeLevel++;
-                    showToast(`🔧 Кирка улучшена до ${_pickaxeLevel} уровня!`, "#ffcc66");
-                    saveGame();
-                    updateUI();
-                    document.getElementById('pickaxeModal').classList.remove('show');
-                } else {
-                    showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c");
-                    document.getElementById('pickaxeModal').classList.remove('show');
-                }
+                if (_pickaxeLevel >= 5) { showToast("🔧 Кирка уже максимального уровня!", "#ff8888"); document.getElementById('pickaxeModal').classList.remove('show'); return; }
+                if (_diamonds >= cost) { _diamonds -= cost; _pickaxeLevel++; showToast(`🔧 Кирка улучшена до ${_pickaxeLevel} уровня!`, "#ffcc66"); saveGame(); updateUI(); document.getElementById('pickaxeModal').classList.remove('show'); }
+                else { showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c"); document.getElementById('pickaxeModal').classList.remove('show'); }
             }
             
             function updatePickaxeVisual() {
@@ -2522,19 +2137,11 @@
                 pickaxe.classList.remove('pickaxe-lvl1', 'pickaxe-lvl2', 'pickaxe-lvl3', 'pickaxe-lvl4', 'pickaxe-lvl5');
                 pickaxe.classList.add(`pickaxe-lvl${_pickaxeLevel}`);
                 document.getElementById('pickaxeLevel').innerText = `Ур.${_pickaxeLevel}`;
-                if (_pickaxeLevel >= 5) {
-                    document.getElementById('upgradePickaxeBtn').style.opacity = '0.5';
-                    document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none';
-                } else {
-                    document.getElementById('upgradePickaxeBtn').style.opacity = '1';
-                    document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'auto';
-                }
+                if (_pickaxeLevel >= 5) { document.getElementById('upgradePickaxeBtn').style.opacity = '0.5'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none'; }
+                else { document.getElementById('upgradePickaxeBtn').style.opacity = '1'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'auto'; }
                 const eventX2 = document.getElementById('eventX2');
-                if (isEventActive()) {
-                    eventX2.style.display = 'flex';
-                } else {
-                    eventX2.style.display = 'none';
-                }
+                if (isEventActive()) eventX2.style.display = 'flex';
+                else eventX2.style.display = 'none';
             }
             
             function updateMiningInProfile() {
@@ -2595,34 +2202,20 @@
             function updateQuestsUI() {
                 const c = document.getElementById('questsContent');
                 if (!c) return;
-                
                 let done = questsList.filter(q => _quests[q.id]?.completed).length;
                 const progressSpan = document.getElementById('questsProgress');
                 if (progressSpan) progressSpan.innerHTML = `(${done}/${questsList.length})`;
-                
                 c.innerHTML = questsList.map(q => {
                     const cur = _quests[q.id]?.current || 0;
                     const pct = Math.min(100, Math.floor(cur / q.target * 100));
-                    return `<div class="quest-item">
-                        <div>
-                            <div>${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div>
-                            <div>${q.desc} (${cur}/${q.target})</div>
-                            <div style="background:#2a3a2a; border-radius:20px; height:4px; width:100%; margin-top:5px;">
-                                <div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div>
-                            </div>
-                        </div>
-                        <div>+${q.reward}💎</div>
-                    </div>`;
+                    return `<div class="quest-item"><div><div>${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div><div>${q.desc} (${cur}/${q.target})</div><div style="background:#2a3a2a; border-radius:20px; height:4px; width:100%; margin-top:5px;"><div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div></div></div><div>+${q.reward}💎</div></div>`;
                 }).join('');
             }
             
             function checkCalendarReset() {
                 const now = new Date();
                 const todayStr = now.toDateString();
-                if (_lastCalendarDate !== todayStr) {
-                    _lastCalendarDate = todayStr;
-                    saveGame();
-                }
+                if (_lastCalendarDate !== todayStr) { _lastCalendarDate = todayStr; saveGame(); }
                 updateCalendarUI();
             }
             
@@ -2638,14 +2231,9 @@
                 if (!reward) return false;
                 if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💎 +${reward.amount} алмазов (календарь)!`, "#aaffdd"); }
                 else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды (календарь)!`, "#aaffdd"); }
-                else if (reward.type === 'card') {
-                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь)`, rank: reward.rank });
-                    showToast(`✨ КАРТА ${reward.rank} из календаря!`, "#ffd966");
-                }
+                else if (reward.type === 'card') { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь)`, rank: reward.rank }); showToast(`✨ КАРТА ${reward.rank} из календаря!`, "#ffd966"); }
                 _calendarClaimed[day] = true;
-                saveGame();
-                updateCalendarUI();
-                checkAchievements();
+                saveGame(); updateCalendarUI(); checkAchievements();
                 return true;
             }
                         
@@ -2655,44 +2243,22 @@
                 const today = new Date();
                 const currentDay = today.getDate();
                 const available = canClaimCalendar();
-                
                 let html = '';
                 for (let i = 1; i <= 30; i++) {
                     const reward = calendarRewards[i-1];
                     const isClaimed = _calendarClaimed[i];
                     const isToday = (i === currentDay);
                     const isLocked = !available || (i > currentDay && !isClaimed);
-                    
-                    let statusClass = '';
-                    let statusIcon = '';
-                    if (isClaimed) {
-                        statusClass = 'claimed';
-                        statusIcon = '✅';
-                    } else if (isToday && !isLocked && !isClaimed) {
-                        statusClass = 'today';
-                        statusIcon = '🎁';
-                    } else if (isLocked) {
-                        statusClass = 'locked';
-                        statusIcon = '🔒';
-                    } else {
-                        statusIcon = '📅';
-                    }
-                    
+                    let statusClass = '', statusIcon = '';
+                    if (isClaimed) { statusClass = 'claimed'; statusIcon = '✅'; }
+                    else if (isToday && !isLocked && !isClaimed) { statusClass = 'today'; statusIcon = '🎁'; }
+                    else if (isLocked) { statusClass = 'locked'; statusIcon = '🔒'; }
+                    else { statusIcon = '📅'; }
                     let rewardText = reward.text;
                     if (rewardText.length > 20) rewardText = rewardText.substring(0, 18) + '…';
-                    
-                    html += `
-                        <div class="calendar-day-item ${statusClass}" onclick="window.claimCalendarDay(${i})">
-                            <div class="calendar-day-left">
-                                <div class="calendar-day-number">День ${i}</div>
-                                <div class="calendar-day-reward">🎁 ${rewardText}</div>
-                            </div>
-                            <div class="calendar-day-status">${statusIcon}</div>
-                        </div>
-                    `;
+                    html += `<div class="calendar-day-item ${statusClass}" onclick="window.claimCalendarDay(${i})"><div class="calendar-day-left"><div class="calendar-day-number">День ${i}</div><div class="calendar-day-reward">🎁 ${rewardText}</div></div><div class="calendar-day-status">${statusIcon}</div></div>`;
                 }
                 container.innerHTML = html;
-                
                 const msgDiv = document.getElementById('calendarMessage');
                 if (!available) msgDiv.innerHTML = '🔒 Календарь станет доступен после достижения 5 уровня!';
                 else if (_calendarClaimed[currentDay]) msgDiv.innerHTML = '✅ Награда за сегодня получена! Возвращайтесь завтра.';
@@ -2702,25 +2268,11 @@
             function checkDailyReset() {
                 const today = new Date().toDateString();
                 const lastReset = localStorage.getItem('minebuff_last_reset');
-                
                 let newLimit = 100 + Math.floor(_level / 10);
                 if (newLimit > 200) newLimit = 200;
-                
-                if (lastReset !== today) { 
-                    _strikesDone = 0; 
-                    _strikesLimit = newLimit;
-                    localStorage.setItem('minebuff_last_reset', today); 
-                    saveGame(); 
-                } else {
-                    if (_strikesLimit !== newLimit) {
-                        _strikesLimit = newLimit;
-                        if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
-                        saveGame();
-                    }
-                }
+                if (lastReset !== today) { _strikesDone = 0; _strikesLimit = newLimit; localStorage.setItem('minebuff_last_reset', today); saveGame(); } 
+                else { if (_strikesLimit !== newLimit) { _strikesLimit = newLimit; if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit; saveGame(); } }
                 if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
-                const levelBtn = document.getElementById('levelUpBtn');
-                if (levelBtn) { if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) levelBtn.classList.add('disabled'); else levelBtn.classList.remove('disabled'); }
                 const now = new Date();
                 if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
                     for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
@@ -2730,98 +2282,297 @@
                 }
                 updatePickaxeVisual();
                 checkChestReset();
-                checkWeeklyReset();
                 checkCalendarReset();
-                if (supabaseClient) {
-                    checkAndResetWeeklyTop();
-                }
             }
             
-            async function syncWeeklyStrikes() {
+            async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    await supabaseClient.from('weekly_strikes').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        weekly_strikes: _weeklyStrikes,
-                        mb_link: _mbProfileLink || null,
-                        updated_at: new Date().toISOString()
+                    await supabaseClient.from('leaderboard').upsert({
+                        player_id: _playerId, username: _playerName, level: _level, diamonds: _diamonds,
+                        mb_link: _mbProfileLink || null, updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
-                } catch(e) { console.warn('Weekly sync error:', e); }
+                } catch(e) { console.warn('syncToSupabase error:', e); }
+                syncPvPToSupabase();
+                updateTopCardsInDB();
             }
-
-            async function loadWeeklyTop() {
-                if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
+                        
+            async function loadTopFromSupabase() {
+                if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
-                    const { data } = await supabaseClient
-                        .from('weekly_strikes')
-                        .select('username, weekly_strikes, player_id, updated_at, mb_link');
-                    
-                    const container = document.getElementById('weeklyTopList');
-                    const rankBlock = document.getElementById('weeklyPlayerRankBlock');
-                    const rankSpan = document.getElementById('weeklyPlayerRank');
-                    const totalSpan = document.getElementById('weeklyTotalPlayersCount');
-                    
+                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link').order('level', { ascending: false }).order('updated_at', { ascending: true });
+                    const container = document.getElementById('topList');
+                    const rankBlock = document.getElementById('playerRankBlock');
+                    const rankSpan = document.getElementById('playerRank');
+                    const totalSpan = document.getElementById('totalPlayersCount');
                     if (!data || !data.length) {
                         container.innerHTML = '<li>Пока никого</li>';
                         if (rankBlock) rankBlock.style.display = 'none';
                         if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
                         return;
                     }
-                    
                     const sorted = [...data];
-                    sorted.sort((a, b) => {
-                        if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
-                        return new Date(a.updated_at) - new Date(b.updated_at);
-                    });
-                    
+                    sorted.sort((a, b) => { if (a.level !== b.level) return b.level - a.level; return new Date(a.updated_at) - new Date(b.updated_at); });
                     if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
-                    
                     const top10 = sorted.slice(0, 10);
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-strikes="${p.weekly_strikes}" data-mb-link="${p.mb_link || ''}">
-                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                            <span>💥 ${p.weekly_strikes}</span>
-                        </li>`;
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}"><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`;
                     }).join('');
-                    
                     const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) {
-                        rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов) из ${sorted.length}`;
-                        rankBlock.style.display = 'block';
-                    } else {
-                        rankBlock.style.display = 'none';
-                    }
-                    
-                    // ОБРАБОТЧИК КЛИКА
-                    document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
+                    if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`; rankBlock.style.display = 'block'; }
+                    else { rankBlock.style.display = 'none'; }
+                    document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
                         li.onclick = (e) => {
                             e.stopPropagation();
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
-                            const targetPlayerStrikes = li.getAttribute('data-player-strikes');
                             const targetMbLink = li.getAttribute('data-mb-link');
-                            
-                            if (targetPlayerId === _playerId) {
-                                // ЭТО ТЕКУЩИЙ ИГРОК
-                                showToast(`👋 Это вы, ${_playerName}! ${_weeklyStrikes} ударов за неделю`, "#ffcc66");
-                            } else {
-                                // ЭТО ДРУГОЙ ИГРОК
-                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') {
-                                    showProfileLinkModalForPlayer(targetMbLink, targetPlayerName);
-                                } else {
-                                    showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
-                                }
+                            if (targetPlayerId === _playerId) { showToast(`👋 Это вы, ${_playerName}! Уровень ${_level}`, "#ffcc66"); }
+                            else {
+                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') { showProfileLinkModalForPlayer(targetMbLink, targetPlayerName); }
+                                else { showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88"); }
                             }
                         };
                     });
-                    
-                } catch(e) { console.warn('loadWeeklyTop error:', e); }
+                } catch(e) { console.warn('loadTopFromSupabase error:', e); }
+            }
+                        
+            function initSupabase() {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                s.onload = () => {
+                    supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4');
+                    setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); checkAdminCommands(); }, 500);
+                };
+                document.head.appendChild(s);
             }
             
+            function getCardPower(rank) {
+                const powers = { 'A': 10, 'P': 9, 'G': 8, 'B': 7, 'C': 6, 'D': 5, 'E': 4, 'V': 12, 'L': 12, 'H': 12, 'N': 12 };
+                return powers[rank] || 3;
+            }
+
+            function getTop3Cards() {
+                const cards = [..._cardHistory].filter(c => c.rank);
+                const sorted = cards.sort((a, b) => getCardPower(b.rank) - getCardPower(a.rank));
+                return sorted.slice(0, 3).map(c => ({ rank: c.rank, power: getCardPower(c.rank) }));
+            }
+
+            function getLeagueByRating(rating) {
+                if (rating >= 6000) return { name: 'Звёздный рудник', icon: '✨', bonus: 75 };
+                if (rating >= 4000) return { name: 'Мифриловый трон', icon: '🌀', bonus: 50 };
+                if (rating >= 2750) return { name: 'Алмазный престол', icon: '💎', bonus: 40 };
+                if (rating >= 1750) return { name: 'Платиновый синклит', icon: '🔹', bonus: 30 };
+                if (rating >= 1000) return { name: 'Золотая цитадель', icon: '🟡', bonus: 20 };
+                if (rating >= 500) return { name: 'Серебряный гребень', icon: '⚪', bonus: 15 };
+                if (rating >= 250) return { name: 'Медный бастион', icon: '🟠', bonus: 10 };
+                if (rating >= 100) return { name: 'Каменный рубеж', icon: '⚙️', bonus: 5 };
+                if (rating >= 50) return { name: 'Песчаная жила', icon: '🟫', bonus: 2 };
+                return { name: 'Новичок', icon: '🌱', bonus: 0 };
+            }
+
+            async function findOpponent() {
+                if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return null; }
+                const { data } = await supabaseClient.from('leaderboard').select('player_id, username, level, diamonds, top_cards').neq('player_id', _playerId).limit(50);
+                if (!data || data.length === 0) { showToast("❌ Нет доступных соперников", "#ff8888"); return null; }
+                const validOpponents = data.filter(p => { try { const cards = JSON.parse(p.top_cards || '[]'); return cards.length >= 1; } catch { return false; } });
+                if (validOpponents.length === 0) { showToast("❌ Нет соперников с картами", "#ff8888"); return null; }
+                const randomIndex = Math.floor(Math.random() * validOpponents.length);
+                return validOpponents[randomIndex];
+            }
+
+            async function updateTopCardsInDB() {
+                if (!supabaseClient || !_playerId) return;
+                const topCards = getTop3Cards();
+                await supabaseClient.from('leaderboard').upsert({ player_id: _playerId, username: _playerName, top_cards: JSON.stringify(topCards), updated_at: new Date().toISOString() }, { onConflict: 'player_id' });
+            }
+
+            async function startBattle() {
+                if (_level < 5) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
+                const myCards = getTop3Cards();
+                if (myCards.length < 3) { showToast("❌ Нужно минимум 3 карты!", "#ff8888"); return; }
+                const opponent = await findOpponent();
+                if (!opponent) return;
+                let opponentCards = [];
+                try { opponentCards = JSON.parse(opponent.top_cards || '[]'); } catch { opponentCards = []; }
+                if (opponentCards.length < 3) { showToast("❌ У соперника недостаточно карт", "#ff8888"); return; }
+                const sortedMyCards = [...myCards].sort((a, b) => b.power - a.power);
+                const sortedOpponentCards = [...opponentCards].sort((a, b) => b.power - a.power);
+                showBattleModal(opponent.username, sortedMyCards, sortedOpponentCards);
+                startBattleAnimation(sortedMyCards, sortedOpponentCards, opponent.username);
+            }
+
+            function showBattleModal(opponentName, myCards, opponentCards) {
+                if (battleModalDiv && battleModalDiv.remove) battleModalDiv.remove();
+                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
+                const myCardsHtml = myCards.map((card, i) => `<div class="battle-card my-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">⚔️</div></div>`).join('');
+                const opponentCardsHtml = opponentCards.map((card, i) => `<div class="battle-card opponent-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">🛡️</div></div>`).join('');
+                const modalHtml = `<div class="battle-modal"><div class="battle-modal-content"><div class="battle-header"><div class="battle-title">⚔️ ДУЭЛЬ ⚔️</div><div class="battle-opponent">Противник: <strong>${escapeHtml(opponentName)}</strong></div></div><div class="battle-arena"><div class="battle-side opponent-side"><div class="battle-side-title">💀 ПРОТИВНИК 💀</div><div class="battle-cards-container" id="opponentCardsContainer">${opponentCardsHtml}</div></div><div class="battle-vs">VS</div><div class="battle-side my-side"><div class="battle-side-title">⚔️ ВЫ ⚔️</div><div class="battle-cards-container" id="myCardsContainer">${myCardsHtml}</div></div></div><div class="battle-log" id="battleLog"><div>⚔️ Бой начинается!</div></div><div class="battle-buttons"><button class="battle-skip-btn" id="battleSkipBtn">⏩ ПРОПУСТИТЬ БОЙ</button></div></div></div>`;
+                battleModalDiv = document.createElement('div');
+                battleModalDiv.className = 'battle-modal-overlay show';
+                battleModalDiv.innerHTML = modalHtml;
+                document.body.appendChild(battleModalDiv);
+                document.getElementById('battleSkipBtn').onclick = () => skipBattleAnimation();
+            }
+
+            function startBattleAnimation(myCards, opponentCards, opponentName) {
+                let myIndex = 0, opponentIndex = 0, myWins = 0, opponentWins = 0, battleLog = [];
+                function addLog(message, type = 'info') { battleLog.push({ message, type, time: Date.now() }); updateBattleLog(); }
+                function updateBattleLog() {
+                    const logContainer = document.getElementById('battleLog');
+                    if (!logContainer) return;
+                    logContainer.innerHTML = battleLog.slice(-8).map(log => `<div class="battle-log-entry ${log.type}">${log.message}</div>`).join('');
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }
+                function updateCardStatus(cardElement, isWinner, isLoser = false) {
+                    if (!cardElement) return;
+                    if (isWinner) { cardElement.classList.add('card-winner'); cardElement.classList.remove('card-loser'); }
+                    else if (isLoser) { cardElement.classList.add('card-loser'); cardElement.classList.remove('card-winner'); }
+                    else { cardElement.classList.remove('card-winner', 'card-loser'); }
+                }
+                function executeBattle() {
+                    if (myIndex >= myCards.length && opponentIndex >= opponentCards.length) { finishBattle(myWins, opponentWins, opponentName); return; }
+                    if (myIndex >= myCards.length) { addLog(`❌ У вас закончились карты! Поражение!`, 'loss'); finishBattle(myWins, opponentWins, opponentName); return; }
+                    if (opponentIndex >= opponentCards.length) { addLog(`✅ У противника закончились карты! Победа!`, 'win'); finishBattle(myWins, opponentWins, opponentName); return; }
+                    const myCard = myCards[myIndex];
+                    const opponentCard = opponentCards[opponentIndex];
+                    const myCardElement = document.querySelector(`.my-card[data-card-index="${myIndex}"]`);
+                    const opponentCardElement = document.querySelector(`.opponent-card[data-card-index="${opponentIndex}"]`);
+                    addLog(`⚔️ Раунд ${myIndex + 1}: Ваша ${myCard.rank} (${myCard.power}) vs ${opponentCard.rank} (${opponentCard.power})`, 'battle');
+                    updateCardStatus(myCardElement, false, false);
+                    updateCardStatus(opponentCardElement, false, false);
+                    myCardElement?.classList.add('card-attacking');
+                    opponentCardElement?.classList.add('card-defending');
+                    setTimeout(() => {
+                        myCardElement?.classList.remove('card-attacking');
+                        opponentCardElement?.classList.remove('card-defending');
+                        if (myCard.power > opponentCard.power) {
+                            myWins++;
+                            addLog(`✅ ПОБЕДА! Ваша ${myCard.rank} сильнее!`, 'win');
+                            updateCardStatus(myCardElement, true, false);
+                            updateCardStatus(opponentCardElement, false, true);
+                            opponentIndex++;
+                        } else if (myCard.power < opponentCard.power) {
+                            opponentWins++;
+                            addLog(`❌ ПОРАЖЕНИЕ! ${opponentCard.rank} сильнее!`, 'loss');
+                            updateCardStatus(myCardElement, false, true);
+                            updateCardStatus(opponentCardElement, true, false);
+                            myIndex++;
+                        } else {
+                            addLog(`🤝 НИЧЬЯ!`, 'draw');
+                            updateCardStatus(myCardElement, false, false);
+                            updateCardStatus(opponentCardElement, false, false);
+                            myIndex++;
+                            opponentIndex++;
+                        }
+                        setTimeout(() => executeBattle(), 800);
+                    }, 800);
+                }
+                addLog(`🎮 Бой начинается!`, 'info');
+                setTimeout(() => executeBattle(), 500);
+            }
+
+            function finishBattle(myWins, opponentWins, opponentName) {
+                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
+                let result = '', ratingChange = 0;
+                if (myWins > opponentWins) { result = 'win'; ratingChange = 15; _pvpWins++; }
+                else if (myWins < opponentWins) { result = 'loss'; ratingChange = -15; _pvpLosses++; }
+                else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
+                _pvpRating += ratingChange;
+                if (_pvpRating < 0) _pvpRating = 0;
+                _pvpHistory.unshift({ opponent: opponentName, result: result, ratingChange: ratingChange, date: new Date().toISOString(), myWins: myWins, opponentWins: opponentWins });
+                if (_pvpHistory.length > 20) _pvpHistory.pop();
+                saveGame(); updateUI(); updateArenaUI(); syncPvPToSupabase(); checkAchievements();
+                const logContainer = document.getElementById('battleLog');
+                if (logContainer) {
+                    let resultMessage = result === 'win' ? `🏆 ПОБЕДА! ${myWins}:${opponentWins} +${ratingChange} рейтинга! 🏆` : result === 'loss' ? `💔 ПОРАЖЕНИЕ! ${myWins}:${opponentWins} ${ratingChange} рейтинга 💔` : `🤝 НИЧЬЯ! ${myWins}:${opponentWins}`;
+                    logContainer.innerHTML += `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
+                }
+                const buttonsContainer = document.querySelector('.battle-buttons');
+                if (buttonsContainer && !document.getElementById('battleCloseBtn')) {
+                    const closeBtn = document.createElement('button');
+                    closeBtn.id = 'battleCloseBtn';
+                    closeBtn.className = 'battle-close-btn';
+                    closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
+                    closeBtn.onclick = () => { if (battleModalDiv) battleModalDiv.remove(); };
+                    buttonsContainer.appendChild(closeBtn);
+                }
+                const skipBtn = document.getElementById('battleSkipBtn');
+                if (skipBtn) skipBtn.style.display = 'none';
+            }
+
+            function skipBattleAnimation() {
+                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
+                const myCards = getTop3Cards();
+                const opponentCardsElements = document.querySelectorAll('.opponent-card');
+                const myCardsElements = document.querySelectorAll('.my-card');
+                let myPower = 0, opponentPower = 0;
+                myCardsElements.forEach(card => { myPower += parseInt(card.dataset.power); });
+                opponentCardsElements.forEach(card => { opponentPower += parseInt(card.dataset.power); });
+                let result = '', ratingChange = 0;
+                if (myPower > opponentPower) { result = 'win'; ratingChange = 15; _pvpWins++; }
+                else if (myPower < opponentPower) { result = 'loss'; ratingChange = -15; _pvpLosses++; }
+                else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
+                const opponentName = document.querySelector('.battle-opponent strong')?.innerText || 'Соперник';
+                _pvpRating += ratingChange;
+                if (_pvpRating < 0) _pvpRating = 0;
+                _pvpHistory.unshift({ opponent: opponentName, result: result, ratingChange: ratingChange, date: new Date().toISOString(), myWins: myPower > opponentPower ? 3 : myPower < opponentPower ? 0 : 1, opponentWins: myPower > opponentPower ? 0 : myPower < opponentPower ? 3 : 1 });
+                if (_pvpHistory.length > 20) _pvpHistory.pop();
+                saveGame(); updateUI(); updateArenaUI(); syncPvPToSupabase();
+                const logContainer = document.getElementById('battleLog');
+                if (logContainer) {
+                    let resultMessage = result === 'win' ? `🏆 ПОБЕДА! ${myPower}:${opponentPower} +${ratingChange} рейтинга! 🏆` : result === 'loss' ? `💔 ПОРАЖЕНИЕ! ${myPower}:${opponentPower} ${ratingChange} рейтинга 💔` : `🤝 НИЧЬЯ! ${myPower}:${opponentPower}`;
+                    logContainer.innerHTML = `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
+                }
+                const buttonsContainer = document.querySelector('.battle-buttons');
+                if (buttonsContainer) {
+                    const skipBtn = document.getElementById('battleSkipBtn');
+                    if (skipBtn) skipBtn.style.display = 'none';
+                    if (!document.getElementById('battleCloseBtn')) {
+                        const closeBtn = document.createElement('button');
+                        closeBtn.id = 'battleCloseBtn';
+                        closeBtn.className = 'battle-close-btn';
+                        closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
+                        closeBtn.onclick = () => { if (battleModalDiv) battleModalDiv.remove(); };
+                        buttonsContainer.appendChild(closeBtn);
+                    }
+                }
+            }
+
+            async function syncPvPToSupabase() {
+                if (!supabaseClient || !_playerId || !_playerName) return;
+                try {
+                    const league = getLeagueByRating(_pvpRating);
+                    await supabaseClient.from('pvp_rating').upsert({ player_id: _playerId, username: _playerName, rating: _pvpRating, wins: _pvpWins, losses: _pvpLosses, draws: _pvpDraws, league_name: league.name, league_icon: league.icon, updated_at: new Date().toISOString() }, { onConflict: 'player_id' });
+                } catch(e) { console.warn('syncPvP error:', e); }
+            }
+
+            function updateArenaUI() {
+                const league = getLeagueByRating(_pvpRating);
+                document.getElementById('arenaLeagueIcon').innerText = league.icon;
+                document.getElementById('arenaLeagueName').innerText = league.name;
+                document.getElementById('arenaRatingValue').innerText = _pvpRating;
+                document.getElementById('arenaWinsValue').innerText = _pvpWins;
+                document.getElementById('arenaLossesValue').innerText = _pvpLosses;
+                document.getElementById('arenaDrawsValue').innerText = _pvpDraws;
+                const historyContainer = document.getElementById('arenaHistoryList');
+                if (historyContainer) {
+                    if (!_pvpHistory.length) historyContainer.innerHTML = '<li style="justify-content:center;">— Нет боёв —</li>';
+                    else historyContainer.innerHTML = _pvpHistory.slice(0, 10).map(h => { const date = new Date(h.date).toLocaleDateString(); const resultText = h.result === 'win' ? '✅ Победа' : h.result === 'loss' ? '❌ Поражение' : '🤝 Ничья'; return `<li><span>${date} vs ${escapeHtml(h.opponent)}</span><span>${resultText} ${h.ratingChange > 0 ? '+' : ''}${h.ratingChange}</span></li>`; }).join('');
+                }
+            }
+
+            async function loadPvPData() {
+                if (!supabaseClient || !_playerId) return;
+                try {
+                    const { data } = await supabaseClient.from('pvp_rating').select('*').eq('player_id', _playerId).single();
+                    if (data) { _pvpRating = data.rating || 0; _pvpWins = data.wins || 0; _pvpLosses = data.losses || 0; _pvpDraws = data.draws || 0; updateArenaUI(); }
+                } catch(e) { console.warn('loadPvPData error:', e); }
+            }
+
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
                 document.getElementById('diamondValue').innerText = Math.floor(_diamonds);
@@ -2860,66 +2611,12 @@
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
                     chestStrikesCounter: _chestStrikesCounter, lastChestDate: _lastChestDate,
-                    weeklyStrikes: _weeklyStrikes, lastWeeklyReset: _lastWeeklyReset,
-                    pendingWeeklyReward: _pendingWeeklyReward,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
-                    mbProfileLink: _mbProfileLink, 
-
-                    pvpRating: _pvpRating,
-                    pvpWins: _pvpWins,
-                    pvpLosses: _pvpLosses,
-                    pvpDraws: _pvpDraws,
-                    pvpDuelsToday: _pvpDuelsToday,
-                    pvpLastDuelDate: _pvpLastDuelDate,
-                    pvpHistory: _pvpHistory
-
+                    mbProfileLink: _mbProfileLink,
+                    pvpRating: _pvpRating, pvpWins: _pvpWins, pvpLosses: _pvpLosses, pvpDraws: _pvpDraws, pvpHistory: _pvpHistory
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
-                if (supabaseClient && _playerId && _playerName) {
-                    syncToSupabase();
-                    syncWeeklyStrikes();
-                }
-            }
-
-            // ========== АВТОМАТИЧЕСКИЙ СБРОС ТОПА ПРИ ПЕРВОМ ЗАХОДЕ В НОВУЮ НЕДЕЛЮ ==========
-            async function checkAndResetWeeklyTop() {
-                if (!supabaseClient) return;
-                
-                const now = new Date();
-                const currentWeekStart = new Date(now);
-                const daysToLastSunday = now.getDay(); // 0 = воскресенье
-                currentWeekStart.setDate(now.getDate() - daysToLastSunday);
-                currentWeekStart.setHours(23, 59, 59, 999);
-                
-                // Получаем последний известный сброс
-                const lastResetStr = localStorage.getItem('weekly_top_last_reset');
-                const lastReset = lastResetStr ? new Date(lastResetStr) : null;
-                
-                // Если сброс не делался на этой неделе
-                if (!lastReset || lastReset < currentWeekStart) {
-                    try {
-                        // Очищаем таблицу weekly_strikes
-                        const { error } = await supabaseClient
-                            .from('weekly_strikes')
-                            .delete()
-                            .neq('player_id', 'none'); // удаляем всех, кроме заглушки
-                        
-                        if (error) throw error;
-                        
-                        // Обновляем локальный флаг сброса
-                        localStorage.setItem('weekly_top_last_reset', currentWeekStart.toISOString());
-                        console.log('✅ Weekly top reset completed');
-                        showToast('📊 Топ ударов обновлён на новую неделю!', '#aaffdd');
-                        
-                        // Также сбрасываем локальные удары игрока
-                        _weeklyStrikes = 0;
-                        saveGame();
-                        updateUI();
-                        
-                    } catch(e) {
-                        console.warn('Weekly reset error:', e);
-                    }
-                }
+                if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
             }
             
             function loadGame() {
@@ -2936,21 +2633,14 @@
                         _pickaxeLevel = d.pickaxeLevel || 1;
                         _chestStrikesCounter = d.chestStrikesCounter || 0;
                         _lastChestDate = d.lastChestDate;
-                        _weeklyStrikes = d.weeklyStrikes || 0;
-                        _lastWeeklyReset = d.lastWeeklyReset;
-                        _pendingWeeklyReward = d.pendingWeeklyReward || null;
                         _calendarClaimed = d.calendarClaimed || {};
                         _lastCalendarDate = d.lastCalendarDate;
                         _mbProfileLink = d.mbProfileLink || null;
-
                         _pvpRating = d.pvpRating || 0;
                         _pvpWins = d.pvpWins || 0;
                         _pvpLosses = d.pvpLosses || 0;
                         _pvpDraws = d.pvpDraws || 0;
-                        _pvpDuelsToday = d.pvpDuelsToday || 0;
-                        _pvpLastDuelDate = d.pvpLastDuelDate;
                         _pvpHistory = d.pvpHistory || [];
-
                     } catch(e) {}
                 }
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -2963,19 +2653,10 @@
                 if (!_playerName || _playerName === "Игрок") showNameModal();
                 else { document.getElementById('playerName').innerText = _playerName; document.getElementById('playerId').innerText = _playerId.slice(-12); }
                 checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
-                loadSettings();    
-                applyTheme(getCurrentTheme());
+                loadSettings(); applyTheme(getCurrentTheme());
                 updateProfileLinkUI();
                 loadPvPData();
                 updateTopCardsInDB();
-                checkAndResetWeeklyTop();
-                
-                if (_pendingWeeklyReward) {
-                    setTimeout(() => {
-                        checkPendingReward();
-                    }, 500);
-                }
-
                 checkAdminCommands();
             }
             
@@ -2994,695 +2675,18 @@
                     if (supabaseClient) syncToSupabase();
                 };
             }
-            
-            async function syncToSupabase() {
-                if (!supabaseClient || !_playerId || !_playerName) return;
-                try {
-                    // Обновляем leaderboard
-                    await supabaseClient.from('leaderboard').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        level: _level,
-                        diamonds: _diamonds,
-                        mb_link: _mbProfileLink || null,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                    
-                    // Обновляем weekly_strikes (добавляем mb_link)
-                    await supabaseClient.from('weekly_strikes').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        weekly_strikes: _weeklyStrikes,
-                        mb_link: _mbProfileLink || null,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                } catch(e) { console.warn('syncToSupabase error:', e); }
-                syncPvPToSupabase();
-                updateTopCardsInDB();
-            }
-                        
-            async function loadTopFromSupabase() {
-                if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
-                try {
-                    const { data } = await supabaseClient
-                        .from('leaderboard')
-                        .select('username, level, player_id, updated_at, mb_link')
-                        .order('level', { ascending: false })
-                        .order('updated_at', { ascending: true });
-                    
-                    const container = document.getElementById('topList');
-                    const rankBlock = document.getElementById('playerRankBlock');
-                    const rankSpan = document.getElementById('playerRank');
-                    const totalSpan = document.getElementById('totalPlayersCount');
-                    
-                    if (!data || !data.length) {
-                        container.innerHTML = '<li>Пока никого</li>';
-                        if (rankBlock) rankBlock.style.display = 'none';
-                        if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
-                        return;
-                    }
-                    
-                    const sorted = [...data];
-                    sorted.sort((a, b) => {
-                        if (a.level !== b.level) return b.level - a.level;
-                        return new Date(a.updated_at) - new Date(b.updated_at);
-                    });
-                    
-                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
-                    
-                    const top10 = sorted.slice(0, 10);
-                    container.innerHTML = top10.map((p, i) => {
-                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
-                        const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}">
-                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                            <span>⭐ Ур.${p.level}</span>
-                        </li>`;
-                    }).join('');
-                    
-                    const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) {
-                        rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`;
-                        rankBlock.style.display = 'block';
-                    } else {
-                        rankBlock.style.display = 'none';
-                    }
-                    
-                    // ОБРАБОТЧИК КЛИКА
-                    document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
-                        li.style.cursor = 'pointer';
-                        li.onclick = (e) => {
-                            e.stopPropagation();
-                            const targetPlayerId = li.getAttribute('data-player-id');
-                            const targetPlayerName = li.getAttribute('data-player-name');
-                            const targetPlayerLevel = li.getAttribute('data-player-level');
-                            const targetMbLink = li.getAttribute('data-mb-link');
-                            
-                            if (targetPlayerId === _playerId) {
-                                // ЭТО ТЕКУЩИЙ ИГРОК
-                                showToast(`👋 Это вы, ${_playerName}! Уровень ${_level}`, "#ffcc66");
-                            } else {
-                                // ЭТО ДРУГОЙ ИГРОК
-                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') {
-                                    showProfileLinkModalForPlayer(targetMbLink, targetPlayerName);
-                                } else {
-                                    showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88");
-                                }
-                            }
-                        };
-                    });
-                    
-                } catch(e) { console.warn('loadTopFromSupabase error:', e); }
-            }
-                        
-            function initSupabase() {
-                const s = document.createElement('script');
-                s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-                s.onload = () => {
-                    supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4');
-                    setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); loadWeeklyTop(); checkAdminCommands(); }, 500);
-                };
-                document.head.appendChild(s);
-            }
-            
-            function getCardPower(rank) {
-                const powers = {
-                    'A': 10, 'P': 9, 'G': 8, 'B': 7, 'C': 6, 'D': 5, 'E': 4,
-                    'V': 12, 'L': 12, 'H': 12, 'N': 12
-                };
-                return powers[rank] || 3;
-            }
-
-            function getTop3Cards() {
-                const cards = [..._cardHistory].filter(c => c.rank);
-                const sorted = cards.sort((a, b) => getCardPower(b.rank) - getCardPower(a.rank));
-                return sorted.slice(0, 3).map(c => ({ rank: c.rank, power: getCardPower(c.rank) }));
-            }
-
-            function getLeagueByRating(rating) {
-                if (rating >= 6000) return { name: 'Звёздный рудник', icon: '✨', color: '#ffaa66', bonus: 75 };
-                if (rating >= 4000) return { name: 'Мифриловый трон', icon: '🌀', color: '#88aaff', bonus: 50 };
-                if (rating >= 2750) return { name: 'Алмазный престол', icon: '💎', color: '#88ffff', bonus: 40 };
-                if (rating >= 1750) return { name: 'Платиновый синклит', icon: '🔹', color: '#aaffaa', bonus: 30 };
-                if (rating >= 1000) return { name: 'Золотая цитадель', icon: '🟡', color: '#ffcc66', bonus: 20 };
-                if (rating >= 500) return { name: 'Серебряный гребень', icon: '⚪', color: '#cccccc', bonus: 15 };
-                if (rating >= 250) return { name: 'Медный бастион', icon: '🟠', color: '#ffaa66', bonus: 10 };
-                if (rating >= 100) return { name: 'Каменный рубеж', icon: '⚙️', color: '#aaaaaa', bonus: 5 };
-                if (rating >= 50) return { name: 'Песчаная жила', icon: '🟫', color: '#aa8866', bonus: 2 };
-                return { name: 'Новичок', icon: '🌱', color: '#88aa88', bonus: 0 };  // 0-49 рейтинга
-            }
-
-            async function findOpponent() {
-                if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return null; }
-                
-                // Ищем реальных игроков (не себя)
-                const { data } = await supabaseClient
-                    .from('leaderboard')
-                    .select('player_id, username, level, diamonds, top_cards')
-                    .neq('player_id', _playerId)
-                    .limit(50);
-                
-                if (!data || data.length === 0) {
-                    showToast("❌ Нет доступных соперников", "#ff8888");
-                    return null;
-                }
-                
-                // Фильтруем тех, у кого есть карты
-                const validOpponents = data.filter(p => {
-                    try {
-                        const cards = JSON.parse(p.top_cards || '[]');
-                        return cards.length >= 1;
-                    } catch { return false; }
-                });
-                
-                if (validOpponents.length === 0) {
-                    showToast("❌ Нет соперников с картами", "#ff8888");
-                    return null;
-                }
-                
-                // Выбираем случайного соперника
-                const randomIndex = Math.floor(Math.random() * validOpponents.length);
-                return validOpponents[randomIndex];
-            }
-
-            async function updateTopCardsInDB() {
-                if (!supabaseClient || !_playerId) return;
-                const topCards = getTop3Cards();
-                await supabaseClient.from('leaderboard').upsert({
-                    player_id: _playerId,
-                    username: _playerName,
-                    top_cards: JSON.stringify(topCards),
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'player_id' });
-            }
-
-            async function startBattle() {
-                if (_level < 5) { 
-                    showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); 
-                    return; 
-                }
-                
-                const myCards = getTop3Cards();
-                if (myCards.length < 3) { 
-                    showToast("❌ Нужно минимум 3 карты для участия в дуэлях! Получите карты через Telegram @minebuff", "#ff8888"); 
-                    return; 
-                }
-                
-                const opponent = await findOpponent();
-                if (!opponent) return;
-                
-                let opponentCards = [];
-                try {
-                    opponentCards = JSON.parse(opponent.top_cards || '[]');
-                } catch { opponentCards = []; }
-                
-                if (opponentCards.length < 3) {
-                    showToast("❌ У соперника недостаточно карт", "#ff8888");
-                    return;
-                }
-                
-                const sortedMyCards = [...myCards].sort((a, b) => b.power - a.power);
-                const sortedOpponentCards = [...opponentCards].sort((a, b) => b.power - a.power);
-                
-                showBattleModal(opponent.username, sortedMyCards, sortedOpponentCards);
-                startBattleAnimation(sortedMyCards, sortedOpponentCards, opponent.username);
-            }
-
-            function showBattleModal(opponentName, myCards, opponentCards) {
-                // Закрываем предыдущее окно если есть
-                if (battleModalDiv && battleModalDiv.remove) battleModalDiv.remove();
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                
-                const myCardsHtml = myCards.map((card, i) => `
-                    <div class="battle-card my-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}">
-                        <div class="battle-card-rank">${card.rank}</div>
-                        <div class="battle-card-power">💪 ${card.power}</div>
-                        <div class="battle-card-status">⚔️</div>
-                    </div>
-                `).join('');
-                
-                const opponentCardsHtml = opponentCards.map((card, i) => `
-                    <div class="battle-card opponent-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}">
-                        <div class="battle-card-rank">${card.rank}</div>
-                        <div class="battle-card-power">💪 ${card.power}</div>
-                        <div class="battle-card-status">🛡️</div>
-                    </div>
-                `).join('');
-                
-                const modalHtml = `
-                    <div class="battle-modal">
-                        <div class="battle-modal-content">
-                            <div class="battle-header">
-                                <div class="battle-title">⚔️ ДУЭЛЬ ⚔️</div>
-                                <div class="battle-opponent">Противник: <strong>${escapeHtml(opponentName)}</strong></div>
-                            </div>
-                            
-                            <div class="battle-arena">
-                                <div class="battle-side opponent-side">
-                                    <div class="battle-side-title">💀 ПРОТИВНИК 💀</div>
-                                    <div class="battle-cards-container" id="opponentCardsContainer">
-                                        ${opponentCardsHtml}
-                                    </div>
-                                </div>
-                                
-                                <div class="battle-vs">VS</div>
-                                
-                                <div class="battle-side my-side">
-                                    <div class="battle-side-title">⚔️ ВЫ ⚔️</div>
-                                    <div class="battle-cards-container" id="myCardsContainer">
-                                        ${myCardsHtml}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="battle-log" id="battleLog">
-                                <div>⚔️ Бой начинается!</div>
-                            </div>
-                            
-                            <div class="battle-buttons">
-                                <button class="battle-skip-btn" id="battleSkipBtn">⏩ ПРОПУСТИТЬ БОЙ</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                battleModalDiv = document.createElement('div');
-                battleModalDiv.className = 'battle-modal-overlay show';
-                battleModalDiv.innerHTML = modalHtml;
-                document.body.appendChild(battleModalDiv);
-                
-                document.getElementById('battleSkipBtn').onclick = () => skipBattleAnimation();
-            }
-
-            function startBattleAnimation(myCards, opponentCards, opponentName) {
-                let myIndex = 0;
-                let opponentIndex = 0;
-                let myWins = 0;
-                let opponentWins = 0;
-                let battleLog = [];
-                let currentBattle = null;
-                
-                function addLog(message, type = 'info') {
-                    battleLog.push({ message, type, time: Date.now() });
-                    updateBattleLog();
-                }
-                
-                function updateBattleLog() {
-                    const logContainer = document.getElementById('battleLog');
-                    if (!logContainer) return;
-                    const recentLogs = battleLog.slice(-8);
-                    logContainer.innerHTML = recentLogs.map(log => 
-                        `<div class="battle-log-entry ${log.type}">${log.message}</div>`
-                    ).join('');
-                    logContainer.scrollTop = logContainer.scrollHeight;
-                }
-                
-                function updateCardStatus(cardElement, isWinner, isLoser = false) {
-                    if (!cardElement) return;
-                    if (isWinner) {
-                        cardElement.classList.add('card-winner');
-                        cardElement.classList.remove('card-loser');
-                    } else if (isLoser) {
-                        cardElement.classList.add('card-loser');
-                        cardElement.classList.remove('card-winner');
-                    } else {
-                        cardElement.classList.remove('card-winner', 'card-loser');
-                    }
-                }
-                
-                function executeBattle() {
-                    if (myIndex >= myCards.length && opponentIndex >= opponentCards.length) {
-                        // Бой закончен
-                        finishBattle(myWins, opponentWins, opponentName);
-                        return;
-                    }
-                    
-                    if (myIndex >= myCards.length) {
-                        addLog(`❌ У вас закончились карты! Поражение!`, 'loss');
-                        finishBattle(myWins, opponentWins, opponentName);
-                        return;
-                    }
-                    
-                    if (opponentIndex >= opponentCards.length) {
-                        addLog(`✅ У противника закончились карты! Победа!`, 'win');
-                        finishBattle(myWins, opponentWins, opponentName);
-                        return;
-                    }
-                    
-                    const myCard = myCards[myIndex];
-                    const opponentCard = opponentCards[opponentIndex];
-                    
-                    const myCardElement = document.querySelector(`.my-card[data-card-index="${myIndex}"]`);
-                    const opponentCardElement = document.querySelector(`.opponent-card[data-card-index="${opponentIndex}"]`);
-                    
-                    addLog(`⚔️ Раунд ${myIndex + 1}: Ваша ${myCard.rank} (${myCard.power}) vs ${opponentCard.rank} (${opponentCard.power})`, 'battle');
-                    
-                    updateCardStatus(myCardElement, false, false);
-                    updateCardStatus(opponentCardElement, false, false);
-                    
-                    myCardElement?.classList.add('card-attacking');
-                    opponentCardElement?.classList.add('card-defending');
-                    
-                    setTimeout(() => {
-                        myCardElement?.classList.remove('card-attacking');
-                        opponentCardElement?.classList.remove('card-defending');
-                        
-                        if (myCard.power > opponentCard.power) {
-                            myWins++;
-                            addLog(`✅ ПОБЕДА! Ваша ${myCard.rank} сильнее! (${myCard.power} > ${opponentCard.power})`, 'win');
-                            updateCardStatus(myCardElement, true, false);
-                            updateCardStatus(opponentCardElement, false, true);
-                            opponentIndex++;
-                        } else if (myCard.power < opponentCard.power) {
-                            opponentWins++;
-                            addLog(`❌ ПОРАЖЕНИЕ! ${opponentCard.rank} сильнее вашей ${myCard.rank} (${myCard.power} < ${opponentCard.power})`, 'loss');
-                            updateCardStatus(myCardElement, false, true);
-                            updateCardStatus(opponentCardElement, true, false);
-                            myIndex++;
-                        } else {
-                            addLog(`🤝 НИЧЬЯ! Обе карты равны по силе!`, 'draw');
-                            updateCardStatus(myCardElement, false, false);
-                            updateCardStatus(opponentCardElement, false, false);
-                            myIndex++;
-                            opponentIndex++;
-                        }
-                        
-                        setTimeout(() => executeBattle(), 800);
-                    }, 800);
-                }
-                
-                addLog(`🎮 Бой начинается! У вас ${myCards.length} карт, у противника ${opponentCards.length}`, 'info');
-                setTimeout(() => executeBattle(), 500);
-            }
-
-            function finishBattle(myWins, opponentWins, opponentName) {
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                
-                let result = '';
-                let ratingChange = 0;
-                
-                if (myWins > opponentWins) {
-                    result = 'win';
-                    ratingChange = 15;
-                    _pvpWins++;
-                } else if (myWins < opponentWins) {
-                    result = 'loss';
-                    ratingChange = -15;
-                    _pvpLosses++;
-                } else {
-                    result = 'draw';
-                    ratingChange = 0;
-                    _pvpDraws++;
-                }
-                
-                // Обновляем рейтинг
-                _pvpRating += ratingChange;
-                if (_pvpRating < 0) _pvpRating = 0;
-                _pvpHistory.unshift({
-                    opponent: opponentName,
-                    result: result,
-                    ratingChange: ratingChange,
-                    date: new Date().toISOString(),
-                    myWins: myWins,
-                    opponentWins: opponentWins
-                });
-                if (_pvpHistory.length > 20) _pvpHistory.pop();
-                
-                saveGame();
-                updateUI();
-                updateArenaUI();
-                syncPvPToSupabase();
-                checkAchievements();
-                
-                // Показываем результат в модальном окне
-                const logContainer = document.getElementById('battleLog');
-                if (logContainer) {
-                    let resultMessage = '';
-                    if (result === 'win') resultMessage = `🏆 ПОБЕДА! ${myWins} : ${opponentWins} +${ratingChange} рейтинга! 🏆`;
-                    else if (result === 'loss') resultMessage = `💔 ПОРАЖЕНИЕ! ${myWins} : ${opponentWins} ${ratingChange} рейтинга 💔`;
-                    else resultMessage = `🤝 НИЧЬЯ! ${myWins} : ${opponentWins} Рейтинг не изменился 🤝`;
-                    
-                    logContainer.innerHTML += `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
-                }
-                
-                // Добавляем кнопку закрытия
-                const buttonsContainer = document.querySelector('.battle-buttons');
-                if (buttonsContainer && !document.getElementById('battleCloseBtn')) {
-                    const closeBtn = document.createElement('button');
-                    closeBtn.id = 'battleCloseBtn';
-                    closeBtn.className = 'battle-close-btn';
-                    closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
-                    closeBtn.onclick = () => {
-                        if (battleModalDiv) battleModalDiv.remove();
-                    };
-                    buttonsContainer.appendChild(closeBtn);
-                }
-                
-                // Убираем кнопку пропуска
-                const skipBtn = document.getElementById('battleSkipBtn');
-                if (skipBtn) skipBtn.style.display = 'none';
-            }
-
-            function skipBattleAnimation() {
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                
-                // Быстро вычисляем результат без анимации
-                const myCards = getTop3Cards();
-                const opponentCardsElements = document.querySelectorAll('.opponent-card');
-                const myCardsElements = document.querySelectorAll('.my-card');
-                
-                let myPower = 0, opponentPower = 0;
-                myCardsElements.forEach(card => {
-                    myPower += parseInt(card.dataset.power);
-                });
-                opponentCardsElements.forEach(card => {
-                    opponentPower += parseInt(card.dataset.power);
-                });
-                
-                let result = '';
-                let ratingChange = 0;
-                let myWins = 0, opponentWins = 0;
-                
-                if (myPower > opponentPower) {
-                    result = 'win';
-                    ratingChange = 15;
-                    myWins = 3;
-                    opponentWins = 0;
-                    _pvpWins++;
-                } else if (myPower < opponentPower) {
-                    result = 'loss';
-                    ratingChange = -15;
-                    myWins = 0;
-                    opponentWins = 3;
-                    _pvpLosses++;
-                } else {
-                    result = 'draw';
-                    ratingChange = 0;
-                    myWins = 1;
-                    opponentWins = 1;
-                    _pvpDraws++;
-                }
-                
-                const opponentName = document.querySelector('.battle-opponent strong')?.innerText || 'Соперник';
-                
-                _pvpRating += ratingChange;
-                if (_pvpRating < 0) _pvpRating = 0;
-                _pvpHistory.unshift({
-                    opponent: opponentName,
-                    result: result,
-                    ratingChange: ratingChange,
-                    date: new Date().toISOString(),
-                    myWins: myWins,
-                    opponentWins: opponentWins
-                });
-                if (_pvpHistory.length > 20) _pvpHistory.pop();
-                
-                saveGame();
-                updateUI();
-                updateArenaUI();
-                syncPvPToSupabase();
-                
-                const logContainer = document.getElementById('battleLog');
-                if (logContainer) {
-                    let resultMessage = '';
-                    if (result === 'win') resultMessage = `🏆 ПОБЕДА! ${myPower} : ${opponentPower} +${ratingChange} рейтинга! 🏆`;
-                    else if (result === 'loss') resultMessage = `💔 ПОРАЖЕНИЕ! ${myPower} : ${opponentPower} ${ratingChange} рейтинга 💔`;
-                    else resultMessage = `🤝 НИЧЬЯ! ${myPower} : ${opponentPower} Рейтинг не изменился 🤝`;
-                    
-                    logContainer.innerHTML = `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
-                }
-                
-                const buttonsContainer = document.querySelector('.battle-buttons');
-                if (buttonsContainer) {
-                    const skipBtn = document.getElementById('battleSkipBtn');
-                    if (skipBtn) skipBtn.style.display = 'none';
-                    
-                    if (!document.getElementById('battleCloseBtn')) {
-                        const closeBtn = document.createElement('button');
-                        closeBtn.id = 'battleCloseBtn';
-                        closeBtn.className = 'battle-close-btn';
-                        closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
-                        closeBtn.onclick = () => {
-                            if (battleModalDiv) battleModalDiv.remove();
-                        };
-                        buttonsContainer.appendChild(closeBtn);
-                    }
-                }
-            }
-
-            function showBattleResultModal(opponentName, myPower, opponentPower, result, ratingChange) {
-                const modalHtml = `
-                    <div class="modal-content" style="max-width: 320px;">
-                        <div class="modal-header">
-                            <div class="modal-icon">⚔️</div>
-                            <div class="modal-title">РЕЗУЛЬТАТ БОЯ</div>
-                        </div>
-                        <div class="modal-body">
-                            <div style="margin-bottom: 16px;">Противник: <strong>${escapeHtml(opponentName)}</strong></div>
-                            <div class="stat-row"><span>💪 Ваша сила:</span><span>${myPower}</span></div>
-                            <div class="stat-row"><span>💀 Сила врага:</span><span>${opponentPower}</span></div>
-                            <div class="stat-row" style="background: ${result === 'win' ? '#2a4a2a' : result === 'loss' ? '#4a2a2a' : '#2a2a4a'}">
-                                <span>🏆 Результат:</span>
-                                <span>${result === 'win' ? 'ПОБЕДА' : result === 'loss' ? 'ПОРАЖЕНИЕ' : 'НИЧЬЯ'}</span>
-                            </div>
-                            <div class="stat-row"><span>📈 Изменение рейтинга:</span><span>${ratingChange > 0 ? '+' : ''}${ratingChange}</span></div>
-                            <div class="reward-preview"><span>⭐ Текущий рейтинг: ${_pvpRating}</span></div>
-                        </div>
-                        <div class="modal-buttons"><button class="modal-btn close" id="battleResultCloseBtn">ЗАКРЫТЬ</button></div>
-                    </div>
-                `;
-                
-                const modalDiv = document.createElement('div');
-                modalDiv.className = 'modal show';
-                modalDiv.style.display = 'flex';
-                modalDiv.innerHTML = modalHtml;
-                document.body.appendChild(modalDiv);
-                
-                modalDiv.querySelector('#battleResultCloseBtn').onclick = () => modalDiv.remove();
-                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
-            }
-
-            async function syncPvPToSupabase() {
-                if (!supabaseClient || !_playerId || !_playerName) return;
-                try {
-                    const league = getLeagueByRating(_pvpRating);
-                    await supabaseClient.from('pvp_rating').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        rating: _pvpRating,
-                        wins: _pvpWins,
-                        losses: _pvpLosses,
-                        draws: _pvpDraws,
-                        duels_today: _pvpDuelsToday,
-                        last_duel_date: _pvpLastDuelDate,
-                        league_name: league.name,
-                        league_icon: league.icon,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                } catch(e) { console.warn('syncPvP error:', e); }
-            }
-
-            function updateArenaUI() {
-                const league = getLeagueByRating(_pvpRating);
-                document.getElementById('arenaLeagueIcon').innerText = league.icon;
-                document.getElementById('arenaLeagueName').innerText = league.name;
-                document.getElementById('arenaRatingValue').innerText = _pvpRating;
-                document.getElementById('arenaWinsValue').innerText = _pvpWins;
-                document.getElementById('arenaLossesValue').innerText = _pvpLosses;
-                document.getElementById('arenaDrawsValue').innerText = _pvpDraws;
-                
-                // История боёв
-                const historyContainer = document.getElementById('arenaHistoryList');
-                if (historyContainer) {
-                    if (!_pvpHistory.length) {
-                        historyContainer.innerHTML = '<li style="justify-content:center;">— Нет боёв —</li>';
-                    } else {
-                        historyContainer.innerHTML = _pvpHistory.slice(0, 10).map(h => {
-                            const date = new Date(h.date).toLocaleDateString();
-                            const resultText = h.result === 'win' ? '✅ Победа' : h.result === 'loss' ? '❌ Поражение' : '🤝 Ничья';
-                            return `<li><span>${date} vs ${escapeHtml(h.opponent)}</span><span>${resultText} ${h.ratingChange > 0 ? '+' : ''}${h.ratingChange}</span></li>`;
-                        }).join('');
-                    }
-                }
-            }
-
-            function buyExtraDuel() {
-                const cost = 5;
-                if (_diamonds >= cost) {
-                    _diamonds -= cost;
-                    _pvpDuelsToday = Math.max(0, _pvpDuelsToday - 1);
-                    saveGame();
-                    updateUI();
-                    updateArenaUI();
-                    showToast(`✅ Куплена дополнительная дуэль! Осталось ${_pvpDuelsToday}/3`, "#aaffdd");
-                } else {
-                    showToast(`❌ Нужно ${cost} алмазов для дополнительной дуэли`, "#ff8888");
-                }
-            }
-
-            async function loadPvPData() {
-                if (!supabaseClient || !_playerId) return;
-                try {
-                    const { data } = await supabaseClient.from('pvp_rating').select('*').eq('player_id', _playerId).single();
-                    if (data) {
-                        _pvpRating = data.rating || 0;
-                        _pvpWins = data.wins || 0;
-                        _pvpLosses = data.losses || 0;
-                        _pvpDraws = data.draws || 0;
-                        _pvpDuelsToday = data.duels_today || 0;
-                        _pvpLastDuelDate = data.last_duel_date;
-                        updateArenaUI();
-                    }
-                } catch(e) { console.warn('loadPvPData error:', e); }
-            }
 
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
-
-            function initCombinedTopTabs() {
-                const levelsTab = document.getElementById('topLevelsTabBtn');
-                const strikesTab = document.getElementById('topStrikesTabBtn');
-                const levelsContent = document.getElementById('topLevelsContent');
-                const strikesContent = document.getElementById('topStrikesContent');
-                
-                if (levelsTab && strikesTab && levelsContent && strikesContent) {
-                    // Обработчик для вкладки "Топ уровней"
-                    levelsTab.onclick = function() {
-                        levelsTab.classList.add('active');
-                        strikesTab.classList.remove('active');
-                        levelsContent.classList.add('active');
-                        strikesContent.classList.remove('active');
-                        loadTopFromSupabase(); // загружаем топ уровней
-                    };
-                    
-                    // Обработчик для вкладки "Топ ударов (неделя)"
-                    strikesTab.onclick = function() {
-                        strikesTab.classList.add('active');
-                        levelsTab.classList.remove('active');
-                        strikesContent.classList.add('active');
-                        levelsContent.classList.remove('active');
-                        loadWeeklyTop(); // загружаем топ ударов
-                    };
-                    
-                    // По умолчанию активна вкладка уровней
-                    levelsTab.classList.add('active');
-                    strikesTab.classList.remove('active');
-                    levelsContent.classList.add('active');
-                    strikesContent.classList.remove('active');
-                }
-            }
 
             window.mineOre = function() {
                 if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
                 const gain = getOrePerClick(); _ore += gain; _strikesDone++;
-                _weeklyStrikes++;
-                if (!isChestAvailable()) { _chestStrikesCounter++; }
                 showToast(`⛏️ +${gain} руды`, "#ffdd99"); saveGame(); updateUI();
                 updateQuestProgress('daily_mine', gain); updateQuestProgress('daily_strikes', 1);
                 checkAchievements();
                 document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
                 setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
                 checkChest();
-                syncWeeklyStrikes();
             };
             
             window.claimBonus = function() {
@@ -3700,8 +2704,6 @@
             };
             
             window.showLevelUpModal = function() {
-                const today = new Date().toDateString();
-                if (_lastUpgradeDate && new Date(_lastUpgradeDate).toDateString() === today) { showToast("⏰ Только 1 раз в сутки!", "#ffaa88"); return; }
                 const cost = getLevelUpCost(_level);
                 document.getElementById('modalCurrentLevel').innerText = _level;
                 document.getElementById('modalNextLevel').innerText = _level + 1;
@@ -3737,15 +2739,13 @@
             window.openChest = openChest;
             window.claimCalendarDay = claimCalendarReward;
             
-            // НОВОЕ: обработчик сохранения ссылки
             document.getElementById('saveProfileLinkBtn')?.addEventListener('click', () => {
                 const inputVal = document.getElementById('profileLinkInput').value.trim();
                 if (!inputVal) { showToast("❌ Введите ID профиля!", "#ff8888"); return; }
-                // Извлекаем ID из ссылки или просто число
                 let profileId = inputVal;
                 const match = inputVal.match(/mangabuff\.ru\/users\/(\d+)/);
                 if (match) profileId = match[1];
-                if (!/^\d+$/.test(profileId)) { showToast("❌ Неверный формат! Введите ID или ссылку вида https://mangabuff.ru/users/123456", "#ff8888"); return; }
+                if (!/^\d+$/.test(profileId)) { showToast("❌ Неверный формат!", "#ff8888"); return; }
                 saveMbProfileLink(profileId);
             });
             
@@ -3762,41 +2762,18 @@
                     menuItems.forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
                     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-                    
                     let panelId = '';
                     if (tab === 'mine') panelId = 'minePanel';
                     else if (tab === 'profile') panelId = 'profilePanel';
                     else if (tab === 'exchange') panelId = 'exchangePanel';
                     else if (tab === 'calendar') panelId = 'calendarPanel';
-                    else if (tab === 'combinedTop') panelId = 'combinedTopPanel';
+                    else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
                     else if (tab === 'arena') panelId = 'arenaPanel';
                     else if (tab === 'info') panelId = 'infoPanel';
-                    
-                    if (panelId) {
-                        document.getElementById(panelId).classList.add('active');
-                    }
-                    
+                    if (panelId) document.getElementById(panelId).classList.add('active');
                     sideMenu.classList.remove('show');
-                    
-                    // Загрузка данных для соответствующих вкладок
-                    if (tab === 'combinedTop') {
-                        loadTopFromSupabase();
-                        loadWeeklyTop();
-                        // Активируем первую вкладку (Топ уровней) по умолчанию
-                        setTimeout(() => {
-                            const levelsTab = document.getElementById('topLevelsTabBtn');
-                            const strikesTab = document.getElementById('topStrikesTabBtn');
-                            const levelsContent = document.getElementById('topLevelsContent');
-                            const strikesContent = document.getElementById('topStrikesContent');
-                            if (levelsTab && strikesTab && levelsContent && strikesContent) {
-                                levelsTab.classList.add('active');
-                                strikesTab.classList.remove('active');
-                                levelsContent.classList.add('active');
-                                strikesContent.classList.remove('active');
-                            }
-                        }, 50);
-                    }
+                    if (tab === 'top') loadTopFromSupabase();
                     if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
@@ -3822,7 +2799,6 @@
             document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
             
             initDropdowns();
-            initCombinedTopTabs();
             loadGame();
             initSupabase();
             setInterval(() => { checkDailyReset(); updateUI(); checkAdminCommands(); }, 30000);
