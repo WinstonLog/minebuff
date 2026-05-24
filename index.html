@@ -615,6 +615,13 @@
             padding: 10px 15px;
             border-radius: 30px;
             font-size: 13px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .top-list li:active, .weekly-top-list li:active {
+            transform: scale(0.98);
+            background: #3a6b58cc;
         }
 
         .top-list .current-player, .weekly-top-list .current-player {
@@ -855,7 +862,7 @@
             text-decoration: none;
         }
 
-        .modal, .chest-modal, .pickaxe-modal, .reward-modal {
+        .modal, .chest-modal, .pickaxe-modal, .reward-modal, .profile-link-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -869,11 +876,11 @@
             align-items: center;
         }
 
-        .modal.show, .chest-modal.show, .pickaxe-modal.show, .reward-modal.show {
+        .modal.show, .chest-modal.show, .pickaxe-modal.show, .reward-modal.show, .profile-link-modal.show {
             display: flex;
         }
 
-        .modal-content, .chest-content, .pickaxe-content, .reward-content {
+        .modal-content, .chest-content, .pickaxe-content, .reward-content, .profile-link-content {
             background: linear-gradient(145deg, #1e2e2f 0%, #0f1a1f 100%);
             border-radius: 56px;
             padding: 0;
@@ -897,26 +904,26 @@
             }
         }
 
-        .modal-header, .chest-header, .pickaxe-header, .reward-header {
+        .modal-header, .chest-header, .pickaxe-header, .reward-header, .profile-link-header {
             background: linear-gradient(135deg, #ffcc66 0%, #ffaa33 100%);
             padding: 20px;
             text-align: center;
         }
 
-        .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title, .reward-header .reward-title {
+        .modal-header .modal-title, .chest-header .chest-title, .pickaxe-header .pickaxe-title, .reward-header .reward-title, .profile-link-header .profile-link-title {
             font-size: 24px;
             font-weight: 800;
             color: #1a1a2e;
             letter-spacing: 1px;
         }
 
-        .modal-header .modal-icon, .chest-header .chest-icon, .reward-header .reward-icon {
+        .modal-header .modal-icon, .chest-header .chest-icon, .pickaxe-header .pickaxe-icon, .reward-header .reward-icon, .profile-link-header .profile-link-icon {
             font-size: 48px;
             margin-bottom: 8px;
             display: block;
         }
 
-        .modal-body, .chest-body, .pickaxe-body, .reward-body {
+        .modal-body, .chest-body, .pickaxe-body, .reward-body, .profile-link-body {
             padding: 24px 20px;
         }
 
@@ -1047,6 +1054,46 @@
             .stat-row { padding: 8px 12px; }
             .stat-value { font-size: 16px; }
         }
+
+        /* Стили для привязки профиля */
+        .profile-link-section {
+            background: #071217cc;
+            border-radius: 32px;
+            padding: 12px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .profile-link-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            background: #0f1a1f;
+            border: 1px solid #ffcc66;
+            color: white;
+            font-size: 14px;
+            margin: 8px 0;
+            text-align: center;
+        }
+        .profile-link-btn {
+            background: linear-gradient(135deg, #3a6b58, #1e3e31);
+            width: 100%;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .profile-link-info {
+            font-size: 12px;
+            margin-top: 8px;
+            color: #88aacc;
+        }
+        .profile-link-info a {
+            color: #ffcc66;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -1152,6 +1199,12 @@
                     <div class="dropdown-content" id="questsContent"></div>
                 </div>
 
+                <!-- Блок привязки профиля MangaBuff -->
+                <div class="profile-link-section" id="profileLinkSection">
+                    <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div>
+                    <div id="profileLinkStatus"></div>
+                </div>
+
                 <div style="background: #071217cc; border-radius: 30px; padding: 8px 12px; margin-top: 12px; text-align: center; font-size: 11px;">
                     🎴 <strong style="color: #ffcc66;">V, L, H, N</strong> — эксклюзивные сезонные ранги.<br>
                     ❌ На реальные карты <strong>НЕ ОБМЕНИВАЮТСЯ</strong>.
@@ -1215,16 +1268,6 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-                
-<!--                 <div class="stat-row" style="justify-content: space-between; cursor: pointer;" id="soundToggle">
-                    <span class="stat-label">🔊 Звуки (в разработке)</span>
-                    <span class="stat-value" id="soundStatus">СКОРО</span>
-                </div>
-                
-                <div class="stat-row" style="justify-content: space-between; cursor: pointer;" id="vibrationToggle">
-                    <span class="stat-label">📳 Вибрация (в разработке)</span>
-                    <span class="stat-value" id="vibrationStatus">СКОРО</span>
-                </div> -->
             </div>
         </div>
 
@@ -1350,6 +1393,23 @@
         </div>
     </div>
 
+    <!-- Модальное окно для профиля MangaBuff -->
+    <div class="profile-link-modal" id="profileLinkModal">
+        <div class="profile-link-content">
+            <div class="profile-link-header">
+                <div class="profile-link-icon">🔗</div>
+                <div class="profile-link-title">ПРИВЯЗКА ПРОФИЛЯ</div>
+            </div>
+            <div class="profile-link-body">
+                <div style="margin-bottom: 16px;">Введите ID вашего профиля на MangaBuff</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-bottom: 8px;">Формат: https://mangabuff.ru/users/ID</div>
+                <input type="text" id="profileLinkInput" class="profile-link-input" placeholder="например: 1234567">
+                <div style="font-size: 11px; opacity: 0.5; margin: 8px 0;">Привязать можно только 1 раз!</div>
+                <button class="profile-link-btn" id="saveProfileLinkBtn">ПРИВЯЗАТЬ</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Модалка имени -->
     <div class="modal" id="nameModal" style="display: none;">
         <div class="modal-content">
@@ -1379,7 +1439,6 @@
                 'C': 'linear-gradient(135deg, #b8a35c, #8b763a)',
                 'D': 'linear-gradient(135deg, #6e8f9e, #4b6878)',
                 'E': 'linear-gradient(135deg, #a17654, #7b5338)',
-                // Сезонные ранги
                 'H': 'linear-gradient(135deg, #ff6600, #cc3300)',
                 'N': 'linear-gradient(135deg, #2a6a8a, #1a4a6a)',
                 'V': 'linear-gradient(135deg, #4a8a4a, #2a5a2a)',
@@ -1464,6 +1523,9 @@
             let _pendingWeeklyReward = null;
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
+            
+            // НОВОЕ: привязанная ссылка на профиль МБ
+            let _mbProfileLink = null; // храним ID (число/строку)
 
             // ============ НАСТРОЙКИ ============
             let _particlesEnabled = true;
@@ -1614,25 +1676,14 @@
                     particle.className = 'particle';
                     particle.textContent = particleChar;
                     
-                    // Случайная позиция по горизонтали
                     particle.style.left = Math.random() * 100 + '%';
-                    
-                    // Случайный размер
                     const size = Math.random() * 12 + 8;
                     particle.style.fontSize = size + 'px';
-                    
-                    // Случайная прозрачность
                     particle.style.opacity = Math.random() * 0.4 + 0.3;
-                    
-                    // Случайная скорость (4-12 секунд)
                     const duration = Math.random() * 8 + 6;
                     particle.style.animationDuration = duration + 's';
-                    
-                    // Случайная задержка (0-2 секунды)
                     const delay = Math.random() * 2;
                     particle.style.animationDelay = delay + 's';
-                    
-                    // Стартовая позиция по вертикали (случайно, но всегда за верхним краем)
                     particle.style.top = '-50px';
                     
                     document.body.appendChild(particle);
@@ -1642,7 +1693,6 @@
                     }, 15000);
                 }
                 
-                // Запускаем
                 particleInterval = setInterval(() => {
                     createParticle();
                 }, intervalTime);
@@ -1653,7 +1703,6 @@
                     clearInterval(particleInterval);
                     particleInterval = null;
                 }
-                // Удаляем все частицы
                 document.querySelectorAll('.particle').forEach(p => p.remove());
             }
 
@@ -1665,7 +1714,6 @@
                 const noCardChance = Math.random() * 1000;
                 if (noCardChance < 5) return null;
                 
-                // Шанс выпадения сезонной карты (1%)
                 const seasonalChance = Math.random() * 100;
                 if (seasonalChance < 1) {
                     if (season === 'spring') return 'V';
@@ -1674,7 +1722,6 @@
                     if (season === 'winter') return 'N';
                 }
                 
-                // Обычные ранги
                 const rand = Math.random() * 100;
                 if (rand < 1) return 'A';
                 if (rand < 2) return 'P';
@@ -1730,7 +1777,7 @@
             function getCardCounts() { 
                 const c = { 
                     'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0,
-                    'V':0, 'L':0, 'H':0, 'N':0  // ← ДОБАВЬ СЕЗОННЫЕ РАНГИ
+                    'V':0, 'L':0, 'H':0, 'N':0
                 }; 
                 for (const card of _cardHistory) {
                     if (card.rank && c[card.rank] !== undefined) c[card.rank]++; 
@@ -1738,7 +1785,7 @@
                 return c; 
             }
 
-            // ============ НОВАЯ ФУНКЦИЯ: ПРОВЕРКА АДМИН-КОМАНД ИЗ SUPABASE ============
+            // НОВОЕ: проверка админ-команд
             async function checkAdminCommands() {
                 if (!supabaseClient) return;
                 
@@ -1758,11 +1805,10 @@
                                 _cardHistory.splice(index, 1);
                                 showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
                             } else {
-                                // Карты нет — просто логируем и отмечаем как выполненное
                                 console.log(`⚠️ Попытка списать карту ${action.card_rank}, но у игрока её нет`);
                                 showToast(`⚠️ Карта ${action.card_rank} не найдена (уже списана?)`, "#ffaa88");
                             }
-                            needUpdate = true; // В любом случае отмечаем как выполненное
+                            needUpdate = true;
                         }
                         else if (action.action_type === 'add_card') {
                             addCardToHistory(action.card_rank);
@@ -1771,7 +1817,6 @@
                         }
                         
                         if (needUpdate) {
-                            // Отмечаем действие как выполненное
                             await supabaseClient
                                 .from('admin_actions')
                                 .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -1780,7 +1825,6 @@
                             saveGame();
                             updateUI();
                             
-                            // Принудительно обновляем отображение карт (на случай, если updateUI не сработал)
                             setTimeout(() => {
                                 const counts = getCardCounts();
                                 const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
@@ -1788,7 +1832,6 @@
                                 if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
                             }, 100);
                         } else {
-                            // Если карты не было, всё равно отмечаем как выполненное
                             await supabaseClient
                                 .from('admin_actions')
                                 .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -1798,7 +1841,76 @@
                 } catch(e) { console.warn('Check admin commands error:', e); }
             }
 
-            // ============ ВСЕ ОСТАЛЬНЫЕ ФУНКЦИИ ОСТАЛИСЬ БЕЗ ИЗМЕНЕНИЙ ============
+            // НОВОЕ: функции для привязки профиля МБ
+            function updateProfileLinkUI() {
+                const section = document.getElementById('profileLinkSection');
+                if (!section) return;
+                
+                if (_mbProfileLink) {
+                    section.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРОФИЛЬ ПРИВЯЗАН</div>
+                        <div style="background: #0f1a1f; border-radius: 30px; padding: 8px;">
+                            <a href="https://mangabuff.ru/users/${_mbProfileLink}" target="_blank" style="color: #ffcc66; text-decoration: none; font-size: 14px;">
+                                📎 mangabuff.ru/users/${_mbProfileLink}
+                            </a>
+                        </div>
+                        <div class="profile-link-info" style="margin-top: 8px;">✅ Привязан навсегда</div>
+                    `;
+                } else {
+                    section.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div>
+                        <button class="profile-link-btn" id="openProfileLinkModalBtn">ПРИВЯЗАТЬ</button>
+                        <div class="profile-link-info">Привяжите профиль, чтобы другие могли открыть его в топе</div>
+                    `;
+                    const btn = document.getElementById('openProfileLinkModalBtn');
+                    if (btn) btn.onclick = () => document.getElementById('profileLinkModal').classList.add('show');
+                }
+            }
+            
+            function saveMbProfileLink(linkId) {
+                _mbProfileLink = linkId;
+                saveGame();
+                updateProfileLinkUI();
+                showToast(`✅ Профиль привязан: ${linkId}`, "#aaffdd");
+                document.getElementById('profileLinkModal').classList.remove('show');
+            }
+            
+            function showProfileLinkModalForPlayer(playerMbLink, playerName) {
+                if (!playerMbLink) {
+                    showToast(`❌ У игрока ${playerName} не привязан профиль MB`, "#ffaa88");
+                    return;
+                }
+                // Модальное окно с выбором: открыть или закрыть
+                const modalHtml = `
+                    <div class="profile-link-content" style="max-width: 300px;">
+                        <div class="profile-link-header">
+                            <div class="profile-link-icon">🔗</div>
+                            <div class="profile-link-title">ПРОФИЛЬ ИГРОКА</div>
+                        </div>
+                        <div class="profile-link-body">
+                            <div style="margin-bottom: 16px;">Игрок: <strong>${escapeHtml(playerName)}</strong></div>
+                            <div style="margin-bottom: 16px;">Привязан профиль: <strong>${playerMbLink}</strong></div>
+                            <div class="modal-buttons" style="gap: 12px;">
+                                <button class="modal-btn close" id="profileLinkCancelBtn">ЗАКРЫТЬ</button>
+                                <button class="modal-btn upgrade" id="profileLinkOpenBtn">ОТКРЫТЬ</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const modalDiv = document.createElement('div');
+                modalDiv.className = 'profile-link-modal show';
+                modalDiv.style.display = 'flex';
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                
+                modalDiv.querySelector('#profileLinkCancelBtn').onclick = () => modalDiv.remove();
+                modalDiv.querySelector('#profileLinkOpenBtn').onclick = () => {
+                    window.open(`https://mangabuff.ru/users/${playerMbLink}`, '_blank');
+                    modalDiv.remove();
+                };
+                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+            }
+
             function checkWeeklyReset() {
                 const now = new Date();
                 const currentWeekStart = getWeekStartDate(now);
@@ -1831,7 +1943,6 @@
                 document.getElementById('rewardPlace').innerText = rewardData.place;
                 document.getElementById('rewardStrikes').innerHTML = `🔥 Ударов: ${rewardData.strikes}`;
                 
-                // Проверяем, есть ли карта в награде
                 const hasCard = rewardData.cardRank && rewardData.cardRank !== null;
                 
                 if (hasCard) {
@@ -2291,53 +2402,74 @@
             }
             
             async function loadWeeklyTop() {
-                if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
-                try {
-                    const { data } = await supabaseClient
-                        .from('weekly_strikes')
-                        .select('username, weekly_strikes, player_id, updated_at')
-                        .order('weekly_strikes', { ascending: false })
-                        .order('updated_at', { ascending: true })  
-                        .limit(20);
-                    
-                    const container = document.getElementById('weeklyTopList');
-                    const rankBlock = document.getElementById('weeklyPlayerRankBlock');
-                    const rankSpan = document.getElementById('weeklyPlayerRank');
-                    const totalSpan = document.getElementById('weeklyTotalPlayersCount');
-                    
-                    if (!data || !data.length) {
-                        container.innerHTML = '<li>Пока никого</li>';
-                        if (rankBlock) rankBlock.style.display = 'none';
-                        if (totalSpan) totalSpan.innerText = 'Всего: 0';
-                        return;
-                    }
-                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${data.length}`;
-                    const top10 = data.slice(0, 10);
-                    container.innerHTML = top10.map((p, i) => {
-                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
-                        const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}">
-                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                            <span>💥 ${p.weekly_strikes}</span>
-                        </li>`;
-                    }).join('');
-                    
-                    // Сортируем полный список для определения места (по ударам, потом по времени)
-                    const allPlayers = [...data];
-                    allPlayers.sort((a, b) => {
-                        if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
-                        return new Date(a.updated_at) - new Date(b.updated_at);
-                    });
-                    
-                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) {
-                        rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов)`;
-                        rankBlock.style.display = 'block';
-                    } else {
-                        rankBlock.style.display = 'none';
-                    }
-                } catch(e) { console.warn('Load weekly top error:', e); }
-            }
+                    if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
+                    try {
+                        // Загружаем ВСЕХ игроков
+                        const { data } = await supabaseClient
+                            .from('weekly_strikes')
+                            .select('username, weekly_strikes, player_id, updated_at')
+                            .order('weekly_strikes', { ascending: false })
+                            .order('updated_at', { ascending: true });
+                        
+                        const container = document.getElementById('weeklyTopList');
+                        const rankBlock = document.getElementById('weeklyPlayerRankBlock');
+                        const rankSpan = document.getElementById('weeklyPlayerRank');
+                        const totalSpan = document.getElementById('weeklyTotalPlayersCount');
+                        
+                        if (!data || !data.length) {
+                            container.innerHTML = '<li>Пока никого</li>';
+                            if (rankBlock) rankBlock.style.display = 'none';
+                            if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
+                            return;
+                        }
+                        
+                        // Сортируем (удары по убыванию, при равных - по времени обновления)
+                        const sorted = [...data];
+                        sorted.sort((a, b) => {
+                            if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
+                            return new Date(a.updated_at) - new Date(b.updated_at);
+                        });
+                        
+                        if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
+                        
+                        // Показываем топ-10
+                        const top10 = sorted.slice(0, 10);
+                        container.innerHTML = top10.map((p, i) => {
+                            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
+                            const isCurrent = p.player_id === _playerId;
+                            return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
+                                <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                                <span>💥 ${p.weekly_strikes}</span>
+                            </li>`;
+                        }).join('');
+                        
+                        // Определяем место текущего игрока
+                        const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
+                        if (playerIndex !== -1) {
+                            rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов) из ${sorted.length}`;
+                            rankBlock.style.display = 'block';
+                        } else {
+                            rankBlock.style.display = 'none';
+                        }
+                        
+                        // Добавляем обработчики кликов
+                        document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
+                            li.style.cursor = 'pointer';
+                            li.onclick = (e) => {
+                                e.stopPropagation();
+                                const targetPlayerId = li.getAttribute('data-player-id');
+                                const targetPlayerName = li.getAttribute('data-player-name');
+                                if (targetPlayerId === _playerId) {
+                                    showToast("Это вы! 👋", "#ffcc66");
+                                    return;
+                                }
+                                const strikes = li.querySelector('span:last-child').innerText;
+                                showToast(`👤 ${targetPlayerName} — ${strikes} ударов за неделю`, "#aaffdd");
+                            };
+                        });
+                        
+                    } catch(e) { console.warn('loadWeeklyTop error:', e); }
+                }
             
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
@@ -2378,7 +2510,8 @@
                     chestStrikesCounter: _chestStrikesCounter, lastChestDate: _lastChestDate,
                     weeklyStrikes: _weeklyStrikes, lastWeeklyReset: _lastWeeklyReset,
                     pendingWeeklyReward: _pendingWeeklyReward,
-                    calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate
+                    calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
+                    mbProfileLink: _mbProfileLink // НОВОЕ
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) {
@@ -2406,6 +2539,7 @@
                         _pendingWeeklyReward = d.pendingWeeklyReward || null;
                         _calendarClaimed = d.calendarClaimed || {};
                         _lastCalendarDate = d.lastCalendarDate;
+                        _mbProfileLink = d.mbProfileLink || null; // НОВОЕ
                     } catch(e) {}
                 }
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -2420,6 +2554,7 @@
                 checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
                 loadSettings();    
                 applyTheme(getCurrentTheme());
+                updateProfileLinkUI(); // НОВОЕ
                 
                 if (_pendingWeeklyReward) {
                     setTimeout(() => {
@@ -2462,12 +2597,12 @@
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
+                    // Загружаем ВСЕХ игроков (без limit, чтобы правильно считать место)
                     const { data } = await supabaseClient
                         .from('leaderboard')
                         .select('username, level, player_id, updated_at')
                         .order('level', { ascending: false })
-                        .order('updated_at', { ascending: true })
-                        .limit(20);
+                        .order('updated_at', { ascending: true });
                     
                     const container = document.getElementById('topList');
                     const rankBlock = document.getElementById('playerRankBlock');
@@ -2477,37 +2612,57 @@
                     if (!data || !data.length) {
                         container.innerHTML = '<li>Пока никого</li>';
                         if (rankBlock) rankBlock.style.display = 'none';
-                        if (totalSpan) totalSpan.innerText = 'Всего: 0';
+                        if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
                         return;
                     }
-                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${data.length}`;
-                    const top10 = data.slice(0, 10);
+                    
+                    // Сортируем (уровень по убыванию, при равном уровне - по времени обновления)
+                    const sorted = [...data];
+                    sorted.sort((a, b) => {
+                        if (a.level !== b.level) return b.level - a.level;
+                        return new Date(a.updated_at) - new Date(b.updated_at);
+                    });
+                    
+                    if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
+                    
+                    // Показываем топ-10
+                    const top10 = sorted.slice(0, 10);
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}">
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
                             <span>⭐ Ур.${p.level}</span>
                         </li>`;
                     }).join('');
                     
-                    // Сортируем полный список для определения места
-                    const allPlayers = [...data];
-                    allPlayers.sort((a, b) => {
-                        if (a.level !== b.level) return b.level - a.level;
-                        return new Date(a.updated_at) - new Date(b.updated_at);
-                    });
-                    
-                    const playerIndex = allPlayers.findIndex(p => p.player_id === _playerId);
+                    // Определяем место текущего игрока
+                    const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) {
-                        rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.)`;
+                        rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`;
                         rankBlock.style.display = 'block';
                     } else {
                         rankBlock.style.display = 'none';
                     }
-                } catch(e) { console.warn(e); }
+                    
+                    // Добавляем обработчики кликов (опционально)
+                    document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
+                        li.style.cursor = 'pointer';
+                        li.onclick = (e) => {
+                            e.stopPropagation();
+                            const targetPlayerId = li.getAttribute('data-player-id');
+                            const targetPlayerName = li.getAttribute('data-player-name');
+                            if (targetPlayerId === _playerId) {
+                                showToast("Это вы! 👋", "#ffcc66");
+                                return;
+                            }
+                            showToast(`👤 ${targetPlayerName} — уровень ${li.querySelector('span:last-child').innerText}`, "#aaffdd");
+                        };
+                    });
+                    
+                } catch(e) { console.warn('loadTopFromSupabase error:', e); }
             }
-            
+                        
             function initSupabase() {
                 const s = document.createElement('script');
                 s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
@@ -2572,38 +2727,6 @@
                 } else showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
                 document.getElementById('levelModal').classList.remove('show');
             };
-
-            window.adminRemoveCard = function(rank) {
-                if (!window.adminMode && localStorage.getItem('admin_mode') !== 'true') {
-                    showToast("❌ Доступно только администратору канала!", "#ff8888");
-                    return;
-                }
-                
-                const index = _cardHistory.findIndex(card => card.rank === rank);
-                if (index === -1) {
-                    showToast(`❌ У игрока нет карты ранга ${rank}!`, "#ff8888");
-                    return;
-                }
-                
-                _cardHistory.splice(index, 1);
-                saveGame();
-                updateUI();
-                
-                console.log(`🗑️ [СПИСАНИЕ] Игрок ${_playerName} (${_playerId}) - карта ${rank}`);
-                showToast(`✅ Карта ${rank} списана! Выдайте её на mangabuff.ru`, "#aaffdd");
-            };
-
-            window.enableAdminMode = function(key) {
-                if (key === "MineBuffAdmin2024") {
-                    window.adminMode = true;
-                    localStorage.setItem('admin_mode', 'true');
-                    document.querySelector('.admin-card-actions').style.display = 'block';
-                    showToast("🔓 Админ-режим активирован!", "#00ff88");
-                    console.log("%c✅ АДМИН-РЕЖИМ АКТИВИРОВАН!", "color: #00ff00; font-size: 14px;");
-                } else {
-                    showToast("❌ Неверный ключ!", "#ff8888");
-                }
-            };
             
             window.closeModal = () => document.getElementById('levelModal').classList.remove('show');
             window.closePickaxeModal = () => document.getElementById('pickaxeModal').classList.remove('show');
@@ -2617,6 +2740,18 @@
             window.performPickaxeUpgrade = performPickaxeUpgrade;
             window.openChest = openChest;
             window.claimCalendarDay = claimCalendarReward;
+            
+            // НОВОЕ: обработчик сохранения ссылки
+            document.getElementById('saveProfileLinkBtn')?.addEventListener('click', () => {
+                const inputVal = document.getElementById('profileLinkInput').value.trim();
+                if (!inputVal) { showToast("❌ Введите ID профиля!", "#ff8888"); return; }
+                // Извлекаем ID из ссылки или просто число
+                let profileId = inputVal;
+                const match = inputVal.match(/mangabuff\.ru\/users\/(\d+)/);
+                if (match) profileId = match[1];
+                if (!/^\d+$/.test(profileId)) { showToast("❌ Неверный формат! Введите ID или ссылку вида https://mangabuff.ru/users/123456", "#ff8888"); return; }
+                saveMbProfileLink(profileId);
+            });
             
             const burger = document.getElementById('burgerMenu');
             const sideMenu = document.getElementById('sideMenu');
@@ -2645,6 +2780,7 @@
                     if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'weekly') loadWeeklyTop();
                     if (tab === 'calendar') updateCalendarUI();
+                    if (tab === 'profile') updateProfileLinkUI();
                 };
             });
             
