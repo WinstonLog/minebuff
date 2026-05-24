@@ -2732,6 +2732,9 @@
                 checkChestReset();
                 checkWeeklyReset();
                 checkCalendarReset();
+                if (supabaseClient) {
+                    checkAndResetWeeklyTop();
+                }
             }
             
             async function syncWeeklyStrikes() {
@@ -2877,6 +2880,47 @@
                     syncWeeklyStrikes();
                 }
             }
+
+            // ========== АВТОМАТИЧЕСКИЙ СБРОС ТОПА ПРИ ПЕРВОМ ЗАХОДЕ В НОВУЮ НЕДЕЛЮ ==========
+            async function checkAndResetWeeklyTop() {
+                if (!supabaseClient) return;
+                
+                const now = new Date();
+                const currentWeekStart = new Date(now);
+                const daysToLastSunday = now.getDay(); // 0 = воскресенье
+                currentWeekStart.setDate(now.getDate() - daysToLastSunday);
+                currentWeekStart.setHours(23, 59, 59, 999);
+                
+                // Получаем последний известный сброс
+                const lastResetStr = localStorage.getItem('weekly_top_last_reset');
+                const lastReset = lastResetStr ? new Date(lastResetStr) : null;
+                
+                // Если сброс не делался на этой неделе
+                if (!lastReset || lastReset < currentWeekStart) {
+                    try {
+                        // Очищаем таблицу weekly_strikes
+                        const { error } = await supabaseClient
+                            .from('weekly_strikes')
+                            .delete()
+                            .neq('player_id', 'none'); // удаляем всех, кроме заглушки
+                        
+                        if (error) throw error;
+                        
+                        // Обновляем локальный флаг сброса
+                        localStorage.setItem('weekly_top_last_reset', currentWeekStart.toISOString());
+                        console.log('✅ Weekly top reset completed');
+                        showToast('📊 Топ ударов обновлён на новую неделю!', '#aaffdd');
+                        
+                        // Также сбрасываем локальные удары игрока
+                        _weeklyStrikes = 0;
+                        saveGame();
+                        updateUI();
+                        
+                    } catch(e) {
+                        console.warn('Weekly reset error:', e);
+                    }
+                }
+            }
             
             function loadGame() {
                 const saved = localStorage.getItem('minebuff_save');
@@ -2924,6 +2968,7 @@
                 updateProfileLinkUI();
                 loadPvPData();
                 updateTopCardsInDB();
+                checkAndResetWeeklyTop();
                 
                 if (_pendingWeeklyReward) {
                     setTimeout(() => {
