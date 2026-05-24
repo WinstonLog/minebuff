@@ -2464,7 +2464,6 @@
             async function loadWeeklyTop() {
                 if (!supabaseClient) { setTimeout(loadWeeklyTop, 500); return; }
                 try {
-                    // Загружаем ВСЕХ игроков
                     const { data } = await supabaseClient
                         .from('weekly_strikes')
                         .select('username, weekly_strikes, player_id, updated_at');
@@ -2481,30 +2480,24 @@
                         return;
                     }
                     
-                    // СОРТИРОВКА: сначала по ударам (↓), потом по времени ДОСТИЖЕНИЯ (↑)
                     const sorted = [...data];
                     sorted.sort((a, b) => {
-                        if (a.weekly_strikes !== b.weekly_strikes) {
-                            return b.weekly_strikes - a.weekly_strikes;
-                        }
-                        // Чем СТАРШЕ updated_at — тем выше (кто первый достиг)
+                        if (a.weekly_strikes !== b.weekly_strikes) return b.weekly_strikes - a.weekly_strikes;
                         return new Date(a.updated_at) - new Date(b.updated_at);
                     });
                     
                     if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
                     
-                    // Показываем топ-10
                     const top10 = sorted.slice(0, 10);
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-strikes="${p.weekly_strikes}">
                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
                             <span>💥 ${p.weekly_strikes}</span>
                         </li>`;
                     }).join('');
                     
-                    // Определяем место текущего игрока
                     const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) {
                         rankSpan.innerText = `${playerIndex + 1} место (${_weeklyStrikes} ударов) из ${sorted.length}`;
@@ -2513,23 +2506,23 @@
                         rankBlock.style.display = 'none';
                     }
                     
-                    // Добавляем обработчики кликов
                     document.querySelectorAll('#weeklyTopList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
                         li.onclick = (e) => {
                             e.stopPropagation();
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
+                            const targetPlayerStrikes = li.getAttribute('data-player-strikes');
+                            
                             if (targetPlayerId === _playerId) {
                                 if (_mbProfileLink) {
                                     showProfileLinkModalForPlayer(_mbProfileLink, _playerName);
                                 } else {
-                                    showToast("Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
+                                    showToast("🔗 Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
                                 }
-                                return;
+                            } else {
+                                showToast(`👤 ${targetPlayerName} — ${targetPlayerStrikes} ударов за неделю`, "#aaffdd");
                             }
-                            const strikes = li.querySelector('span:last-child').innerText;
-                            showToast(`👤 ${targetPlayerName} — ${strikes} ударов за неделю`, "#aaffdd");
                         };
                     });
                     
@@ -2662,7 +2655,6 @@
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
-                    // Загружаем ВСЕХ игроков (без limit, чтобы правильно считать место)
                     const { data } = await supabaseClient
                         .from('leaderboard')
                         .select('username, level, player_id, updated_at')
@@ -2681,7 +2673,6 @@
                         return;
                     }
                     
-                    // Сортируем (уровень по убыванию, при равном уровне - по времени обновления)
                     const sorted = [...data];
                     sorted.sort((a, b) => {
                         if (a.level !== b.level) return b.level - a.level;
@@ -2690,18 +2681,16 @@
                     
                     if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
                     
-                    // Показываем топ-10
                     const top10 = sorted.slice(0, 10);
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}">
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}">
                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
                             <span>⭐ Ур.${p.level}</span>
                         </li>`;
                     }).join('');
                     
-                    // Определяем место текущего игрока
                     const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) {
                         rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`;
@@ -2710,18 +2699,23 @@
                         rankBlock.style.display = 'none';
                     }
                     
-                    // Добавляем обработчики кликов (опционально)
                     document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
                         li.onclick = (e) => {
                             e.stopPropagation();
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
+                            const targetPlayerLevel = li.getAttribute('data-player-level');
+                            
                             if (targetPlayerId === _playerId) {
-                                showToast("Это вы! 👋", "#ffcc66");
-                                return;
+                                if (_mbProfileLink) {
+                                    showProfileLinkModalForPlayer(_mbProfileLink, _playerName);
+                                } else {
+                                    showToast("🔗 Вы не привязали профиль MB! Сделайте это в профиле", "#ffaa88");
+                                }
+                            } else {
+                                showToast(`👤 ${targetPlayerName} — уровень ${targetPlayerLevel}`, "#aaffdd");
                             }
-                            showToast(`👤 ${targetPlayerName} — уровень ${li.querySelector('span:last-child').innerText}`, "#aaffdd");
                         };
                     });
                     
