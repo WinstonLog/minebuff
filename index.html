@@ -835,6 +835,40 @@
             transform: translateX(26px);
         }
 
+        /* Топы */
+        .top-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 60px;
+            padding: 4px;
+        }
+        .top-tab-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.1s;
+            background: transparent;
+            color: #9bbfd0;
+            border: none;
+        }
+        .top-tab-btn.active {
+            background: linear-gradient(135deg, #3a6b58, #1e3e31);
+            color: #ffcc66;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .top-content {
+            display: none;
+        }
+        .top-content.active {
+            display: block;
+        }
+
         .footer {
             margin-top: 16px;
             text-align: center;
@@ -1117,8 +1151,7 @@
                 <div class="menu-item" data-tab="calendar">📅 Календарь <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
-                <div class="menu-item" data-tab="weekly">📊 Топ ударов <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="top">🌍 Топ уровней</div>
+                <div class="menu-item" data-tab="combinedTop">🏆 Топ игроков<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
             </div>
         </div>
@@ -1222,26 +1255,29 @@
             </div>
         </div>
 
-        <!-- Еженедельный топ ударов -->
-        <div class="tab-panel" id="weeklyPanel">
-            <div class="weekly-top-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">🏆 ТОП УДАРОВ (НЕДЕЛЯ)</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7;">Кто больше ударов за неделю</div>
-                <div class="weekly-reset-info" id="weeklyResetInfo">⏳ Сброс: воскресенье, 23:59</div>
-                <ul class="weekly-top-list" id="weeklyTopList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
-                <div id="weeklyPlayerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="weeklyPlayerRank">—</span></div>
-                <div class="total-players" id="weeklyTotalPlayersCount"></div>
-            </div>
-        </div>
-
-        <!-- Топ уровней -->
-        <div class="tab-panel" id="topPanel">
+        <!-- ТОП ИГРОКОВ -->
+        <div class="tab-panel" id="combinedTopPanel">
             <div class="top-panel game-panel">
-                <div style="font-weight: bold; font-size: 18px;">🏆 ТОП УРОВНЕЙ</div>
-                <div style="font-size: 11px; opacity: 0.7;">По уровню (все время)</div>
-                <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
-                <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="playerRank">—</span></div>
-                <div class="total-players" id="totalPlayersCount"></div>
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🏆 ТОП ИГРОКОВ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Лучшие игроки MINEBUFF</div>
+                
+                <div class="top-tabs">
+                    <button class="top-tab-btn" id="topLevelsTabBtn">⭐ ТОП УРОВНЕЙ</button>
+                    <button class="top-tab-btn" id="topStrikesTabBtn">💥 ТОП УДАРОВ</button>
+                </div>
+                
+                <div id="topLevelsContent" class="top-content active">
+                    <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
+                    <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="playerRank">—</span></div>
+                    <div class="total-players" id="totalPlayersCount"></div>
+                </div>
+                
+                <div id="topStrikesContent" class="top-content">
+                    <div class="weekly-reset-info" id="weeklyResetInfo">⏳ Сброс: воскресенье, 23:59</div>
+                    <ul class="weekly-top-list" id="weeklyTopList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
+                    <div id="weeklyPlayerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="weeklyPlayerRank">—</span></div>
+                    <div class="total-players" id="weeklyTotalPlayersCount"></div>
+                </div>
             </div>
         </div>
 
@@ -2071,7 +2107,7 @@
                 
                 if (reward.type === 'diamonds') { 
                     _diamonds += reward.amount; 
-                    showToast(`💰 +${reward.amount} алмазов!`, "#ffcc66"); 
+                    showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); 
                 } else if (reward.type === 'ore') { 
                     _ore += reward.amount; 
                     showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); 
@@ -2703,7 +2739,40 @@
             }
             
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
-            
+
+            function initCombinedTopTabs() {
+                const levelsTab = document.getElementById('topLevelsTabBtn');
+                const strikesTab = document.getElementById('topStrikesTabBtn');
+                const levelsContent = document.getElementById('topLevelsContent');
+                const strikesContent = document.getElementById('topStrikesContent');
+                
+                if (levelsTab && strikesTab && levelsContent && strikesContent) {
+                    // Обработчик для вкладки "Топ уровней"
+                    levelsTab.onclick = function() {
+                        levelsTab.classList.add('active');
+                        strikesTab.classList.remove('active');
+                        levelsContent.classList.add('active');
+                        strikesContent.classList.remove('active');
+                        loadTopFromSupabase(); // загружаем топ уровней
+                    };
+                    
+                    // Обработчик для вкладки "Топ ударов (неделя)"
+                    strikesTab.onclick = function() {
+                        strikesTab.classList.add('active');
+                        levelsTab.classList.remove('active');
+                        strikesContent.classList.add('active');
+                        levelsContent.classList.remove('active');
+                        loadWeeklyTop(); // загружаем топ ударов
+                    };
+                    
+                    // По умолчанию активна вкладка уровней
+                    levelsTab.classList.add('active');
+                    strikesTab.classList.remove('active');
+                    levelsContent.classList.add('active');
+                    strikesContent.classList.remove('active');
+                }
+            }
+
             window.mineOre = function() {
                 if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
                 const gain = getOrePerClick(); _ore += gain; _strikesDone++;
@@ -2762,7 +2831,7 @@
             window.openTelegram = function() {
                 if (!_playerName) { showToast("⚠️ Укажите имя!", "#ffaa88"); return; }
                 const msg = `🎴 ЗАПРОС КАРТЫ 🎴\n👤 ${_playerName}\n🆔 ${_playerId}\n⭐ Уровень ${_level}\n💎 ${_diamonds} алмазов`;
-                window.open(`https://t.me/+JGrSP24ks2wxODIy?text=${encodeURIComponent(msg)}`, '_blank');
+                window.open(`https://t.me/minebuff?text=${encodeURIComponent(msg)}`, '_blank');
                 showToast("✅ Отправьте скриншот в Telegram!", "#aaffdd");
             };
             window.showPickaxeModal = showPickaxeModal;
@@ -2795,19 +2864,40 @@
                     menuItems.forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
                     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    
                     let panelId = '';
                     if (tab === 'mine') panelId = 'minePanel';
                     else if (tab === 'profile') panelId = 'profilePanel';
                     else if (tab === 'exchange') panelId = 'exchangePanel';
                     else if (tab === 'calendar') panelId = 'calendarPanel';
-                    else if (tab === 'weekly') panelId = 'weeklyPanel';
+                    else if (tab === 'combinedTop') panelId = 'combinedTopPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
-                    else panelId = 'topPanel';
-                    document.getElementById(panelId).classList.add('active');
+                    
+                    if (panelId) {
+                        document.getElementById(panelId).classList.add('active');
+                    }
+                    
                     sideMenu.classList.remove('show');
-                    if (tab === 'top') loadTopFromSupabase();
+                    
+                    // Загрузка данных для соответствующих вкладок
+                    if (tab === 'combinedTop') {
+                        loadTopFromSupabase();
+                        loadWeeklyTop();
+                        // Активируем первую вкладку (Топ уровней) по умолчанию
+                        setTimeout(() => {
+                            const levelsTab = document.getElementById('topLevelsTabBtn');
+                            const strikesTab = document.getElementById('topStrikesTabBtn');
+                            const levelsContent = document.getElementById('topLevelsContent');
+                            const strikesContent = document.getElementById('topStrikesContent');
+                            if (levelsTab && strikesTab && levelsContent && strikesContent) {
+                                levelsTab.classList.add('active');
+                                strikesTab.classList.remove('active');
+                                levelsContent.classList.add('active');
+                                strikesContent.classList.remove('active');
+                            }
+                        }, 50);
+                    }
                     if (tab === 'exchange') updateExchangeGrid();
-                    if (tab === 'weekly') loadWeeklyTop();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
                 };
@@ -2830,6 +2920,7 @@
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             
             initDropdowns();
+            initCombinedTopTabs();
             loadGame();
             initSupabase();
             setInterval(() => { checkDailyReset(); updateUI(); checkAdminCommands(); }, 30000);
