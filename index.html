@@ -1334,11 +1334,12 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
-                <div class="menu-item" data-tab="arena">⚔️ Арена<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
+                <div class="menu-item" data-tab="arena">⚔️ Арена<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
                 <div class="menu-item" data-tab="combinedTop">🏆 Топ игроков<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="info">📚 Инфо<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
         </div>
@@ -1488,7 +1489,6 @@
 <!--                 <div class="strikes-counter">⚔️ ДУЭЛИ БЕЗ ЛИМИТА: <span id="arenaDuelsToday">∞</span></div> -->
                 
                 <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
-<!--                 <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button> -->
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
@@ -1524,6 +1524,79 @@
                         <input type="checkbox" id="particlesToggleCheckbox">
                         <span class="slider"></span>
                     </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ИНФОРМАЦИЯ / ПОМОЩЬ -->
+        <div class="tab-panel" id="infoPanel">
+            <div class="game-panel">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">📚 ИНФОРМАЦИЯ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Что за что отвечает</div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">⛏️ ШАХТА</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • <strong>Кирка</strong> — улучшается за алмазы, увеличивает добычу руды за удар<br>
+                            • <strong>Уровень</strong> — повышается за алмазы, увеличивает лимит ударов в день<br>
+                            • <strong>Бонус +5💎</strong> — ежедневный бесплатный бонус<br>
+                            • <strong>Обмен</strong> — 100 руды = 1 алмаз<br>
+                            • <strong>x2 событие</strong> — по выходным (сб-вс) добыча руды удваивается
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">🎴 КАРТЫ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • <strong>Ранги (от слабого к сильному):</strong> E → D → C → B → G → P → A<br>
+                            • <strong>Сезонные ранги:</strong> V(весна), L(лето), H(хеллоуин), N(зима) — сила 12<br>
+                            • <strong>Обмен 3:1</strong> — три карты одного ранга = одна карта выше рангом<br>
+                            • <strong>Получение карт:</strong> через Telegram @minebuff 
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">⚔️ АРЕНА (PvP)</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • <strong>Доступ:</strong> с 5 уровня и 3+ карт<br>
+                            • <strong>Бой:</strong> 3 раунда, ваши ТОП-3 карты против карт соперника<br>
+                            • <strong>Рейтинг:</strong> победа +15, поражение -15, ничья 0<br>
+                            • <strong>Лиги:</strong> рейтинг определяет вашу лигу и бонус к добыче
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">🏆 ДОСТИЖЕНИЯ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • Повышение уровня (5,10,25,50)<br>
+                            • Коллекционирование карт (5,15,30)<br>
+                            • Накопление ресурсов (1000/10000 руды, 50/200 алмазов)<br>
+                            • 500 ударов всего<br>
+                            • Собрать все сезонные карты (V,L,H,N)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • Заходи каждый день и получай награды!<br>
+                            • Доступен с 5 уровня<br>
+                            • На 14 день — карта D, на 30 день — карта C
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
+                    📢 По всем вопросам: <a href="https://t.me/b_loody" target="_blank" style="color: #ffcc66;">@b_loody</a>
                 </div>
             </div>
         </div>
@@ -2352,6 +2425,7 @@
                 _chestStrikesCounter = 0;
                 saveGame(); 
                 updateUI();
+                checkAchievements();
                 
                 document.getElementById('chestModal').classList.remove('show');
                 _pendingChest = null;
@@ -2369,6 +2443,7 @@
                 _cardHistory = newHistory;
                 _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🔄 Обмен: ${rule.need}x${rule.from} → ${rule.to}`, rank: rule.to });
                 saveGame(); updateUI();
+                checkAchievements();
                 showToast(`✅ Обмен выполнен! +1 карта ${rule.to}`, "#aaffdd");
             }
             
@@ -2570,6 +2645,7 @@
                 _calendarClaimed[day] = true;
                 saveGame();
                 updateCalendarUI();
+                checkAchievements();
                 return true;
             }
                         
@@ -3291,6 +3367,7 @@
                 updateUI();
                 updateArenaUI();
                 syncPvPToSupabase();
+                checkAchievements();
                 
                 // Показываем результат в модальном окне
                 const logContainer = document.getElementById('battleLog');
@@ -3649,6 +3726,7 @@
                     else if (tab === 'combinedTop') panelId = 'combinedTopPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
                     else if (tab === 'arena') panelId = 'arenaPanel';
+                    else if (tab === 'info') panelId = 'infoPanel';
                     
                     if (panelId) {
                         document.getElementById(panelId).classList.add('active');
