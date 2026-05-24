@@ -1984,14 +1984,22 @@
                             showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
                             needUpdate = true;
                         }
-                        // ========== ДОБАВЛЕНО ДЛЯ АЛМАЗОВ ==========
                         else if (action.action_type === 'add_diamonds') {
                             const amount = action.amount || 0;
                             _diamonds += amount;
                             showToast(`💎 Администратор выдал ${amount} алмазов!`, "#ffd966");
                             needUpdate = true;
                         }
-                        // ==========================================
+                        else if (action.action_type === 'remove_diamonds') {
+                            const amount = action.amount || 0;
+                            if (_diamonds >= amount) {
+                                _diamonds -= amount;
+                                showToast(`💎 Администратор списал ${amount} алмазов!`, "#ffaa88");
+                            } else {
+                                showToast(`⚠️ Недостаточно алмазов!`, "#ff8888");
+                            }
+                            needUpdate = true;
+                        }
                         
                         if (needUpdate) {
                             await supabaseClient
@@ -2001,13 +2009,6 @@
                             
                             saveGame();
                             updateUI();
-                            
-                            setTimeout(() => {
-                                const counts = getCardCounts();
-                                const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
-                                if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
-                                if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
-                            }, 100);
                         } else {
                             await supabaseClient
                                 .from('admin_actions')
