@@ -1314,44 +1314,6 @@
             background: linear-gradient(135deg, #3a6b58, #1e3e31);
             color: white;
         }
-
-        /* Сезонный босс */
-        .seasonal-boss-card {
-            transition: all 0.3s ease;
-        }
-        .boss-hp {
-            text-align: center;
-            font-size: 14px;
-            margin: 8px 0;
-        }
-        .boss-hp-bar {
-            background: #333;
-            border-radius: 20px;
-            height: 12px;
-            margin: 8px 0;
-            overflow: hidden;
-        }
-        .boss-hp-fill {
-            background: linear-gradient(90deg, #ff4444, #ff8888);
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            transition: width 0.3s;
-        }
-        .seasonal-boss-stats {
-            font-size: 11px;
-        }
-
-        /* Вкладки арены */
-        .arena-tab-btn {
-            transition: all 0.2s ease;
-        }
-        .arena-tab-btn:active {
-            transform: scale(0.96);
-        }
-        .arena-tab-content {
-            transition: display 0.2s ease;
-        }
     </style>
 </head>
 <body>
@@ -1507,71 +1469,35 @@
             </div>
         </div>
 
-        <!-- АРЕНА (PvP + Босс) -->
+        <!-- АРЕНА (PvP) -->
         <div class="tab-panel" id="arenaPanel">
             <div class="game-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">⚔️ АРЕНА</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Сражайся с игроками или атакуй босса!</div>
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">⚔️ PvP АРЕНА</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Сражайся с другими игроками!</div>
                 
-                <!-- Вкладки арены -->
-                <div class="arena-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 60px; padding: 4px;">
-                    <button class="arena-tab-btn" id="arenaPvPTabBtn" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: #ffcc66; border: none;">⚔️ PvP ДУЭЛИ</button>
-                    <button class="arena-tab-btn" id="arenaBossTabBtn" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #9bbfd0; border: none;">👑 СЕЗОННЫЙ БОСС</button>
+                <div class="stats">
+                    <div class="stat-card"><div class="stat-label">🏆 Лига</div><div class="stat-value"><span id="arenaLeagueIcon">🟫</span> <span id="arenaLeagueName">Песчаная жила</span></div></div>
+                    <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">0</div></div>
                 </div>
                 
-                <!-- PvP контент -->
-                <div id="arenaPvPContent" class="arena-tab-content" style="display: block;">
-                    <div class="stats">
-                        <div class="stat-card"><div class="stat-label">🏆 Лига</div><div class="stat-value"><span id="arenaLeagueIcon">🟫</span> <span id="arenaLeagueName">Песчаная жила</span></div></div>
-                        <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">0</div></div>
-                    </div>
-                    
-                    <div class="stats">
-                        <div class="stat-card"><div class="stat-label">✅</div><div class="stat-value" id="arenaWinsValue">0</div></div>
-                        <div class="stat-card"><div class="stat-label">❌</div><div class="stat-value" id="arenaLossesValue">0</div></div>
-                        <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
-                    </div>
-                    
-                    <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
-                    
-                    <div class="dropdown-section">
-                        <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
-                        <div class="dropdown-content"><ul class="weekly-top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
-                    </div>
-                    
-                    <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                        💡 Победа +15 рейтинга, поражение -15, ничья 0
-                    </div>
+                <div class="stats">
+                    <div class="stat-card"><div class="stat-label">✅</div><div class="stat-value" id="arenaWinsValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">❌</div><div class="stat-value" id="arenaLossesValue">0</div></div>
+                    <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
                 </div>
                 
-                <!-- Босс контент -->
-                <div id="arenaBossContent" class="arena-tab-content" style="display: none;">
-                    <div id="seasonalBossCard" class="seasonal-boss-card" style="background: linear-gradient(135deg, #2a1a1a, #1a0a0a); border-radius: 30px; padding: 12px; margin-bottom: 12px; border: 1px solid #ffcc66;">
-                        Загрузка...
-                    </div>
-                    
-                    <button id="attackSeasonalBossBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ АТАКОВАТЬ БОССА</button>
-                    
-                    <div style="display: flex; justify-content: space-between; gap: 10px; margin: 10px 0;">
-                        <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">💥 Мой урон</div>
-                            <div style="font-size: 20px; font-weight: bold;" id="seasonalBossMyDamage">0</div>
-                        </div>
-                        <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">💀 Убито боссов</div>
-                            <div style="font-size: 20px; font-weight: bold;" id="seasonalBossKillCount">0</div>
-                        </div>
-                    </div>
-                    
-                    <div class="dropdown-section" style="margin-top: 8px;">
-                        <div class="dropdown-header"><div class="dropdown-title">🏆 ТОП УРОНА ПО БОССУ</div><div class="dropdown-arrow">▼</div></div>
-                        <div class="dropdown-content"><ul class="weekly-top-list" id="seasonalBossTopList"><li>Загрузка...</li></ul></div>
-                    </div>
-                    
-                    <div class="dropdown-section">
-                        <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ УБИЙСТВ</div><div class="dropdown-arrow">▼</div></div>
-                        <div class="dropdown-content"><ul class="weekly-top-list" id="seasonalBossHistoryList"><li>— Нет истории —</li></ul></div>
-                    </div>
+<!--                 <div class="strikes-counter">⚔️ ДУЭЛИ БЕЗ ЛИМИТА: <span id="arenaDuelsToday">∞</span></div> -->
+                
+                <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content"><ul class="weekly-top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
+                    💡 Победа +15 рейтинга, поражение -15, ничья 0<br>
+<!--                     🎴 Сила карт: A=10, P=9, G=8, B=7, C=6, D=5, E=4, ивентовые=12 -->
                 </div>
             </div>
         </div>
@@ -1937,14 +1863,6 @@
             let _pvpHistory = [];
             let battleAnimationInterval = null;
             let battleModalDiv = null;
-
-            let _seasonalBoss = null;
-            let _seasonalBossDamageTop = [];
-            let _mySeasonalBossDamage = 0;
-            let _seasonalBossLastKill = null;
-            let _seasonalBossKillCount = 0;
-            let _seasonalBossAttackCooldown = null;
-            let _lastSeasonalBossAttack = null;
             
             // НОВОЕ: привязанная ссылка на профиль МБ
             let _mbProfileLink = null; // храним ID (число/строку)
@@ -2929,7 +2847,6 @@
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updateArenaUI();
-                updateSeasonalBossUI();
             }
             
             function saveGame() {
@@ -2951,11 +2868,7 @@
                     pvpDraws: _pvpDraws,
                     pvpDuelsToday: _pvpDuelsToday,
                     pvpLastDuelDate: _pvpLastDuelDate,
-                    pvpHistory: _pvpHistory,
-
-                    mySeasonalBossDamage: _mySeasonalBossDamage,
-                    seasonalBossKillCount: _seasonalBossKillCount,
-                    lastSeasonalBossAttack: _lastSeasonalBossAttack
+                    pvpHistory: _pvpHistory
 
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
@@ -2993,10 +2906,6 @@
                         _pvpDuelsToday = d.pvpDuelsToday || 0;
                         _pvpLastDuelDate = d.pvpLastDuelDate;
                         _pvpHistory = d.pvpHistory || [];
-
-                        _mySeasonalBossDamage = d.mySeasonalBossDamage || 0;
-                        _seasonalBossKillCount = d.seasonalBossKillCount || 0;
-                        _lastSeasonalBossAttack = d.lastSeasonalBossAttack || null;
 
                     } catch(e) {}
                 }
@@ -3147,7 +3056,6 @@
                 s.onload = () => {
                     supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4');
                     setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); loadWeeklyTop(); checkAdminCommands(); }, 500);
-                    initSeasonalBoss();
                 };
                 document.head.appendChild(s);
             }
@@ -3682,427 +3590,8 @@
                     }
                 } catch(e) { console.warn('loadPvPData error:', e); }
             }
-            
-            function getSeasonalBossByDate() {
-                const now = new Date();
-                const month = now.getMonth() + 1;
-                
-                if (month >= 3 && month <= 5) {
-                    return {
-                        id: 'spring',
-                        name: '🌸 Весенний Элементаль',
-                        icon: '🌸',
-                        baseHp: 50000,
-                        rewardDiamonds: { 1: 50, 2: 30, 3: 15 },
-                        rewardCards: { 1: 'V', 2: 'V', 3: 'V' }
-                    };
-                }
-                if (month >= 6 && month <= 8) {
-                    return {
-                        id: 'summer',
-                        name: '☀️ Летний Феникс',
-                        icon: '☀️',
-                        baseHp: 60000,
-                        rewardDiamonds: { 1: 50, 2: 30, 3: 15 },
-                        rewardCards: { 1: 'L', 2: 'L', 3: 'L' }
-                    };
-                }
-                if (month >= 9 && month <= 11) {
-                    return {
-                        id: 'autumn',
-                        name: '🍂 Урожайный Страж',
-                        icon: '🍂',
-                        baseHp: 45000,
-                        rewardDiamonds: { 1: 40, 2: 25, 3: 10 },
-                        rewardCards: { 1: 'H', 2: 'H', 3: 'H' }
-                    };
-                }
-                return {
-                    id: 'winter',
-                    name: '❄️ Ледяной Гигант',
-                    icon: '❄️',
-                    baseHp: 70000,
-                    rewardDiamonds: { 1: 60, 2: 35, 3: 20 },
-                    rewardCards: { 1: 'N', 2: 'N', 3: 'N' }
-                };
-            }
-
-            async function initSeasonalBoss() {
-                if (!supabaseClient) return;
-                
-                const currentSeason = getSeasonalBossByDate();
-                
-                try {
-                    // Ищем активного босса в БД
-                    let { data: bossData } = await supabaseClient
-                        .from('seasonal_boss')
-                        .select('*')
-                        .eq('season_id', currentSeason.id)
-                        .eq('is_active', true)
-                        .single();
-                    
-                    if (!bossData) {
-                        // Создаём нового босса
-                        const newBoss = {
-                            season_id: currentSeason.id,
-                            boss_name: currentSeason.name,
-                            boss_icon: currentSeason.icon,
-                            max_hp: currentSeason.baseHp,
-                            current_hp: currentSeason.baseHp,
-                            is_active: true,
-                            killed_by: null,
-                            killed_at: null,
-                            damage_top: [],
-                            created_at: new Date().toISOString()
-                        };
-                        
-                        const { data: inserted } = await supabaseClient
-                            .from('seasonal_boss')
-                            .insert(newBoss)
-                            .select()
-                            .single();
-                        
-                        bossData = inserted;
-                    }
-                    
-                    // Проверяем, не мёртв ли босс уже больше 24 часов
-                    if (bossData.current_hp <= 0 && bossData.killed_at) {
-                        const killedDate = new Date(bossData.killed_at);
-                        const now = new Date();
-                        const hoursSinceKill = (now - killedDate) / (1000 * 60 * 60);
-                        if (hoursSinceKill >= 24) {
-                            // Возрождаем босса
-                            await supabaseClient
-                                .from('seasonal_boss')
-                                .update({
-                                    current_hp: currentSeason.baseHp,
-                                    is_active: true,
-                                    killed_by: null,
-                                    killed_at: null,
-                                    damage_top: []
-                                })
-                                .eq('id', bossData.id);
-                            
-                            bossData.current_hp = currentSeason.baseHp;
-                            bossData.is_active = true;
-                            bossData.killed_by = null;
-                            bossData.killed_at = null;
-                            bossData.damage_top = [];
-                        }
-                    }
-                    
-                    _seasonalBoss = {
-                        id: bossData.id,
-                        season_id: bossData.season_id,
-                        name: bossData.boss_name,
-                        icon: bossData.boss_icon,
-                        currentHp: bossData.current_hp,
-                        maxHp: bossData.max_hp,
-                        killedBy: bossData.killed_by,
-                        killedAt: bossData.killed_at,
-                        rewardDiamonds: currentSeason.rewardDiamonds,
-                        rewardCards: currentSeason.rewardCards
-                    };
-                    
-                    _seasonalBossDamageTop = bossData.damage_top || [];
-                    
-                    // Загружаем личный урон игрока
-                    const { data: playerDamage } = await supabaseClient
-                        .from('seasonal_boss_damage')
-                        .select('total_damage')
-                        .eq('boss_id', _seasonalBoss.id)
-                        .eq('player_id', _playerId)
-                        .single();
-                    
-                    _mySeasonalBossDamage = playerDamage?.total_damage || 0;
-                    
-                    // Загружаем количество убийств
-                    const { data: killData } = await supabaseClient
-                        .from('seasonal_boss_kills')
-                        .select('count')
-                        .eq('player_id', _playerId)
-                        .single();
-                    
-                    _seasonalBossKillCount = killData?.count || 0;
-                    
-                } catch(e) {
-                    console.warn('initSeasonalBoss error:', e);
-                }
-                
-                updateSeasonalBossUI();
-                
-                // Подписываемся на обновления босса в реальном времени
-                subscribeToBossUpdates();
-            }
-
-            let bossSubscription = null;
-
-            function subscribeToBossUpdates() {
-                if (bossSubscription) return;
-                if (!supabaseClient) return;
-                
-                bossSubscription = supabaseClient
-                    .channel('seasonal_boss_updates')
-                    .on('postgres_changes', 
-                        { event: 'UPDATE', schema: 'public', table: 'seasonal_boss' },
-                        (payload) => {
-                            const updatedBoss = payload.new;
-                            if (updatedBoss.id === _seasonalBoss?.id) {
-                                _seasonalBoss.currentHp = updatedBoss.current_hp;
-                                _seasonalBoss.killedBy = updatedBoss.killed_by;
-                                _seasonalBoss.killedAt = updatedBoss.killed_at;
-                                _seasonalBossDamageTop = updatedBoss.damage_top || [];
-                                updateSeasonalBossUI();
-                                
-                                if (updatedBoss.current_hp <= 0 && updatedBoss.killed_at) {
-                                    showToast(`💀 ${_seasonalBoss.name} ПОВЕРЖЕН! Возродится через 24 часа 💀`, "#ff4444");
-                                }
-                            }
-                        }
-                    )
-                    .subscribe();
-            }
-
-            // Создать нового сезонного босса
-            async function resetSeasonalBoss() {
-                const currentSeason = getSeasonalBossByDate();
-                _seasonalBoss = {
-                    ...currentSeason,
-                    currentHp: currentSeason.baseHp,
-                    maxHp: currentSeason.baseHp,
-                    killedBy: null,
-                    killedAt: null
-                };
-                _seasonalBossDamageTop = [];
-                _mySeasonalBossDamage = 0;
-                
-                if (supabaseClient) {
-                    await supabaseClient.from('seasonal_boss').insert({
-                        season_id: currentSeason.id,
-                        boss_name: currentSeason.name,
-                        max_hp: currentSeason.baseHp,
-                        current_hp: currentSeason.baseHp,
-                        damage_top: [],
-                        created_at: new Date().toISOString()
-                    });
-                }
-                
-                saveGame();
-                updateSeasonalBossUI();
-            }
-
-            async function attackSeasonalBoss() {
-                if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return; }
-                if (_level < 3) { showToast("❌ Босс доступен с 3 уровня!", "#ff8888"); return; }
-                
-                // Проверка кулдауна (30 секунд)
-                if (_lastSeasonalBossAttack) {
-                    const secondsSinceLast = (Date.now() - new Date(_lastSeasonalBossAttack).getTime()) / 1000;
-                    if (secondsSinceLast < 30) {
-                        showToast(`⏳ Следующая атака через ${Math.ceil(30 - secondsSinceLast)} сек`, "#ffaa88");
-                        return;
-                    }
-                }
-                
-                if (!_seasonalBoss || _seasonalBoss.currentHp <= 0) {
-                    showToast("💀 Босс повержен! Возродится через 24 часа", "#ff8888");
-                    return;
-                }
-                
-                // Расчёт урона
-                const topCards = getTop3Cards();
-                const cardBonus = topCards.reduce((sum, c) => sum + c.power, 0);
-                const baseDamage = Math.floor(Math.random() * 100) + 50;
-                const totalDamage = baseDamage + cardBonus;
-                
-                _lastSeasonalBossAttack = new Date().toISOString();
-                
-                // Вызываем RPC функцию для нанесения урона (атомарно)
-                const { data: result, error } = await supabaseClient.rpc('deal_damage_to_boss', {
-                    p_boss_id: _seasonalBoss.id,
-                    p_player_id: _playerId,
-                    p_player_name: _playerName,
-                    p_damage: totalDamage
-                });
-                
-                if (error) {
-                    console.error('Attack error:', error);
-                    showToast("❌ Ошибка атаки", "#ff8888");
-                    return;
-                }
-                
-                _mySeasonalBossDamage += totalDamage;
-                showToast(`⚔️ Вы нанесли ${totalDamage} урона! (база ${baseDamage} + карты ${cardBonus})`, "#ffcc66");
-                
-                // Проверяем, убил ли босса
-                if (result && result.boss_killed) {
-                    _seasonalBossKillCount++;
-                    showToast(`🏆 ВЫ УБИЛИ БОССА! +${result.reward_diamonds}💎 и карта ${result.reward_card}!`, "#ffdd99");
-                    
-                    if (result.reward_card) addCardToHistory(result.reward_card);
-                    if (result.reward_diamonds) _diamonds += result.reward_diamonds;
-                    saveGame();
-                    updateUI();
-                }
-                
-                saveGame();
-                updateSeasonalBossUI();
-            }
-
-            // Смерть сезонного босса
-            async function onSeasonalBossDeath() {
-                _seasonalBoss.currentHp = 0;
-                _seasonalBoss.killedBy = _playerName;
-                _seasonalBoss.killedAt = new Date().toISOString();
-                _seasonalBossKillCount++;
-                
-                // Награды топ-3
-                const top3 = _seasonalBossDamageTop.slice(0, 3);
-                for (let i = 0; i < top3.length; i++) {
-                    const player = top3[i];
-                    const place = i + 1;
-                    const diamondsReward = _seasonalBoss.rewardDiamonds[place];
-                    const cardRank = _seasonalBoss.rewardCards[place];
-                    
-                    if (player.player_id === _playerId) {
-                        _diamonds += diamondsReward;
-                        addCardToHistory(cardRank);
-                        showToast(`🏆 Вы ${place} место по урону! +${diamondsReward}💎 и карта ${cardRank}!`, "#ffdd99");
-                        
-                        // Сохраняем в историю
-                        const history = JSON.parse(localStorage.getItem('seasonal_boss_history') || '[]');
-                        history.unshift({
-                            date: new Date().toISOString(),
-                            boss: _seasonalBoss.name,
-                            place: place,
-                            damage: player.damage,
-                            rewardDiamonds: diamondsReward,
-                            rewardCard: cardRank
-                        });
-                        if (history.length > 20) history.pop();
-                        localStorage.setItem('seasonal_boss_history', JSON.stringify(history));
-                    }
-                }
-                
-                // Обновляем БД
-                if (supabaseClient) {
-                    await supabaseClient.from('seasonal_boss')
-                        .update({
-                            current_hp: 0,
-                            killed_by: _playerName,
-                            killed_at: new Date().toISOString(),
-                            damage_top: _seasonalBossDamageTop
-                        })
-                        .eq('season_id', _seasonalBoss.id);
-                }
-                
-                showToast(`💀 ${_seasonalBoss.name} ПОВЕРЖЕН! Возродится через 24 часа 💀`, "#ff4444");
-                updateSeasonalBossUI();
-                saveGame();
-            }
-
-            // Получить историю сезонного босса
-            function getSeasonalBossHistory() {
-                const history = localStorage.getItem('seasonal_boss_history');
-                return history ? JSON.parse(history) : [];
-            }
-
-            function updateSeasonalBossUI() {
-                if (!_seasonalBoss) return;
-                
-                const bossCard = document.getElementById('seasonalBossCard');
-                if (!bossCard) return;
-                
-                const hpPercent = (_seasonalBoss.currentHp / _seasonalBoss.maxHp) * 100;
-                const isDead = _seasonalBoss.currentHp <= 0;
-                
-                bossCard.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
-                        <span style="font-size: 32px;">${_seasonalBoss.icon}</span>
-                        <span style="font-size: 20px; font-weight: bold;">${_seasonalBoss.name}</span>
-                        <span style="font-size: 32px;">${_seasonalBoss.icon}</span>
-                    </div>
-                    <div class="boss-hp">❤️ HP: <span id="seasonalBossHp">${_seasonalBoss.currentHp.toLocaleString()}</span> / <span id="seasonalBossMaxHp">${_seasonalBoss.maxHp.toLocaleString()}</span></div>
-                    <div class="boss-hp-bar"><div class="boss-hp-fill" id="seasonalBossHpFill" style="width: ${Math.max(0, Math.min(100, hpPercent))}%;"></div></div>
-                    <div class="seasonal-boss-stats" style="display: flex; justify-content: space-between; margin: 10px 0; gap: 10px;">
-                        <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🥇 1 место</div>
-                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[1]}💎 + ${_seasonalBoss.rewardCards[1]}</div>
-                        </div>
-                        <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🥈 2 место</div>
-                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[2]}💎 + ${_seasonalBoss.rewardCards[2]}</div>
-                        </div>
-                        <div style="flex: 1; background: #0f1a1fcc; border-radius: 20px; padding: 6px; text-align: center;">
-                            <div style="font-size: 10px;">🥉 3 место</div>
-                            <div style="font-size: 12px; font-weight: bold;">${_seasonalBoss.rewardDiamonds[3]}💎 + ${_seasonalBoss.rewardCards[3]}</div>
-                        </div>
-                    </div>
-                    ${isDead ? `<div style="background: #ff4444cc; border-radius: 20px; padding: 8px; text-align: center; margin-top: 8px;">
-                        💀 БОСС ПОВЕРЖЕН! Убит: ${_seasonalBoss.killedBy || 'неизвестно'} 💀<br>
-                        Возродится через 24 часа
-                    </div>` : ''}
-                    <div style="font-size: 11px; text-align: center; margin-top: 8px; opacity: 0.6;">
-                        💡 Кулдаун атаки: 30 сек | Урон: 50-150 + сила ваших ТОП-3 карт
-                    </div>
-                `;
-                
-                // Топ урона
-                const topContainer = document.getElementById('seasonalBossTopList');
-                if (topContainer) {
-                    if (!_seasonalBossDamageTop.length) {
-                        topContainer.innerHTML = '<li style="justify-content:center;">— Пока никто не атаковал —</li>';
-                    } else {
-                        topContainer.innerHTML = _seasonalBossDamageTop.slice(0, 10).map((p, i) => {
-                            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
-                            const isCurrent = p.player_id === _playerId;
-                            return `<li class="${isCurrent ? 'current-player' : ''}">
-                                <span>${medal} ${escapeHtml((p.player_name || 'Аноним').slice(0, 15))}</span>
-                                <span>⚔️ ${p.damage.toLocaleString()}</span>
-                            </li>`;
-                        }).join('');
-                    }
-                }
-                
-                // Мой урон
-                const myDamageEl = document.getElementById('seasonalBossMyDamage');
-                if (myDamageEl) myDamageEl.innerText = _mySeasonalBossDamage.toLocaleString();
-                
-                // Количество убийств
-                const killCountEl = document.getElementById('seasonalBossKillCount');
-                if (killCountEl) killCountEl.innerText = _seasonalBossKillCount;
-            }
 
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
-
-            function initArenaTabs() {
-                const pvpTab = document.getElementById('arenaPvPTabBtn');
-                const bossTab = document.getElementById('arenaBossTabBtn');
-                const pvpContent = document.getElementById('arenaPvPContent');
-                const bossContent = document.getElementById('arenaBossContent');
-                
-                if (pvpTab && bossTab && pvpContent && bossContent) {
-                    pvpTab.onclick = () => {
-                        pvpTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
-                        pvpTab.style.color = '#ffcc66';
-                        bossTab.style.background = 'transparent';
-                        bossTab.style.color = '#9bbfd0';
-                        pvpContent.style.display = 'block';
-                        bossContent.style.display = 'none';
-                    };
-                    
-                    bossTab.onclick = () => {
-                        bossTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
-                        bossTab.style.color = '#ffcc66';
-                        pvpTab.style.background = 'transparent';
-                        pvpTab.style.color = '#9bbfd0';
-                        bossContent.style.display = 'block';
-                        pvpContent.style.display = 'none';
-                        // Обновляем данные босса при переключении
-                        updateSeasonalBossUI();
-                    };
-                }
-            }
 
             function initCombinedTopTabs() {
                 const levelsTab = document.getElementById('topLevelsTabBtn');
@@ -4286,11 +3775,9 @@
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
-            document.getElementById('attackSeasonalBossBtn')?.addEventListener('click', () => attackSeasonalBoss());
             
             initDropdowns();
             initCombinedTopTabs();
-            initArenaTabs(); 
             loadGame();
             initSupabase();
             setInterval(() => { checkDailyReset(); updateUI(); checkAdminCommands(); }, 30000);
