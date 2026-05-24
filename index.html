@@ -1485,10 +1485,10 @@
                     <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
                 </div>
                 
-                <div class="strikes-counter">⚔️ ДУЭЛИ СЕГОДНЯ: <span id="arenaDuelsToday">0</span> / 3</div>
+<!--                 <div class="strikes-counter">⚔️ ДУЭЛИ БЕЗ ЛИМИТА: <span id="arenaDuelsToday">∞</span></div> -->
                 
                 <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
-                <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button>
+<!--                 <button class="arena-attack-btn" id="arenaBuyDuelBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">💎 КУПИТЬ ДУЭЛЬ (5💎)</button> -->
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
@@ -3014,19 +3014,6 @@
             async function findOpponent() {
                 if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return null; }
                 
-                // Проверка лимита дуэлей
-                const today = new Date().toDateString();
-                if (_pvpLastDuelDate !== today) {
-                    _pvpDuelsToday = 0;
-                    _pvpLastDuelDate = today;
-                    saveGame();
-                }
-                
-                if (_pvpDuelsToday >= 3) {
-                    showToast("❌ Лимит дуэлей на сегодня (3). Купите дополнительную за 5💎", "#ffaa88");
-                    return null;
-                }
-                
                 // Ищем реальных игроков (не себя)
                 const { data } = await supabaseClient
                     .from('leaderboard')
@@ -3069,18 +3056,20 @@
             }
 
             async function startBattle() {
-                if (_level < 1) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
+                if (_level < 5) { 
+                    showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); 
+                    return; 
+                }
                 
                 const myCards = getTop3Cards();
                 if (myCards.length < 3) { 
-                    showToast("❌ Нужно минимум 3 карты для участия в дуэлях!", "#ff8888"); 
+                    showToast("❌ Нужно минимум 3 карты для участия в дуэлях! Получите карты через Telegram @minebuff", "#ff8888"); 
                     return; 
                 }
                 
                 const opponent = await findOpponent();
                 if (!opponent) return;
                 
-                // Получаем карты соперника (у него точно есть 3+ карты)
                 let opponentCards = [];
                 try {
                     opponentCards = JSON.parse(opponent.top_cards || '[]');
@@ -3091,14 +3080,10 @@
                     return;
                 }
                 
-                // Сортируем карты по силе для красивого отображения
                 const sortedMyCards = [...myCards].sort((a, b) => b.power - a.power);
                 const sortedOpponentCards = [...opponentCards].sort((a, b) => b.power - a.power);
                 
-                // Создаём модальное окно боя
                 showBattleModal(opponent.username, sortedMyCards, sortedOpponentCards);
-                
-                // Запускаем анимацию боя
                 startBattleAnimation(sortedMyCards, sortedOpponentCards, opponent.username);
             }
 
@@ -3292,7 +3277,6 @@
                 // Обновляем рейтинг
                 _pvpRating += ratingChange;
                 if (_pvpRating < 0) _pvpRating = 0;
-                _pvpDuelsToday++;
                 _pvpHistory.unshift({
                     opponent: opponentName,
                     result: result,
@@ -3381,7 +3365,6 @@
                 
                 _pvpRating += ratingChange;
                 if (_pvpRating < 0) _pvpRating = 0;
-                _pvpDuelsToday++;
                 _pvpHistory.unshift({
                     opponent: opponentName,
                     result: result,
@@ -3485,7 +3468,6 @@
                 document.getElementById('arenaWinsValue').innerText = _pvpWins;
                 document.getElementById('arenaLossesValue').innerText = _pvpLosses;
                 document.getElementById('arenaDrawsValue').innerText = _pvpDraws;
-                document.getElementById('arenaDuelsToday').innerText = `${_pvpDuelsToday}/3`;
                 
                 // История боёв
                 const historyContainer = document.getElementById('arenaHistoryList');
@@ -3715,7 +3697,6 @@
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
-            document.getElementById('arenaBuyDuelBtn')?.addEventListener('click', () => buyExtraDuel());
             
             initDropdowns();
             initCombinedTopTabs();
