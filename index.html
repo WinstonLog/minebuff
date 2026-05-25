@@ -1340,6 +1340,16 @@
                 </div>
                 <div class="cards-stats" id="cardsStats"></div>
                 
+                <!-- Временная кнопка для исправления уровня (появится только если есть проблемы) -->
+                <div id="fixLevelBtnContainer" style="display: none; margin-top: 12px;">
+                    <button id="fixMyLevelBtn" style="background: linear-gradient(135deg, #ff6600, #cc3300); width:100%; padding:12px; border-radius:40px; font-weight:bold; color:white; border:none; cursor:pointer;">
+                        🔧 ИСПРАВИТЬ СТОИМОСТЬ УРОВНЯ
+                    </button>
+                    <div style="font-size: 10px; text-align: center; margin-top: 6px; opacity: 0.7;">
+                        Нажмите, если у вас неправильная цена повышения уровня (баг старой версии)
+                    </div>
+                </div>
+
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content" id="achievementsContent"></div>
@@ -2795,6 +2805,63 @@
                 document.getElementById('battleSkipBtn').onclick = () => skipBattleAnimation();
             }
 
+            function checkIfNeedFix() {
+                const container = document.getElementById('fixLevelBtnContainer');
+                if (!container) return;
+                
+                const correctCost = getLevelUpCost(_level);
+                const fixKey = 'player_self_fixed';
+                const alreadyFixed = localStorage.getItem(fixKey);
+                
+                console.log(`DEBUG: level=${_level}, diamonds=${_diamonds}, correctCost=${correctCost}, alreadyFixed=${alreadyFixed}`);
+                
+                // Показываем кнопку если:
+                // 1. Игрок уже не фиксил
+                // 2. И алмазов слишком много для его уровня (больше чем стоимость + 20)
+                // ИЛИ для уровней 3-5 принудительно показываем если алмазов > 40
+                let showButton = false;
+                
+                if (!alreadyFixed) {
+                    if (_diamonds > correctCost + 20) {
+                        showButton = true;
+                    }
+                    // Дополнительная проверка для низких уровней
+                    if (_level >= 3 && _level <= 5 && _diamonds > 40) {
+                        showButton = true;
+                    }
+                }
+                
+                if (showButton) {
+                    container.style.display = 'block';
+                    console.log('Кнопка исправления ПОКАЗАНА');
+                } else {
+                    container.style.display = 'block';
+                }
+            }
+
+            // Функция исправления
+            function fixMyLevel() {
+                const correctCost = getLevelUpCost(_level);
+                const oldDiamonds = _diamonds;
+                
+                // Рассчитываем правильное количество алмазов для этого уровня
+                let correctDiamonds = correctCost + 10;
+                if (correctDiamonds > 100) correctDiamonds = 100;
+                
+                if (_diamonds > correctDiamonds) {
+                    _diamonds = correctDiamonds;
+                    showToast(`✅ Баланс исправлен: ${oldDiamonds} → ${_diamonds} 💎`, "#aaffdd");
+                    localStorage.setItem('player_self_fixed', 'true');
+                    saveGame();
+                    updateUI();
+                    document.getElementById('fixLevelBtnContainer').style.display = 'none';
+                } else {
+                    showToast(`✅ У вас и так нормальный баланс!`, "#aaffdd");
+                    localStorage.setItem('player_self_fixed', 'true');
+                    document.getElementById('fixLevelBtnContainer').style.display = 'none';
+                }
+            }
+
             function startBattleAnimation(myCards, opponentCards, opponentName) {
                 let myIndex = 0, opponentIndex = 0, myWins = 0, opponentWins = 0, battleLog = [];
                 function addLog(message, type = 'info') { battleLog.push({ message, type, time: Date.now() }); updateBattleLog(); }
@@ -2978,8 +3045,10 @@
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updateArenaUI();
+
+                checkIfNeedFix();
             }
-            
+
             function fixPlayerLevels() {
                 const fixKey = 'level_cost_fixed_v4';
                 if (!localStorage.getItem(fixKey)) {
@@ -3064,6 +3133,10 @@
                 updateTopCardsInDB();
                 checkAdminCommands();
                 fixPlayerLevels();
+                setTimeout(() => {
+                    checkIfNeedFix();
+                    console.log('Проверка кнопки выполнена, уровень:', _level, 'алмазы:', _diamonds);
+                }, 500);
             }
             
             function showNameModal() {
@@ -3373,6 +3446,11 @@
                 } else {
                     document.getElementById('pricePreview').innerHTML = `Введите алмазы для расчёта`;
                 }
+            });
+
+            // Кнопка исправления уровня
+            document.getElementById('fixMyLevelBtn')?.addEventListener('click', () => {
+                fixMyLevel();
             });
 
             initDropdowns();
