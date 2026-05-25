@@ -1603,7 +1603,7 @@
                         <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
                             • <strong>Доступ:</strong> с 5 уровня и 3+ карт<br>
                             • <strong>Бой:</strong> 3 раунда, ваши ТОП-3 карты против карт соперника<br>
-                            • <strong>Рейтинг:</strong> победа +15, поражение -15, ничья 0<br>
+                            • <strong>Рейтинг:</strong> победа +25, поражение -25, ничья 0<br>
                             • <strong>Лиги:</strong> рейтинг определяет вашу лигу
                         </div>
                     </div>
@@ -3225,8 +3225,8 @@
                 myCardsElements.forEach(card => { myPower += parseInt(card.dataset.power); });
                 opponentCardsElements.forEach(card => { opponentPower += parseInt(card.dataset.power); });
                 let result = '', ratingChange = 0;
-                if (myPower > opponentPower) { result = 'win'; ratingChange = 15; _pvpWins++; }
-                else if (myPower < opponentPower) { result = 'loss'; ratingChange = -15; _pvpLosses++; }
+                if (myPower > opponentPower) { result = 'win'; ratingChange = 25; _pvpWins++; }
+                else if (myPower < opponentPower) { result = 'loss'; ratingChange = -25; _pvpLosses++; }
                 else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
                 const opponentName = document.querySelector('.battle-opponent strong')?.innerText || 'Соперник';
                 _pvpRating += ratingChange;
