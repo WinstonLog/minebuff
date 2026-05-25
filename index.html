@@ -2979,43 +2979,29 @@
                 updateMiningInProfile();
                 updateArenaUI();
             }
-
+            
             function fixPlayerLevels() {
-                const fixKey = 'level_cost_fixed_v3';
+                const fixKey = 'level_cost_fixed_v4';
                 if (!localStorage.getItem(fixKey)) {
-                    let changed = false;
+                    // Правильные цены для уровней (по новой формуле)
+                    const correctCosts = {
+                        1: 15,   // 1→2
+                        2: 20,   // 2→3
+                        3: 25,   // 3→4
+                        4: 30,   // 4→5
+                        5: 43,   // 5→6 (округлённо)
+                    };
                     
-                    // Получаем правильную стоимость для текущего уровня
-                    const correctCost = getLevelUpCost(_level);
-                    
-                    // Если у игрока алмазов слишком много для его уровня
-                    let maxAllowed = 0;
-                    if (_level === 3) maxAllowed = 35;
-                    else if (_level === 4) maxAllowed = 50;
-                    else if (_level === 5) maxAllowed = 70;
-                    else if (_level === 6) maxAllowed = 100;
-                    else maxAllowed = _level * 20;
-                    
-                    if (_diamonds > maxAllowed + 20) {
-                        const oldDiamonds = _diamonds;
-                        _diamonds = maxAllowed;
-                        showToast(`⚠️ Баланс скорректирован: ${oldDiamonds} → ${_diamonds} 💎`, "#ffaa88");
-                        changed = true;
-                    }
-                    
-                    // Дополнительная проверка: если игрок не может повысить уровень, но алмазов много
-                    if (_diamonds >= correctCost && _diamonds < correctCost + 50) {
-                        // Всё нормально, алмазов хватает на уровень
-                    } else if (_diamonds >= correctCost + 50) {
-                        // Слишком много алмазов для этого уровня
-                        _diamonds = correctCost + 30;
-                        showToast(`⚠️ Алмазы скорректированы до нормального значения`, "#ffaa88");
-                        changed = true;
-                    }
-                    
-                    if (changed) {
-                        saveGame();
-                        updateUI();
+                    // Если у игрока уровень 3-5, проверяем алмазы
+                    if (_level >= 3 && _level <= 5) {
+                        const expectedMaxDiamonds = correctCosts[_level] + 10;
+                        if (_diamonds > expectedMaxDiamonds + 20) {
+                            const oldDiamonds = _diamonds;
+                            _diamonds = expectedMaxDiamonds;
+                            showToast(`⚠️ Алмазы скорректированы: ${oldDiamonds} → ${_diamonds} 💎 (новая система уровней)`, "#ffaa88");
+                            saveGame();
+                            updateUI();
+                        }
                     }
                     
                     localStorage.setItem(fixKey, 'true');
