@@ -1243,6 +1243,9 @@
             background: linear-gradient(135deg, #3a6b58, #1e3e31);
             color: white;
         }
+        .modal .progress-fill {
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -1263,11 +1266,12 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
-                <div class="menu-item" data-tab="shop">🛒 Магазин</div>
+                <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="arena">⚔️ Арена</div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
+                <div class="menu-item" data-tab="shop">🛒 Магазин</div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
                 <div class="menu-item" data-tab="info">📚 Инфо</div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
@@ -1458,7 +1462,40 @@
                     <div style="background: #071217cc; border-radius: 20px; padding: 12px; margin-top: 16px; text-align: center; font-size: 11px;">
                         🔒 Все переводы защищены. После оплаты напишите <a href="https://t.me/minebuff" target="_blank" style="color: #ffcc66;">@minebuff</a> для получения алмазов
                     </div>
+                </div> 
+            </div> 
+        </div> 
+
+        <!-- ПИТОМЕЦ -->
+        <div class="tab-panel" id="petsPanel">
+            <div class="game-panel" style="display: flex; flex-direction: column; min-height: 500px;">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🐾 ПИТОМЕЦ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Помощник в шахте, увеличивает добычу руды!</div>
+                
+                <div style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 16px; border: 2px solid #ffcc66;">
+                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div style="font-size: 64px;" id="activePetIcon">🦫</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 18px;" id="activePetName">Дух шахты</div>
+                            <div style="font-size: 12px; opacity: 0.8;" id="activePetBonus">+0% к добыче руды</div>
+                            <div style="font-size: 11px; margin-top: 4px;" id="activePetLevel">Не куплен</div>
+                        </div>
+                    </div>
                 </div>
+                
+                <button id="buyPetBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 14px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer; margin-bottom: 12px;">КУПИТЬ ЗА 2000💎</button>
+                
+                <div id="upgradePetContainer" style="display: none;">
+                    <button id="upgradePetBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer; width: 100%;">⬆️ ПОВЫСИТЬ УРОВЕНЬ</button>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 20px; padding: 12px; margin-top: auto; text-align: center; font-size: 11px;">
+                    👻 <strong>Дух шахты</strong><br>
+                    • Начальный бонус: +1% к добыче руды за уровень<br>
+                    • Максимальный уровень: 10 (+10% к добыче)<br>
+                    💡 Повышение уровня: 25💎
+                </div>
+            </div>
         </div>
 
         <!-- ТОП ИГРОКОВ (только уровни) -->
@@ -1746,6 +1783,45 @@
         </div>
     </div>
 
+    <!-- Модальное окно для повышения уровня питомца -->
+    <div class="modal" id="petUpgradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🦫</div>
+                <div class="modal-title">ПОВЫШЕНИЕ УРОВНЯ</div>
+            </div>
+            <div class="modal-body">
+                <div class="stat-row">
+                    <span class="stat-label">ТЕКУЩИЙ УРОВЕНЬ</span>
+                    <span class="stat-value" id="petModalCurrentLevel">1</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="petProgressFill" style="width: 10%;"></div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">СЛЕДУЮЩИЙ УРОВЕНЬ</span>
+                    <span class="stat-value highlight" id="petModalNextLevel">2</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">💎 НУЖНО АЛМАЗОВ</span>
+                    <span class="stat-value" id="petModalCost">25</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">💎 У ВАС</span>
+                    <span class="stat-value" id="petModalDiamonds">0</span>
+                </div>
+                <div class="reward-preview">
+                    <span>✨ При повышении уровня:</span><br>
+                    <span>📈 Бонус к добыче: <span id="petCurrentBonus">1</span>% → <span id="petNextBonus">2</span>%</span>
+                </div>
+            </div>
+            <div class="modal-buttons" style="padding: 0 20px 20px 20px;">
+                <button class="modal-btn close" id="petModalCloseBtn">ЗАКРЫТЬ</button>
+                <button class="modal-btn upgrade" id="petModalUpgradeBtn">УЛУЧШИТЬ</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             let supabaseClient = null;
@@ -1852,6 +1928,20 @@
 
             let _particlesEnabled = true;
 
+            // ========== ПИТОМЕЦ ==========
+            let _hasPet = false;          // есть ли питомец
+            let _petLevel = 1;            // уровень питомца (1-10)
+
+            // Конфиг питомца
+            const petConfig = {
+                name: 'Дух шахты',
+                icon: '👻',
+                price: 2000,
+                maxLevel: 10,
+                baseBonus: 1,      // +1% за уровень
+                upgradeCost: 25
+            };
+
             function loadSettings() {
                 const saved = localStorage.getItem('minebuff_settings');
                 if (saved) {
@@ -1861,6 +1951,145 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Получить бонус питомца в процентах
+            function getPetBonusPercent() {
+                if (!_hasPet) return 0;
+                return _petLevel * petConfig.baseBonus;
+            }
+
+            // Получить множитель добычи
+            function getPetMultiplier() {
+                return 1 + getPetBonusPercent() / 100;
+            }
+
+            // Купить питомца
+            function buyPet() {
+                if (_hasPet) {
+                    showToast("❌ У вас уже есть питомец!", "#ff8888");
+                    return;
+                }
+                
+                if (_diamonds < petConfig.price) {
+                    showToast(`❌ Нужно ${petConfig.price} алмазов!`, "#ff8888");
+                    return;
+                }
+                
+                _diamonds -= petConfig.price;
+                _hasPet = true;
+                _petLevel = 1;
+                
+                showToast(`🎉 Вы купили ${petConfig.name}! ${petConfig.icon} Теперь он помогает в шахте!`, "#aaffdd");
+                saveGame();
+                updateUI();
+                updatePetUI();
+            }
+
+            // Показать модальное окно повышения уровня питомца
+            function showPetUpgradeModal() {
+                if (!_hasPet) {
+                    showToast("❌ У вас нет питомца! Купите его в разделе Питомцы.", "#ff8888");
+                    return;
+                }
+                
+                if (_petLevel >= petConfig.maxLevel) {
+                    showToast(`❌ Питомец уже максимального ${petConfig.maxLevel} уровня!`, "#ff8888");
+                    return;
+                }
+                
+                const currentLevel = _petLevel;
+                const nextLevel = _petLevel + 1;
+                const cost = petConfig.upgradeCost;
+                const currentBonus = currentLevel * petConfig.baseBonus;
+                const nextBonus = nextLevel * petConfig.baseBonus;
+                
+                document.getElementById('petModalCurrentLevel').innerText = currentLevel;
+                document.getElementById('petModalNextLevel').innerText = nextLevel;
+                document.getElementById('petModalCost').innerText = cost;
+                document.getElementById('petModalDiamonds').innerText = _diamonds;
+                document.getElementById('petCurrentBonus').innerText = currentBonus;
+                document.getElementById('petNextBonus').innerText = nextBonus;
+                
+                const progressPercent = (currentLevel / petConfig.maxLevel) * 100;
+                document.getElementById('petProgressFill').style.width = progressPercent + '%';
+                
+                document.getElementById('petUpgradeModal').classList.add('show');
+            }
+
+            // Выполнить повышение уровня питомца
+            function performPetUpgrade() {
+                if (!_hasPet) {
+                    showToast("❌ У вас нет питомца!", "#ff8888");
+                    document.getElementById('petUpgradeModal').classList.remove('show');
+                    return;
+                }
+                
+                if (_petLevel >= petConfig.maxLevel) {
+                    showToast(`❌ Питомец уже максимального уровня!`, "#ff8888");
+                    document.getElementById('petUpgradeModal').classList.remove('show');
+                    return;
+                }
+                
+                const cost = petConfig.upgradeCost;
+                if (_diamonds >= cost) {
+                    _diamonds -= cost;
+                    _petLevel++;
+                    
+                    const newBonus = _petLevel * petConfig.baseBonus;
+                    showToast(`✨ ${petConfig.name} повышен до ${_petLevel} уровня! Бонус +${newBonus}% к добыче! ✨`, "#ffd966");
+                    saveGame();
+                    updateUI();
+                    updatePetUI();
+                    document.getElementById('petUpgradeModal').classList.remove('show');
+                } else {
+                    showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c");
+                    document.getElementById('petUpgradeModal').classList.remove('show');
+                }
+            }
+
+            // Закрыть модальное окно
+            function closePetUpgradeModal() {
+                document.getElementById('petUpgradeModal').classList.remove('show');
+            }
+
+            // Обновить UI питомца
+            function updatePetUI() {
+                const iconEl = document.getElementById('activePetIcon');
+                const nameEl = document.getElementById('activePetName');
+                const bonusEl = document.getElementById('activePetBonus');
+                const levelEl = document.getElementById('activePetLevel');
+                const buyBtn = document.getElementById('buyPetBtn');
+                const upgradeBtn = document.getElementById('upgradePetBtn');
+                const upgradeContainer = document.getElementById('upgradePetContainer');
+                
+                if (iconEl) iconEl.innerText = petConfig.icon;
+                if (nameEl) nameEl.innerText = petConfig.name;
+                
+                if (_hasPet) {
+                    const bonus = getPetBonusPercent();
+                    const multiplier = getPetMultiplier();
+                    if (bonusEl) bonusEl.innerHTML = `+${bonus}% к добыче руды (x${multiplier.toFixed(2)})`;
+                    if (levelEl) levelEl.innerHTML = `Уровень ${_petLevel} / ${petConfig.maxLevel}`;
+                    if (buyBtn) buyBtn.style.display = 'none';
+                    if (upgradeContainer) upgradeContainer.style.display = 'block';
+                    if (upgradeBtn) {
+                        if (_petLevel >= petConfig.maxLevel) {
+                            upgradeBtn.disabled = true;
+                            upgradeBtn.style.opacity = '0.5';
+                            upgradeBtn.innerText = '⭐ МАКСИМАЛЬНЫЙ УРОВЕНЬ ⭐';
+                        } else {
+                            upgradeBtn.disabled = false;
+                            upgradeBtn.style.opacity = '1';
+                            upgradeBtn.innerText = `⬆️ ПОВЫСИТЬ УРОВЕНЬ (${petConfig.upgradeCost}💎)`;
+                        }
+                    }
+                } else {
+                    if (bonusEl) bonusEl.innerHTML = 'Нет питомца';
+                    if (levelEl) levelEl.innerHTML = 'Не куплен';
+                    if (buyBtn) buyBtn.style.display = 'block';
+                    if (upgradeContainer) upgradeContainer.style.display = 'none';
+                }
             }
 
             function saveSettings() {
@@ -2032,6 +2261,17 @@
                 let maxOre = 9 + bonus + pickBonus;
                 let oreGain = Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
                 if (isEventActive()) oreGain *= 2;
+                
+                // Бонус от питомца (округляем вверх, чтобы +1% давал +1 руду минимум)
+                const petMultiplier = getPetMultiplier();
+                let oreWithPet = oreGain * petMultiplier;
+                
+                // Округляем по математическим правилам (не вниз!)
+                oreGain = Math.round(oreWithPet);
+                
+                // Минимум 1 руда за удар
+                if (oreGain < 1) oreGain = 1;
+                
                 return oreGain;
             }
             
@@ -2499,7 +2739,6 @@
                     updateQuestsUI();
                 }
                 updatePickaxeVisual();
-                checkChestReset();
                 checkCalendarReset();
             }
             
@@ -2987,6 +3226,7 @@
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updateArenaUI();
+                updatePetUI();
             }
             
             function saveGame() {
@@ -2997,6 +3237,7 @@
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
                     lastChestTime: _lastChestTime,
+                    hasPet: _hasPet, petLevel: _petLevel,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                     pvpRating: _pvpRating, pvpWins: _pvpWins, pvpLosses: _pvpLosses, pvpDraws: _pvpDraws, pvpHistory: _pvpHistory
@@ -3026,6 +3267,9 @@
                         _pvpLosses = d.pvpLosses || 0;
                         _pvpDraws = d.pvpDraws || 0;
                         _pvpHistory = d.pvpHistory || [];
+                        _hasPet = d.hasPet || false;
+                        _petLevel = d.petLevel || 1;
+
                     } catch(e) {}
                 }
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -3171,6 +3415,7 @@
                     else if (tab === 'arena') panelId = 'arenaPanel';
                     else if (tab === 'info') panelId = 'infoPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
+                    else if (tab === 'pets') panelId = 'petsPanel';
                     if (panelId) document.getElementById(panelId).classList.add('active');
                     sideMenu.classList.remove('show');
                     if (tab === 'top') loadTopFromSupabase();
@@ -3197,6 +3442,15 @@
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
+            document.getElementById('buyPetBtn')?.addEventListener('click', () => buyPet());
+            document.getElementById('upgradePetBtn')?.addEventListener('click', () => showPetUpgradeModal());
+            document.getElementById('petModalCloseBtn')?.addEventListener('click', () => closePetUpgradeModal());
+            document.getElementById('petModalUpgradeBtn')?.addEventListener('click', () => performPetUpgrade());
+            document.getElementById('petUpgradeModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('petUpgradeModal')) {
+                    closePetUpgradeModal();
+                }
+            });
             // Магазин - сундук с картой (с модальным окном)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
                 const cost = 50;
