@@ -2745,7 +2745,7 @@
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    // Преобразуем карты в JSON для хранения
+                    const topCards = getTop3Cards();
                     const cardsForDb = _cardHistory.map(card => ({
                         rank: card.rank,
                         text: card.text,
@@ -2758,12 +2758,12 @@
                         level: _level,
                         diamonds: _diamonds,
                         mb_link: _mbProfileLink || null,
-                        cards_json: cardsForDb, // сохраняем ВСЕ карты игрока
+                        cards_json: cardsForDb,
+                        top_cards: JSON.stringify(topCards),  // ← ДОБАВЬ ЭТО
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
                 syncPvPToSupabase();
-                updateTopCardsInDB();
             }
             
             async function getPlayerCards(playerId) {
@@ -3000,19 +3000,65 @@
             }
 
             async function findOpponent() {
-                if (!supabaseClient) { showToast("❌ Нет соединения", "#ff8888"); return null; }
-                const { data } = await supabaseClient.from('leaderboard').select('player_id, username, level, diamonds, top_cards').neq('player_id', _playerId).limit(50);
-                if (!data || data.length === 0) { showToast("❌ Нет доступных соперников", "#ff8888"); return null; }
-                const validOpponents = data.filter(p => { try { const cards = JSON.parse(p.top_cards || '[]'); return cards.length >= 1; } catch { return false; } });
-                if (validOpponents.length === 0) { showToast("❌ Нет соперников с картами", "#ff8888"); return null; }
-                const randomIndex = Math.floor(Math.random() * validOpponents.length);
-                return validOpponents[randomIndex];
+                if (!supabaseClient) { 
+                    showToast("❌ Нет соединения с сервером", "#ff8888"); 
+                    return null; 
+                }
+                
+                try {
+                    // Получаем всех игроков, у которых есть top_cards (не пустые)
+                    const { data, error } = await supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, username, level, diamonds, top_cards')
+                        .not('top_cards', 'is', null)
+                        .neq('player_id', _playerId)
+                        .limit(30);
+                    
+                    if (error) throw error;
+                    
+                    if (!data || data.length === 0) {
+                        showToast("❌ Нет доступных соперников с картами", "#ff8888");
+                        return null;
+                    }
+                    
+                    // Фильтруем тех, у кого есть минимум 1 карта
+                    const validOpponents = data.filter(p => {
+                        try {
+                            const cards = JSON.parse(p.top_cards || '[]');
+                            return cards.length >= 1;
+                        } catch { 
+                            return false; 
+                        }
+                    });
+                    
+                    if (validOpponents.length === 0) {
+                        showToast("❌ Нет соперников с картами", "#ff8888");
+                        return null;
+                    }
+                    
+                    // Выбираем случайного соперника из отфильтрованных
+                    const randomIndex = Math.floor(Math.random() * validOpponents.length);
+                    const opponent = validOpponents[randomIndex];
+                    
+                    showToast(`⚔️ Соперник найден: ${opponent.username}`, "#aaffdd");
+                    return opponent;
+                    
+                } catch(e) { 
+                    console.warn('findOpponent error:', e); 
+                    showToast("❌ Ошибка поиска соперника", "#ff8888");
+                    return null; 
+                }
             }
 
             async function updateTopCardsInDB() {
                 if (!supabaseClient || !_playerId) return;
                 const topCards = getTop3Cards();
-                await supabaseClient.from('leaderboard').upsert({ player_id: _playerId, username: _playerName, top_cards: JSON.stringify(topCards), updated_at: new Date().toISOString() }, { onConflict: 'player_id' });
+                await supabaseClient.from('leaderboard').upsert({ 
+                    player_id: _playerId, 
+                    username: _playerName, 
+                    top_cards: JSON.stringify(topCards), 
+                    updated_at: new Date().toISOString() 
+                }, { onConflict: 'player_id' });
             }
 
             async function startBattle() {
