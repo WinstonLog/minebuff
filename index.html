@@ -3183,22 +3183,35 @@
                 _pvpHistory.unshift({ opponent: opponentName, result: result, ratingChange: ratingChange, date: new Date().toISOString(), myWins: myWins, opponentWins: opponentWins });
                 if (_pvpHistory.length > 20) _pvpHistory.pop();
                 saveGame(); updateUI(); updateArenaUI(); syncPvPToSupabase(); checkAchievements();
+                
                 const logContainer = document.getElementById('battleLog');
                 if (logContainer) {
                     let resultMessage = result === 'win' ? `🏆 ПОБЕДА! ${myWins}:${opponentWins} +${ratingChange} рейтинга! 🏆` : result === 'loss' ? `💔 ПОРАЖЕНИЕ! ${myWins}:${opponentWins} ${ratingChange} рейтинга 💔` : `🤝 НИЧЬЯ! ${myWins}:${opponentWins}`;
                     logContainer.innerHTML += `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
                 }
+                
+                // Добавляем кнопку закрытия, если её ещё нет
+                const modalContent = document.querySelector('.battle-modal-content');
                 const buttonsContainer = document.querySelector('.battle-buttons');
-                if (buttonsContainer && !document.getElementById('battleCloseBtn')) {
+                
+                if (modalContent && !document.getElementById('battleCloseBtn')) {
+                    // Если нет контейнера кнопок, создаём его
+                    let container = buttonsContainer;
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'battle-buttons';
+                        modalContent.appendChild(container);
+                    }
+                    
                     const closeBtn = document.createElement('button');
                     closeBtn.id = 'battleCloseBtn';
                     closeBtn.className = 'battle-close-btn';
                     closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
-                    closeBtn.onclick = () => { if (battleModalDiv) battleModalDiv.remove(); };
-                    buttonsContainer.appendChild(closeBtn);
+                    closeBtn.onclick = () => { 
+                        if (battleModalDiv) battleModalDiv.remove(); 
+                    };
+                    container.appendChild(closeBtn);
                 }
-                const skipBtn = document.getElementById('battleSkipBtn');
-                if (skipBtn) skipBtn.style.display = 'none';
             }
 
             function skipBattleAnimation() {
@@ -3243,7 +3256,19 @@
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
                     const league = getLeagueByRating(_pvpRating);
-                    await supabaseClient.from('pvp_rating').upsert({ player_id: _playerId, username: _playerName, rating: _pvpRating, wins: _pvpWins, losses: _pvpLosses, draws: _pvpDraws, league_name: league.name, league_icon: league.icon, updated_at: new Date().toISOString() }, { onConflict: 'player_id' });
+                    const { error } = await supabaseClient.from('pvp_rating').upsert({
+                        player_id: _playerId,
+                        username: _playerName,
+                        rating: _pvpRating,
+                        wins: _pvpWins,
+                        losses: _pvpLosses,
+                        draws: _pvpDraws,
+                        league_name: league.name,
+                        league_icon: league.icon,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id' });
+                    
+                    if (error) console.warn('syncPvP error:', error);
                 } catch(e) { console.warn('syncPvP error:', e); }
             }
 
