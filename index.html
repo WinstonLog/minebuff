@@ -3105,12 +3105,14 @@
                 if (battleAnimationInterval) clearInterval(battleAnimationInterval);
                 const myCardsHtml = myCards.map((card, i) => `<div class="battle-card my-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">⚔️</div></div>`).join('');
                 const opponentCardsHtml = opponentCards.map((card, i) => `<div class="battle-card opponent-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">🛡️</div></div>`).join('');
-                const modalHtml = `<div class="battle-modal"><div class="battle-modal-content"><div class="battle-header"><div class="battle-title">⚔️ ДУЭЛЬ ⚔️</div><div class="battle-opponent">Противник: <strong>${escapeHtml(opponentName)}</strong></div></div><div class="battle-arena"><div class="battle-side opponent-side"><div class="battle-side-title">💀 ПРОТИВНИК 💀</div><div class="battle-cards-container" id="opponentCardsContainer">${opponentCardsHtml}</div></div><div class="battle-vs">VS</div><div class="battle-side my-side"><div class="battle-side-title">⚔️ ВЫ ⚔️</div><div class="battle-cards-container" id="myCardsContainer">${myCardsHtml}</div></div></div><div class="battle-log" id="battleLog"><div>⚔️ Бой начинается!</div></div><div class="battle-buttons"><button class="battle-skip-btn" id="battleSkipBtn">⏩ ПРОПУСТИТЬ БОЙ</button></div></div></div>`;
+                
+                // Убрана кнопка "ПРОПУСТИТЬ БОЙ"
+                const modalHtml = `<div class="battle-modal"><div class="battle-modal-content"><div class="battle-header"><div class="battle-title">⚔️ ДУЭЛЬ ⚔️</div><div class="battle-opponent">Противник: <strong>${escapeHtml(opponentName)}</strong></div></div><div class="battle-arena"><div class="battle-side opponent-side"><div class="battle-side-title">💀 ПРОТИВНИК 💀</div><div class="battle-cards-container" id="opponentCardsContainer">${opponentCardsHtml}</div></div><div class="battle-vs">VS</div><div class="battle-side my-side"><div class="battle-side-title">⚔️ ВЫ ⚔️</div><div class="battle-cards-container" id="myCardsContainer">${myCardsHtml}</div></div></div><div class="battle-log" id="battleLog"><div>⚔️ Бой начинается!</div></div></div></div>`;
+                
                 battleModalDiv = document.createElement('div');
                 battleModalDiv.className = 'battle-modal-overlay show';
                 battleModalDiv.innerHTML = modalHtml;
                 document.body.appendChild(battleModalDiv);
-                document.getElementById('battleSkipBtn').onclick = () => skipBattleAnimation();
             }
 
             function startBattleAnimation(myCards, opponentCards, opponentName) {
