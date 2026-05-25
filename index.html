@@ -2268,6 +2268,14 @@
             
             function canClaimCalendar() { return _level >= 5; }
             
+            function getLastClaimedDay() {
+                let lastDay = 0;
+                for (let i = 1; i <= 30; i++) {
+                    if (_calendarClaimed[i]) lastDay = i;
+                }
+                return lastDay === 0 ? null : lastDay;
+            }
+
             function claimCalendarReward(day) {
                 if (!canClaimCalendar()) { showToast("❌ Календарь доступен с 5 уровня!", "#ff8888"); return false; }
                 
@@ -2354,19 +2362,136 @@
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
+                    // Преобразуем карты в JSON для хранения
+                    const cardsForDb = _cardHistory.map(card => ({
+                        rank: card.rank,
+                        text: card.text,
+                        date: card.id || Date.now()
+                    }));
+                    
                     await supabaseClient.from('leaderboard').upsert({
-                        player_id: _playerId, username: _playerName, level: _level, diamonds: _diamonds,
-                        mb_link: _mbProfileLink || null, updated_at: new Date().toISOString()
+                        player_id: _playerId,
+                        username: _playerName,
+                        level: _level,
+                        diamonds: _diamonds,
+                        mb_link: _mbProfileLink || null,
+                        cards_json: cardsForDb, // сохраняем ВСЕ карты игрока
+                        updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
                 syncPvPToSupabase();
                 updateTopCardsInDB();
             }
-                        
+            
+            async function getPlayerCards(playerId) {
+                if (!supabaseClient) return null;
+                
+                try {
+                    const { data } = await supabaseClient
+                        .from('leaderboard')
+                        .select('username, level, cards_json')
+                        .eq('player_id', playerId)
+                        .single();
+                    
+                    if (!data) return null;
+                    
+                    // Подсчитываем количество каждой карты
+                    const counts = {
+                        'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0,
+                        'V':0, 'L':0, 'H':0, 'N':0
+                    };
+                    
+                    let totalCards = 0;
+                    
+                    if (data.cards_json && Array.isArray(data.cards_json)) {
+                        data.cards_json.forEach(card => {
+                            if (card.rank && counts[card.rank] !== undefined) {
+                                counts[card.rank]++;
+                                totalCards++;
+                            }
+                        });
+                    }
+                    
+                    // Генерируем HTML только для тех рангов, которые ЕСТЬ у игрока
+                    const rankOrder = ['A', 'P', 'G', 'B', 'C', 'D', 'E', 'V', 'L', 'H', 'N'];
+                    const cardsHtml = rankOrder
+                        .filter(rank => counts[rank] > 0) // показываем ТОЛЬКО те ранги, которые есть
+                        .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
+                        .join('');
+                    
+                    return {
+                        level: data.level || 1,
+                        totalCards: totalCards,
+                        cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                        cardsCounts: counts
+                    };
+                } catch(e) {
+                    console.warn('getPlayerCards error:', e);
+                    return null;
+                }
+            }
+
+            function showPlayerProfileModal(data) {
+                const modalHtml = `
+                    <div class="profile-link-content" style="max-width: 380px;">
+                        <div class="profile-link-header">
+                            <div class="profile-link-icon">👤</div>
+                            <div class="profile-link-title">ПРОФИЛЬ ИГРОКА</div>
+                        </div>
+                        <div class="profile-link-body">
+                            <div style="margin-bottom: 12px; text-align: center;">
+                                <strong style="font-size: 20px; color: #ffcc66;">${escapeHtml(data.playerName)}</strong>
+                            </div>
+                            
+                            <div style="display: flex; gap: 12px; margin: 12px 0;">
+                                <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 8px; text-align: center;">
+                                    <div style="font-size: 10px; color: #9bbfd0;">⭐ УРОВЕНЬ</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #ffcc66;">${data.level || 1}</div>
+                                </div>
+                                <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 8px; text-align: center;">
+                                    <div style="font-size: 10px; color: #9bbfd0;">🎴 ВСЕГО КАРТ</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #ffcc66;">${data.totalCards || 0}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 8px;">
+                                <div style="font-size: 12px; color: #9bbfd0; margin-bottom: 8px; text-align: center;">📊 КОЛЛЕКЦИЯ КАРТ</div>
+                                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-height: 250px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 20px;">
+                                    ${data.cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>'}
+                                </div>
+                            </div>
+                            
+                            ${data.mbLink ? `
+                            <div style="margin-top: 16px; text-align: center; font-size: 12px; background: #0f1a1f; border-radius: 30px; padding: 8px;">
+                                🔗 <a href="https://mangabuff.ru/users/${data.mbLink}" target="_blank" style="color: #ffcc66; text-decoration: none;">Открыть профиль на MangaBuff →</a>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="modal-buttons" style="gap: 12px; margin-top: 16px;">
+                                <button class="modal-btn close" id="profileModalCloseBtn">ЗАКРЫТЬ</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Удаляем старое модальное окно если есть
+                const oldModal = document.querySelector('.profile-link-modal.show');
+                if (oldModal) oldModal.remove();
+                
+                const modalDiv = document.createElement('div');
+                modalDiv.className = 'profile-link-modal show';
+                modalDiv.style.display = 'flex';
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                
+                modalDiv.querySelector('#profileModalCloseBtn').onclick = () => modalDiv.remove();
+                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+            }
+
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
-                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link').order('level', { ascending: false }).order('updated_at', { ascending: true });
+                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link, cards_json').order('level', { ascending: false }).order('updated_at', { ascending: true });
                     const container = document.getElementById('topList');
                     const rankBlock = document.getElementById('playerRankBlock');
                     const rankSpan = document.getElementById('playerRank');
@@ -2384,22 +2509,73 @@
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}"><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`;
+                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}" data-cards-json='${JSON.stringify(p.cards_json || [])}'><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`;
                     }).join('');
                     const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`; rankBlock.style.display = 'block'; }
                     else { rankBlock.style.display = 'none'; }
+                    
                     document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
                         li.style.cursor = 'pointer';
-                        li.onclick = (e) => {
+                        li.onclick = async (e) => {
                             e.stopPropagation();
                             const targetPlayerId = li.getAttribute('data-player-id');
                             const targetPlayerName = li.getAttribute('data-player-name');
                             const targetMbLink = li.getAttribute('data-mb-link');
-                            if (targetPlayerId === _playerId) { showToast(`👋 Это вы, ${_playerName}! Уровень ${_level}`, "#ffcc66"); }
-                            else {
-                                if (targetMbLink && targetMbLink !== 'null' && targetMbLink !== '') { showProfileLinkModalForPlayer(targetMbLink, targetPlayerName); }
-                                else { showToast(`🔗 У игрока ${targetPlayerName} не привязан профиль MB`, "#ffaa88"); }
+                            const targetCardsJson = li.getAttribute('data-cards-json');
+                            
+                            if (targetPlayerId === _playerId) {
+                                // Свой профиль - показываем из локальных данных
+                                const myCounts = getCardCounts();
+                                const myCardsHtml = rankNames
+                                    .filter(rank => myCounts[rank] > 0)
+                                    .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
+                                    .join('');
+                                
+                                showPlayerProfileModal({
+                                    playerName: _playerName,
+                                    level: _level,
+                                    totalCards: _cardHistory.length,
+                                    cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                                    mbLink: _mbProfileLink
+                                });
+                            } else {
+                                // Чужой профиль - используем данные из БД
+                                showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
+                                
+                                // Парсим карты из атрибута
+                                let playerCards = [];
+                                try {
+                                    if (targetCardsJson && targetCardsJson !== '[]') {
+                                        playerCards = JSON.parse(targetCardsJson);
+                                    }
+                                } catch(e) { console.warn('Parse cards error:', e); }
+                                
+                                // Подсчитываем карты
+                                const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
+                                let totalCards = 0;
+                                
+                                if (playerCards && Array.isArray(playerCards)) {
+                                    playerCards.forEach(card => {
+                                        if (card.rank && counts[card.rank] !== undefined) {
+                                            counts[card.rank]++;
+                                            totalCards++;
+                                        }
+                                    });
+                                }
+                                
+                                const cardsHtml = rankNames
+                                    .filter(rank => counts[rank] > 0)
+                                    .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
+                                    .join('');
+                                
+                                showPlayerProfileModal({
+                                    playerName: targetPlayerName,
+                                    level: li.getAttribute('data-player-level') || '?',
+                                    totalCards: totalCards,
+                                    cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                                    mbLink: targetMbLink
+                                });
                             }
                         };
                     });
