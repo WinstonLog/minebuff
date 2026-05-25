@@ -2262,19 +2262,21 @@
                 let oreGain = Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
                 if (isEventActive()) oreGain *= 2;
                 
-                // Бонус от питомца (округляем вверх, чтобы +1% давал +1 руду минимум)
+                // Бонус от лиги
+                const league = getLeagueByRating(_pvpRating);
+                if (league.bonus > 0) {
+                    const leagueMultiplier = 1 + league.bonus / 100;
+                    oreGain = Math.floor(oreGain * leagueMultiplier);
+                }
+                
+                // Бонус от питомца
                 const petMultiplier = getPetMultiplier();
-                let oreWithPet = oreGain * petMultiplier;
+                oreGain = Math.round(oreGain * petMultiplier);
                 
-                // Округляем по математическим правилам (не вниз!)
-                oreGain = Math.round(oreWithPet);
-                
-                // Минимум 1 руда за удар
                 if (oreGain < 1) oreGain = 1;
-                
                 return oreGain;
             }
-            
+                        
             function getCurrentMiningRange() {
                 let bonus = Math.floor(_level / 10);
                 let pickBonus = _pickaxeLevel - 1;
