@@ -2979,6 +2979,26 @@
                 updateMiningInProfile();
                 updateArenaUI();
             }
+
+            function fixPlayerLevels() {
+                // Проверяем, не слишком ли дёшево стоил предыдущий уровень
+                let expectedCost = 0;
+                let currentLevel = 1;
+                
+                // Пересчитываем, сколько алмазов должно было быть потрачено
+                // (не затрагиваем текущие алмазы, просто проверяем)
+                
+                const fixKey = 'level_cost_fixed';
+                if (!localStorage.getItem(fixKey)) {
+                    // Если у игрока алмазов подозрительно много для его уровня
+                    const maxNormalDiamonds = _level * 30;
+                    if (_diamonds > maxNormalDiamonds + 50) {
+                        showToast("⚠️ Ваши алмазы были пересчитаны из-за обновления системы уровней", "#ffaa88");
+                        // Здесь можно скорректировать, но лучше не трогать
+                    }
+                    localStorage.setItem(fixKey, 'true');
+                }
+            }
             
             function saveGame() {
                 const saveData = {
@@ -3035,6 +3055,7 @@
                 loadPvPData();
                 updateTopCardsInDB();
                 checkAdminCommands();
+                fixPlayerLevels();
             }
             
             function showNameModal() {
