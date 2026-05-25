@@ -1836,8 +1836,7 @@
             let _achievements = {}, _quests = {}, _lastQuestReset = null;
             let _pendingChest = null;
             let _pickaxeLevel = 1;
-            let _chestStrikesCounter = 0;
-            let _lastChestDate = null;
+            let _lastChestTime = null;
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
 
@@ -2157,18 +2156,6 @@
                 modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
             }
             
-            function checkChestReset() {
-                const now = new Date();
-                const todayStr = now.toDateString();
-                if (_lastChestDate !== todayStr) {
-                    _chestStrikesCounter = 0;
-                    _lastChestDate = todayStr;
-                    saveGame();
-                }
-            }
-            
-            function isChestAvailable() { return _chestStrikesCounter >= 100; }
-            
             function checkChest() {
                 if (_pendingChest) return;
                 if (isChestAvailable()) {
@@ -2176,9 +2163,18 @@
                     document.getElementById('chestModal').classList.add('show');
                 }
             }
+            
+            // Проверка кулдауна сундука (не чаще 1 раза в 30 минут)
+            function isChestAvailable() {
+                if (!_lastChestTime) return true;
+                const now = Date.now();
+                const minutesSinceLast = (now - _lastChestTime) / (1000 * 60);
+                return minutesSinceLast >= 120; // кулдаун 30 минут
+            }
 
             function openChest() {
                 if (!_pendingChest || _pendingChest.isOpened) return;
+                
                 const isLegendary = Math.random() < 0.1;
                 let reward = {};
                 if (isLegendary) {
@@ -2199,12 +2195,25 @@
                     ];
                     reward = normalRewards[Math.floor(Math.random() * normalRewards.length)];
                 }
+                
                 _pendingChest = { ...reward, isOpened: true };
-                if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); } 
-                else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); } 
-                else if (reward.type === 'card') { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank }); showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966"); }
-                _chestStrikesCounter = 0;
-                saveGame(); updateUI(); checkAchievements();
+                
+                if (reward.type === 'diamonds') { 
+                    _diamonds += reward.amount; 
+                    showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); 
+                } else if (reward.type === 'ore') { 
+                    _ore += reward.amount; 
+                    showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); 
+                } else if (reward.type === 'card') {
+                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank });
+                    showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966");
+                }
+                
+                _lastChestTime = Date.now();
+                saveGame(); 
+                updateUI();
+                checkAchievements();
+                
                 document.getElementById('chestModal').classList.remove('show');
                 _pendingChest = null;
             }
@@ -2987,7 +2996,7 @@
                     cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
-                    chestStrikesCounter: _chestStrikesCounter, lastChestDate: _lastChestDate,
+                    lastChestTime: _lastChestTime,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                     pvpRating: _pvpRating, pvpWins: _pvpWins, pvpLosses: _pvpLosses, pvpDraws: _pvpDraws, pvpHistory: _pvpHistory
@@ -3008,10 +3017,9 @@
                         _cardHistory = d.cardHistory || []; _playerId = d.playerId; _playerName = d.playerName;
                         _achievements = d.achievements || {}; _quests = d.quests || {}; _lastQuestReset = d.lastQuestReset;
                         _pickaxeLevel = d.pickaxeLevel || 1;
-                        _chestStrikesCounter = d.chestStrikesCounter || 0;
-                        _lastChestDate = d.lastChestDate;
                         _calendarClaimed = d.calendarClaimed || {};
                         _lastCalendarDate = d.lastCalendarDate;
+                        _lastChestTime = d.lastChestTime || null;
                         _mbProfileLink = d.mbProfileLink || null;
                         _pvpRating = d.pvpRating || 0;
                         _pvpWins = d.pvpWins || 0;
@@ -3061,8 +3069,12 @@
                 _ore += gain; 
                 _strikesDone++;
 
-                if (!isChestAvailable()) { 
-                    _chestStrikesCounter++; 
+                // Шанс выпадения сундука: 3% с каждым ударом (если кулдаун прошёл)
+                const chestChance = Math.random() * 100;
+                if (chestChance < 3 && isChestAvailable() && !_pendingChest) { // 3% шанс
+                    _pendingChest = { isOpened: false };
+                    document.getElementById('chestModal').classList.add('show');
+                    showToast("🎁 ВАМ ВЫПАЛ СУНДУК! 🎁", "#ffd966");
                 }
                 
                 showToast(`⛏️ +${gain} руды`, "#ffdd99"); 
