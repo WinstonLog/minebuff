@@ -1263,6 +1263,7 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
+                <div class="menu-item" data-tab="shop">🛒 Магазин</div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="arena">⚔️ Арена</div>
@@ -1371,6 +1372,95 @@
             </div>
         </div>
 
+        <!-- МАГАЗИН -->
+        <div class="tab-panel" id="shopPanel">
+            <div class="game-panel">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🛒 МАГАЗИН</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 16px;">Трать алмазы или пополни баланс!</div>
+                
+                <!-- ВКЛАДКИ МАГАЗИНА -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 60px; padding: 4px;">
+                    <button id="shopGoodsTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: #ffcc66; border: none;">📦 ТОВАРЫ</button>
+                    <button id="shopDonateTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #9bbfd0; border: none;">💳 ПОПОЛНЕНИЕ</button>
+                </div>
+                
+                <!-- ТОВАРЫ -->
+                <div id="shopGoodsContent">
+                    <!-- Сундук с картой -->
+                    <div style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 12px; border: 2px solid #ffaa33;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <div style="font-size: 48px;">🎁</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 16px;">ТАИНСТВЕННЫЙ СУНДУК</div>
+                                <div style="font-size: 12px; opacity: 0.7;">Случайная карта ранга от E до A!</div>
+<!--                                 <div style="font-size: 11px; margin-top: 4px;">🎴 Шансы: A(1%), P(3%), G(4%), B(7%), C(15%), D(30%), E(40%)</div> -->
+                            </div>
+                            <button id="openCardChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 24px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">50💎 ОТКРЫТЬ</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Бустер на удары -->
+                    <div style="background: linear-gradient(135deg, #1a2a2a, #0a1a1a); border-radius: 30px; padding: 16px; margin-bottom: 12px; border: 1px solid #ffcc6633;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <div style="font-size: 48px;">⚡</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 16px;">ЭНЕРГИЯ ШАХТЫ</div>
+                                <div style="font-size: 12px; opacity: 0.7;">+20 ударов сверх лимита сегодня!</div>
+                            </div>
+                            <button id="buyStrikesBoostBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">30💎 КУПИТЬ</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ПОПОЛНЕНИЕ (ДОНАТ) -->
+                <div id="shopDonateContent" style="display: none;">
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <div style="font-size: 48px;">💎</div>
+                        <div style="font-weight: bold; font-size: 16px;">ПОПОЛНИТЬ БАЛАНС</div>
+                        <div style="font-size: 12px; opacity: 0.7;">1 ₽ = 5 💎 + бонус! Или введите свою сумму</div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Готовые суммы до 300 ₽ -->
+                        <button class="donate-btn" data-amount="50" data-diamonds="275" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 16px; border-radius: 30px; font-weight: bold; color: white; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span>⭐ 50 ₽</span>
+                            <span style="background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 30px;">+275 💎</span>
+                        </button>
+                        
+                        <button class="donate-btn" data-amount="100" data-diamonds="550" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 16px; border-radius: 30px; font-weight: bold; color: white; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span>🔥 100 ₽</span>
+                            <span style="background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 30px;">+550 💎</span>
+                        </button>
+                        
+                        <button class="donate-btn" data-amount="150" data-diamonds="850" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 16px; border-radius: 30px; font-weight: bold; color: white; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span>💎 150 ₽</span>
+                            <span style="background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 30px;">+850 💎</span>
+                        </button>
+                        
+                        <!-- Разделитель -->
+                        <div style="height: 12px;"></div>
+                        
+                        <!-- Ручной ввод алмазов -->
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 30px; padding: 16px; margin-top: 8px;">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 12px; text-align: center;">✏️ СВОЯ СУММА (без бонуса)</div>
+                            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                                <div style="flex: 2;">
+                                    <input type="number" id="customDiamondsInput" placeholder="Кол-во алмазов" style="width: 100%; padding: 12px; border-radius: 30px; background: #0f1a1f; border: 1px solid #ffcc66; color: white; font-size: 14px; text-align: center;">
+                                </div>
+                                <button id="customDonateBtn" style="flex: 1; background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px; border-radius: 30px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">💎 КУПИТЬ</button>
+                            </div>
+                            <div style="font-size: 11px; opacity: 0.6; text-align: center; margin-top: 10px;">
+                                💡 1 ₽ = 5 💎 | <span id="pricePreview">Введите алмазы для расчёта</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #071217cc; border-radius: 20px; padding: 12px; margin-top: 16px; text-align: center; font-size: 11px;">
+                        🔒 Все переводы защищены. После оплаты напишите <a href="https://t.me/minebuff" target="_blank" style="color: #ffcc66;">@minebuff</a> для получения алмазов
+                    </div>
+                </div>
+        </div>
+
         <!-- ТОП ИГРОКОВ (только уровни) -->
         <div class="tab-panel" id="topPanel">
             <div class="top-panel game-panel">
@@ -1385,7 +1475,7 @@
 
         <!-- АРЕНА (PvP) -->
         <div class="tab-panel" id="arenaPanel">
-            <div class="game-panel">
+            <div class="game-panel" style="display: flex; flex-direction: column; min-height: 500px;">
                 <div style="font-weight: bold; font-size: 18px; text-align: center;">⚔️ PvP АРЕНА</div>
                 <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Сражайся с другими игроками!</div>
                 
@@ -1482,7 +1572,7 @@
                     </div>
                 </div>
                 
-                <div class="dropdown-section">
+<!--                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">🏆 ДОСТИЖЕНИЯ</div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content">
                         <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
@@ -1493,7 +1583,7 @@
                             • Собрать все сезонные карты (V,L,H,N)
                         </div>
                     </div>
-                </div>
+                </div> -->
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
@@ -1637,6 +1727,21 @@
             </div>
             <div class="modal-buttons" style="padding: 0 20px 20px 20px;">
                 <button id="saveNameBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; color: white; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer;">ПОДТВЕРДИТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для сундука с картой -->
+    <div class="chest-reward-modal" id="chestRewardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(12px); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 1px solid #ffcc66;">
+            <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
+                <div style="font-size: 48px;">🎁</div>
+                <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">СУНДУК ОТКРЫТ!</div>
+            </div>
+            <div style="padding: 24px 20px;">
+                <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту:</div>
+                <div id="chestRewardCard" style="font-size: 48px; font-weight: bold; background: #2a3a3a; border-radius: 30px; padding: 20px; margin: 10px 0; display: inline-block; width: 100%; box-sizing: border-box;">?</div>
+                <button id="closeChestRewardBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer; margin-top: 16px;">ЗАКРЫТЬ</button>
             </div>
         </div>
     </div>
@@ -2342,11 +2447,41 @@
             function checkDailyReset() {
                 const today = new Date().toDateString();
                 const lastReset = localStorage.getItem('minebuff_last_reset');
-                let newLimit = 100 + Math.floor(_level / 10);
-                if (newLimit > 200) newLimit = 200;
-                if (lastReset !== today) { _strikesDone = 0; _strikesLimit = newLimit; localStorage.setItem('minebuff_last_reset', today); saveGame(); } 
-                else { if (_strikesLimit !== newLimit) { _strikesLimit = newLimit; if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit; saveGame(); } }
+                const baseLimit = 100 + Math.floor(_level / 10);
+                const maxLimit = 200;
+                const finalBaseLimit = Math.min(baseLimit, maxLimit);
+                
+                // Получаем сохранённый бустер (если есть)
+                let activeBoost = 0;
+                const boostKey = `strikes_boost_${today}`;
+                const hasBoostToday = localStorage.getItem(boostKey) === 'true';
+                
+                if (lastReset !== today) {
+                    // НОВЫЙ ДЕНЬ - сбрасываем всё
+                    _strikesDone = 0;
+                    _strikesLimit = finalBaseLimit;
+                    // Добавляем бустер, если куплен сегодня
+                    if (hasBoostToday) {
+                        _strikesLimit += 20;
+                        activeBoost = 20;
+                    }
+                    localStorage.setItem('minebuff_last_reset', today);
+                    saveGame();
+                } else {
+                    // ТОТ ЖЕ ДЕНЬ - обновляем лимит с учётом бустера
+                    let expectedLimit = finalBaseLimit;
+                    if (hasBoostToday) {
+                        expectedLimit += 20;
+                    }
+                    if (_strikesLimit !== expectedLimit) {
+                        _strikesLimit = expectedLimit;
+                        if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
+                        saveGame();
+                    }
+                }
+                
                 if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
+                
                 const now = new Date();
                 if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
                     for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
@@ -3023,6 +3158,7 @@
                     else if (tab === 'settings') panelId = 'settingsPanel';
                     else if (tab === 'arena') panelId = 'arenaPanel';
                     else if (tab === 'info') panelId = 'infoPanel';
+                    else if (tab === 'shop') panelId = 'shopPanel';
                     if (panelId) document.getElementById(panelId).classList.add('active');
                     sideMenu.classList.remove('show');
                     if (tab === 'top') loadTopFromSupabase();
@@ -3049,7 +3185,167 @@
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
-            
+            // Магазин - сундук с картой (с модальным окном)
+            document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
+                const cost = 50;
+                if (_diamonds >= cost) {
+                    _diamonds -= cost;
+                    
+                    // Определяем рандомный ранг карты (с E рангом)
+                    const rand = Math.random() * 100;
+                    let rank = 'E';
+                    
+                    if (rand < 1) rank = 'A';       // 1%
+                    else if (rand < 4) rank = 'P';   // 3%
+                    else if (rand < 8) rank = 'G';   // 4%
+                    else if (rand < 15) rank = 'B';  // 7%
+                    else if (rand < 30) rank = 'C';  // 15%
+                    else if (rand < 60) rank = 'D';  // 30%
+                    else rank = 'E';                 // 40%
+                    
+                    // Сохраняем карту
+                    addCardToHistory(rank);
+                    saveGame();
+                    updateUI();
+                    
+                    // Показываем модальное окно с результатом
+                    const modal = document.getElementById('chestRewardModal');
+                    const cardDiv = document.getElementById('chestRewardCard');
+                    
+                    // Цвета для всех рангов
+                    const rankColors = {
+                        'A': '#5a1a1a',
+                        'P': '#102b4e',
+                        'G': '#1c4620',
+                        'B': '#3a1e52',
+                        'C': '#b8a35c',
+                        'D': '#6e8f9e',
+                        'E': '#a17654'
+                    };
+                    cardDiv.style.background = rankColors[rank] || '#2a3a3a';
+                    cardDiv.innerHTML = `<span style="font-size: 36px;">🎴</span><br><span style="font-size: 28px;">${rank}</span>`;
+                    
+                    modal.style.display = 'flex';
+                    
+                    // Закрытие модального окна
+                    const closeBtn = document.getElementById('closeChestRewardBtn');
+                    const newCloseBtn = closeBtn.cloneNode(true);
+                    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+                    newCloseBtn.onclick = () => {
+                        modal.style.display = 'none';
+                    };
+                    modal.onclick = (e) => {
+                        if (e.target === modal) modal.style.display = 'none';
+                    };
+                    
+                } else {
+                    showToast(`❌ Нужно 50 алмазов!`, "#ff8888");
+                }
+            });
+
+            // Бустер на +20 ударов
+            document.getElementById('buyStrikesBoostBtn')?.addEventListener('click', () => {
+                const cost = 30;
+                const today = new Date().toDateString();
+                const boostKey = `strikes_boost_${today}`;
+                const alreadyBoosted = localStorage.getItem(boostKey);
+                
+                if (alreadyBoosted) {
+                    showToast("⏰ Сегодня вы уже покупали бустер ударов!", "#ffaa88");
+                    return;
+                }
+                
+                if (_diamonds >= cost) {
+                    _diamonds -= cost;
+                    
+                    // Сохраняем флаг, что бустер куплен сегодня
+                    localStorage.setItem(boostKey, 'true');
+                    
+                    // Добавляем +20 к текущему лимиту
+                    _strikesLimit += 20;
+                    
+                    showToast(`⚡ +20 ударов на сегодня! Лимит: ${_strikesLimit}`, "#aaffdd");
+                    saveGame();
+                    updateUI();
+                } else {
+                    showToast(`❌ Нужно 30 алмазов!`, "#ff8888");
+                }
+            });
+
+            // Переключение вкладок в магазине
+            const shopGoodsTab = document.getElementById('shopGoodsTab');
+            const shopDonateTab = document.getElementById('shopDonateTab');
+            const shopGoodsContent = document.getElementById('shopGoodsContent');
+            const shopDonateContent = document.getElementById('shopDonateContent');
+
+            if (shopGoodsTab && shopDonateTab) {
+                shopGoodsTab.onclick = () => {
+                    shopGoodsTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
+                    shopGoodsTab.style.color = '#ffcc66';
+                    shopDonateTab.style.background = 'transparent';
+                    shopDonateTab.style.color = '#9bbfd0';
+                    shopGoodsContent.style.display = 'block';
+                    shopDonateContent.style.display = 'none';
+                };
+                
+                shopDonateTab.onclick = () => {
+                    shopDonateTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
+                    shopDonateTab.style.color = '#ffcc66';
+                    shopGoodsTab.style.background = 'transparent';
+                    shopGoodsTab.style.color = '#9bbfd0';
+                    shopDonateContent.style.display = 'block';
+                    shopGoodsContent.style.display = 'none';
+                };
+            }
+
+            // Кнопки доната
+            document.querySelectorAll('.donate-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const amount = btn.getAttribute('data-amount');
+                    const url = `https://yoomoney.ru/to/4100119003253255/${amount}`;
+                    window.open(url, '_blank');
+                    showToast(`💰 Перенаправление на оплату ${amount} ₽...`, "#aaffdd");
+                });
+            });
+
+            // Ручной ввод алмазов
+            document.getElementById('customDonateBtn')?.addEventListener('click', () => {
+                const diamonds = parseInt(document.getElementById('customDiamondsInput').value);
+                if (!diamonds || diamonds <= 0) {
+                    showToast("❌ Введите количество алмазов!", "#ff8888");
+                    return;
+                }
+                
+                // 1 ₽ = 5 💎 (без бонуса)
+                let rubles = diamonds / 5;
+                
+                // Округляем до целых рублей, чтобы не было копеек
+                rubles = Math.ceil(rubles);
+                
+                if (rubles < 10) {
+                    showToast("❌ Минимальная сумма 10 ₽ (50 алмазов)", "#ff8888");
+                    return;
+                }
+                
+                const url = `https://yoomoney.ru/to/4100119003253255/${rubles}`;
+                window.open(url, '_blank');
+                showToast(`💰 Перенаправление на оплату ${rubles} ₽ за ${diamonds} 💎`, "#aaffdd");
+                
+                // Очищаем поле
+                document.getElementById('customDiamondsInput').value = '';
+            });
+
+            // Предпросмотр суммы
+            document.getElementById('customDiamondsInput')?.addEventListener('input', function() {
+                const diamonds = parseInt(this.value);
+                if (diamonds && diamonds > 0) {
+                    const rubles = Math.ceil(diamonds / 5);
+                    document.getElementById('pricePreview').innerHTML = `${diamonds} 💎 = ${rubles} ₽`;
+                } else {
+                    document.getElementById('pricePreview').innerHTML = `Введите алмазы для расчёта`;
+                }
+            });
+
             initDropdowns();
             loadGame();
             initSupabase();
