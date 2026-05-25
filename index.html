@@ -1535,7 +1535,7 @@
                 </div>
                 
                 <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    💡 Победа +15 рейтинга, поражение -15, ничья 0
+                    💡 Победа +25 рейтинга, поражение -25, ничья 0
                 </div>
             </div>
         </div>
@@ -3177,8 +3177,8 @@
             function finishBattle(myWins, opponentWins, opponentName) {
                 if (battleAnimationInterval) clearInterval(battleAnimationInterval);
                 let result = '', ratingChange = 0;
-                if (myWins > opponentWins) { result = 'win'; ratingChange = 15; _pvpWins++; }
-                else if (myWins < opponentWins) { result = 'loss'; ratingChange = -15; _pvpLosses++; }
+                if (myWins > opponentWins) { result = 'win'; ratingChange = 25; _pvpWins++; }
+                else if (myWins < opponentWins) { result = 'loss'; ratingChange = -25; _pvpLosses++; }
                 else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
                 _pvpRating += ratingChange;
                 if (_pvpRating < 0) _pvpRating = 0;
