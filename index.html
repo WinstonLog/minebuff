@@ -2244,7 +2244,25 @@
             function checkCalendarReset() {
                 const now = new Date();
                 const todayStr = now.toDateString();
-                if (_lastCalendarDate !== todayStr) { _lastCalendarDate = todayStr; saveGame(); }
+                const lastDateStr = _lastCalendarDate ? new Date(_lastCalendarDate).toDateString() : null;
+                
+                // Если игрок заходил раньше
+                if (lastDateStr) {
+                    const lastDate = new Date(_lastCalendarDate);
+                    const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+                    
+                    // Если пропущен хотя бы 1 день — сбрасываем прогресс
+                    if (diffDays > 1) {
+                        _calendarClaimed = {};
+                        showToast("📅 Вы пропустили день! Прогресс календаря сброшен.", "#ffaa88");
+                    }
+                    else if (diffDays === 1) {
+
+                    }
+                }
+                
+                _lastCalendarDate = todayStr;
+                saveGame();
                 updateCalendarUI();
             }
             
@@ -2252,17 +2270,36 @@
             
             function claimCalendarReward(day) {
                 if (!canClaimCalendar()) { showToast("❌ Календарь доступен с 5 уровня!", "#ff8888"); return false; }
+                
                 const today = new Date();
                 const currentDay = today.getDate();
+                
+                // Не даём взять награду не за сегодня
                 if (day !== currentDay) { showToast("❌ Можно получить только сегодняшнюю награду!", "#ff8888"); return false; }
+                
+                // Проверка последовательности (нельзя взять 3 день, если не взят 2)
+                const lastClaimedDay = getLastClaimedDay();
+                if (lastClaimedDay !== null && day !== lastClaimedDay + 1) {
+                    showToast(`❌ Вы пропустили день! Начните календарь заново с 1 дня.`, "#ff8888");
+                    return false;
+                }
+                
                 if (_calendarClaimed[day]) { showToast("❌ Награда за сегодня уже получена!", "#ff8888"); return false; }
+                
                 const reward = calendarRewards[day - 1];
                 if (!reward) return false;
+                
                 if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💎 +${reward.amount} алмазов (календарь)!`, "#aaffdd"); }
                 else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды (календарь)!`, "#aaffdd"); }
-                else if (reward.type === 'card') { _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь)`, rank: reward.rank }); showToast(`✨ КАРТА ${reward.rank} из календаря!`, "#ffd966"); }
+                else if (reward.type === 'card') { 
+                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь)`, rank: reward.rank }); 
+                    showToast(`✨ КАРТА ${reward.rank} из календаря!`, "#ffd966"); 
+                }
+                
                 _calendarClaimed[day] = true;
-                saveGame(); updateCalendarUI(); checkAchievements();
+                saveGame();
+                updateCalendarUI();
+                checkAchievements();
                 return true;
             }
                         
