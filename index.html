@@ -3006,39 +3006,42 @@
                 }
                 
                 try {
-                    // Получаем всех игроков, у которых есть top_cards (не пустые)
+                    // Получаем ВСЕХ игроков, кроме себя
                     const { data, error } = await supabaseClient
                         .from('leaderboard')
                         .select('player_id, username, level, diamonds, top_cards')
-                        .not('top_cards', 'is', null)
                         .neq('player_id', _playerId)
-                        .limit(30);
+                        .limit(100);
                     
                     if (error) throw error;
                     
                     if (!data || data.length === 0) {
-                        showToast("❌ Нет доступных соперников с картами", "#ff8888");
+                        showToast("❌ Нет доступных соперников", "#ff8888");
                         return null;
                     }
                     
-                    // Фильтруем тех, у кого есть минимум 1 карта
-                    const validOpponents = data.filter(p => {
+                    // Фильтруем ТОЛЬКО тех, у кого 3 или более карт
+                    const opponentsWithCards = [];
+                    
+                    for (const player of data) {
                         try {
-                            const cards = JSON.parse(p.top_cards || '[]');
-                            return cards.length >= 1;
-                        } catch { 
-                            return false; 
+                            const cards = JSON.parse(player.top_cards || '[]');
+                            if (cards.length >= 3) {
+                                opponentsWithCards.push(player);
+                            }
+                        } catch(e) {
+                            console.warn('Parse error for', player.username);
                         }
-                    });
+                    }
                     
-                    if (validOpponents.length === 0) {
-                        showToast("❌ Нет соперников с картами", "#ff8888");
+                    if (opponentsWithCards.length === 0) {
+                        showToast("❌ Нет соперников с 3+ картами! Создайте свою карту через Telegram", "#ff8888");
                         return null;
                     }
                     
-                    // Выбираем случайного соперника из отфильтрованных
-                    const randomIndex = Math.floor(Math.random() * validOpponents.length);
-                    const opponent = validOpponents[randomIndex];
+                    // Выбираем случайного соперника из тех, у кого есть 3+ карт
+                    const randomIndex = Math.floor(Math.random() * opponentsWithCards.length);
+                    const opponent = opponentsWithCards[randomIndex];
                     
                     showToast(`⚔️ Соперник найден: ${opponent.username}`, "#aaffdd");
                     return opponent;
@@ -3062,16 +3065,37 @@
             }
 
             async function startBattle() {
-                if (_level < 5) { showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); return; }
+                if (_level < 5) { 
+                    showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); 
+                    return; 
+                }
+                
                 const myCards = getTop3Cards();
-                if (myCards.length < 3) { showToast("❌ Нужно минимум 3 карты!", "#ff8888"); return; }
+                if (myCards.length < 3) { 
+                    showToast("❌ Нужно минимум 3 карты для участия в дуэлях! Получите карты через Telegram @minebuff", "#ff8888"); 
+                    return; 
+                }
+                
                 const opponent = await findOpponent();
-                if (!opponent) return;
+                if (!opponent) return; // Если нет соперников - выходим
+                
+                // Здесь уже точно есть соперник с 3+ картами
                 let opponentCards = [];
-                try { opponentCards = JSON.parse(opponent.top_cards || '[]'); } catch { opponentCards = []; }
-                if (opponentCards.length < 3) { showToast("❌ У соперника недостаточно карт", "#ff8888"); return; }
+                try {
+                    opponentCards = JSON.parse(opponent.top_cards || '[]');
+                } catch { 
+                    opponentCards = []; 
+                }
+                
+                // Эта проверка теперь не нужна, но оставим на всякий случай
+                if (opponentCards.length < 3) {
+                    showToast("❌ У соперника недостаточно карт", "#ff8888");
+                    return;
+                }
+                
                 const sortedMyCards = [...myCards].sort((a, b) => b.power - a.power);
                 const sortedOpponentCards = [...opponentCards].sort((a, b) => b.power - a.power);
+                
                 showBattleModal(opponent.username, sortedMyCards, sortedOpponentCards);
                 startBattleAnimation(sortedMyCards, sortedOpponentCards, opponent.username);
             }
