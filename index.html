@@ -2600,27 +2600,93 @@
             
             function checkCalendarReset() {
                 const now = new Date();
-                const todayStr = now.toDateString();
-                const lastDateStr = _lastCalendarDate ? new Date(_lastCalendarDate).toDateString() : null;
                 
-                // Если игрок заходил раньше
-                if (lastDateStr) {
-                    const lastDate = new Date(_lastCalendarDate);
-                    const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+                // Если календарь ещё не активирован и уровень >= 5
+                if (!_lastCalendarDate && _level >= 5) {
+                    _lastCalendarDate = now.toISOString();
+                    _calendarClaimed = {};
                     
-                    // Если пропущен хотя бы 1 день — сбрасываем прогресс
-                    if (diffDays > 1) {
-                        _calendarClaimed = {};
-                        showToast("📅 Вы пропустили день! Прогресс календаря сброшен.", "#ffaa88");
+                    // АВТОМАТИЧЕСКИ ВЫДАЁМ НАГРАДУ ЗА 1 ДЕНЬ
+                    const firstDayReward = calendarRewards[0];
+                    if (firstDayReward.type === 'diamonds') {
+                        _diamonds += firstDayReward.amount;
+                        showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
+                    } else if (firstDayReward.type === 'ore') {
+                        _ore += firstDayReward.amount;
+                        showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
+                    } else if (firstDayReward.type === 'card') {
+                        _cardHistory.unshift({ 
+                            id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                            text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
+                            rank: firstDayReward.rank 
+                        });
+                        showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
                     }
-                    else if (diffDays === 1) {
-
+                    
+                    _calendarClaimed[1] = true; // Отмечаем 1 день как полученный
+                    showToast("📅 Календарь активирован! Награда за 1 день выдана автоматически!", "#aaffdd");
+                    
+                    saveGame();
+                    updateCalendarUI();
+                    return;
+                }
+                
+                // Если уровень < 5 — календарь неактивен
+                if (_level < 5) {
+                    updateCalendarUI();
+                    return;
+                }
+                
+                // Проверка пропуска дня
+                if (_lastCalendarDate) {
+                    const lastClaimedDay = getLastClaimedDay();
+                    const currentDay = getCurrentCalendarDay();
+                    
+                    // Если пропустили день
+                    if (lastClaimedDay > 0 && currentDay > lastClaimedDay + 1) {
+                        _calendarClaimed = {};
+                        _lastCalendarDate = now.toISOString();
+                        
+                        // Снова выдаём награду за 1 день
+                        const firstDayReward = calendarRewards[0];
+                        if (firstDayReward.type === 'diamonds') {
+                            _diamonds += firstDayReward.amount;
+                            showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
+                        } else if (firstDayReward.type === 'ore') {
+                            _ore += firstDayReward.amount;
+                            showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
+                        } else if (firstDayReward.type === 'card') {
+                            _cardHistory.unshift({ 
+                                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                                text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
+                                rank: firstDayReward.rank 
+                            });
+                            showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
+                        }
+                        
+                        _calendarClaimed[1] = true;
+                        showToast("📅 Прогресс календаря сброшен. Награда за 1 день выдана!", "#ffaa88");
+                        saveGame();
                     }
                 }
                 
-                _lastCalendarDate = todayStr;
-                saveGame();
                 updateCalendarUI();
+            }
+
+            function getCurrentCalendarDay() {
+                if (!_lastCalendarDate || _level < 5) return 0;
+                
+                const startDate = new Date(_lastCalendarDate);
+                const now = new Date();
+                
+                startDate.setHours(0, 0, 0, 0);
+                now.setHours(0, 0, 0, 0);
+                
+                const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays >= 30) return 31; // календарь завершён
+                
+                return diffDays + 1;
             }
             
             function canClaimCalendar() { return _level >= 5; }
@@ -2634,31 +2700,42 @@
             }
 
             function claimCalendarReward(day) {
-                if (!canClaimCalendar()) { showToast("❌ Календарь доступен с 5 уровня!", "#ff8888"); return false; }
+                if (!canClaimCalendar()) { 
+                    showToast("❌ Календарь доступен с 5 уровня!", "#ff8888"); 
+                    return false; 
+                }
                 
-                const today = new Date();
-                const currentDay = today.getDate();
+                const currentCalendarDay = getCurrentCalendarDay();
                 
-                // Не даём взять награду не за сегодня
-                if (day !== currentDay) { showToast("❌ Можно получить только сегодняшнюю награду!", "#ff8888"); return false; }
-                
-                // Проверка последовательности (нельзя взять 3 день, если не взят 2)
-                const lastClaimedDay = getLastClaimedDay();
-                if (lastClaimedDay !== null && day !== lastClaimedDay + 1) {
-                    showToast(`❌ Вы пропустили день! Начните календарь заново с 1 дня.`, "#ff8888");
+                if (currentCalendarDay > 30) {
+                    showToast("📅 Вы завершили календарь!", "#ffaa88");
                     return false;
                 }
                 
-                if (_calendarClaimed[day]) { showToast("❌ Награда за сегодня уже получена!", "#ff8888"); return false; }
+                if (day !== currentCalendarDay) {
+                    showToast(`❌ Сегодня день ${currentCalendarDay} календаря!`, "#ff8888");
+                    return false;
+                }
+                
+                if (_calendarClaimed[day]) { 
+                    showToast("❌ Награда уже получена!", "#ff8888"); 
+                    return false; 
+                }
                 
                 const reward = calendarRewards[day - 1];
                 if (!reward) return false;
                 
-                if (reward.type === 'diamonds') { _diamonds += reward.amount; showToast(`💎 +${reward.amount} алмазов (календарь)!`, "#aaffdd"); }
-                else if (reward.type === 'ore') { _ore += reward.amount; showToast(`⛏️ +${reward.amount} руды (календарь)!`, "#aaffdd"); }
+                if (reward.type === 'diamonds') { 
+                    _diamonds += reward.amount; 
+                    showToast(`💎 +${reward.amount} алмазов (день ${day})!`, "#aaffdd"); 
+                }
+                else if (reward.type === 'ore') { 
+                    _ore += reward.amount; 
+                    showToast(`⛏️ +${reward.amount} руды (день ${day})!`, "#aaffdd"); 
+                }
                 else if (reward.type === 'card') { 
-                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь)`, rank: reward.rank }); 
-                    showToast(`✨ КАРТА ${reward.rank} из календаря!`, "#ffd966"); 
+                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь, день ${day})`, rank: reward.rank }); 
+                    showToast(`✨ КАРТА ${reward.rank} (день ${day})!`, "#ffd966"); 
                 }
                 
                 _calendarClaimed[day] = true;
@@ -2671,29 +2748,58 @@
             function updateCalendarUI() {
                 const container = document.getElementById('calendarList');
                 if (!container) return;
-                const today = new Date();
-                const currentDay = today.getDate();
+                
                 const available = canClaimCalendar();
+                const currentDay = getCurrentCalendarDay();
+                const isCompleted = currentDay > 30;
+                
+                if (!available) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px;">🔒 Календарь станет доступен после 5 уровня!</div>';
+                    const msgDiv = document.getElementById('calendarMessage');
+                    if (msgDiv) msgDiv.innerHTML = '⭐ Повысьте уровень до 5! ⭐';
+                    return;
+                }
+                
+                if (isCompleted) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px;">🏆 КАЛЕНДАРЬ ЗАВЕРШЁН! 🏆</div>';
+                    const msgDiv = document.getElementById('calendarMessage');
+                    if (msgDiv) msgDiv.innerHTML = 'Вы получили все 30 наград!';
+                    return;
+                }
+                
                 let html = '';
                 for (let i = 1; i <= 30; i++) {
                     const reward = calendarRewards[i-1];
                     const isClaimed = _calendarClaimed[i];
                     const isToday = (i === currentDay);
-                    const isLocked = !available || (i > currentDay && !isClaimed);
+                    const isLocked = (i > currentDay);
+                    
                     let statusClass = '', statusIcon = '';
                     if (isClaimed) { statusClass = 'claimed'; statusIcon = '✅'; }
-                    else if (isToday && !isLocked && !isClaimed) { statusClass = 'today'; statusIcon = '🎁'; }
+                    else if (isToday && !isLocked) { statusClass = 'today'; statusIcon = '🎁'; }
                     else if (isLocked) { statusClass = 'locked'; statusIcon = '🔒'; }
                     else { statusIcon = '📅'; }
+                    
                     let rewardText = reward.text;
                     if (rewardText.length > 20) rewardText = rewardText.substring(0, 18) + '…';
-                    html += `<div class="calendar-day-item ${statusClass}" onclick="window.claimCalendarDay(${i})"><div class="calendar-day-left"><div class="calendar-day-number">День ${i}</div><div class="calendar-day-reward">🎁 ${rewardText}</div></div><div class="calendar-day-status">${statusIcon}</div></div>`;
+                    
+                    html += `<div class="calendar-day-item ${statusClass}" onclick="window.claimCalendarDay(${i})">
+                                <div class="calendar-day-left">
+                                    <div class="calendar-day-number">День ${i}</div>
+                                    <div class="calendar-day-reward">🎁 ${rewardText}</div>
+                                </div>
+                                <div class="calendar-day-status">${statusIcon}</div>
+                            </div>`;
                 }
+                
                 container.innerHTML = html;
+                
                 const msgDiv = document.getElementById('calendarMessage');
-                if (!available) msgDiv.innerHTML = '🔒 Календарь станет доступен после достижения 5 уровня!';
-                else if (_calendarClaimed[currentDay]) msgDiv.innerHTML = '✅ Награда за сегодня получена! Возвращайтесь завтра.';
-                else msgDiv.innerHTML = '🎁 Нажмите на сегодняшний день, чтобы получить награду!';
+                if (_calendarClaimed[currentDay]) {
+                    msgDiv.innerHTML = `✅ День ${currentDay} получен! Завтра будет день ${currentDay + 1}.`;
+                } else {
+                    msgDiv.innerHTML = `🎁 День ${currentDay}! Нажмите, чтобы получить награду! 🎁`;
+                }
             }
             
             function checkDailyReset() {
