@@ -1058,205 +1058,17 @@
             color: #ffcc66;
             text-decoration: none;
         }
-
-        .battle-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .battle-modal {
-            width: 95%;
-            max-width: 500px;
-            background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
-            border-radius: 40px;
-            border: 1px solid #ffcc66;
-            overflow: hidden;
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        .battle-modal-content {
-            padding: 16px;
-        }
-
-        .battle-header {
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .battle-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffcc66;
-            margin-bottom: 8px;
-        }
-
-        .battle-arena {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .battle-side {
-            flex: 1;
-            text-align: center;
-        }
-
-        .battle-side-title {
-            font-size: 12px;
-            margin-bottom: 12px;
-            padding: 6px;
-            border-radius: 20px;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .opponent-side .battle-side-title { color: #ff8888; }
-        .my-side .battle-side-title { color: #88ff88; }
-
-        .battle-vs {
-            display: flex;
-            align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: #ffcc66;
-            text-shadow: 0 0 5px #ffcc66;
-        }
-
-        .battle-cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .battle-card {
-            background: linear-gradient(135deg, #2a3a3a, #1a2a2a);
-            border-radius: 16px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #ffcc6633;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .battle-card-rank {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .battle-card-power {
-            font-size: 12px;
-            color: #ffcc66;
-        }
-
-        .battle-card-status {
-            font-size: 16px;
-            margin-top: 4px;
-        }
-
-        .card-attacking {
-            animation: attack 0.3s ease;
-            background: linear-gradient(135deg, #3a5a3a, #2a4a2a);
-            border-color: #ffcc66;
-        }
-
-        .card-defending {
-            animation: defend 0.3s ease;
-            background: linear-gradient(135deg, #5a3a3a, #4a2a2a);
-        }
-
-        .card-winner {
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 10px #00ff00;
-            background: linear-gradient(135deg, #2a5a2a, #1a4a1a);
-        }
-
-        .card-loser {
-            border: 2px solid #ff0000;
-            box-shadow: 0 0 10px #ff0000;
-            background: linear-gradient(135deg, #5a2a2a, #4a1a1a);
-            opacity: 0.7;
-        }
-
-        @keyframes attack {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(10px); }
-            100% { transform: translateX(0); }
-        }
-
-        @keyframes defend {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
-        .battle-log {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
-            padding: 12px;
-            height: 150px;
-            overflow-y: auto;
-            font-size: 12px;
-            margin-bottom: 16px;
-        }
-
-        .battle-log-entry {
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .battle-log-entry.win { color: #88ff88; }
-        .battle-log-entry.loss { color: #ff8888; }
-        .battle-log-entry.draw { color: #ffcc66; }
-        .battle-log-entry.result { font-weight: bold; font-size: 14px; text-align: center; padding: 8px; }
-
-        .battle-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .battle-skip-btn, .battle-close-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            border: none;
-            transition: 0.1s;
-        }
-
-        .battle-skip-btn {
-            background: linear-gradient(135deg, #6b3a5a, #4a2a3a);
-            color: white;
-        }
-
-        .battle-close-btn {
-            background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            color: white;
-        }
         .modal .progress-fill {
             transition: width 0.3s ease;
         }
-
         .menu-item {
             position: relative;
         }
-
         .lock-icon {
             margin-left: auto;
             font-size: 14px;
             opacity: 0.7;
         }
-
         .menu-item[style*="opacity: 0.6"]:active {
             transform: none;
         }
@@ -1280,14 +1092,12 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
-                <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="calendar">📅 Календарь</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
-                <div class="menu-item" data-tab="arena">⚔️ Арена</div>
-                <div class="menu-item" data-tab="exchange">🔄 Обмен</div>
-                <div class="menu-item" data-tab="shop">🛒 Магазин</div>
+                <div class="menu-item" data-tab="calendar">📅 Календарь<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
-                <div class="menu-item" data-tab="info">📚 Инфо</div>
+                <div class="menu-item" data-tab="exchange">🔄 Обмен<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
+                <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
         </div>
@@ -1524,36 +1334,6 @@
             </div>
         </div>
 
-        <!-- АРЕНА (PvP) -->
-        <div class="tab-panel" id="arenaPanel">
-            <div class="game-panel" style="display: flex; flex-direction: column; min-height: 500px;">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">⚔️ PvP АРЕНА</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Сражайся с другими игроками!</div>
-                
-                <div class="stats">
-                    <div class="stat-card"><div class="stat-label">🏆 Лига</div><div class="stat-value"><span id="arenaLeagueIcon">🟫</span> <span id="arenaLeagueName">Песчаная жила</span></div></div>
-                    <div class="stat-card"><div class="stat-label">⭐ Рейтинг</div><div class="stat-value" id="arenaRatingValue">0</div></div>
-                </div>
-                
-                <div class="stats">
-                    <div class="stat-card"><div class="stat-label">✅</div><div class="stat-value" id="arenaWinsValue">0</div></div>
-                    <div class="stat-card"><div class="stat-label">❌</div><div class="stat-value" id="arenaLossesValue">0</div></div>
-                    <div class="stat-card"><div class="stat-label">🤝</div><div class="stat-value" id="arenaDrawsValue">0</div></div>
-                </div>
-                
-                <button class="arena-attack-btn" id="arenaBattleBtn" style="background: linear-gradient(135deg, #6b3a5a, #4a2a3a); width:100%; padding:12px; border-radius:40px; font-weight:bold; margin:10px 0;">⚔️ НАЙТИ СОПЕРНИКА</button>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">📜 ИСТОРИЯ БОЁВ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content"><ul class="top-list" id="arenaHistoryList"><li style="justify-content:center;">— Нет боёв —</li></ul></div>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    💡 Победа +25 рейтинга, поражение -25, ничья 0
-                </div>
-            </div>
-        </div>
-
         <!-- Календарь -->
         <div class="tab-panel" id="calendarPanel">
             <div class="calendar-panel">
@@ -1610,31 +1390,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">⚔️ АРЕНА (PvP)</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Доступ:</strong> с 5 уровня и 3+ карт<br>
-                            • <strong>Бой:</strong> 3 раунда, ваши ТОП-3 карты против карт соперника<br>
-                            • <strong>Рейтинг:</strong> победа +25, поражение -25, ничья 0<br>
-                            • <strong>Лиги:</strong> рейтинг определяет вашу лигу
-                        </div>
-                    </div>
-                </div>
-                
-<!--                 <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">🏆 ДОСТИЖЕНИЯ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • Повышение уровня (5,10,25,50)<br>
-                            • Коллекционирование карт (5,15,30)<br>
-                            • Накопление ресурсов (1000/10000 руды, 50/200 алмазов)<br>
-                            • 500 ударов всего<br>
-                            • Собрать все сезонные карты (V,L,H,N)
-                        </div>
-                    </div>
-                </div> -->
                 
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
@@ -1930,14 +1685,6 @@
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
             let _totalStrikesEver = 0;
-
-            let _pvpRating = 0;
-            let _pvpWins = 0;
-            let _pvpLosses = 0;
-            let _pvpDraws = 0;
-            let _pvpHistory = [];
-            let battleAnimationInterval = null;
-            let battleModalDiv = null;
             
             let _mbProfileLink = null;
 
@@ -1963,7 +1710,6 @@
                 'pets': 3,
                 'calendar': 5,
                 'mine': 1,
-                'arena': 5,
                 'exchange': 2,
                 'shop': 2,
                 'top': 1,
@@ -2363,14 +2109,7 @@
                 let maxOre = 9 + bonus + pickBonus;
                 let oreGain = Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
                 if (isEventActive()) oreGain *= 2;
-                
-                // Бонус от лиги
-                const league = getLeagueByRating(_pvpRating);
-                if (league.bonus > 0) {
-                    const leagueMultiplier = 1 + league.bonus / 100;
-                    oreGain = Math.floor(oreGain * leagueMultiplier);
-                }
-                
+                                
                 // Бонус от питомца
                 const petMultiplier = getPetMultiplier();
                 oreGain = Math.round(oreGain * petMultiplier);
@@ -2991,7 +2730,6 @@
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
-                syncPvPToSupabase();
             }
             
             async function getPlayerCards(playerId) {
@@ -3202,326 +2940,6 @@
                 };
                 document.head.appendChild(s);
             }
-            
-            function getCardPower(rank) {
-                const powers = { 'A': 10, 'P': 9, 'G': 8, 'B': 7, 'C': 6, 'D': 5, 'E': 4, 'V': 12, 'L': 12, 'H': 12, 'N': 12 };
-                return powers[rank] || 3;
-            }
-
-            function getTop3Cards() {
-                const cards = [..._cardHistory].filter(c => c.rank);
-                const sorted = cards.sort((a, b) => getCardPower(b.rank) - getCardPower(a.rank));
-                return sorted.slice(0, 3).map(c => ({ rank: c.rank, power: getCardPower(c.rank) }));
-            }
-
-            function getLeagueByRating(rating) {
-                if (rating >= 6000) return { name: 'Звёздный рудник', icon: '✨', bonus: 75 };
-                if (rating >= 4000) return { name: 'Мифриловый трон', icon: '🌀', bonus: 50 };
-                if (rating >= 2750) return { name: 'Алмазный престол', icon: '💎', bonus: 40 };
-                if (rating >= 1750) return { name: 'Платиновый синклит', icon: '🔹', bonus: 30 };
-                if (rating >= 1000) return { name: 'Золотая цитадель', icon: '🟡', bonus: 20 };
-                if (rating >= 500) return { name: 'Серебряный гребень', icon: '⚪', bonus: 15 };
-                if (rating >= 250) return { name: 'Медный бастион', icon: '🟠', bonus: 10 };
-                if (rating >= 100) return { name: 'Каменный рубеж', icon: '⚙️', bonus: 5 };
-                if (rating >= 50) return { name: 'Песчаная жила', icon: '🟫', bonus: 2 };
-                return { name: 'Новичок', icon: '🌱', bonus: 0 };
-            }
-
-            async function findOpponent() {
-                if (!supabaseClient) { 
-                    showToast("❌ Нет соединения с сервером", "#ff8888"); 
-                    return null; 
-                }
-                
-                try {
-                    // Получаем ВСЕХ игроков, кроме себя
-                    const { data, error } = await supabaseClient
-                        .from('leaderboard')
-                        .select('player_id, username, level, diamonds, top_cards')
-                        .neq('player_id', _playerId)
-                        .limit(100);
-                    
-                    if (error) throw error;
-                    
-                    if (!data || data.length === 0) {
-                        showToast("❌ Нет доступных соперников", "#ff8888");
-                        return null;
-                    }
-                    
-                    // Фильтруем ТОЛЬКО тех, у кого 3 или более карт
-                    const opponentsWithCards = [];
-                    
-                    for (const player of data) {
-                        try {
-                            const cards = JSON.parse(player.top_cards || '[]');
-                            if (cards.length >= 3) {
-                                opponentsWithCards.push(player);
-                            }
-                        } catch(e) {
-                            console.warn('Parse error for', player.username);
-                        }
-                    }
-                    
-                    if (opponentsWithCards.length === 0) {
-                        showToast("❌ Нет соперников с 3+ картами! Создайте свою карту через Telegram", "#ff8888");
-                        return null;
-                    }
-                    
-                    // Выбираем случайного соперника из тех, у кого есть 3+ карт
-                    const randomIndex = Math.floor(Math.random() * opponentsWithCards.length);
-                    const opponent = opponentsWithCards[randomIndex];
-                    
-                    showToast(`⚔️ Соперник найден: ${opponent.username}`, "#aaffdd");
-                    return opponent;
-                    
-                } catch(e) { 
-                    console.warn('findOpponent error:', e); 
-                    showToast("❌ Ошибка поиска соперника", "#ff8888");
-                    return null; 
-                }
-            }
-
-            async function updateTopCardsInDB() {
-                if (!supabaseClient || !_playerId) return;
-                const topCards = getTop3Cards();
-                await supabaseClient.from('leaderboard').upsert({ 
-                    player_id: _playerId, 
-                    username: _playerName, 
-                    top_cards: JSON.stringify(topCards), 
-                    updated_at: new Date().toISOString() 
-                }, { onConflict: 'player_id' });
-            }
-
-            async function startBattle() {
-                if (_level < 5) { 
-                    showToast("❌ Арена доступна с 5 уровня!", "#ff8888"); 
-                    return; 
-                }
-                
-                const myCards = getTop3Cards();
-                if (myCards.length < 3) { 
-                    showToast("❌ Нужно минимум 3 карты для участия в дуэлях! Получите карты через Telegram @minebuff", "#ff8888"); 
-                    return; 
-                }
-                
-                const opponent = await findOpponent();
-                if (!opponent) return; // Если нет соперников - выходим
-                
-                // Здесь уже точно есть соперник с 3+ картами
-                let opponentCards = [];
-                try {
-                    opponentCards = JSON.parse(opponent.top_cards || '[]');
-                } catch { 
-                    opponentCards = []; 
-                }
-                
-                // Эта проверка теперь не нужна, но оставим на всякий случай
-                if (opponentCards.length < 3) {
-                    showToast("❌ У соперника недостаточно карт", "#ff8888");
-                    return;
-                }
-                
-                const sortedMyCards = [...myCards].sort((a, b) => b.power - a.power);
-                const sortedOpponentCards = [...opponentCards].sort((a, b) => b.power - a.power);
-                
-                showBattleModal(opponent.username, sortedMyCards, sortedOpponentCards);
-                startBattleAnimation(sortedMyCards, sortedOpponentCards, opponent.username);
-            }
-
-            function showBattleModal(opponentName, myCards, opponentCards) {
-                if (battleModalDiv && battleModalDiv.remove) battleModalDiv.remove();
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                const myCardsHtml = myCards.map((card, i) => `<div class="battle-card my-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">⚔️</div></div>`).join('');
-                const opponentCardsHtml = opponentCards.map((card, i) => `<div class="battle-card opponent-card" data-card-index="${i}" data-power="${card.power}" data-rank="${card.rank}"><div class="battle-card-rank">${card.rank}</div><div class="battle-card-power">💪 ${card.power}</div><div class="battle-card-status">🛡️</div></div>`).join('');
-                
-                // Убрана кнопка "ПРОПУСТИТЬ БОЙ"
-                const modalHtml = `<div class="battle-modal"><div class="battle-modal-content"><div class="battle-header"><div class="battle-title">⚔️ ДУЭЛЬ ⚔️</div><div class="battle-opponent">Противник: <strong>${escapeHtml(opponentName)}</strong></div></div><div class="battle-arena"><div class="battle-side opponent-side"><div class="battle-side-title">💀 ПРОТИВНИК 💀</div><div class="battle-cards-container" id="opponentCardsContainer">${opponentCardsHtml}</div></div><div class="battle-vs">VS</div><div class="battle-side my-side"><div class="battle-side-title">⚔️ ВЫ ⚔️</div><div class="battle-cards-container" id="myCardsContainer">${myCardsHtml}</div></div></div><div class="battle-log" id="battleLog"><div>⚔️ Бой начинается!</div></div></div></div>`;
-                
-                battleModalDiv = document.createElement('div');
-                battleModalDiv.className = 'battle-modal-overlay show';
-                battleModalDiv.innerHTML = modalHtml;
-                document.body.appendChild(battleModalDiv);
-            }
-
-            function startBattleAnimation(myCards, opponentCards, opponentName) {
-                let myIndex = 0, opponentIndex = 0, myWins = 0, opponentWins = 0, battleLog = [];
-                function addLog(message, type = 'info') { battleLog.push({ message, type, time: Date.now() }); updateBattleLog(); }
-                function updateBattleLog() {
-                    const logContainer = document.getElementById('battleLog');
-                    if (!logContainer) return;
-                    logContainer.innerHTML = battleLog.slice(-8).map(log => `<div class="battle-log-entry ${log.type}">${log.message}</div>`).join('');
-                    logContainer.scrollTop = logContainer.scrollHeight;
-                }
-                function updateCardStatus(cardElement, isWinner, isLoser = false) {
-                    if (!cardElement) return;
-                    if (isWinner) { cardElement.classList.add('card-winner'); cardElement.classList.remove('card-loser'); }
-                    else if (isLoser) { cardElement.classList.add('card-loser'); cardElement.classList.remove('card-winner'); }
-                    else { cardElement.classList.remove('card-winner', 'card-loser'); }
-                }
-                function executeBattle() {
-                    if (myIndex >= myCards.length && opponentIndex >= opponentCards.length) { finishBattle(myWins, opponentWins, opponentName); return; }
-                    if (myIndex >= myCards.length) { addLog(`❌ У вас закончились карты! Поражение!`, 'loss'); finishBattle(myWins, opponentWins, opponentName); return; }
-                    if (opponentIndex >= opponentCards.length) { addLog(`✅ У противника закончились карты! Победа!`, 'win'); finishBattle(myWins, opponentWins, opponentName); return; }
-                    const myCard = myCards[myIndex];
-                    const opponentCard = opponentCards[opponentIndex];
-                    const myCardElement = document.querySelector(`.my-card[data-card-index="${myIndex}"]`);
-                    const opponentCardElement = document.querySelector(`.opponent-card[data-card-index="${opponentIndex}"]`);
-                    addLog(`⚔️ Раунд ${myIndex + 1}: Ваша ${myCard.rank} (${myCard.power}) vs ${opponentCard.rank} (${opponentCard.power})`, 'battle');
-                    updateCardStatus(myCardElement, false, false);
-                    updateCardStatus(opponentCardElement, false, false);
-                    myCardElement?.classList.add('card-attacking');
-                    opponentCardElement?.classList.add('card-defending');
-                    setTimeout(() => {
-                        myCardElement?.classList.remove('card-attacking');
-                        opponentCardElement?.classList.remove('card-defending');
-                        if (myCard.power > opponentCard.power) {
-                            myWins++;
-                            addLog(`✅ ПОБЕДА! Ваша ${myCard.rank} сильнее!`, 'win');
-                            updateCardStatus(myCardElement, true, false);
-                            updateCardStatus(opponentCardElement, false, true);
-                            opponentIndex++;
-                        } else if (myCard.power < opponentCard.power) {
-                            opponentWins++;
-                            addLog(`❌ ПОРАЖЕНИЕ! ${opponentCard.rank} сильнее!`, 'loss');
-                            updateCardStatus(myCardElement, false, true);
-                            updateCardStatus(opponentCardElement, true, false);
-                            myIndex++;
-                        } else {
-                            addLog(`🤝 НИЧЬЯ!`, 'draw');
-                            updateCardStatus(myCardElement, false, false);
-                            updateCardStatus(opponentCardElement, false, false);
-                            myIndex++;
-                            opponentIndex++;
-                        }
-                        setTimeout(() => executeBattle(), 800);
-                    }, 800);
-                }
-                addLog(`🎮 Бой начинается!`, 'info');
-                setTimeout(() => executeBattle(), 500);
-            }
-
-            function finishBattle(myWins, opponentWins, opponentName) {
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                let result = '', ratingChange = 0;
-                if (myWins > opponentWins) { result = 'win'; ratingChange = 25; _pvpWins++; }
-                else if (myWins < opponentWins) { result = 'loss'; ratingChange = -25; _pvpLosses++; }
-                else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
-                _pvpRating += ratingChange;
-                if (_pvpRating < 0) _pvpRating = 0;
-                _pvpHistory.unshift({ opponent: opponentName, result: result, ratingChange: ratingChange, date: new Date().toISOString(), myWins: myWins, opponentWins: opponentWins });
-                if (_pvpHistory.length > 20) _pvpHistory.pop();
-                saveGame(); updateUI(); updateArenaUI(); syncPvPToSupabase(); checkAchievements();
-                
-                const logContainer = document.getElementById('battleLog');
-                if (logContainer) {
-                    let resultMessage = result === 'win' ? `🏆 ПОБЕДА! ${myWins}:${opponentWins} +${ratingChange} рейтинга! 🏆` : result === 'loss' ? `💔 ПОРАЖЕНИЕ! ${myWins}:${opponentWins} ${ratingChange} рейтинга 💔` : `🤝 НИЧЬЯ! ${myWins}:${opponentWins}`;
-                    logContainer.innerHTML += `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
-                }
-                
-                // Добавляем кнопку закрытия, если её ещё нет
-                const modalContent = document.querySelector('.battle-modal-content');
-                const buttonsContainer = document.querySelector('.battle-buttons');
-                
-                if (modalContent && !document.getElementById('battleCloseBtn')) {
-                    // Если нет контейнера кнопок, создаём его
-                    let container = buttonsContainer;
-                    if (!container) {
-                        container = document.createElement('div');
-                        container.className = 'battle-buttons';
-                        modalContent.appendChild(container);
-                    }
-                    
-                    const closeBtn = document.createElement('button');
-                    closeBtn.id = 'battleCloseBtn';
-                    closeBtn.className = 'battle-close-btn';
-                    closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
-                    closeBtn.onclick = () => { 
-                        if (battleModalDiv) battleModalDiv.remove(); 
-                    };
-                    container.appendChild(closeBtn);
-                }
-            }
-
-            function skipBattleAnimation() {
-                if (battleAnimationInterval) clearInterval(battleAnimationInterval);
-                const myCards = getTop3Cards();
-                const opponentCardsElements = document.querySelectorAll('.opponent-card');
-                const myCardsElements = document.querySelectorAll('.my-card');
-                let myPower = 0, opponentPower = 0;
-                myCardsElements.forEach(card => { myPower += parseInt(card.dataset.power); });
-                opponentCardsElements.forEach(card => { opponentPower += parseInt(card.dataset.power); });
-                let result = '', ratingChange = 0;
-                if (myPower > opponentPower) { result = 'win'; ratingChange = 25; _pvpWins++; }
-                else if (myPower < opponentPower) { result = 'loss'; ratingChange = -25; _pvpLosses++; }
-                else { result = 'draw'; ratingChange = 0; _pvpDraws++; }
-                const opponentName = document.querySelector('.battle-opponent strong')?.innerText || 'Соперник';
-                _pvpRating += ratingChange;
-                if (_pvpRating < 0) _pvpRating = 0;
-                _pvpHistory.unshift({ opponent: opponentName, result: result, ratingChange: ratingChange, date: new Date().toISOString(), myWins: myPower > opponentPower ? 3 : myPower < opponentPower ? 0 : 1, opponentWins: myPower > opponentPower ? 0 : myPower < opponentPower ? 3 : 1 });
-                if (_pvpHistory.length > 20) _pvpHistory.pop();
-                saveGame(); updateUI(); updateArenaUI(); syncPvPToSupabase();
-                const logContainer = document.getElementById('battleLog');
-                if (logContainer) {
-                    let resultMessage = result === 'win' ? `🏆 ПОБЕДА! ${myPower}:${opponentPower} +${ratingChange} рейтинга! 🏆` : result === 'loss' ? `💔 ПОРАЖЕНИЕ! ${myPower}:${opponentPower} ${ratingChange} рейтинга 💔` : `🤝 НИЧЬЯ! ${myPower}:${opponentPower}`;
-                    logContainer.innerHTML = `<div class="battle-log-entry result ${result}">${resultMessage}</div>`;
-                }
-                const buttonsContainer = document.querySelector('.battle-buttons');
-                if (buttonsContainer) {
-                    const skipBtn = document.getElementById('battleSkipBtn');
-                    if (skipBtn) skipBtn.style.display = 'none';
-                    if (!document.getElementById('battleCloseBtn')) {
-                        const closeBtn = document.createElement('button');
-                        closeBtn.id = 'battleCloseBtn';
-                        closeBtn.className = 'battle-close-btn';
-                        closeBtn.innerHTML = '✖ ЗАКРЫТЬ';
-                        closeBtn.onclick = () => { if (battleModalDiv) battleModalDiv.remove(); };
-                        buttonsContainer.appendChild(closeBtn);
-                    }
-                }
-            }
-
-            async function syncPvPToSupabase() {
-                if (!supabaseClient || !_playerId || !_playerName) return;
-                try {
-                    const league = getLeagueByRating(_pvpRating);
-                    const { error } = await supabaseClient.from('pvp_rating').upsert({
-                        player_id: _playerId,
-                        username: _playerName,
-                        rating: _pvpRating,
-                        wins: _pvpWins,
-                        losses: _pvpLosses,
-                        draws: _pvpDraws,
-                        league_name: league.name,
-                        league_icon: league.icon,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
-                    
-                    if (error) console.warn('syncPvP error:', error);
-                } catch(e) { console.warn('syncPvP error:', e); }
-            }
-
-            function updateArenaUI() {
-                const league = getLeagueByRating(_pvpRating);
-                document.getElementById('arenaLeagueIcon').innerText = league.icon;
-                document.getElementById('arenaLeagueName').innerText = league.name;
-                document.getElementById('arenaRatingValue').innerText = _pvpRating;
-                document.getElementById('arenaWinsValue').innerText = _pvpWins;
-                document.getElementById('arenaLossesValue').innerText = _pvpLosses;
-                document.getElementById('arenaDrawsValue').innerText = _pvpDraws;
-                const historyContainer = document.getElementById('arenaHistoryList');
-                if (historyContainer) {
-                    if (!_pvpHistory.length) historyContainer.innerHTML = '<li style="justify-content:center;">— Нет боёв —</li>';
-                    else historyContainer.innerHTML = _pvpHistory.slice(0, 10).map(h => { const date = new Date(h.date).toLocaleDateString(); const resultText = h.result === 'win' ? '✅ Победа' : h.result === 'loss' ? '❌ Поражение' : '🤝 Ничья'; return `<li><span>${date} vs ${escapeHtml(h.opponent)}</span><span>${resultText} ${h.ratingChange > 0 ? '+' : ''}${h.ratingChange}</span></li>`; }).join('');
-                }
-            }
-
-            async function loadPvPData() {
-                if (!supabaseClient || !_playerId) return;
-                try {
-                    const { data } = await supabaseClient.from('pvp_rating').select('*').eq('player_id', _playerId).single();
-                    if (data) { _pvpRating = data.rating || 0; _pvpWins = data.wins || 0; _pvpLosses = data.losses || 0; _pvpDraws = data.draws || 0; updateArenaUI(); }
-                } catch(e) { console.warn('loadPvPData error:', e); }
-            }
 
             function updateUI() {
                 document.getElementById('oreValue').innerText = Math.floor(_ore);
@@ -3550,7 +2968,6 @@
                 updateExchangeGrid();
                 updatePickaxeVisual();
                 updateMiningInProfile();
-                updateArenaUI();
                 updatePetUI();
             }
             
@@ -3565,7 +2982,6 @@
                     hasPet: _hasPet, petLevel: _petLevel,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
-                    pvpRating: _pvpRating, pvpWins: _pvpWins, pvpLosses: _pvpLosses, pvpDraws: _pvpDraws, pvpHistory: _pvpHistory
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3588,11 +3004,6 @@
                         _lastChestTime = d.lastChestTime || null;
                         _totalStrikesEver = d.totalStrikesEver || 0;
                         _mbProfileLink = d.mbProfileLink || null;
-                        _pvpRating = d.pvpRating || 0;
-                        _pvpWins = d.pvpWins || 0;
-                        _pvpLosses = d.pvpLosses || 0;
-                        _pvpDraws = d.pvpDraws || 0;
-                        _pvpHistory = d.pvpHistory || [];
                         _hasPet = d.hasPet || false;
                         _petLevel = d.petLevel || 1;
 
@@ -3610,8 +3021,6 @@
                 checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
                 loadSettings(); applyTheme(getCurrentTheme());
                 updateProfileLinkUI();
-                loadPvPData();
-                updateTopCardsInDB();
                 checkAdminCommands();
                 updateSectionLocks();
             }
@@ -3645,8 +3054,8 @@
                 _strikesDone++;
                 _totalStrikesEver++;
                 
-                // Прогрессивный шанс: растёт от 0% до 3% (после 60 ударов достигает 3%)
-                let chestChancePercent = Math.min(3, Math.floor(_totalStrikesEver / 20));
+                // Прогрессивный шанс: первые 30 ударов 0%, потом 1-3%
+                let chestChancePercent = _totalStrikesEver < 30 ? 0 : Math.min(3, Math.floor((_totalStrikesEver - 30) / 20));
                 const chestChance = Math.random() * 100;
                 
                 if (chestChance < chestChancePercent && isChestAvailable() && !_pendingChest) {
@@ -3654,7 +3063,7 @@
                     document.getElementById('chestModal').classList.add('show');
                     showToast("🎁 ВАМ ВЫПАЛ СУНДУК! 🎁", "#ffd966");
                 }
-                
+                            
                 showToast(`⛏️ +${gain} руды`, "#ffdd99"); 
                 saveGame(); 
                 updateUI();
@@ -3664,7 +3073,6 @@
                 
                 document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
                 setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
-                checkChest();
             };
             
             window.claimBonus = function() {
@@ -3768,7 +3176,6 @@
                     if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
-                    if (tab === 'arena') { updateArenaUI(); loadPvPData(); }
                 };
             });
             
@@ -3787,7 +3194,6 @@
             document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
-            document.getElementById('arenaBattleBtn')?.addEventListener('click', () => startBattle());
             document.getElementById('buyPetBtn')?.addEventListener('click', () => buyPet());
             document.getElementById('upgradePetBtn')?.addEventListener('click', () => showPetUpgradeModal());
             document.getElementById('petModalCloseBtn')?.addEventListener('click', () => closePetUpgradeModal());
