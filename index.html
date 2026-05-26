@@ -2437,7 +2437,7 @@
                     return `<div class="quest-item"><div><div>${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div><div>${q.desc} (${cur}/${q.target})</div><div style="background:#2a3a2a; border-radius:20px; height:4px; width:100%; margin-top:5px;"><div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div></div></div><div>+${q.reward}💎</div></div>`;
                 }).join('');
             }
-            
+                        
             function checkCalendarReset() {
                 const now = new Date();
                 const todayStr = now.toDateString();
@@ -2447,8 +2447,9 @@
                 
                 // Если календарь ещё не активирован и уровень >= 5
                 if (!_lastCalendarDate && _level >= 5) {
+                    // ПОЛНОСТЬЮ ОЧИЩАЕМ ВСЁ
                     _lastCalendarDate = now.toISOString();
-                    _calendarClaimed = {};
+                    _calendarClaimed = {};  // ← Очищаем
                     
                     // Автоматически выдаём награду за 1 день
                     const firstDayReward = calendarRewards[0];
@@ -2467,18 +2468,11 @@
                         showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
                     }
                     
-                    _calendarClaimed[1] = true;
+                    _calendarClaimed[1] = true;  // ← Отмечаем 1 день
                     showToast("📅 Календарь активирован! Награда за 1 день выдана автоматически!", "#aaffdd");
                     
                     localStorage.setItem('minebuff_last_visit', todayStr);
                     saveGame();
-                    // Добавьте в конец checkCalendarReset() перед updateCalendarUI():
-                    console.log('📅 Календарь:', {
-                        startDate: _lastCalendarDate,
-                        claimedDays: Object.keys(_calendarClaimed),
-                        lastClaimedDay: getLastClaimedDay(),
-                        currentDay: getCurrentCalendarDay()
-                    });
                     updateCalendarUI();
                     return;
                 }
@@ -2491,7 +2485,6 @@
                 
                 // Проверка пропуска дня (только если календарь активирован)
                 if (_lastCalendarDate) {
-                    // Проверяем, заходил ли игрок вчера
                     if (lastVisitDate) {
                         const lastDate = new Date(lastVisitDate);
                         const today = new Date(todayStr);
@@ -2499,7 +2492,7 @@
                         
                         // Если пропущен хотя бы 1 день — ПОЛНЫЙ СБРОС
                         if (diffDays > 1) {
-                            // Полностью очищаем календарь
+                            // ПОЛНОСТЬЮ ОЧИЩАЕМ КАЛЕНДАРЬ
                             _calendarClaimed = {};
                             _lastCalendarDate = now.toISOString();
                             
@@ -3006,6 +2999,16 @@
                         _mbProfileLink = d.mbProfileLink || null;
                         _hasPet = d.hasPet || false;
                         _petLevel = d.petLevel || 1;
+
+                        // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
+                        if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
+                            // Если есть дни больше 1, но нет 1 дня — сбрасываем
+                            if (!_calendarClaimed[1] && Object.keys(_calendarClaimed).length > 0) {
+                                console.log('Обнаружен битый календарь, сбрасываем...');
+                                _calendarClaimed = {};
+                                _lastCalendarDate = null;
+                            }
+                        }
 
                     } catch(e) {}
                 }
