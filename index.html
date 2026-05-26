@@ -1915,6 +1915,7 @@
             let _lastChestTime = null;
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
+            let _totalStrikesEver = 0;
 
             let _pvpRating = 0;
             let _pvpWins = 0;
@@ -2411,7 +2412,7 @@
                 if (!_lastChestTime) return true;
                 const now = Date.now();
                 const minutesSinceLast = (now - _lastChestTime) / (1000 * 60);
-                return minutesSinceLast >= 120; // кулдаун 30 минут
+                return minutesSinceLast >= 30; // кулдаун 30 минут
             }
 
             function openChest() {
@@ -3335,7 +3336,7 @@
                     cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
-                    lastChestTime: _lastChestTime,
+                    lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver,
                     hasPet: _hasPet, petLevel: _petLevel,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
@@ -3360,6 +3361,7 @@
                         _calendarClaimed = d.calendarClaimed || {};
                         _lastCalendarDate = d.lastCalendarDate;
                         _lastChestTime = d.lastChestTime || null;
+                        _totalStrikesEver = d.totalStrikesEver || 0;
                         _mbProfileLink = d.mbProfileLink || null;
                         _pvpRating = d.pvpRating || 0;
                         _pvpWins = d.pvpWins || 0;
@@ -3407,14 +3409,21 @@
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
 
             window.mineOre = function() {
-                if (_strikesDone >= _strikesLimit) { showToast("⛔ Лимит ударов", "#ff8c6e"); return; }
+                if (_strikesDone >= _strikesLimit) { 
+                    showToast("⛔ Лимит ударов", "#ff8c6e"); 
+                    return; 
+                }
+                
                 const gain = getOrePerClick(); 
                 _ore += gain; 
                 _strikesDone++;
-
-                // Шанс выпадения сундука: 3% с каждым ударом (если кулдаун прошёл)
+                _totalStrikesEver++;
+                
+                // Прогрессивный шанс: растёт от 0% до 3% (после 60 ударов достигает 3%)
+                let chestChancePercent = Math.min(3, Math.floor(_totalStrikesEver / 20));
                 const chestChance = Math.random() * 100;
-                if (chestChance < 3 && isChestAvailable() && !_pendingChest) { // 3% шанс
+                
+                if (chestChance < chestChancePercent && isChestAvailable() && !_pendingChest) {
                     _pendingChest = { isOpened: false };
                     document.getElementById('chestModal').classList.add('show');
                     showToast("🎁 ВАМ ВЫПАЛ СУНДУК! 🎁", "#ffd966");
@@ -3426,6 +3435,7 @@
                 updateQuestProgress('daily_mine', gain); 
                 updateQuestProgress('daily_strikes', 1);
                 checkAchievements();
+                
                 document.getElementById('pickaxeBtn').style.transform = 'scale(0.92)';
                 setTimeout(() => document.getElementById('pickaxeBtn').style.transform = '', 90);
                 checkChest();
