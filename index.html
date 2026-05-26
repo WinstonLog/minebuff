@@ -2713,7 +2713,6 @@
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    const topCards = getTop3Cards();
                     const cardsForDb = _cardHistory.map(card => ({
                         rank: card.rank,
                         text: card.text,
@@ -2727,7 +2726,6 @@
                         diamonds: _diamonds,
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
-                        top_cards: JSON.stringify(topCards),  // ← ДОБАВЬ ЭТО
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                 } catch(e) { console.warn('syncToSupabase error:', e); }
@@ -3381,6 +3379,6 @@
             setInterval(() => { checkDailyReset(); updateUI(); checkAdminCommands(); }, 30000);
         })();
     </script>
-    <script src="admin.js"></script>
+    <!-- <script src="admin.js"></script> -->
 </body>
 </html>
