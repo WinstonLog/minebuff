@@ -1246,6 +1246,20 @@
         .modal .progress-fill {
             transition: width 0.3s ease;
         }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .lock-icon {
+            margin-left: auto;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .menu-item[style*="opacity: 0.6"]:active {
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -1943,6 +1957,34 @@
                 upgradeCost: 25
             };
 
+            // Блокировка разделов по уровню
+            const sectionLevelRequirements = {
+                'profile': 1,
+                'pets': 3,
+                'calendar': 5,
+                'mine': 1,
+                'arena': 5,
+                'exchange': 2,
+                'shop': 2,
+                'top': 1,
+                'info': 1,
+                'settings': 1
+            };
+
+            // Названия разделов для уведомлений
+            const sectionNames = {
+                'profile': 'Профиль',
+                'pets': 'Питомцы',
+                'calendar': 'Календарь',
+                'mine': 'Шахта',
+                'arena': 'Арена',
+                'exchange': 'Обмен',
+                'shop': 'Магазин',
+                'top': 'Топ игроков',
+                'info': 'Инфо',
+                'settings': 'Настройки'
+            };
+
             function loadSettings() {
                 const saved = localStorage.getItem('minebuff_settings');
                 if (saved) {
@@ -2092,6 +2134,65 @@
                     if (upgradeContainer) upgradeContainer.style.display = 'none';
                 }
             }
+
+            function isSectionUnlocked(sectionId) {
+                const requiredLevel = sectionLevelRequirements[sectionId];
+                if (!requiredLevel) return true; // если раздела нет в списке - открыт
+                return _level >= requiredLevel;
+            }
+
+            function tryOpenSection(sectionId, panelId) {
+                if (!isSectionUnlocked(sectionId)) {
+                    const requiredLevel = sectionLevelRequirements[sectionId];
+                    const sectionName = sectionNames[sectionId] || sectionId;
+                    showToast(`🔒 Раздел "${sectionName}" откроется на ${requiredLevel} уровне!`, "#ffaa88");
+                    return false;
+                }
+                
+                // Переключаем активный таб
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(panelId).classList.add('active');
+                
+                // Обновляем активный пункт меню
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.tab === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
+                
+                return true;
+            }
+
+            function updateSectionLocks() {
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    const sectionId = item.dataset.tab;
+                    if (!sectionId) return;
+                    
+                    const isUnlocked = isSectionUnlocked(sectionId);
+                    const lockSpan = item.querySelector('.lock-icon');
+                    
+                    if (!isUnlocked) {
+                        // Добавляем иконку замка, если её нет
+                        if (!lockSpan) {
+                            const lockIcon = document.createElement('span');
+                            lockIcon.className = 'lock-icon';
+                            lockIcon.style.marginLeft = 'auto';
+                            lockIcon.style.fontSize = '14px';
+                            lockIcon.style.opacity = '0.7';
+                            lockIcon.innerText = '🔒';
+                            item.appendChild(lockIcon);
+                        }
+                        item.style.opacity = '0.6';
+                    } else {
+                        // Убираем замок, если он есть
+                        if (lockSpan) lockSpan.remove();
+                        item.style.opacity = '1';
+                    }
+                });
+            }
+
+
 
             function saveSettings() {
                 const settings = {
@@ -2600,13 +2701,17 @@
             
             function checkCalendarReset() {
                 const now = new Date();
+                const todayStr = now.toDateString();
+                
+                // Получаем сохранённую дату последнего входа (если есть)
+                const lastVisitDate = localStorage.getItem('minebuff_last_visit');
                 
                 // Если календарь ещё не активирован и уровень >= 5
                 if (!_lastCalendarDate && _level >= 5) {
                     _lastCalendarDate = now.toISOString();
                     _calendarClaimed = {};
                     
-                    // АВТОМАТИЧЕСКИ ВЫДАЁМ НАГРАДУ ЗА 1 ДЕНЬ
+                    // Автоматически выдаём награду за 1 день
                     const firstDayReward = calendarRewards[0];
                     if (firstDayReward.type === 'diamonds') {
                         _diamonds += firstDayReward.amount;
@@ -2623,10 +2728,18 @@
                         showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
                     }
                     
-                    _calendarClaimed[1] = true; // Отмечаем 1 день как полученный
+                    _calendarClaimed[1] = true;
                     showToast("📅 Календарь активирован! Награда за 1 день выдана автоматически!", "#aaffdd");
                     
+                    localStorage.setItem('minebuff_last_visit', todayStr);
                     saveGame();
+                    // Добавьте в конец checkCalendarReset() перед updateCalendarUI():
+                    console.log('📅 Календарь:', {
+                        startDate: _lastCalendarDate,
+                        claimedDays: Object.keys(_calendarClaimed),
+                        lastClaimedDay: getLastClaimedDay(),
+                        currentDay: getCurrentCalendarDay()
+                    });
                     updateCalendarUI();
                     return;
                 }
@@ -2637,39 +2750,45 @@
                     return;
                 }
                 
-                // Проверка пропуска дня
+                // Проверка пропуска дня (только если календарь активирован)
                 if (_lastCalendarDate) {
-                    const lastClaimedDay = getLastClaimedDay();
-                    const currentDay = getCurrentCalendarDay();
-                    
-                    // Если пропустили день
-                    if (lastClaimedDay > 0 && currentDay > lastClaimedDay + 1) {
-                        _calendarClaimed = {};
-                        _lastCalendarDate = now.toISOString();
+                    // Проверяем, заходил ли игрок вчера
+                    if (lastVisitDate) {
+                        const lastDate = new Date(lastVisitDate);
+                        const today = new Date(todayStr);
+                        const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
                         
-                        // Снова выдаём награду за 1 день
-                        const firstDayReward = calendarRewards[0];
-                        if (firstDayReward.type === 'diamonds') {
-                            _diamonds += firstDayReward.amount;
-                            showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
-                        } else if (firstDayReward.type === 'ore') {
-                            _ore += firstDayReward.amount;
-                            showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
-                        } else if (firstDayReward.type === 'card') {
-                            _cardHistory.unshift({ 
-                                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                                text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
-                                rank: firstDayReward.rank 
-                            });
-                            showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
+                        // Если пропущен хотя бы 1 день — ПОЛНЫЙ СБРОС
+                        if (diffDays > 1) {
+                            // Полностью очищаем календарь
+                            _calendarClaimed = {};
+                            _lastCalendarDate = now.toISOString();
+                            
+                            // Выдаём награду за 1 день заново
+                            const firstDayReward = calendarRewards[0];
+                            if (firstDayReward.type === 'diamonds') {
+                                _diamonds += firstDayReward.amount;
+                                showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
+                            } else if (firstDayReward.type === 'ore') {
+                                _ore += firstDayReward.amount;
+                                showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
+                            } else if (firstDayReward.type === 'card') {
+                                _cardHistory.unshift({ 
+                                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                                    text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
+                                    rank: firstDayReward.rank 
+                                });
+                                showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
+                            }
+                            
+                            _calendarClaimed[1] = true;
+                            showToast("📅 Вы пропустили день! Календарь полностью сброшен. Награда за 1 день выдана!", "#ffaa88");
+                            saveGame();
                         }
-                        
-                        _calendarClaimed[1] = true;
-                        showToast("📅 Прогресс календаря сброшен. Награда за 1 день выдана!", "#ffaa88");
-                        saveGame();
                     }
                 }
                 
+                localStorage.setItem('minebuff_last_visit', todayStr);
                 updateCalendarUI();
             }
 
@@ -2696,7 +2815,7 @@
                 for (let i = 1; i <= 30; i++) {
                     if (_calendarClaimed[i]) lastDay = i;
                 }
-                return lastDay === 0 ? null : lastDay;
+                return lastDay;
             }
 
             function claimCalendarReward(day) {
@@ -3494,8 +3613,9 @@
                 loadPvPData();
                 updateTopCardsInDB();
                 checkAdminCommands();
+                updateSectionLocks();
             }
-            
+
             function showNameModal() {
                 const modal = document.getElementById('nameModal');
                 modal.style.display = 'flex';
@@ -3575,9 +3695,14 @@
             window.performUpgrade = function() {
                 const cost = getLevelUpCost(_level);
                 if (_diamonds >= cost) {
-                    _diamonds -= cost; _level++; _lastUpgradeDate = new Date();
+                    _diamonds -= cost; 
+                    _level++; 
+                    _lastUpgradeDate = new Date();
                     updateQuestProgress('daily_upgrade', 1);
-                    saveGame(); updateUI(); showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
+                    saveGame(); 
+                    updateUI(); 
+                    updateSectionLocks(); // ← ДОБАВИТЬ ЭТУ СТРОКУ
+                    showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
                     if (supabaseClient) syncToSupabase();
                     checkAchievements();
                 } else showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
@@ -3617,9 +3742,8 @@
             menuItems.forEach(item => {
                 item.onclick = () => {
                     const tab = item.dataset.tab;
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    
+                    // Определяем ID панели
                     let panelId = '';
                     if (tab === 'mine') panelId = 'minePanel';
                     else if (tab === 'profile') panelId = 'profilePanel';
@@ -3631,8 +3755,15 @@
                     else if (tab === 'info') panelId = 'infoPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
                     else if (tab === 'pets') panelId = 'petsPanel';
-                    if (panelId) document.getElementById(panelId).classList.add('active');
+                    
+                    if (panelId) {
+                        // Пытаемся открыть раздел с проверкой уровня
+                        tryOpenSection(tab, panelId);
+                    }
+                    
                     sideMenu.classList.remove('show');
+                    
+                    // Дополнительные действия при открытии
                     if (tab === 'top') loadTopFromSupabase();
                     if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'calendar') updateCalendarUI();
