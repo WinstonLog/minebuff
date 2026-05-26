@@ -2290,6 +2290,9 @@
                 } else if (reward.type === 'card') {
                     _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank });
                     showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966");
+                    
+                    // ✅ ДОБАВИТЬ ЭТУ СТРОКУ:
+                    updateQuestProgress('daily_card', 1);
                 }
                 
                 _lastChestTime = Date.now();
@@ -2586,7 +2589,9 @@
                 }
                 else if (reward.type === 'card') { 
                     _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (календарь, день ${day})`, rank: reward.rank }); 
-                    showToast(`✨ КАРТА ${reward.rank} (день ${day})!`, "#ffd966"); 
+                    showToast(`✨ КАРТА ${reward.rank} (день ${day})!`, "#ffd966");
+                    
+                    updateQuestProgress('daily_card', 1);
                 }
                 
                 _calendarClaimed[day] = true;
