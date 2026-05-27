@@ -2474,7 +2474,7 @@
                 if (day !== 3) {
                     return { available: false, reason: 'Сундук Q доступен только по средам!' };
                 }
-                if (hours < 8 || hours >= 24) {
+                if (hours < 8 || hours >= 23) {
                     return { available: false, reason: 'Сундук Q доступен с 8:00 до 23:00 по средам!' };
                 }
                 
@@ -2496,12 +2496,12 @@
                 }
                 
                 // Проверка алмазов
-                if (_diamonds < 0) {
+                if (_diamonds < 100) {
                     showToast("❌ Нужно 100 алмазов для открытия сундука Q!", "#ff8888");
                     return;
                 }
                 
-                _diamonds -= 0;
+                _diamonds -= 100;
                 
                 // Определяем, что выпадет: Q-ранг (20%) или E-ранг (80%)
                 const isFRank = Math.random() < 0.2;
