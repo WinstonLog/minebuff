@@ -1627,6 +1627,16 @@
             </div>
         </div>
 
+        <!-- Календарь -->
+        <div class="tab-panel" id="calendarPanel">
+            <div class="calendar-panel">
+                <div class="calendar-title">📅 ЕЖЕДНЕВНЫЙ КАЛЕНДАРЬ</div>
+                <div class="calendar-subtitle">Заходи каждый день и получай награды!</div>
+                <div id="calendarList" class="calendar-list"></div>
+                <div id="calendarMessage" class="calendar-message"></div>
+            </div>
+        </div>
+
         <!-- Настройки -->
         <div class="tab-panel" id="settingsPanel">
             <div class="game-panel">
@@ -2450,9 +2460,16 @@
                     return false;
                 }
                 
+                // Добавьте проверку существования элемента
+                const targetPanel = document.getElementById(panelId);
+                if (!targetPanel) {
+                    console.error(`Панель ${panelId} не найдена!`);
+                    return false;
+                }
+                
                 // Переключаем активный таб
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-                document.getElementById(panelId).classList.add('active');
+                targetPanel.classList.add('active');
                 
                 // Обновляем активный пункт меню
                 document.querySelectorAll('.menu-item').forEach(item => {
@@ -2464,7 +2481,6 @@
                 
                 return true;
             }
-
             function updateSectionLocks() {
                 document.querySelectorAll('.menu-item').forEach(item => {
                     const sectionId = item.dataset.tab;
@@ -3724,7 +3740,6 @@
                     else if (tab === 'calendar') panelId = 'calendarPanel';
                     else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
-                    else if (tab === 'arena') panelId = 'arenaPanel';
                     else if (tab === 'info') panelId = 'infoPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
                     else if (tab === 'pets') panelId = 'petsPanel';
