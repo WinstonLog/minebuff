@@ -2248,10 +2248,23 @@
                 
                 const card = reward.card;
                 nameEl.innerHTML = card.name;
-                imgEl.src = `f_${card.id}.png`; 
+                
+                // ПРАВИЛЬНЫЙ ПУТЬ К ИЗОБРАЖЕНИЮ
+                const imagePath = `cards/f_${card.id}.png`;
+                console.log('Загрузка изображения:', imagePath); // для отладки
+                
+                imgEl.src = imagePath;
                 imgEl.style.display = 'block';
                 imgContainer.innerHTML = '';
                 imgContainer.appendChild(imgEl);
+                
+                // Обработчик ошибки загрузки
+                imgEl.onerror = function() {
+                    console.error('Не удалось загрузить изображение:', imagePath);
+                    imgEl.style.display = 'none';
+                    imgContainer.innerHTML = '<span style="font-size: 48px;">🎴</span><div style="font-size: 12px; color: #ff8888;">Изображение не найдено</div>';
+                };
+                
                 statusEl.innerHTML = reward.isDuplicate ? '🔄 Дубликат! +7 💎' : '✨ НОВАЯ КАРТА! ✨';
                 
                 modal.style.display = 'flex';
@@ -2265,7 +2278,6 @@
                 };
             }
 
-            // Функция для показа модального окна из коллекции
             function showCollectionCardModal(cardName, imageSrc) {
                 const modal = document.getElementById('collectionCardModal');
                 const imgEl = document.getElementById('collectionCardImg');
@@ -2278,10 +2290,17 @@
                 
                 nameEl.innerHTML = cardName;
                 rankEl.innerHTML = 'F';
+                
                 imgEl.src = imageSrc;
                 imgEl.style.display = 'block';
                 imgContainer.innerHTML = '';
                 imgContainer.appendChild(imgEl);
+                
+                imgEl.onerror = function() {
+                    console.error('Не удалось загрузить:', imageSrc);
+                    imgEl.style.display = 'none';
+                    imgContainer.innerHTML = '<span style="font-size: 48px;">🎴</span><div style="font-size: 10px;">Нет изображения</div>';
+                };
                 
                 modal.style.display = 'flex';
                 
@@ -2321,7 +2340,7 @@
                     if (isCollected) {
                         cardDiv.innerHTML = `
                             <div class="collection-f-image-container">
-                                <img class="collection-f-image" src="f_${card.id}.png" alt="${card.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' fill=\'%232a3a3a\'/%3E%3Ctext x=\'40\' y=\'45\' text-anchor=\'middle\' fill=\'%23ffcc66\' font-size=\'12\'%3E🎴%3C/text%3E%3C/svg%3E'">
+                                <img class="collection-f-image" src="cards/f_${card.id}.png" alt="${card.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' fill=\'%232a3a3a\'/%3E%3Ctext x=\'40\' y=\'45\' text-anchor=\'middle\' fill=\'%23ffcc66\' font-size=\'12\'%3E🎴%3C/text%3E%3C/svg%3E'">
                                 <div class="collection-f-rank-corner">F</div>
                             </div>
                             <div class="collection-f-name">${card.name}</div>
@@ -2342,7 +2361,7 @@
                     
                     if (isCollected) {
                         cardDiv.addEventListener('click', () => {
-                            showCollectionCardModal(card.name, `f_${card.id}.png`);
+                            showCollectionCardModal(card.name, `cards/f_${card.id}.png`);
                         });
                     }
                     
@@ -3059,6 +3078,7 @@
                         else if (a.id === 'rank_miner') completed = _level >= 5;
                         else if (a.id === 'rank_miner_master') completed = _level >= 10;
                         else if (a.id === 'rank_ore_baron') completed = _level >= 50;
+                        else if (a.id === 'rank_king') completed = _level >= 75;
                         else if (a.id === 'rank_legend') completed = _level >= 100;
                         // ========== НОВЫЕ ДОСТИЖЕНИЯ ==========
                         else if (a.id === 'f_collector_6') {
@@ -3716,6 +3736,7 @@
                 updateProfileLinkUI();
                 checkAdminCommands();
                 updateSectionLocks();
+                checkRankUpgrade();
             }
 
             function checkRankUpgrade() {
@@ -3813,7 +3834,8 @@
                     updateQuestProgress('daily_upgrade', 1);
                     saveGame(); 
                     updateUI(); 
-                    updateSectionLocks(); // ← ДОБАВИТЬ ЭТУ СТРОКУ
+                    updateSectionLocks();
+                    checkRankUpgrade();
                     showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
                     if (supabaseClient) syncToSupabase();
                     checkAchievements();
