@@ -2119,9 +2119,9 @@
                 { id: 'rank_legend', name: 'Живая легенда', desc: 'Достичь максимального 100 уровня', reward: 200 },
                 
                 // Q-коллекция
-                { id: 'q_collector_6', name: 'Охотник за редкостями', desc: 'Собрать 6 карт Q-ранга', reward: 15 },
-                { id: 'q_collector_12', name: 'Мастер коллекции', desc: 'Собрать 12 карт Q-ранга', reward: 30 },
-                { id: 'q_collector_24', name: 'Абсолютный коллекционер', desc: 'Собрать все 24 карты Q-ранга', reward: 100 },
+                { id: 'q_collector_12', name: 'Охотник за редкостями', desc: 'Собрать 12 карт Q-ранга', reward: 15 },
+                { id: 'q_collector_25', name: 'Мастер коллекции', desc: 'Собрать 25 карт Q-ранга', reward: 30 },
+                { id: 'q_collector_50', name: 'Абсолютный коллекционер', desc: 'Собрать все 50 карты Q-ранга', reward: 100 },
                 
                 // Питомец
                 { id: 'pet_level_5', name: 'Преданный дух', desc: 'Питомец 5 уровня', reward: 10 },
@@ -3371,17 +3371,17 @@
                         else if (a.id === 'rank_king') completed = _level >= 75;
                         else if (a.id === 'rank_legend') completed = _level >= 100;
                         // ========== НОВЫЕ ДОСТИЖЕНИЯ ==========
-                        else if (a.id === 'q_collector_6') {
+                        else if (a.id === 'q_collector_12') {
                             const collectedCount = Object.keys(_collectedCards).length;
                             completed = collectedCount >= 6;
                         }
-                        else if (a.id === 'q_collector_12') {
+                        else if (a.id === 'q_collector_25') {
                             const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 12;
+                            completed = collectedCount >= 25;
                         }
-                        else if (a.id === 'q_collector_24') {
+                        else if (a.id === 'q_collector_50') {
                             const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 24;
+                            completed = collectedCount >= 50;
                         }
                         else if (a.id === 'pet_level_5') {
                             completed = _hasPet && _petLevel >= 5;
