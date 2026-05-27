@@ -1114,27 +1114,6 @@
             font-weight: bold;
         }
 
-        .filter-bar-f {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .filter-btn-f {
-            background: rgba(0, 0, 0, 0.4);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 12px;
-            color: #fff;
-            cursor: pointer;
-            transition: 0.1s;
-            white-space: nowrap;
-        }
-
         .filter-btn-f.active {
             background: linear-gradient(135deg, #3a6b58, #1e3e31);
             color: #ffcc66;
@@ -1330,6 +1309,153 @@
                 font-size: 8px;
             }
         }
+
+        /* Анимация переворота карты */
+        @keyframes cardFlip {
+            0% {
+                transform: rotateY(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: rotateY(90deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        .card-flip-animation {
+            animation: cardFlip 0.5s ease-in-out;
+        }
+
+        /* Стили для модального окна с переворотом */
+        .f-card-modal .modal-content,
+        .collection-card-modal .modal-content {
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .f-card-modal .flip-container,
+        .collection-card-modal .flip-container {
+            perspective: 1000px;
+        }
+
+        .f-card-modal .flipper,
+        .collection-card-modal .flipper {
+            transition: 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .f-card-modal .front,
+        .f-card-modal .back,
+        .collection-card-modal .front,
+        .collection-card-modal .back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .f-card-modal .back,
+        .collection-card-modal .back {
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            border-radius: 20px;
+        }
+
+        .f-card-modal .front,
+        .collection-card-modal .front {
+            z-index: 2;
+        }
+
+        .flip-card {
+            transform: rotateY(180deg);
+        }
+
+        /* Уведомления */
+        .notification-toast {
+            background: linear-gradient(135deg, #1a2a2f, #0f1a1f);
+            border-left: 4px solid #ffcc66;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+            max-width: 350px;
+            margin-left: auto;
+        }
+
+        .notification-toast:hover {
+            transform: translateX(-5px);
+            transition: transform 0.2s;
+        }
+
+        .notification-toast.warning {
+            border-left-color: #ff4444;
+        }
+
+        .notification-toast.success {
+            border-left-color: #44ff44;
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #ffcc66;
+        }
+
+        .notification-text {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .notification-time {
+            font-size: 10px;
+            opacity: 0.5;
+            margin-top: 4px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1341,6 +1467,10 @@
                 <div class="burger-line"></div>
                 <div class="burger-line"></div>
             </div>
+        </div>
+        <div id="dbErrorBanner" style="display: none; background: linear-gradient(135deg, #ff4444, #990000); color: white; text-align: center; padding: 10px; margin-bottom: 12px; border-radius: 20px; font-size: 12px; animation: pulse 1s infinite;">
+            ⚠️ СЕРВЕР ВРЕМЕННО НЕДОСТУПЕН ⚠️<br>
+            <span style="font-size: 10px; opacity: 0.8;">Данные сохраняются локально. Скоро всё заработает!</span>
         </div>
 
         <div class="side-menu" id="sideMenu">
@@ -1933,6 +2063,10 @@
         </div>
     </div>
 
+    <!-- Контейнер для уведомлений -->
+    <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
+    </div>
+
     <script>
         (function() {
             let supabaseClient = null;
@@ -2076,6 +2210,14 @@
 
             let _particlesEnabled = true;
 
+            let dbErrorCount = 0;
+            let dbErrorBanner = null;
+
+            // ========== СИСТЕМА УВЕДОМЛЕНИЙ ==========
+            let notificationInterval = null;
+            let lastNotificationCheck = null;
+
+
             // ========== ПИТОМЕЦ ==========
             let _hasPet = false;          // есть ли питомец
             let _petLevel = 1;            // уровень питомца (1-10)
@@ -2111,7 +2253,6 @@
                 'pets': 'Питомцы',
                 'calendar': 'Календарь',
                 'mine': 'Шахта',
-                'arena': 'Арена',
                 'exchange': 'Обмен',
                 'shop': 'Магазин',
                 'top': 'Топ игроков',
@@ -2128,6 +2269,130 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            function showNotification(title, text, icon = '🔔', type = 'info') {
+                const container = document.getElementById('notificationContainer');
+                if (!container) return;
+                
+                const notification = document.createElement('div');
+                notification.className = `notification-toast ${type === 'warning' ? 'warning' : (type === 'success' ? 'success' : '')}`;
+                notification.innerHTML = `
+                    <div class="notification-icon">${icon}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-text">${text}</div>
+                        <div class="notification-time">только что</div>
+                    </div>
+                `;
+                
+                notification.onclick = () => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                };
+                
+                container.appendChild(notification);
+                
+                // Автоматически скрыть через 8 секунд
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.animation = 'slideOutRight 0.3s ease';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 8000);
+            }
+            
+            function checkAndSendNotifications() {
+                const now = new Date();
+                const lastCheck = lastNotificationCheck ? new Date(lastNotificationCheck) : null;
+                
+                // Проверяем сундук F (только по средам с 8:00 до 23:00)
+                const fChestAvail = isFChestAvailable();
+                const fChestKey = `notif_fchest_${now.toDateString()}`;
+                if (fChestAvail.available && !localStorage.getItem(fChestKey)) {
+                    showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук F доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
+                    localStorage.setItem(fChestKey, 'true');
+                }
+                
+                // Проверяем сброс ударов (когда удары обнулились в новом дне)
+                const strikesResetKey = `notif_strikes_${now.toDateString()}`;
+                const lastReset = localStorage.getItem('minebuff_last_reset');
+                
+                // Уведомление только если сегодня новый день И удары обнулились
+                if (!localStorage.getItem(strikesResetKey) && lastReset === now.toDateString() && _strikesDone === 0) {
+                    showNotification('⚡ УДАРЫ ОБНОВЛЕНЫ', `У вас ${_strikesLimit} новых ударов! Заходите в шахту!`, '⛏️', 'success');
+                    localStorage.setItem(strikesResetKey, 'true');
+                }
+                
+                // Проверяем ежедневный бонус
+                const dailyBonusKey = `notif_bonus_${now.toDateString()}`;
+                const today = now.toDateString();
+                if (!localStorage.getItem(dailyBonusKey) && (!_lastBonusDate || _lastBonusDate.toDateString() !== today)) {
+                    showNotification('🎁 ЕЖЕДНЕВНЫЙ БОНУС', 'Не забудьте забрать +5💎 в шахте!', '💎', 'info');
+                    localStorage.setItem(dailyBonusKey, 'true');
+                }
+                
+                // ДОПОЛНИТЕЛЬНО: проверяем, что сундук F скоро закроется
+                const hours = now.getHours();
+                const day = now.getDay();
+                const closingKey = `notif_fchest_closing_${now.toDateString()}`;
+                if (day === 3 && hours >= 22 && hours < 23 && !localStorage.getItem(closingKey)) {
+                    showNotification('⚠️ СУНДУК F СКОРО ЗАКРОЕТСЯ', 'Остался 1 час! Успейте открыть!', '⏰', 'warning');
+                    localStorage.setItem(closingKey, 'true');
+                }
+                
+                // ДОПОЛНИТЕЛЬНО: проверяем, что удары почти закончились
+                const strikesLowKey = `notif_strikes_low_${now.toDateString()}`;
+                const remainingStrikes = _strikesLimit - _strikesDone;
+                if (!localStorage.getItem(strikesLowKey) && remainingStrikes <= 10 && remainingStrikes > 0 && _strikesDone > 0) {
+                    showNotification('⚡ МАЛО УДАРОВ', `Осталось ${remainingStrikes} ударов! Заходите в шахту!`, '⛏️', 'warning');
+                    localStorage.setItem(strikesLowKey, 'true');
+                }
+                
+                lastNotificationCheck = now.toISOString();
+            }
+
+            // Запускаем проверку уведомлений каждые 10 минут
+            function startNotificationChecker() {
+                if (notificationInterval) clearInterval(notificationInterval);
+                
+                // Проверяем сразу при загрузке
+                setTimeout(() => checkAndSendNotifications(), 5000);
+                
+                // Проверяем каждые 10 минут
+                notificationInterval = setInterval(() => {
+                    checkAndSendNotifications();
+                }, 600000); // 10 минут
+            }
+
+            // Проверка при переключении вкладки (когда пользователь возвращается)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    checkAndSendNotifications();
+                }
+            });
+
+            function showDBError() {
+                dbErrorCount++;
+                if (!dbErrorBanner) {
+                    dbErrorBanner = document.getElementById('dbErrorBanner');
+                }
+                if (dbErrorBanner) {
+                    dbErrorBanner.style.display = 'block';
+                    // Автоматически скрываем после 10 секунд, если больше нет ошибок
+                    setTimeout(() => {
+                        if (dbErrorCount < 3) {
+                            dbErrorBanner.style.display = 'none';
+                        }
+                    }, 10000);
+                }
+            }
+
+            function hideDBError() {
+                dbErrorCount = 0;
+                if (dbErrorBanner) {
+                    dbErrorBanner.style.display = 'none';
+                }
             }
 
             function getCurrentRank() {
@@ -2251,12 +2516,23 @@
                 
                 // ПРАВИЛЬНЫЙ ПУТЬ К ИЗОБРАЖЕНИЮ
                 const imagePath = `cards/f_${card.id}.png`;
-                console.log('Загрузка изображения:', imagePath); // для отладки
                 
-                imgEl.src = imagePath;
-                imgEl.style.display = 'block';
-                imgContainer.innerHTML = '';
-                imgContainer.appendChild(imgEl);
+                // АНИМАЦИЯ ПЕРЕВОРОТА
+                imgEl.style.opacity = '0';
+                imgEl.style.transform = 'rotateY(90deg)';
+                imgEl.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    imgEl.src = imagePath;
+                    imgEl.style.display = 'block';
+                    imgContainer.innerHTML = '';
+                    imgContainer.appendChild(imgEl);
+                    
+                    setTimeout(() => {
+                        imgEl.style.opacity = '1';
+                        imgEl.style.transform = 'rotateY(0deg)';
+                    }, 50);
+                }, 150);
                 
                 // Обработчик ошибки загрузки
                 imgEl.onerror = function() {
@@ -2277,7 +2553,6 @@
                     if (e.target === modal) modal.style.display = 'none';
                 };
             }
-
             function showCollectionCardModal(cardName, imageSrc) {
                 const modal = document.getElementById('collectionCardModal');
                 const imgEl = document.getElementById('collectionCardImg');
@@ -2368,35 +2643,6 @@
                     gridContainer.appendChild(cardDiv);
                 });
                 checkAchievements(); 
-            }
-
-            // Функция для показа модального окна с картой F
-            function showFCardModal(cardName, imageSrc) {
-                const modal = document.getElementById('fCardModal');
-                const imgEl = document.getElementById('fCardImg');
-                const nameEl = document.getElementById('fCardName');
-                const statusEl = document.getElementById('fCardStatus');
-                const closeBtn = document.getElementById('closeFCardModalBtn');
-                
-                if (!modal) return;
-                
-                nameEl.innerHTML = cardName;
-                imgEl.src = imageSrc;
-                imgEl.style.display = 'block';
-                imgEl.onerror = () => {
-                    imgEl.style.display = 'none';
-                    document.getElementById('fCardImage').innerHTML = '<span style="font-size: 48px;">🎴</span>';
-                };
-                statusEl.innerHTML = '✨ Карта из коллекции F ✨';
-                
-                modal.style.display = 'flex';
-                
-                closeBtn.onclick = () => {
-                    modal.style.display = 'none';
-                };
-                modal.onclick = (e) => {
-                    if (e.target === modal) modal.style.display = 'none';
-                };
             }
 
             // Получить бонус питомца в процентах
@@ -3426,7 +3672,13 @@
                         cards_json: cardsForDb,
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
-                } catch(e) { console.warn('syncToSupabase error:', e); }
+                    
+                    hideDBError(); // Скрываем баннер при успехе
+                    
+                } catch(e) { 
+                    console.warn('syncToSupabase error:', e);
+                    showDBError(); // Показываем баннер при ошибке
+                }
             }
             
             async function getPlayerCards(playerId) {
@@ -3714,7 +3966,6 @@
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
                             // Если есть дни больше 1, но нет 1 дня — сбрасываем
                             if (!_calendarClaimed[1] && Object.keys(_calendarClaimed).length > 0) {
-                                console.log('Обнаружен битый календарь, сбрасываем...');
                                 _calendarClaimed = {};
                                 _lastCalendarDate = null;
                             }
@@ -3737,6 +3988,7 @@
                 checkAdminCommands();
                 updateSectionLocks();
                 checkRankUpgrade();
+                startNotificationChecker();
             }
 
             function checkRankUpgrade() {
