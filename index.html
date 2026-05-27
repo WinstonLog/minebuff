@@ -1742,7 +1742,7 @@
         <!-- КОЛЛЕКЦИЯ F-РАНГА -->
         <div class="tab-panel" id="collectionPanel">
             <div class="collection-q-panel">
-                <!-- СУНДУК F - НАВЕРХУ -->
+                <!-- СУНДУК Q - НАВЕРХУ -->
                 <div style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #ffaa33;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <div style="font-size: 48px;">📦</div>
@@ -1766,9 +1766,9 @@
                 
                 <!-- ИНФОРМАЦИОННЫЙ БЛОК (ПРИЖАТ К НИЗУ) -->
                 <div class="collection-q-info">
-                    🎴 <strong>F-ранг</strong> — эксклюзивные коллекционные карты.<br>
-                    💰 Дубликаты F-ранга превращаются в +7💎<br>
-                    📦 Сундук F доступен по <strong>средам с 8:00 до 23:00</strong>
+                    🎴 <strong>Q-ранг</strong> — эксклюзивные коллекционные карты.<br>
+                    💰 Дубликаты Q-ранга превращаются в +7💎<br>
+                    📦 Сундук Q доступен по <strong>средам с 8:00 до 23:00</strong>
                 </div>
             </div>
         </div>
@@ -1997,7 +1997,7 @@
                 <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">🎴 КАРТА КОЛЛЕКЦИИ</div>
             </div>
             <div style="padding: 24px 20px;">
-                <div id="collectionCardImage" style="width: 179px; height: 280px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <div id="collectionCardImage" style="width: 200px; height: 300px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     <img id="collectionCardImg" src="" alt="Карта" style="width: 100%; height: 100%; object-fit: contain; display: none;">
                 </div>
                 <div id="collectionCardName" style="font-size: 18px; font-weight: bold; color: #ffcc66; margin-bottom: 8px;">Название карты</div>
@@ -2053,7 +2053,7 @@
                 <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">🎴 НОВАЯ КАРТА!</div>
             </div>
             <div style="padding: 24px 20px;">
-                <div id="fCardImage" style="width: 179px; height: 280px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <div id="fCardImage" style="width: 200px; height: 300px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     <img id="fCardImg" src="" alt="Карта" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                 </div>
                 <div id="fCardName" style="font-size: 18px; font-weight: bold; color: #ffcc66; margin-bottom: 8px;">Название карты</div>
@@ -2235,7 +2235,7 @@
 
             // Переменные для коллекции F-ранга
             let _collectedCards = {}; // { cardId: true }
-            let _lastFChanceTime = null; // время последнего шанса на сундук F
+            let _lastFChanceTime = null; // время последнего шанса на сундук Q
 
             let _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0, _strikesLimit = 100;
             let _lastBonusDate = null, _lastUpgradeDate = null, _cardHistory = [];
@@ -2350,11 +2350,11 @@
                 const now = new Date();
                 const lastCheck = lastNotificationCheck ? new Date(lastNotificationCheck) : null;
                 
-                // Проверяем сундук F (только по средам с 8:00 до 23:00)
+                // Проверяем сундук Q (только по средам с 8:00 до 23:00)
                 const fChestAvail = isFChestAvailable();
                 const fChestKey = `notiq_fchest_${now.toDateString()}`;
                 if (fChestAvail.available && !localStorage.getItem(fChestKey)) {
-                    showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук F доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
+                    showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук Q доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
                     localStorage.setItem(fChestKey, 'true');
                 }
                 
@@ -2376,12 +2376,12 @@
                     localStorage.setItem(dailyBonusKey, 'true');
                 }
                 
-                // ДОПОЛНИТЕЛЬНО: проверяем, что сундук F скоро закроется
+                // ДОПОЛНИТЕЛЬНО: проверяем, что сундук Q скоро закроется
                 const hours = now.getHours();
                 const day = now.getDay();
                 const closingKey = `notiq_fchest_closing_${now.toDateString()}`;
                 if (day === 3 && hours >= 22 && hours < 23 && !localStorage.getItem(closingKey)) {
-                    showNotification('⚠️ СУНДУК F СКОРО ЗАКРОЕТСЯ', 'Остался 1 час! Успейте открыть!', '⏰', 'warning');
+                    showNotification('⚠️ СУНДУК Q СКОРО ЗАКРОЕТСЯ', 'Остался 1 час! Успейте открыть!', '⏰', 'warning');
                     localStorage.setItem(closingKey, 'true');
                 }
                 
