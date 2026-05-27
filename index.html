@@ -169,7 +169,7 @@
 
         .stat-label {
             font-size: 10px;
-            color: #9bbfd0;
+            color: #fff;
         }
 
         .stat-value {
@@ -908,7 +908,7 @@
         .stat-label {
             font-size: 14px;
             font-weight: 500;
-            color: #9bbfd0;
+            color: #fff;
             text-transform: uppercase;
         }
 
@@ -1129,7 +1129,7 @@
             border-radius: 30px;
             font-weight: 600;
             font-size: 12px;
-            color: #9bbfd0;
+            color: #fff;
             cursor: pointer;
             transition: 0.1s;
             white-space: nowrap;
@@ -1370,6 +1370,7 @@
                     <div class="stat-card"><div class="stat-label">⭐</div><div class="stat-value" id="levelValue">1</div></div>
                 </div>
 
+
                 <div class="player-info">
                     <span>👤 <span id="playerName" class="player-name">—</span></span>
                     <span>🆔 <span id="playerId" class="player-id">—</span></span>
@@ -1385,6 +1386,11 @@
                 </div>
 
                 <div class="strikes-counter">💥 УДАРОВ: <span id="strikesDone">0</span> / <span id="strikesLimit">100</span></div>
+
+                <div class="player-info" style="margin-top: 8px; background: linear-gradient(135deg, #3a6b58, #1e3e31);">
+                    <span>🏅 <span id="mineRankName">Новичок</span></span>
+                    <span>📈 +<span id="mineRankBonus">0</span>%</span>
+                </div> 
 
                 <button class="upgrade-pickaxe-btn" id="upgradePickaxeBtn">🔧 УЛУЧШИТЬ КИРКУ</button>
 
@@ -1423,6 +1429,16 @@
                     <div class="stat-card" style="background: #3a6b58cc;">
                         <div class="stat-label">⛏️</div>
                         <div class="stat-value" id="profileMining"><span id="minOreProfile">5</span>-<span id="maxOreProfile">9</span></div>
+                    </div>
+                </div>
+                <div class="stats" style="margin-bottom: 12px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ffaa33, #cc8833);">
+                        <div class="stat-label">🏅 РАНГ</div>
+                        <div class="stat-value" style="font-size: 18px;" id="rankDisplay">Новичок</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">📈 БОНУС</div>
+                        <div class="stat-value" id="rankBonusDisplay">0%</div>
                     </div>
                 </div>
                 <div class="cards-stats" id="cardsStats"></div>
@@ -1468,7 +1484,7 @@
                 <!-- ВКЛАДКИ МАГАЗИНА -->
                 <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 60px; padding: 4px;">
                     <button id="shopGoodsTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: #ffcc66; border: none;">📦 ТОВАРЫ</button>
-                    <button id="shopDonateTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #9bbfd0; border: none;">💳 ПОПОЛНЕНИЕ</button>
+                    <button id="shopDonateTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #fff; border: none;">💳 ПОПОЛНЕНИЕ</button>
                 </div>
                 
                 <!-- ТОВАРЫ -->
@@ -1946,8 +1962,9 @@
             ];
 
             const achievementsList = [
-                { id: 'level_5', name: 'Новичок', desc: '5 уровень', reward: 3 },
-                { id: 'level_10', name: 'Шахтёр', desc: '10 уровень', reward: 5 },
+                // СУЩЕСТВУЮЩИЕ (оставляем)
+                { id: 'level_5', name: 'Первые шаги', desc: '5 уровень', reward: 3 },
+                { id: 'level_10', name: 'Опытный шахтёр', desc: '10 уровень', reward: 5 },
                 { id: 'level_25', name: 'Профи', desc: '25 уровень', reward: 8 },
                 { id: 'level_50', name: 'Мастер', desc: '50 уровень', reward: 12 },
                 { id: 'cards_5', name: 'Коллекционер', desc: '5 карт', reward: 2 },
@@ -1958,7 +1975,23 @@
                 { id: 'diamonds_50', name: 'Блеск', desc: '50 алмазов', reward: 2 },
                 { id: 'diamonds_200', name: 'Сияние', desc: '200 алмазов', reward: 5 },
                 { id: 'strikes_500', name: 'Трудяга', desc: '500 ударов', reward: 3 },
-                { id: 'seasonal_collector', name: 'Хранитель времени', desc: 'Собрать все сезонные карты (V, L, H, N)', reward: 50 }
+                { id: 'seasonal_collector', name: 'Хранитель времени', desc: 'Собрать все сезонные карты (V, L, H, N)', reward: 50 },
+                
+                // ========== НОВЫЕ ДОСТИЖЕНИЯ ЗА РАНГИ (УНИКАЛЬНЫЕ НАЗВАНИЯ) ==========
+                { id: 'rank_miner', name: 'В глубь земли', desc: 'Достичь ранга Шахтёр (5 уровень)', reward: 10 },
+                { id: 'rank_miner_master', name: 'Повелитель породы', desc: 'Достичь ранга Горняк (10 уровень)', reward: 20 },
+                { id: 'rank_ore_baron', name: 'Кровавый барон', desc: 'Достичь ранга Барон руды (50 уровень)', reward: 50 },
+                { id: 'rank_king', name: 'Монарх недр', desc: 'Достичь ранга Король шахты (75 уровень)', reward: 100 },
+                { id: 'rank_legend', name: 'Живая легенда', desc: 'Достичь максимального 100 уровня', reward: 200 },
+                
+                // F-коллекция
+                { id: 'f_collector_6', name: 'Охотник за редкостями', desc: 'Собрать 6 карт F-ранга', reward: 15 },
+                { id: 'f_collector_12', name: 'Мастер коллекции', desc: 'Собрать 12 карт F-ранга', reward: 30 },
+                { id: 'f_collector_24', name: 'Абсолютный коллекционер', desc: 'Собрать все 24 карты F-ранга', reward: 100 },
+                
+                // Питомец
+                { id: 'pet_level_5', name: 'Преданный дух', desc: 'Питомец 5 уровня', reward: 10 },
+                { id: 'pet_level_10', name: 'Легендарный хранитель', desc: 'Питомец максимального 10 уровня', reward: 25 }
             ];
 
             const questsList = [
@@ -2011,6 +2044,17 @@
                 { id: 6, name: 'Начало F-ранга', image: 'f_6.png' }
             ];
 
+            // ========== СИСТЕМА РАНГОВ/ЗВАНИЙ ==========
+            const rankTitles = [
+                { minLevel: 1, maxLevel: 4, name: 'Новичок', icon: '🪨', bonus: 0 },
+                { minLevel: 5, maxLevel: 9, name: 'Шахтёр', icon: '⛏️', bonus: 2 },
+                { minLevel: 10, maxLevel: 24, name: 'Горняк', icon: '🔥', bonus: 5 },
+                { minLevel: 25, maxLevel: 49, name: 'Мастер рудника', icon: '💎', bonus: 10 },
+                { minLevel: 50, maxLevel: 74, name: 'Барон руды', icon: '🎩', bonus: 15 },
+                { minLevel: 75, maxLevel: 99, name: 'Король шахты', icon: '👑', bonus: 20 },
+                { minLevel: 100, maxLevel: 100, name: 'Легенда', icon: '🏆', bonus: 30 }
+            ];
+
             // Переменные для коллекции F-ранга
             let _collectedCards = {}; // { cardId: true }
             let _lastFChanceTime = null; // время последнего шанса на сундук F
@@ -2025,6 +2069,8 @@
             let _calendarClaimed = {};
             let _lastCalendarDate = null;
             let _totalStrikesEver = 0;
+
+            let _lastRank = null;
             
             let _mbProfileLink = null;
 
@@ -2084,6 +2130,32 @@
                 updateSettingsUI();
             }
 
+            function getCurrentRank() {
+                for (const rank of rankTitles) {
+                    if (_level >= rank.minLevel && _level <= rank.maxLevel) {
+                        return rank;
+                    }
+                }
+                return rankTitles[0]; // Новичок по умолчанию
+            }
+
+            function getRankBonusPercent() {
+                return getCurrentRank().bonus;
+            }
+
+            function updateRankUI() {
+                const currentRank = getCurrentRank();
+                const rankName = document.getElementById('rankDisplay');
+                const rankBonus = document.getElementById('rankBonusDisplay');
+                const mineRankName = document.getElementById('mineRankName');
+                const mineRankBonus = document.getElementById('mineRankBonus');
+                
+                if (rankName) rankName.innerHTML = `${currentRank.icon} ${currentRank.name}`;
+                if (rankBonus) rankBonus.innerHTML = `+${currentRank.bonus}%`;
+                if (mineRankName) mineRankName.innerHTML = `${currentRank.icon} ${currentRank.name}`;
+                if (mineRankBonus) mineRankBonus.innerHTML = currentRank.bonus;
+            }
+
             function isFChestAvailable() {
                 const now = new Date();
                 const day = now.getDay(); // 0 - воскресенье, 3 - среда
@@ -2115,12 +2187,12 @@
                 }
                 
                 // Проверка алмазов
-                if (_diamonds < 150) {
-                    showToast("❌ Нужно 150 алмазов для открытия сундука F!", "#ff8888");
+                if (_diamonds < 100) {
+                    showToast("❌ Нужно 100 алмазов для открытия сундука F!", "#ff8888");
                     return;
                 }
                 
-                _diamonds -= 150;
+                _diamonds -= 100;
                 
                 // Определяем, что выпадет: F-ранг (20%) или E-ранг (80%)
                 const isFRank = Math.random() < 0.2;
@@ -2276,6 +2348,7 @@
                     
                     gridContainer.appendChild(cardDiv);
                 });
+                checkAchievements(); 
             }
 
             // Функция для показа модального окна с картой F
@@ -2371,7 +2444,6 @@
                 document.getElementById('petUpgradeModal').classList.add('show');
             }
 
-            // Выполнить повышение уровня питомца
             function performPetUpgrade() {
                 if (!_hasPet) {
                     showToast("❌ У вас нет питомца!", "#ff8888");
@@ -2395,6 +2467,7 @@
                     saveGame();
                     updateUI();
                     updatePetUI();
+                    checkAchievements();  // ← ДОБАВИТЬ ЭТУ СТРОКУ
                     document.getElementById('petUpgradeModal').classList.remove('show');
                 } else {
                     showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c");
@@ -2680,7 +2753,14 @@
                 let maxOre = 9 + bonus + pickBonus;
                 let oreGain = Math.floor(Math.random() * (maxOre - minOre + 1) + minOre);
                 if (isEventActive()) oreGain *= 2;
-                                
+                
+                // Бонус от ранга
+                const rankBonusPercent = getRankBonusPercent();
+                if (rankBonusPercent > 0) {
+                    const rankMultiplier = 1 + rankBonusPercent / 100;
+                    oreGain = Math.floor(oreGain * rankMultiplier);
+                }
+                
                 // Бонус от питомца
                 const petMultiplier = getPetMultiplier();
                 oreGain = Math.round(oreGain * petMultiplier);
@@ -2976,7 +3056,37 @@
                             const hasN = _cardHistory.some(c => c.rank === 'N');
                             completed = hasV && hasL && hasH && hasN;
                         }
-                        if (completed) { _achievements[a.id] = true; _diamonds += a.reward; any = true; showToast(`🏆 ${a.name}! +${a.reward}💎`, "#ffcc66"); }
+                        else if (a.id === 'rank_miner') completed = _level >= 5;
+                        else if (a.id === 'rank_miner_master') completed = _level >= 10;
+                        else if (a.id === 'rank_ore_baron') completed = _level >= 50;
+                        else if (a.id === 'rank_legend') completed = _level >= 100;
+                        // ========== НОВЫЕ ДОСТИЖЕНИЯ ==========
+                        else if (a.id === 'f_collector_6') {
+                            const collectedCount = Object.keys(_collectedCards).length;
+                            completed = collectedCount >= 6;
+                        }
+                        else if (a.id === 'f_collector_12') {
+                            const collectedCount = Object.keys(_collectedCards).length;
+                            completed = collectedCount >= 12;
+                        }
+                        else if (a.id === 'f_collector_24') {
+                            const collectedCount = Object.keys(_collectedCards).length;
+                            completed = collectedCount >= 24;
+                        }
+                        else if (a.id === 'pet_level_5') {
+                            completed = _hasPet && _petLevel >= 5;
+                        }
+                        else if (a.id === 'pet_level_10') {
+                            completed = _hasPet && _petLevel >= 10;
+                        }
+                        
+                        if (completed) { 
+                            _achievements[a.id] = true; 
+                            _diamonds += a.reward; 
+                            any = true; 
+                            showToast(`🏆 ${a.name}! +${a.reward}💎`, "#ffcc66"); 
+                        }
+
                     }
                 }
                 if (any) { saveGame(); updateUI(); }
@@ -3361,17 +3471,17 @@
                             
                             <div style="display: flex; gap: 12px; margin: 12px 0;">
                                 <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 8px; text-align: center;">
-                                    <div style="font-size: 10px; color: #9bbfd0;">⭐ УРОВЕНЬ</div>
+                                    <div style="font-size: 10px; color: #fff;">⭐ УРОВЕНЬ</div>
                                     <div style="font-size: 24px; font-weight: bold; color: #ffcc66;">${data.level || 1}</div>
                                 </div>
                                 <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 8px; text-align: center;">
-                                    <div style="font-size: 10px; color: #9bbfd0;">🎴 ВСЕГО КАРТ</div>
+                                    <div style="font-size: 10px; color: #fff;">🎴 ВСЕГО КАРТ</div>
                                     <div style="font-size: 24px; font-weight: bold; color: #ffcc66;">${data.totalCards || 0}</div>
                                 </div>
                             </div>
                             
                             <div style="margin-top: 8px;">
-                                <div style="font-size: 12px; color: #9bbfd0; margin-bottom: 8px; text-align: center;">📊 КОЛЛЕКЦИЯ КАРТ</div>
+                                <div style="font-size: 12px; color: #fff; margin-bottom: 8px; text-align: center;">📊 КОЛЛЕКЦИЯ КАРТ</div>
                                 <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-height: 250px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 20px;">
                                     ${data.cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>'}
                                 </div>
@@ -3537,6 +3647,7 @@
                 updateMiningInProfile();
                 updatePetUI();
                 updateCollectionUI();
+                updateRankUI(); 
             }
             
             function saveGame() {
@@ -3548,7 +3659,7 @@
                     pickaxeLevel: _pickaxeLevel,
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver,
                     collectedCards: _collectedCards, lastFChanceTime: _lastFChanceTime,
-                    hasPet: _hasPet, petLevel: _petLevel,
+                    hasPet: _hasPet, petLevel: _petLevel, lastRank: _lastRank,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                 };
@@ -3577,6 +3688,7 @@
                         _petLevel = d.petLevel || 1;
                         _collectedCards = d.collectedCards || {};
                         _lastFChanceTime = d.lastFChanceTime || null;
+                        _lastRank = d.lastRank || null;
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
@@ -3604,6 +3716,17 @@
                 updateProfileLinkUI();
                 checkAdminCommands();
                 updateSectionLocks();
+            }
+
+            function checkRankUpgrade() {
+            const currentRank = getCurrentRank();
+            // Сохраняем предыдущий ранг в отдельную переменную
+            if (!_lastRank) _lastRank = currentRank.name;
+
+            if (_lastRank !== currentRank.name) {
+                _lastRank = currentRank.name;
+                showToast(`🏆 НОВЫЙ РАНГ: ${currentRank.icon} ${currentRank.name}! +${currentRank.bonus}% к добыче! 🏆`, "#ffd966");
+            }
             }
 
             function showNameModal() {
@@ -3883,7 +4006,7 @@
                     shopGoodsTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
                     shopGoodsTab.style.color = '#ffcc66';
                     shopDonateTab.style.background = 'transparent';
-                    shopDonateTab.style.color = '#9bbfd0';
+                    shopDonateTab.style.color = '#fff';
                     shopGoodsContent.style.display = 'block';
                     shopDonateContent.style.display = 'none';
                 };
@@ -3892,7 +4015,7 @@
                     shopDonateTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)';
                     shopDonateTab.style.color = '#ffcc66';
                     shopGoodsTab.style.background = 'transparent';
-                    shopGoodsTab.style.color = '#9bbfd0';
+                    shopGoodsTab.style.color = '#fff';
                     shopDonateContent.style.display = 'block';
                     shopGoodsContent.style.display = 'none';
                 };
