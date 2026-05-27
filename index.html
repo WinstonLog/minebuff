@@ -2352,14 +2352,22 @@
                 
                 // Проверяем сундук F (только по средам с 8:00 до 23:00)
                 const fChestAvail = isFChestAvailable();
+<<<<<<< HEAD
                 const fChestKey = `notiq_fchest_${now.toDateString()}`;
+=======
+                const fChestKey = `notif_fchest_${now.toDateString()}`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 if (fChestAvail.available && !localStorage.getItem(fChestKey)) {
                     showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук F доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
                     localStorage.setItem(fChestKey, 'true');
                 }
                 
                 // Проверяем сброс ударов (когда удары обнулились в новом дне)
+<<<<<<< HEAD
                 const strikesResetKey = `notiq_strikes_${now.toDateString()}`;
+=======
+                const strikesResetKey = `notif_strikes_${now.toDateString()}`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 const lastReset = localStorage.getItem('minebuff_last_reset');
                 
                 // Уведомление только если сегодня новый день И удары обнулились
@@ -2369,7 +2377,11 @@
                 }
                 
                 // Проверяем ежедневный бонус
+<<<<<<< HEAD
                 const dailyBonusKey = `notiq_bonus_${now.toDateString()}`;
+=======
+                const dailyBonusKey = `notif_bonus_${now.toDateString()}`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 const today = now.toDateString();
                 if (!localStorage.getItem(dailyBonusKey) && (!_lastBonusDate || _lastBonusDate.toDateString() !== today)) {
                     showNotification('🎁 ЕЖЕДНЕВНЫЙ БОНУС', 'Не забудьте забрать +5💎 в шахте!', '💎', 'info');
@@ -2379,14 +2391,22 @@
                 // ДОПОЛНИТЕЛЬНО: проверяем, что сундук F скоро закроется
                 const hours = now.getHours();
                 const day = now.getDay();
+<<<<<<< HEAD
                 const closingKey = `notiq_fchest_closing_${now.toDateString()}`;
+=======
+                const closingKey = `notif_fchest_closing_${now.toDateString()}`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 if (day === 3 && hours >= 22 && hours < 23 && !localStorage.getItem(closingKey)) {
                     showNotification('⚠️ СУНДУК F СКОРО ЗАКРОЕТСЯ', 'Остался 1 час! Успейте открыть!', '⏰', 'warning');
                     localStorage.setItem(closingKey, 'true');
                 }
                 
                 // ДОПОЛНИТЕЛЬНО: проверяем, что удары почти закончились
+<<<<<<< HEAD
                 const strikesLowKey = `notiq_strikes_low_${now.toDateString()}`;
+=======
+                const strikesLowKey = `notif_strikes_low_${now.toDateString()}`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 const remainingStrikes = _strikesLimit - _strikesDone;
                 if (!localStorage.getItem(strikesLowKey) && remainingStrikes <= 10 && remainingStrikes > 0 && _strikesDone > 0) {
                     showNotification('⚡ МАЛО УДАРОВ', `Осталось ${remainingStrikes} ударов! Заходите в шахту!`, '⛏️', 'warning');
@@ -2559,7 +2579,11 @@
                 nameEl.innerHTML = card.name;
                 
                 // ПРАВИЛЬНЫЙ ПУТЬ К ИЗОБРАЖЕНИЮ
+<<<<<<< HEAD
                 const imagePath = `cards/q_${card.id}.png`;
+=======
+                const imagePath = `cards/f_${card.id}.png`;
+>>>>>>> 2e4c8e0c59a14abaf4156e56576c498e5359d877
                 
                 // АНИМАЦИЯ ПЕРЕВОРОТА
                 imgEl.style.opacity = '0';
