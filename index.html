@@ -460,10 +460,8 @@
             font-weight: bold;
         }
 
-        .card-badge.V { background: linear-gradient(135deg, #ff69b4, #ffc0cb); color: white; text-shadow: 0 0 2px #8b1a4a; }
-        .card-badge.L { background: linear-gradient(135deg, #5bc0ff, #a8e4ff); color: white; text-shadow: 0 0 2px #004466; }
-        .card-badge.H { background: linear-gradient(135deg, #ff6600, #ffaa44); color: white; text-shadow: 0 0 2px #4a1a00; }
-        .card-badge.N { background: linear-gradient(135deg, #e63946, #ff8a8a); color: white; text-shadow: 0 0 2px #660000; }
+        .card-badge.X { background: linear-gradient(135deg, #ff00ff, #cc00cc); color: white; text-shadow: 0 0 3px #ff00ff; box-shadow: 0 0 8px #ff00ff; animation: xPulse 2s infinite; }
+        .card-badge.S { background: linear-gradient(135deg, #ffcc00, #ff9900); color: #1a1a2e; text-shadow: none; font-weight: bold; box-shadow: 0 0 5px #ffcc00; }
         .card-badge.A { background: #5a1a1a; }
         .card-badge.P { background: #102b4e; }
         .card-badge.G { background: #1c4620; }
@@ -471,6 +469,16 @@
         .card-badge.C { background: #b8a35c; }
         .card-badge.D { background: #6e8f9e; }
         .card-badge.E { background: #a17654; }
+        .card-badge.V { background: linear-gradient(135deg, #ff69b4, #ffc0cb); color: white; text-shadow: 0 0 2px #8b1a4a; }
+        .card-badge.L { background: linear-gradient(135deg, #5bc0ff, #a8e4ff); color: white; text-shadow: 0 0 2px #004466; }
+        .card-badge.H { background: linear-gradient(135deg, #ff6600, #ffaa44); color: white; text-shadow: 0 0 2px #4a1a00; }
+        .card-badge.N { background: linear-gradient(135deg, #e63946, #ff8a8a); color: white; text-shadow: 0 0 2px #660000; }
+
+        @keyframes xPulse {
+            0% { box-shadow: 0 0 5px #ff00ff; }
+            50% { box-shadow: 0 0 15px #ff00ff, 0 0 5px #ff00ff; }
+            100% { box-shadow: 0 0 5px #ff00ff; }
+        }
 
         .dropdown-section {
             background: rgba(0, 0, 0, 0.4);
@@ -1005,309 +1013,6 @@
             transform: none;
         }
 
-        .collection-q-panel {
-            background: rgba(8, 18, 28, 0.8);
-            backdrop-filter: blur(12px);
-            border-radius: 40px;
-            padding: 16px;
-            border: 1px solid rgba(80, 140, 180, 0.3);
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .collection-q-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .collection-q-title {
-            font-size: 18px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ffcc66, #ffaa33);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .collection-q-stats {
-            background: #0f1a1fcc;
-            border-radius: 30px;
-            padding: 4px 12px;
-            font-size: 12px;
-            color: #ffdd99;
-            font-weight: bold;
-        }
-
-        .filter-btn-f.active {
-            background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            color: #ffcc66;
-            border: 1px solid #ffcc66;
-        }
-
-        .collection-q-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            overflow-y: auto;
-            padding: 4px;
-            flex: 1;
-            max-height: 400px;
-        }
-
-        .collection-q-info {
-            background: #071217cc;
-            border-radius: 20px;
-            padding: 10px;
-            margin-top: auto;  /* ← прижимает блок к низу */
-            text-align: center;
-            font-size: 11px;
-        }
-
-        /* Базовая карточка */
-        .collection-q-card {
-            background: linear-gradient(135deg, #1a2a2f, #0f1a1f);
-            border-radius: 12px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            border: 1px solid rgba(255, 204, 102, 0.2);
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.1s, border 0.1s;
-        }
-
-        .collection-q-card.collected {
-            border: 2px solid #ffcc66;
-            background: linear-gradient(135deg, #2a3a3a, #1a2a2a);
-        }
-
-        .collection-q-card.missing {
-            opacity: 0.5;
-        }
-
-        .collection-q-card:active {
-            transform: scale(0.96);
-        }
-
-        .collection-q-image-container {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 90px;
-            aspect-ratio: 0.85 / 1.2;
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
-
-        .collection-q-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            background: #2a3a3a;
-            border-radius: 8px;
-        }
-
-        .collection-q-rank-corner {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 2px 5px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 24px;
-            height: 20px;
-            background: linear-gradient(135deg, #ffcc66, #ffaa33);
-            color: #1a1a2e;
-            z-index: 10;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .collection-q-name {
-            font-size: 10px;
-            font-weight: bold;
-            margin: 4px 0 2px;
-            word-break: break-word;
-            color: #ffdd99;
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .collection-q-status {
-            font-size: 9px;
-            color: #88ff88;
-        }
-
-        .collection-q-status.missing {
-            color: #ff8888;
-        }
-
-        .modal-image {
-            max-width: 85vw;
-            max-height: 75vh;
-            object-fit: contain;  /* показывает ВСЁ изображение целиком */
-            background: transparent;
-            border-radius: 12px;
-        }
-        #fCardImg {
-            width: 100%;
-            height: auto;
-            max-height: 70vh;
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        #fCardImage {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-        /* Планшеты (2-3 колонки) */
-        @media (min-width: 400px) and (max-width: 599px) {
-            .collection-q-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .collection-q-image-container {
-                max-width: 90px;
-            }
-            .collection-q-name {
-                font-size: 11px;
-            }
-        }
-
-        /* Десктоп / широкие экраны */
-        @media (min-width: 600px) {
-            .collection-q-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            .collection-q-image-container {
-                max-width: 100px;
-            }
-            .collection-q-name {
-                font-size: 11px;
-            }
-        }
-
-        /* Очень маленькие телефоны (до 400px) */
-        @media (max-width: 399px) {
-            .collection-q-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .collection-q-image-container {
-                max-width: 80px;
-            }
-            .collection-q-name {
-                font-size: 9px;
-            }
-            .collection-q-rank-corner {
-                top: -4px;
-                right: -4px;
-                font-size: 9px;
-                padding: 1px 4px;
-                min-width: 20px;
-                height: 18px;
-            }
-        }
-
-        /* Для телефонов с очень маленькой шириной */
-        @media (max-width: 320px) {
-            .collection-q-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-            }
-            .collection-q-image-container {
-                max-width: 70px;
-            }
-            .collection-q-name {
-                font-size: 8px;
-            }
-        }
-
-        /* Анимация переворота карты */
-        @keyframes cardFlip {
-            0% {
-                transform: rotateY(0deg);
-                opacity: 0;
-            }
-            50% {
-                transform: rotateY(90deg);
-                opacity: 0.5;
-            }
-            100% {
-                transform: rotateY(0deg);
-                opacity: 1;
-            }
-        }
-
-        .card-flip-animation {
-            animation: cardFlip 0.5s ease-in-out;
-        }
-
-        /* Стили для модального окна с переворотом */
-        .f-card-modal .modal-content,
-        .collection-card-modal .modal-content {
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        .f-card-modal .flip-container,
-        .collection-card-modal .flip-container {
-            perspective: 1000px;
-        }
-
-        .f-card-modal .flipper,
-        .collection-card-modal .flipper {
-            transition: 0.6s;
-            transform-style: preserve-3d;
-            position: relative;
-        }
-
-        .f-card-modal .front,
-        .f-card-modal .back,
-        .collection-card-modal .front,
-        .collection-card-modal .back {
-            backface-visibility: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .f-card-modal .back,
-        .collection-card-modal .back {
-            transform: rotateY(180deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #ffcc66, #ffaa33);
-            border-radius: 20px;
-        }
-
-        .f-card-modal .front,
-        .collection-card-modal .front {
-            z-index: 2;
-        }
-
-        .flip-card {
-            transform: rotateY(180deg);
-        }
-
         /* Уведомления */
         .notification-toast {
             background: linear-gradient(135deg, #1a2a2f, #0f1a1f);
@@ -1409,12 +1114,9 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
-                <div class="menu-item" data-tab="collection">🎴 Коллекция<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
-                <div class="menu-item" data-tab="clan">🏰 Клан<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
@@ -1544,10 +1246,14 @@
                             <div style="font-size: 48px;">🎁</div>
                             <div style="flex: 1;">
                                 <div style="font-weight: bold; font-size: 16px;">ТАИНСТВЕННЫЙ СУНДУК</div>
-                                <div style="font-size: 12px; opacity: 0.7;">Случайная карта ранга от E до A!</div>
-<!--                                 <div style="font-size: 11px; margin-top: 4px;">🎴 Шансы: A(1%), P(3%), G(4%), B(7%), C(15%), D(30%), E(40%)</div> -->
+                                    <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">
+                                        🎴 Случайная карта 
+                                        <span style="color: #ff4444; text-shadow: 0 0 3px #ff0000, 0 0 6px #cc0000; font-weight: bold;">A</span>-<span style="color: #ff69b4; text-shadow: 0 0 3px #ff69b4; font-weight: bold;">S</span>-<span style="color: #00ccff; text-shadow: 0 0 3px #00ccff, 0 0 8px #0088ff; font-weight: bold;">X</span> 
+                                        ранга из Популярного тайтла!
+                                    </div>
+                    
                             </div>
-                            <button id="openCardChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 24px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">50💎 ОТКРЫТЬ</button>
+                            <button id="openCardChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 24px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">70💎 ОТКРЫТЬ</button>
                         </div>
                     </div>
                     
@@ -1614,38 +1320,6 @@
             </div> 
         </div> 
 
-        <!-- ПИТОМЕЦ -->
-        <div class="tab-panel" id="petsPanel">
-            <div class="game-panel" style="display: flex; flex-direction: column; min-height: 500px;">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">🐾 ПИТОМЕЦ</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Помощник в шахте, увеличивает добычу руды!</div>
-                
-                <div style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 16px; border: 2px solid #ffcc66;">
-                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                        <div style="font-size: 64px;" id="activePetIcon">🦫</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 18px;" id="activePetName">Дух шахты</div>
-                            <div style="font-size: 12px; opacity: 0.8;" id="activePetBonus">+0% к добыче руды</div>
-                            <div style="font-size: 11px; margin-top: 4px;" id="activePetLevel">Не куплен</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button id="buyPetBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 14px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer; margin-bottom: 12px;">КУПИТЬ ЗА 2000💎</button>
-                
-                <div id="upgradePetContainer" style="display: none;">
-                    <button id="upgradePetBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer; width: 100%;">⬆️ ПОВЫСИТЬ УРОВЕНЬ</button>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 20px; padding: 12px; margin-top: auto; text-align: center; font-size: 11px;">
-                    👻 <strong>Дух шахты</strong><br>
-                    • Начальный бонус: +1% к добыче руды за уровень<br>
-                    • Максимальный уровень: 10 (+10% к добыче)<br>
-                    💡 Повышение уровня: 25💎
-                </div>
-            </div>
-        </div>
-
         <!-- ТОП ИГРОКОВ (только уровни) -->
         <div class="tab-panel" id="topPanel">
             <div class="top-panel game-panel">
@@ -1655,121 +1329,6 @@
                 <ul class="top-list" id="topList"><li style="justify-content: center; opacity: 0.5;">Загрузка...</li></ul>
                 <div id="playerRankBlock" class="player-rank" style="display: none;">📊 Ваше место: <span id="playerRank">—</span></div>
                 <div class="total-players" id="totalPlayersCount"></div>
-            </div>
-        </div>
-
-        <!-- КЛАНЫ -->
-        <div class="tab-panel" id="clanPanel">
-            <div class="game-panel" style="min-height: 500px;">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">🏰 КЛАНЫ</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 16px;">Объединяйтесь с друзьями и собирайте K-ранг!</div>
-                
-                <!-- ЕСЛИ НЕТ КЛАНА - ПОКАЗЫВАЕМ СОЗДАНИЕ/ПОИСК -->
-                <div id="clanNoClanBlock" style="display: block;">
-                    <!-- ПОИСК КЛАНА -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-weight: bold; margin-bottom: 8px;">🔍 ПОИСК КЛАНА</div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <input type="text" id="clanSearchInput" placeholder="Название клана" style="flex: 2; padding: 12px; border-radius: 40px; background: #0f1a1f; border: 1px solid #ffcc66; color: white; font-size: 14px;">
-                            <button id="searchClanBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">🔍 НАЙТИ</button>
-                        </div>
-                        <div id="clanSearchResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto;"></div>
-                    </div>
-                    
-                    <!-- СОЗДАНИЕ КЛАНА -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-weight: bold; margin-bottom: 8px;">✨ СОЗДАТЬ КЛАН</div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <input type="text" id="clanCreateInput" placeholder="Название клана (3-20 символов)" maxlength="20" style="flex: 2; padding: 12px; border-radius: 40px; background: #0f1a1f; border: 1px solid #ffcc66; color: white; font-size: 14px;">
-                            <button id="createClanBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">🚀 СОЗДАТЬ</button>
-                        </div>
-                        <div style="font-size: 11px; opacity: 0.7; margin-top: 6px;">Стоимость создания: <strong style="color: #ffcc66;">500💎</strong> | Максимум 10 участников</div>
-                    </div>
-                </div>
-                
-                <!-- ЕСЛИ ЕСТЬ КЛАН - ПОКАЗЫВАЕМ ИНФОРМАЦИЮ О КЛАНЕ -->
-                <div id="clanHasClanBlock" style="display: none;">
-                    <div id="clanInfoCard" style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 16px; border: 2px solid #ffcc66;">
-                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                            <div style="font-size: 64px;">🏰</div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; font-size: 20px;" id="clanNameDisplay">—</div>
-                                <div style="font-size: 12px; opacity: 0.8;" id="clanRoleDisplay">—</div>
-                                <div style="font-size: 12px; margin-top: 4px;" id="clanMembersCountDisplay">👥 0/10</div>
-                            </div>
-                            <button id="leaveClanBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">❌ ПОКИНУТЬ</button>
-                        </div>
-                    </div>
-                    
-                    <!-- СПИСОК УЧАСТНИКОВ -->
-                    <div style="margin-bottom: 16px;">
-                        <div style="font-weight: bold; margin-bottom: 8px;">👥 УЧАСТНИКИ КЛАНА</div>
-                        <div id="clanMembersList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
-                    </div>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 20px; padding: 12px; text-align: center; font-size: 11px;">
-                    🏰 <strong>О кланах</strong><br>
-                    • Максимум 10 участников в клане<br>
-                    • Клановый сундук K доступен только участникам по средам с 8:00 до 23:00<br>
-                    • Стоимость открытия: 100💎<br>
-                    • K-ранг — эксклюзивная коллекция, 50 карт<br>
-                    • Дубликаты K-ранга превращаются в +7💎
-                </div>
-            </div>
-        </div>
-
-        <!-- КОЛЛЕКЦИЯ Q И K РАНГОВ (ОБЪЕДИНЁННАЯ) -->
-        <div class="tab-panel" id="collectionPanel">
-            <div class="collection-q-panel">
-                
-                <!-- ВКЛАДКИ ДЛЯ ПЕРЕКЛЮЧЕНИЯ МЕЖДУ Q И K -->
-                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 60px; padding: 4px;">
-                    <button id="collectionQTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: #ffcc66; border: none;">🎴 Q-РАНГ</button>
-                    <button id="collectionKTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #fff; border: none;">🏰 K-РАНГ (КЛАН)</button>
-                </div>
-                
-                <!-- СУНДУК Q (обычный) -->
-                <div id="qChestBlock" style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #ffaa33;">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <div style="font-size: 48px;">📦</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 16px;">МИСТИЧЕСКИЙ СУНДУК Q</div>
-                            <div style="font-size: 12px; opacity: 0.7;">Случайная карта Q или E!</div>
-                            <div style="font-size: 11px; margin-top: 4px;">🕐 Доступен по средам с 8:00 до 23:00</div>
-                        </div>
-                        <button id="openQChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">100💎 ОТКРЫТЬ</button>
-                    </div>
-                </div>
-                
-                <!-- СУНДУК K (клановый) -->
-                <div id="kChestBlock" style="display: none; background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #8B0000;">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <div style="font-size: 48px;">🏰</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 16px;">КЛАНОВЫЙ СУНДУК K</div>
-                            <div style="font-size: 12px; opacity: 0.7;">Случайная карта K или E!</div>
-                            <div style="font-size: 11px; margin-top: 4px;">🕐 Доступен по средам с 8:00 до 23:00 | <span id="kChestRequirement">❌ Требуется клан!</span></div>
-                        </div>
-                        <button id="openKChestBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">100💎 ОТКРЫТЬ</button>
-                    </div>
-                </div>
-                
-                <!-- СТАТИСТИКА -->
-                <div class="collection-q-header">
-                    <div class="collection-q-title" id="collectionTitle">🎴 КОЛЛЕКЦИЯ Q-РАНГА</div>
-                    <div class="collection-q-stats" id="collectionProgress">0/50</div>
-                </div>
-                
-                <!-- СЕТКА КАРТ -->
-                <div id="collectionGrid" class="collection-q-grid"></div>
-                
-                <!-- ИНФОРМАЦИОННЫЙ БЛОК -->
-                <div class="collection-q-info" id="collectionInfo">
-                    🎴 <strong>Q-ранг</strong> — эксклюзивные коллекционные карты.<br>
-                    💰 Дубликаты Q-ранга превращаются в +7💎<br>
-                    📦 Сундук Q доступен по <strong>средам с 8:00 до 23:00</strong>
-                </div>
             </div>
         </div>
 
@@ -1990,115 +1549,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для просмотра карты из коллекции -->
-    <div class="collection-card-modal" id="collectionCardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 1px solid #ffcc66;">
-            <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
-                <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">🎴 КАРТА КОЛЛЕКЦИИ</div>
-            </div>
-            <div style="padding: 24px 20px;">
-                <div id="collectionCardImage" style="width: 200px; height: 300px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img id="collectionCardImg" src="" alt="Карта" style="width: 100%; height: 100%; object-fit: contain; display: none;">
-                </div>
-                <div id="collectionCardName" style="font-size: 18px; font-weight: bold; color: #ffcc66; margin-bottom: 8px;">Название карты</div>
-                <div id="collectionCardRank" style="font-size: 14px; background: linear-gradient(135deg, #ffcc66, #ffaa33); display: inline-block; padding: 4px 12px; border-radius: 20px; color: #1a1a2e; font-weight: bold; margin-bottom: 16px;">Q</div>
-                <button id="closeCollectionCardModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для повышения уровня питомца -->
-    <div class="modal" id="petUpgradeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon">🦫</div>
-                <div class="modal-title">ПОВЫШЕНИЕ УРОВНЯ</div>
-            </div>
-            <div class="modal-body">
-                <div class="stat-row">
-                    <span class="stat-label">ТЕКУЩИЙ УРОВЕНЬ</span>
-                    <span class="stat-value" id="petModalCurrentLevel">1</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="petProgressFill" style="width: 10%;"></div>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">СЛЕДУЮЩИЙ УРОВЕНЬ</span>
-                    <span class="stat-value highlight" id="petModalNextLevel">2</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">💎 НУЖНО АЛМАЗОВ</span>
-                    <span class="stat-value" id="petModalCost">25</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">💎 У ВАС</span>
-                    <span class="stat-value" id="petModalDiamonds">0</span>
-                </div>
-                <div class="reward-preview">
-                    <span>✨ При повышении уровня:</span><br>
-                    <span>📈 Бонус к добыче: <span id="petCurrentBonus">1</span>% → <span id="petNextBonus">2</span>%</span>
-                </div>
-            </div>
-            <div class="modal-buttons" style="padding: 0 20px 20px 20px;">
-                <button class="modal-btn close" id="petModalCloseBtn">ЗАКРЫТЬ</button>
-                <button class="modal-btn upgrade" id="petModalUpgradeBtn">УЛУЧШИТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для F-карты (упрощённое) -->
-    <div class="f-card-modal" id="fCardModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 1px solid #ffcc66;">
-            <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
-                <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">🎴 НОВАЯ КАРТА!</div>
-            </div>
-            <div style="padding: 24px 20px;">
-                <div id="fCardImage" style="width: 200px; height: 300px; margin: 0 auto 16px; background: #2a3a3a; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img id="fCardImg" src="" alt="Карта" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                </div>
-                <div id="fCardName" style="font-size: 18px; font-weight: bold; color: #ffcc66; margin-bottom: 8px;">Название карты</div>
-                <div id="fCardStatus" style="font-size: 14px; opacity: 0.8; margin-bottom: 16px;">✨ Новая карта!</div>
-                <button id="closeFCardModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для выхода из клана -->
-    <div class="modal" id="leaveClanConfirmModal">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
-                <div class="modal-icon">🏰</div>
-                <div class="modal-title">ПОКИНУТЬ КЛАН</div>
-            </div>
-            <div class="modal-body">
-                <div id="leaveClanMessage" style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите покинуть клан?</div>
-                <div id="leaveClanWarning" style="font-size: 12px; opacity: 0.7; margin-bottom: 16px;"></div>
-                <div class="modal-buttons" style="gap: 12px;">
-                    <button class="modal-btn close" id="leaveClanCancelBtn">❌ ОТМЕНА</button>
-                    <button class="modal-btn upgrade" id="leaveClanConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">✅ ПОДТВЕРДИТЬ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для удаления клана (лидер) -->
-    <div class="modal" id="deleteClanConfirmModal">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
-                <div class="modal-icon">⚠️</div>
-                <div class="modal-title">УДАЛИТЬ КЛАН</div>
-            </div>
-            <div class="modal-body">
-                <div style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите удалить клан?</div>
-                <div style="font-size: 12px; opacity: 0.7; margin-bottom: 16px;">⚠️ Это действие НЕЛЬЗЯ отменить! Все участники будут выгнаны.</div>
-                <div class="modal-buttons" style="gap: 12px;">
-                    <button class="modal-btn close" id="deleteClanCancelBtn">❌ ОТМЕНА</button>
-                    <button class="modal-btn upgrade" id="deleteClanConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">🗑️ УДАЛИТЬ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Контейнер для уведомлений -->
     <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
     </div>
@@ -2107,8 +1557,10 @@
         (function() {
             let supabaseClient = null;
             
-            const rankNames = ['L','V','N', 'H', 'E', 'D', 'C', 'B', 'G', 'P', 'A'];
+            const rankNames = ['L','V','N', 'H', 'E', 'D', 'C', 'B', 'G', 'P', 'A','S','X'];
             const rankGradients = {
+                'X': 'linear-gradient(135deg, #ff00ff, #cc00cc)',
+                'S': 'linear-gradient(135deg, #ffcc00, #ff9900)',
                 'A': 'linear-gradient(135deg, #5a1a1a, #3a0808)',
                 'P': 'linear-gradient(135deg, #102b4e, #061b33)',
                 'G': 'linear-gradient(135deg, #1c4620, #0c2a0f)',
@@ -2121,7 +1573,6 @@
                 'V': 'linear-gradient(135deg, #4a8a4a, #2a5a2a)',
                 'L': 'linear-gradient(135deg, #f4d03f, #d4af37)'
             };
-
             const achievementsList = [
                 // СУЩЕСТВУЮЩИЕ (оставляем)
                 { id: 'level_5', name: 'Первые шаги', desc: '5 уровень', reward: 3 },
@@ -2138,21 +1589,13 @@
                 { id: 'strikes_500', name: 'Трудяга', desc: '500 ударов', reward: 3 },
                 { id: 'seasonal_collector', name: 'Хранитель времени', desc: 'Собрать все сезонные карты (V, L, H, N)', reward: 50 },
                 
-                // ========== НОВЫЕ ДОСТИЖЕНИЯ ЗА РАНГИ (УНИКАЛЬНЫЕ НАЗВАНИЯ) ==========
+                // НОВЫЕ ДОСТИЖЕНИЯ ЗА РАНГИ
                 { id: 'rank_miner', name: 'В глубь земли', desc: 'Достичь ранга Шахтёр (5 уровень)', reward: 10 },
                 { id: 'rank_miner_master', name: 'Повелитель породы', desc: 'Достичь ранга Горняк (10 уровень)', reward: 20 },
                 { id: 'rank_ore_baron', name: 'Кровавый барон', desc: 'Достичь ранга Барон руды (50 уровень)', reward: 50 },
                 { id: 'rank_king', name: 'Монарх недр', desc: 'Достичь ранга Король шахты (75 уровень)', reward: 100 },
                 { id: 'rank_legend', name: 'Живая легенда', desc: 'Достичь максимального 100 уровня', reward: 200 },
-                
-                // Q-коллекция
-                { id: 'q_collector_12', name: 'Охотник за редкостями', desc: 'Собрать 12 карт Q-ранга', reward: 15 },
-                { id: 'q_collector_25', name: 'Мастер коллекции', desc: 'Собрать 25 карт Q-ранга', reward: 30 },
-                { id: 'q_collector_50', name: 'Абсолютный коллекционер', desc: 'Собрать все 50 карты Q-ранга', reward: 100 },
-                
-                // Питомец
-                { id: 'pet_level_5', name: 'Преданный дух', desc: 'Питомец 5 уровня', reward: 10 },
-                { id: 'pet_level_10', name: 'Легендарный хранитель', desc: 'Питомец максимального 10 уровня', reward: 25 }
+            
             ];
 
             const questsList = [
@@ -2195,60 +1638,6 @@
                 { day: 30, type: 'card', rank: 'C', text: 'Карта C' }
             ];
 
-            // ========== Q РАНГ (КОЛЛЕКЦИЯ) ==========
-            const qRankCards = [
-                { id: 1, name: '', image: 'q_1.png' },
-                { id: 2, name: '', image: 'q_2.png' },
-                { id: 3, name: '', image: 'q_3.png' },
-                { id: 4, name: '', image: 'q_4.png' },
-                { id: 5, name: '', image: 'q_5.png' },
-                { id: 6, name: '', image: 'q_6.png' },
-                { id: 7, name: '', image: 'q_7.png' },
-                { id: 8, name: '', image: 'q_8.png' },
-                { id: 9, name: '', image: 'q_9.png' },
-                { id: 10, name: '', image: 'q_10.png' },
-                { id: 11, name: '', image: 'q_11.png' },
-                { id: 12, name: '', image: 'q_12.png' },
-                { id: 13, name: '', image: 'q_13.png' },
-                { id: 14, name: '', image: 'q_14.png' },
-                { id: 15, name: '', image: 'q_15.png' },
-                { id: 16, name: '', image: 'q_16.png' },
-                { id: 17, name: '', image: 'q_17.png' },
-                { id: 18, name: '', image: 'q_18.png' },
-                { id: 19, name: '', image: 'q_19.png' },
-                { id: 20, name: '', image: 'q_20.png' },
-                { id: 21, name: '', image: 'q_21.png' },
-                { id: 22, name: '', image: 'q_22.png' },
-                { id: 23, name: '', image: 'q_23.png' },
-                { id: 24, name: '', image: 'q_24.png' },
-                { id: 25, name: '', image: 'q_25.png' },
-                { id: 26, name: '', image: 'q_26.png' },
-                { id: 27, name: '', image: 'q_27.png' },
-                { id: 28, name: '', image: 'q_28.png' },
-                { id: 29, name: '', image: 'q_29.png' },
-                { id: 30, name: '', image: 'q_30.png' },
-                { id: 31, name: '', image: 'q_31.png' },
-                { id: 32, name: '', image: 'q_32.png' },
-                { id: 33, name: '', image: 'q_33.png' },
-                { id: 34, name: '', image: 'q_34.png' },
-                { id: 35, name: '', image: 'q_35.png' },
-                { id: 36, name: '', image: 'q_36.png' },
-                { id: 37, name: '', image: 'q_37.png' },
-                { id: 38, name: '', image: 'q_38.png' },
-                { id: 39, name: '', image: 'q_39.png' },
-                { id: 40, name: '', image: 'q_40.png' },
-                { id: 41, name: '', image: 'q_41.png' },
-                { id: 42, name: '', image: 'q_42.png' },
-                { id: 43, name: '', image: 'q_43.png' },
-                { id: 44, name: '', image: 'q_44.png' },
-                { id: 45, name: '', image: 'q_45.png' },
-                { id: 46, name: '', image: 'q_46.png' },
-                { id: 47, name: '', image: 'q_47.png' },
-                { id: 48, name: '', image: 'q_48.png' },
-                { id: 49, name: '', image: 'q_49.png' },
-                { id: 50, name: '', image: 'q_50.png' }
-            ];
-
             // ========== СИСТЕМА РАНГОВ/ЗВАНИЙ ==========
             const rankTitles = [
                 { minLevel: 1, maxLevel: 4, name: 'Новичок', icon: '🪨', bonus: 0 },
@@ -2287,71 +1676,23 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
-            // ========== K РАНГ (КОЛЛЕКЦИЯ КЛАНА) ==========
-            const kRankCards = Array.from({ length: 50 }, (_, i) => ({
-                id: i + 1,
-                name: `K-${i + 1}`,
-                image: `k_${i + 1}.png`
-            }));
-
-            // ========== ПЕРЕМЕННЫЕ ДЛЯ КЛАНОВ ==========
-            let _clanData = {
-                clanId: null,
-                clanName: null,
-                clanMembers: [], // [{ playerId, playerName, role, joinDate }]
-                myRole: null, // 'leader', 'member'
-                clanKCollected: {} // { cardId: true } для K-ранга
-            };
-
-            // Переменные для хранения данных перед подтверждением
-            let _pendingLeaveClan = false;
-
-            const CLAN_CREATION_PRICE = 500;
-
-            // Текущий активный ранг в коллекции ('q' или 'k')
-            let _activeCollectionRank = 'q';
-
-            // ========== ПИТОМЕЦ ==========
-            let _hasPet = false;          // есть ли питомец
-            let _petLevel = 1;            // уровень питомца (1-10)
-
-            // Конфиг питомца
-            const petConfig = {
-                name: 'Дух шахты',
-                icon: '👻',
-                price: 2000,
-                maxLevel: 10,
-                baseBonus: 1,      // +1% за уровень
-                upgradeCost: 25
-            };
-
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
                 'profile': 1,
-                'collection': 2,
-                'clan':5,
-                'pets': 3,
                 'calendar': 5,
                 'mine': 1,
-                'exchange': 2,
                 'shop': 2,
                 'top': 1,
-                'info': 1,
                 'settings': 1
             };
 
             // Названия разделов для уведомлений
             const sectionNames = {
                 'profile': 'Профиль',
-                'collection': 'Коллекция',
-                'clan': 'Клан',
-                'pets': 'Питомцы',
                 'calendar': 'Календарь',
                 'mine': 'Шахта',
-                'exchange': 'Обмен',
                 'shop': 'Магазин',
                 'top': 'Топ игроков',
-                'info': 'Инфо',
                 'settings': 'Настройки'
             };
 
@@ -2400,14 +1741,6 @@
             function checkAndSendNotifications() {
                 const now = new Date();
                 const lastCheck = lastNotificationCheck ? new Date(lastNotificationCheck) : null;
-                
-                // Проверяем сундук Q (только по средам с 8:00 до 23:00)
-                const fChestAvail = isQChestAvailable();
-                const fChestKey = `notiq_fchest_${now.toDateString()}`;
-                if (fChestAvail.available && !localStorage.getItem(fChestKey)) {
-                    showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук Q доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
-                    localStorage.setItem(fChestKey, 'true');
-                }
                 
                 // Проверяем сброс ударов (когда удары обнулились в новом дне)
                 const strikesResetKey = `notiq_strikes_${now.toDateString()}`;
@@ -2490,174 +1823,6 @@
                 }
             }
 
-            function switchCollectionRank(rank) {
-                _activeCollectionRank = rank;
-                
-                const qChestBlock = document.getElementById('qChestBlock');
-                const kChestBlock = document.getElementById('kChestBlock');
-                const collectionTitle = document.getElementById('collectionTitle');
-                const collectionInfo = document.getElementById('collectionInfo');
-                const qTab = document.getElementById('collectionQTab');
-                const kTab = document.getElementById('collectionKTab');
-                
-                if (rank === 'q') {
-                    if (qChestBlock) qChestBlock.style.display = 'flex';
-                    if (kChestBlock) kChestBlock.style.display = 'none';
-                    if (collectionTitle) collectionTitle.innerHTML = '🎴 КОЛЛЕКЦИЯ Q-РАНГА';
-                    if (collectionInfo) collectionInfo.innerHTML = `🎴 <strong>Q-ранг</strong> — эксклюзивные коллекционные карты.<br>💰 Дубликаты Q-ранга превращаются в +7💎<br>📦 Сундук Q доступен по <strong>средам с 8:00 до 23:00</strong>`;
-                    if (qTab) { qTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)'; qTab.style.color = '#ffcc66'; }
-                    if (kTab) { kTab.style.background = 'transparent'; kTab.style.color = '#fff'; }
-                    updateCollectionUI();
-                } else if (rank === 'k') {
-                    if (qChestBlock) qChestBlock.style.display = 'none';
-                    if (kChestBlock) kChestBlock.style.display = 'flex';
-                    if (collectionTitle) collectionTitle.innerHTML = '🏰 КОЛЛЕКЦИЯ K-РАНГА (КЛАН)';
-                    const requirementSpan = document.getElementById('kChestRequirement');
-                    if (requirementSpan) {
-                        requirementSpan.innerHTML = _clanData.clanId ? '✅ Вы в клане!' : '❌ Требуется клан!';
-                        requirementSpan.style.color = _clanData.clanId ? '#88ff88' : '#ff8888';
-                    }
-                    if (collectionInfo) collectionInfo.innerHTML = `🏰 <strong>K-ранг</strong> — эксклюзивные клановые карты.<br>💰 Дубликаты K-ранга превращаются в +7💎<br>📦 Клановый сундук доступен только участникам клана по <strong>средам с 8:00 до 23:00</strong>`;
-                    if (kTab) { kTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)'; kTab.style.color = '#ffcc66'; }
-                    if (qTab) { qTab.style.background = 'transparent'; qTab.style.color = '#fff'; }
-                    updateCollectionUI();
-                }
-            }
-
-            // Проверка доступности сундука Q
-            function isQChestAvailable() {
-                const now = new Date();
-                const day = now.getDay();
-                const hours = now.getHours();
-                if (day !== 3) return { available: false, reason: '📦 Сундук Q доступен только по средам!' };
-                if (hours < 8 || hours >= 23) return { available: false, reason: '📦 Сундук Q доступен с 8:00 до 23:00 по средам!' };
-                return { available: true, reason: null };
-            }
-
-            // Проверка доступности сундука K
-            function isKChestAvailable() {
-                const now = new Date();
-                const day = now.getDay();
-                const hours = now.getHours();
-                if (!_clanData.clanId) return { available: false, reason: '❌ Вы не состоите в клане!' };
-                if (day !== 3) return { available: false, reason: '🏰 Клановый сундук доступен только по средам!' };
-                if (hours < 8 || hours >= 23) return { available: false, reason: '🏰 Клановый сундук доступен с 8:00 до 23:00 по средам!' };
-                if (_level < 5) return { available: false, reason: '🔒 Кланы доступны с 5 уровня!' };
-                return { available: true, reason: null };
-            }
-
-            // Открытие сундука Q
-            function openQChest() {
-                if (_level < 2) { showToast("🔒 Коллекция Q доступна с 2 уровня!", "#ffaa88"); return; }
-                const availability = isQChestAvailable();
-                if (!availability.available) { showToast(availability.reason, "#ffaa88"); return; }
-                if (_diamonds < 100) { showToast("❌ Нужно 100 алмазов для открытия сундука Q!", "#ff8888"); return; }
-                _diamonds -= 100;
-                const isQRank = Math.random() < 0.2;
-                if (isQRank) {
-                    const availableCards = qRankCards.filter(card => !_collectedCards[card.id]);
-                    let card;
-                    if (availableCards.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * availableCards.length);
-                        card = availableCards[randomIndex];
-                        _collectedCards[card.id] = true;
-                        showQRankRewardModal(card, false);
-                        showToast(`✨ НОВАЯ КАРТА Q: ${card.id}! ✨`, "#ffd966");
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * qRankCards.length);
-                        card = qRankCards[randomIndex];
-                        _diamonds += 7;
-                        showQRankRewardModal(card, true);
-                        showToast(`🔄 Дубликат Q-ранга! +7💎`, "#ffd966");
-                    }
-                    updateQuestProgress('daily_card', 1);
-                } else {
-                    addCardToHistory('E');
-                    showToast(`🎴 Вы получили карту E из сундука Q!`, "#aaffdd");
-                }
-                saveGame();
-                updateUI();
-                updateCollectionUI();
-            }
-
-            // Открытие сундука K
-            function openKChest() {
-                if (_level < 5) { showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); return; }
-                const availability = isKChestAvailable();
-                if (!availability.available) { showToast(availability.reason, '#ffaa88'); return; }
-                if (_diamonds < 100) { showToast('❌ Нужно 100 алмазов для открытия кланового сундука!', '#ff8888'); return; }
-                _diamonds -= 100;
-                const isKRank = Math.random() < 0.2;
-                if (isKRank) {
-                    const availableCards = kRankCards.filter(card => !_clanData.clanKCollected[card.id]);
-                    let card;
-                    if (availableCards.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * availableCards.length);
-                        card = availableCards[randomIndex];
-                        _clanData.clanKCollected[card.id] = true;
-                        showKRankRewardModal(card, false);
-                        showToast(`✨ НОВАЯ КАРТА K: ${card.id}! ✨`, '#ffd966');
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * kRankCards.length);
-                        card = kRankCards[randomIndex];
-                        _diamonds += 7;
-                        showKRankRewardModal(card, true);
-                        showToast(`🔄 Дубликат K-ранга! +7💎`, '#ffd966');
-                    }
-                    updateQuestProgress('daily_card', 1);
-                } else {
-                    addCardToHistory('E');
-                    showToast('🎴 Вы получили карту E из кланового сундука!', '#aaffdd');
-                }
-                saveGame();
-                updateUI();
-                updateCollectionUI();
-            }
-
-            function showQRankRewardModal(card, isDuplicate) {
-                const modalHtml = `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1100; display: flex; justify-content: center; align-items: center;">
-                    <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 2px solid #ffcc66;">
-                        <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
-                            <div style="font-size: 48px;">🎴</div>
-                            <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">НОВАЯ КАРТА!</div>
-                        </div>
-                        <div style="padding: 24px 20px;">
-                            <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту Q-ранга:</div>
-                            <div style="font-size: 48px; font-weight: bold; background: linear-gradient(135deg, #ffcc66, #ffaa33); border-radius: 30px; padding: 20px; margin: 10px 0; color: #1a1a2e;">Карта #${card.id}</div>
-                            <div style="font-size: 14px; color: #ffcc66; margin-bottom: 16px;">${isDuplicate ? '🔄 Дубликат! +7💎' : '✨ НОВАЯ КАРТА В КОЛЛЕКЦИЮ! ✨'}</div>
-                            <button id="closeQRankModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
-                        </div>
-                    </div>
-                </div>`;
-                const modalDiv = document.createElement('div');
-                modalDiv.innerHTML = modalHtml;
-                document.body.appendChild(modalDiv);
-                document.getElementById('closeQRankModalBtn').onclick = () => modalDiv.remove();
-                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
-            }
-
-            function showKRankRewardModal(card, isDuplicate) {
-                const modalHtml = `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1100; display: flex; justify-content: center; align-items: center;">
-                    <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 2px solid #8B0000;">
-                        <div style="background: linear-gradient(135deg, #8B0000, #ff4444); padding: 20px;">
-                            <div style="font-size: 48px;">🏰</div>
-                            <div style="font-size: 24px; font-weight: 800; color: #ffcc66;">КЛАНОВАЯ КАРТА!</div>
-                        </div>
-                        <div style="padding: 24px 20px;">
-                            <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту K-ранга:</div>
-                            <div style="font-size: 48px; font-weight: bold; background: linear-gradient(135deg, #8B0000, #ff4444); border-radius: 30px; padding: 20px; margin: 10px 0; color: white;">Карта #${card.id}</div>
-                            <div style="font-size: 14px; color: #ffcc66; margin-bottom: 16px;">${isDuplicate ? '🔄 Дубликат! +7💎' : '✨ НОВАЯ КАРТА В КОЛЛЕКЦИЮ КЛАНА! ✨'}</div>
-                            <button id="closeKRankModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
-                        </div>
-                    </div>
-                </div>`;
-                const modalDiv = document.createElement('div');
-                modalDiv.innerHTML = modalHtml;
-                document.body.appendChild(modalDiv);
-                document.getElementById('closeKRankModalBtn').onclick = () => modalDiv.remove();
-                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
-            }
-
             function getCurrentRank() {
                 for (const rank of rankTitles) {
                     if (_level >= rank.minLevel && _level <= rank.maxLevel) {
@@ -2682,669 +1847,6 @@
                 if (rankBonus) rankBonus.innerHTML = `+${currentRank.bonus}%`;
                 if (mineRankName) mineRankName.innerHTML = `${currentRank.icon} ${currentRank.name}`;
                 if (mineRankBonus) mineRankBonus.innerHTML = currentRank.bonus;
-            }
-
-            // Функция показа модального окна выхода из клана
-            function showLeaveClanConfirmModal() {
-                if (!_clanData.clanId) {
-                    showToast('❌ Вы не состоите в клане!', '#ff8888');
-                    return;
-                }
-                
-                const isLeader = _clanData.myRole === 'leader';
-                const warningDiv = document.getElementById('leaveClanWarning');
-                const messageDiv = document.getElementById('leaveClanMessage');
-                
-                if (isLeader) {
-                    messageDiv.innerHTML = '⚠️ ВЫ ЛИДЕР КЛАНА! ⚠️';
-                    warningDiv.innerHTML = 'Если вы покинете клан, он будет полностью УДАЛЁН вместе со всеми участниками. Это действие НЕЛЬЗЯ отменить!';
-                } else {
-                    messageDiv.innerHTML = 'Вы уверены, что хотите покинуть клан?';
-                    warningDiv.innerHTML = 'Вы сможете вступить в другой клан позже.';
-                }
-                
-                document.getElementById('leaveClanConfirmModal').classList.add('show');
-            }
-
-            async function leaveClanConfirmed() {
-                if (!supabaseClient || !_clanData.clanId) { 
-                    showToast('❌ Вы не состоите в клане!', '#ff8888'); 
-                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
-                    return false; 
-                }
-                
-                const isLeader = _clanData.myRole === 'leader';
-                const clanIdToDelete = _clanData.clanId;
-                
-                try {
-                    if (isLeader) {
-                        // Лидер удаляет клан
-                        const { error } = await supabaseClient
-                            .from('clans')
-                            .delete()
-                            .eq('id', clanIdToDelete);
-                        
-                        if (error) throw error;
-                        showToast('🗑️ Клан удалён!', '#ffaa88');
-                    } else {
-                        // Обычный участник выходит
-                        const { data: clan, error } = await supabaseClient
-                            .from('clans')
-                            .select('*')
-                            .eq('id', clanIdToDelete)
-                            .single();
-                        
-                        if (error) throw error;
-                        
-                        let members = clan.members || [];
-                        let membersNames = clan.members_names || [];
-                        let membersRoles = clan.members_roles || [];
-                        
-                        const index = members.indexOf(_playerId);
-                        if (index !== -1) {
-                            members.splice(index, 1);
-                            membersNames.splice(index, 1);
-                            membersRoles.splice(index, 1);
-                        }
-                        
-                        const { error: updateError } = await supabaseClient
-                            .from('clans')
-                            .update({
-                                members: members,
-                                members_names: membersNames,
-                                members_roles: membersRoles
-                            })
-                            .eq('id', clanIdToDelete);
-                        
-                        if (updateError) throw updateError;
-                        showToast('👋 Вы покинули клан', '#ffaa88');
-                    }
-                    
-                    // === ПОЛНОСТЬЮ ОЧИЩАЕМ ДАННЫЕ КЛАНА ===
-                    _clanData = { 
-                        clanId: null, 
-                        clanName: null, 
-                        clanMembers: [], 
-                        myRole: null, 
-                        clanKCollected: _clanData?.clanKCollected || {} 
-                    };
-                    
-                    // === ОБЯЗАТЕЛЬНО СОХРАНЯЕМ ===
-                    saveGame();
-                    
-                    // === ОБНОВЛЯЕМ UI ===
-                    updateClanUI();
-                    updateUI();
-                    
-                    // === ОБНОВЛЯЕМ СУНДУК K ===
-                    if (_activeCollectionRank === 'k') { 
-                        const reqSpan = document.getElementById('kChestRequirement'); 
-                        if (reqSpan) { 
-                            reqSpan.innerHTML = '❌ Требуется клан!'; 
-                            reqSpan.style.color = '#ff8888'; 
-                        } 
-                    }
-                    
-                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
-                    
-                    // === ПРОВЕРКА В КОНСОЛИ ===
-                    console.log('✅ Выход из клана выполнен, _clanData.clanId:', _clanData.clanId);
-                    
-                    return true;
-                    
-                } catch(e) { 
-                    console.error('❌ leaveClan error:', e); 
-                    showToast('❌ Ошибка: ' + e.message, '#ff8888'); 
-                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
-                    return false; 
-                }
-            }
-
-            function showCollectionCardModal(cardName, imageSrc) {
-                const modal = document.getElementById('collectionCardModal');
-                const imgEl = document.getElementById('collectionCardImg');
-                const nameEl = document.getElementById('collectionCardName');
-                const rankEl = document.getElementById('collectionCardRank');
-                const closeBtn = document.getElementById('closeCollectionCardModalBtn');
-                const imgContainer = document.getElementById('collectionCardImage');
-                
-                if (!modal) return;
-                
-                nameEl.innerHTML = cardName;
-                rankEl.innerHTML = 'Q';
-                
-                imgEl.src = imageSrc;
-                imgEl.style.display = 'block';
-                imgContainer.innerHTML = '';
-                imgContainer.appendChild(imgEl);
-                
-                imgEl.onerror = function() {
-                    console.error('Не удалось загрузить:', imageSrc);
-                    imgEl.style.display = 'none';
-                    imgContainer.innerHTML = '<span style="font-size: 48px;">🎴</span><div style="font-size: 10px;">Нет изображения</div>';
-                };
-                
-                modal.style.display = 'flex';
-                
-                closeBtn.onclick = () => {
-                    modal.style.display = 'none';
-                };
-                modal.onclick = (e) => {
-                    if (e.target === modal) modal.style.display = 'none';
-                };
-            }
-
-            function updateCollectionUI() {
-                const gridContainer = document.getElementById('collectionGrid');
-                if (!gridContainer) return;
-                
-                let cards, collectedCards, totalCards, rankName, borderColor;
-                
-                if (_activeCollectionRank === 'q') {
-                    cards = qRankCards;
-                    collectedCards = _collectedCards;
-                    totalCards = qRankCards.length;
-                    rankName = 'Q';
-                    borderColor = '#ffcc66';
-                } else {
-                    cards = kRankCards;
-                    collectedCards = _clanData.clanKCollected || {};
-                    totalCards = kRankCards.length;
-                    rankName = 'K';
-                    borderColor = '#8B0000';
-                }
-                
-                const collectedCount = Object.keys(collectedCards).length;
-                const percent = Math.floor((collectedCount / totalCards) * 100);
-                const progressSpan = document.getElementById('collectionProgress');
-                if (progressSpan) progressSpan.innerHTML = `${collectedCount}/${totalCards} (${percent}%)`;
-                
-                gridContainer.innerHTML = '';
-                cards.forEach(card => {
-                    const isCollected = collectedCards[card.id];
-                    const cardDiv = document.createElement('div');
-                    cardDiv.className = `collection-q-card ${isCollected ? 'collected' : 'missing'}`;
-                    if (isCollected) {
-                        cardDiv.innerHTML = `
-                            <div class="collection-q-image-container">
-                                <img class="collection-q-image" src="cards/${rankName === 'Q' ? 'q' : 'k'}_${card.id}.png" alt="${rankName}-${card.id}" onerror="this.src='data:image/svg+xml,%3Csvg...'">
-                                <div class="collection-q-rank-corner" style="background: linear-gradient(135deg, ${borderColor}, ${rankName === 'K' ? '#ff4444' : '#ffaa33'});">${rankName}</div>
-                            </div>
-                            <div class="collection-q-name">${rankName === 'K' ? `Карта K-${card.id}` : (card.name || `Карта Q-${card.id}`)}</div>
-                            <div class="collection-q-status">✅ Собрано</div>
-                        `;
-                    } else {
-                        cardDiv.innerHTML = `
-                            <div class="collection-q-image-container">
-                                <div style="width: 80px; height: 112px; background: #2a3a3a; border-radius: 12px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 32px;">❓</span></div>
-                                <div class="collection-q-rank-corner" style="background: linear-gradient(135deg, ${borderColor}, ${rankName === 'K' ? '#ff4444' : '#ffaa33'}); opacity:0.5;">${rankName}</div>
-                            </div>
-                            <div class="collection-q-name">???</div>
-                            <div class="collection-q-status missing">❌ Не собрано</div>
-                        `;
-                    }
-                    gridContainer.appendChild(cardDiv);
-                });
-                checkAchievements();
-            }
-
-            // Поиск клана
-            async function searchClan(clanName) {
-                console.log('🔍 searchClan called with:', clanName);
-                console.log('supabaseClient exists?', !!supabaseClient);
-                
-                if (!supabaseClient) { 
-                    console.error('❌ supabaseClient is null!');
-                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
-                    return null; 
-                }
-                
-                try {
-                    console.log('📡 Sending request to Supabase...');
-                    const { data, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .ilike('clan_name', `%${clanName}%`)
-                        .limit(20);
-                    
-                    if (error) {
-                        console.error('❌ Supabase error:', error);
-                        throw error;
-                    }
-                    
-                    console.log('✅ Search results:', data);
-                    showToast(`🔍 Найдено кланов: ${data?.length || 0}`, '#aaffdd');
-                    return data || [];
-                } catch(e) { 
-                    console.error('❌ searchClan error:', e); 
-                    showToast('❌ Ошибка поиска клана: ' + e.message, '#ff8888'); 
-                    return null; 
-                }
-            }
-
-            async function createClan(clanName) {
-                console.log('🚀 createClan НАЧАЛО, clanName:', clanName);
-                
-                if (!supabaseClient) { 
-                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
-                    return false; 
-                }
-                
-                if (_level < 5) { 
-                    showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); 
-                    return false; 
-                }
-                
-                if (_clanData.clanId) { 
-                    showToast('❌ Вы уже состоите в клане!', '#ff8888'); 
-                    return false; 
-                }
-                
-                if (!clanName || clanName.length < 3 || clanName.length > 20) { 
-                    showToast('❌ Название клана должно быть 3-20 символов!', '#ff8888'); 
-                    return false; 
-                }
-                
-                // === НОВАЯ ПРОВЕРКА НА АЛМАЗЫ ===
-                if (_diamonds < CLAN_CREATION_PRICE) {
-                    showToast(`❌ Недостаточно алмазов! Нужно ${CLAN_CREATION_PRICE}💎 для создания клана!`, '#ff8888');
-                    return false;
-                }
-                
-                // Проверка на существование
-                try {
-                    const { data: existing } = await supabaseClient
-                        .from('clans')
-                        .select('clan_name')
-                        .eq('clan_name', clanName)
-                        .maybeSingle();
-                    
-                    if (existing) { 
-                        showToast('❌ Клан с таким названием уже существует!', '#ff8888'); 
-                        return false; 
-                    }
-                } catch(e) {}
-                
-                try {
-                    // === СПИСЫВАЕМ АЛМАЗЫ ===
-                    _diamonds -= CLAN_CREATION_PRICE;
-                    
-                    const { data, error } = await supabaseClient
-                        .from('clans')
-                        .insert({
-                            clan_name: clanName,
-                            leader_id: _playerId,
-                            leader_name: _playerName,
-                            created_at: new Date().toISOString(),
-                            members: [_playerId],
-                            members_names: [_playerName],
-                            members_roles: ['leader']
-                        })
-                        .select()
-                        .single();
-                    
-                    if (error) {
-                        // Если ошибка - возвращаем алмазы
-                        _diamonds += CLAN_CREATION_PRICE;
-                        throw error;
-                    }
-                    
-                    showToast(`🎉 Клан "${clanName}" успешно создан! -${CLAN_CREATION_PRICE}💎`, '#aaffdd');
-                    
-                    _clanData = { 
-                        clanId: data.id, 
-                        clanName: data.clan_name, 
-                        clanMembers: [{ playerId: _playerId, playerName: _playerName, role: 'leader' }], 
-                        myRole: 'leader', 
-                        clanKCollected: _clanData.clanKCollected || {} 
-                    };
-                    
-                    saveGame();
-                    updateClanUI();
-                    updateUI(); // Обновляем отображение алмазов
-                    
-                    if (_activeCollectionRank === 'k') { 
-                        const reqSpan = document.getElementById('kChestRequirement'); 
-                        if (reqSpan) { 
-                            reqSpan.innerHTML = '✅ Вы в клане!'; 
-                            reqSpan.style.color = '#88ff88'; 
-                        } 
-                    }
-                    return true;
-                    
-                } catch(e) { 
-                    console.error('❌ createClan error:', e); 
-                    showToast('❌ Ошибка создания клана: ' + e.message, '#ff8888'); 
-                    return false; 
-                }
-            }
-
-            async function joinClan(clanId, clanName) {
-                console.log('👋 joinClan called, clanId:', clanId);
-                
-                if (!supabaseClient) { 
-                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
-                    return false; 
-                }
-                if (_level < 5) { 
-                    showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); 
-                    return false; 
-                }
-                if (_clanData.clanId) { 
-                    showToast('❌ Вы уже состоите в клане!', '#ff8888'); 
-                    return false; 
-                }
-                
-                try {
-                    const { data: clan, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .eq('id', clanId)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    let members = clan.members || [];
-                    let membersNames = clan.members_names || [];
-                    let membersRoles = clan.members_roles || [];
-                    
-                    if (members.length >= 10) { 
-                        showToast('❌ Клан уже полон (максимум 10 участников)!', '#ff8888'); 
-                        return false; 
-                    }
-                    if (members.includes(_playerId)) { 
-                        showToast('❌ Вы уже в этом клане!', '#ff8888'); 
-                        return false; 
-                    }
-                    
-                    members.push(_playerId);
-                    membersNames.push(_playerName);
-                    membersRoles.push('member');
-                    
-                    const { error: updateError } = await supabaseClient
-                        .from('clans')
-                        .update({
-                            members: members,
-                            members_names: membersNames,
-                            members_roles: membersRoles
-                        })
-                        .eq('id', clanId);
-                    
-                    if (updateError) throw updateError;
-                    
-                    _clanData = { 
-                        clanId: clanId, 
-                        clanName: clan.clan_name, 
-                        clanMembers: members.map((id, idx) => ({ 
-                            playerId: id, 
-                            playerName: membersNames[idx], 
-                            role: membersRoles[idx] 
-                        })), 
-                        myRole: 'member', 
-                        clanKCollected: _clanData.clanKCollected || {} 
-                    };
-                    
-                    saveGame(); 
-                    showToast(`✅ Вы вступили в клан "${clanName}"!`, '#aaffdd'); 
-                    updateClanUI();
-                    
-                    if (_activeCollectionRank === 'k') { 
-                        const reqSpan = document.getElementById('kChestRequirement'); 
-                        if (reqSpan) { 
-                            reqSpan.innerHTML = '✅ Вы в клане!'; 
-                            reqSpan.style.color = '#88ff88'; 
-                        } 
-                    }
-                    
-                    // === УВЕДОМЛЯЕМ ЛИДЕРА (если он онлайн) - через refreshClanData ===
-                    // Лидер при следующем обновлении увидит нового участника
-                    
-                    return true;
-                    
-                } catch(e) { 
-                    console.error('❌ joinClan error:', e); 
-                    showToast('❌ Ошибка вступления в клан: ' + e.message, '#ff8888'); 
-                    return false; 
-                }
-            }
-
-            function updateClanUI() {
-                const noClanBlock = document.getElementById('clanNoClanBlock');
-                const hasClanBlock = document.getElementById('clanHasClanBlock');
-                
-                if (!noClanBlock || !hasClanBlock) return;
-                
-                if (_clanData.clanId && _clanData.clanName) {
-                    // Есть клан - показываем информацию
-                    noClanBlock.style.display = 'none';
-                    hasClanBlock.style.display = 'block';
-                    
-                    const memberCount = _clanData.clanMembers.length;
-                    const isLeader = _clanData.myRole === 'leader';
-                    
-                    document.getElementById('clanNameDisplay').innerHTML = _clanData.clanName;
-                    document.getElementById('clanRoleDisplay').innerHTML = isLeader ? '👑 Лидер клана' : '👤 Участник';
-                    document.getElementById('clanMembersCountDisplay').innerHTML = `👥 ${memberCount}/10 участников`;
-                    
-                    // Список участников с кнопкой исключения для лидера
-                    const membersList = document.getElementById('clanMembersList');
-                    if (membersList) {
-                        membersList.innerHTML = _clanData.clanMembers.map(member => `
-                            <div style="background: #0f1a1fcc; border-radius: 30px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 20px;">${member.role === 'leader' ? '👑' : '👤'}</span>
-                                    <span style="font-weight: bold;">${escapeHtml(member.playerName)}</span>
-                                    ${member.role === 'leader' ? '<span style="font-size: 10px; background: #ffcc66; color: #1a1a2e; padding: 2px 8px; border-radius: 20px;">ЛИДЕР</span>' : ''}
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                    
-                } else {
-                    // Нет клана - показываем создание/поиск
-                    noClanBlock.style.display = 'block';
-                    hasClanBlock.style.display = 'none';
-                    
-                    // Очищаем результаты поиска при переключении
-                    const resultsDiv = document.getElementById('clanSearchResults');
-                    if (resultsDiv) resultsDiv.innerHTML = '';
-                }
-            }
-
-            function initClanButtons() {
-                console.log('🔧 Инициализация кнопок кланов (один раз)');
-                
-                // Кнопка поиска
-                const searchBtn = document.getElementById('searchClanBtn');
-                if (searchBtn && !searchBtn._initialized) {
-                    searchBtn._initialized = true;
-                    searchBtn.onclick = async function() {
-                        const query = document.getElementById('clanSearchInput').value.trim();
-                        if (!query) { showToast('❌ Введите название клана!', '#ff8888'); return; }
-                        showToast('🔍 Поиск...', '#aaffdd');
-                        const results = await searchClan(query);
-                        const resultsDiv = document.getElementById('clanSearchResults');
-                        if (results && results.length > 0) {
-                            resultsDiv.innerHTML = results.map(clan => `
-                                <div style="background:#0f1a1fcc; border-radius:30px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                                    <div><strong>🏰 ${escapeHtml(clan.clan_name)}</strong><br><span style="font-size:11px;">👑 ${escapeHtml(clan.leader_name)} | 👥 ${clan.members?.length || 0}/10</span></div>
-                                    <button class="join-clan-btn" data-id="${clan.id}" data-name="${escapeHtml(clan.clan_name)}" style="background:linear-gradient(135deg,#3a6b58,#1e3e31); border:none; padding:8px 20px; border-radius:30px; color:white; cursor:pointer;">ВСТУПИТЬ</button>
-                                </div>
-                            `).join('');
-                            document.querySelectorAll('.join-clan-btn').forEach(btn => {
-                                if (!btn._initialized) {
-                                    btn._initialized = true;
-                                    btn.onclick = () => joinClan(btn.dataset.id, btn.dataset.name);
-                                }
-                            });
-                        } else {
-                            resultsDiv.innerHTML = '<div style="text-align:center; padding:20px;">❌ Кланы не найдены</div>';
-                        }
-                    };
-                    console.log('✅ Кнопка поиска инициализирована');
-                }
-                
-                // Кнопка создания
-                const createBtn = document.getElementById('createClanBtn');
-                if (createBtn && !createBtn._initialized) {
-                    createBtn._initialized = true;
-                    createBtn.onclick = function() {
-                        const clanName = document.getElementById('clanCreateInput').value.trim();
-                        if (!clanName) { showToast('❌ Введите название клана!', '#ff8888'); return; }
-                        if (clanName.length < 3) { showToast('❌ Название должно быть минимум 3 символа!', '#ff8888'); return; }
-                        createClan(clanName);
-                    };
-                    console.log('✅ Кнопка создания инициализирована');
-                }
-                
-                // Кнопка выхода - ПОКАЗЫВАЕМ МОДАЛЬНОЕ ОКНО
-                const leaveBtn = document.getElementById('leaveClanBtn');
-                if (leaveBtn && !leaveBtn._initialized) {
-                    leaveBtn._initialized = true;
-                    leaveBtn.onclick = function() {
-                        showLeaveClanConfirmModal();
-                    };
-                    console.log('✅ Кнопка выхода инициализирована');
-                }
-            }
-
-            // Получить бонус питомца в процентах
-            function getPetBonusPercent() {
-                if (!_hasPet) return 0;
-                return _petLevel * petConfig.baseBonus;
-            }
-
-            // Получить множитель добычи
-            function getPetMultiplier() {
-                return 1 + getPetBonusPercent() / 100;
-            }
-
-            // Купить питомца
-            function buyPet() {
-                if (_hasPet) {
-                    showToast("❌ У вас уже есть питомец!", "#ff8888");
-                    return;
-                }
-                
-                if (_diamonds < petConfig.price) {
-                    showToast(`❌ Нужно ${petConfig.price} алмазов!`, "#ff8888");
-                    return;
-                }
-                
-                _diamonds -= petConfig.price;
-                _hasPet = true;
-                _petLevel = 1;
-                
-                showToast(`🎉 Вы купили ${petConfig.name}! ${petConfig.icon} Теперь он помогает в шахте!`, "#aaffdd");
-                saveGame();
-                updateUI();
-                updatePetUI();
-            }
-
-            // Показать модальное окно повышения уровня питомца
-            function showPetUpgradeModal() {
-                if (!_hasPet) {
-                    showToast("❌ У вас нет питомца! Купите его в разделе Питомцы.", "#ff8888");
-                    return;
-                }
-                
-                if (_petLevel >= petConfig.maxLevel) {
-                    showToast(`❌ Питомец уже максимального ${petConfig.maxLevel} уровня!`, "#ff8888");
-                    return;
-                }
-                
-                const currentLevel = _petLevel;
-                const nextLevel = _petLevel + 1;
-                const cost = petConfig.upgradeCost;
-                const currentBonus = currentLevel * petConfig.baseBonus;
-                const nextBonus = nextLevel * petConfig.baseBonus;
-                
-                document.getElementById('petModalCurrentLevel').innerText = currentLevel;
-                document.getElementById('petModalNextLevel').innerText = nextLevel;
-                document.getElementById('petModalCost').innerText = cost;
-                document.getElementById('petModalDiamonds').innerText = _diamonds;
-                document.getElementById('petCurrentBonus').innerText = currentBonus;
-                document.getElementById('petNextBonus').innerText = nextBonus;
-                
-                const progressPercent = (currentLevel / petConfig.maxLevel) * 100;
-                document.getElementById('petProgressFill').style.width = progressPercent + '%';
-                
-                document.getElementById('petUpgradeModal').classList.add('show');
-            }
-
-            function performPetUpgrade() {
-                if (!_hasPet) {
-                    showToast("❌ У вас нет питомца!", "#ff8888");
-                    document.getElementById('petUpgradeModal').classList.remove('show');
-                    return;
-                }
-                
-                if (_petLevel >= petConfig.maxLevel) {
-                    showToast(`❌ Питомец уже максимального уровня!`, "#ff8888");
-                    document.getElementById('petUpgradeModal').classList.remove('show');
-                    return;
-                }
-                
-                const cost = petConfig.upgradeCost;
-                if (_diamonds >= cost) {
-                    _diamonds -= cost;
-                    _petLevel++;
-                    
-                    const newBonus = _petLevel * petConfig.baseBonus;
-                    showToast(`✨ ${petConfig.name} повышен до ${_petLevel} уровня! Бонус +${newBonus}% к добыче! ✨`, "#ffd966");
-                    saveGame();
-                    updateUI();
-                    updatePetUI();
-                    checkAchievements();  // ← ДОБАВИТЬ ЭТУ СТРОКУ
-                    document.getElementById('petUpgradeModal').classList.remove('show');
-                } else {
-                    showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c");
-                    document.getElementById('petUpgradeModal').classList.remove('show');
-                }
-            }
-
-            // Закрыть модальное окно
-            function closePetUpgradeModal() {
-                document.getElementById('petUpgradeModal').classList.remove('show');
-            }
-
-            // Обновить UI питомца
-            function updatePetUI() {
-                const iconEl = document.getElementById('activePetIcon');
-                const nameEl = document.getElementById('activePetName');
-                const bonusEl = document.getElementById('activePetBonus');
-                const levelEl = document.getElementById('activePetLevel');
-                const buyBtn = document.getElementById('buyPetBtn');
-                const upgradeBtn = document.getElementById('upgradePetBtn');
-                const upgradeContainer = document.getElementById('upgradePetContainer');
-                
-                if (iconEl) iconEl.innerText = petConfig.icon;
-                if (nameEl) nameEl.innerText = petConfig.name;
-                
-                if (_hasPet) {
-                    const bonus = getPetBonusPercent();
-                    const multiplier = getPetMultiplier();
-                    if (bonusEl) bonusEl.innerHTML = `+${bonus}% к добыче руды (x${multiplier.toFixed(2)})`;
-                    if (levelEl) levelEl.innerHTML = `Уровень ${_petLevel} / ${petConfig.maxLevel}`;
-                    if (buyBtn) buyBtn.style.display = 'none';
-                    if (upgradeContainer) upgradeContainer.style.display = 'block';
-                    if (upgradeBtn) {
-                        if (_petLevel >= petConfig.maxLevel) {
-                            upgradeBtn.disabled = true;
-                            upgradeBtn.style.opacity = '0.5';
-                            upgradeBtn.innerText = '⭐ МАКСИМАЛЬНЫЙ УРОВЕНЬ ⭐';
-                        } else {
-                            upgradeBtn.disabled = false;
-                            upgradeBtn.style.opacity = '1';
-                            upgradeBtn.innerText = `⬆️ ПОВЫСИТЬ УРОВЕНЬ (${petConfig.upgradeCost}💎)`;
-                        }
-                    }
-                } else {
-                    if (bonusEl) bonusEl.innerHTML = 'Нет питомца';
-                    if (levelEl) levelEl.innerHTML = 'Не куплен';
-                    if (buyBtn) buyBtn.style.display = 'block';
-                    if (upgradeContainer) upgradeContainer.style.display = 'none';
-                }
             }
 
             function isSectionUnlocked(sectionId) {
@@ -3590,10 +2092,6 @@
                     oreGain = Math.floor(oreGain * rankMultiplier);
                 }
                 
-                // Бонус от питомца
-                const petMultiplier = getPetMultiplier();
-                oreGain = Math.round(oreGain * petMultiplier);
-                
                 if (oreGain < 1) oreGain = 1;
                 return oreGain;
             }
@@ -3617,7 +2115,7 @@
             function getPickaxeUpgradeCost(level) { return Math.floor(30 + (level - 1) * 15); }
 
             function getCardCounts() { 
-                const c = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 }; 
+                const c = { 'X':0, 'S':0, 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 }; 
                 for (const card of _cardHistory) {
                     if (card.rank && c[card.rank] !== undefined) c[card.rank]++; 
                 }
@@ -3873,25 +2371,6 @@
                         else if (a.id === 'rank_ore_baron') completed = _level >= 50;
                         else if (a.id === 'rank_king') completed = _level >= 75;
                         else if (a.id === 'rank_legend') completed = _level >= 100;
-                        // ========== НОВЫЕ ДОСТИЖЕНИЯ ==========
-                        else if (a.id === 'q_collector_12') {
-                            const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 12;
-                        }
-                        else if (a.id === 'q_collector_25') {
-                            const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 25;
-                        }
-                        else if (a.id === 'q_collector_50') {
-                            const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 50;
-                        }
-                        else if (a.id === 'pet_level_5') {
-                            completed = _hasPet && _petLevel >= 5;
-                        }
-                        else if (a.id === 'pet_level_10') {
-                            completed = _hasPet && _petLevel >= 10;
-                        }
                         
                         if (completed) { 
                             _achievements[a.id] = true; 
@@ -4472,68 +2951,6 @@
                     });
                 } catch(e) { console.warn('loadTopFromSupabase error:', e); }
             }
-
-            function restoreClanData() {
-                if (!_clanData.clanId) return;
-                
-                console.log('🔄 Восстановление данных клана из localStorage');
-                console.log('clanId:', _clanData.clanId);
-                console.log('clanName:', _clanData.clanName);
-                console.log('members:', _clanData.clanMembers.length);
-                console.log('myRole:', _clanData.myRole);
-                
-                // Обновляем UI
-                updateClanUI();
-                
-                // Обновляем сундук K, если открыта вкладка K
-                if (_activeCollectionRank === 'k') {
-                    const reqSpan = document.getElementById('kChestRequirement');
-                    if (reqSpan) {
-                        reqSpan.innerHTML = '✅ Вы в клане!';
-                        reqSpan.style.color = '#88ff88';
-                    }
-                }
-            }
-
-            async function refreshClanData() {
-                if (!_clanData.clanId) return;
-                
-                console.log('🔄 Обновление данных клана...');
-                
-                try {
-                    const { data: clan, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .eq('id', _clanData.clanId)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    if (clan) {
-                        const members = clan.members || [];
-                        const membersNames = clan.members_names || [];
-                        const membersRoles = clan.members_roles || [];
-                        
-                        _clanData = {
-                            clanId: clan.id,
-                            clanName: clan.clan_name,
-                            clanMembers: members.map((id, idx) => ({
-                                playerId: id,
-                                playerName: membersNames[idx],
-                                role: membersRoles[idx]
-                            })),
-                            myRole: membersRoles[members.indexOf(_playerId)] || null,
-                            clanKCollected: _clanData.clanKCollected || {}
-                        };
-                        
-                        saveGame();
-                        updateClanUI();
-                        console.log('✅ Данные клана обновлены, участников:', _clanData.clanMembers.length);
-                    }
-                } catch(e) {
-                    console.error('Ошибка обновления данных клана:', e);
-                }
-            }
                         
             function initSupabase() {
                 const s = document.createElement('script');
@@ -4570,8 +2987,6 @@
                 if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
                 updatePickaxeVisual();
                 updateMiningInProfile();
-                updatePetUI();
-                updateCollectionUI();
                 updateRankUI(); 
             }
             
@@ -4582,11 +2997,9 @@
                     cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
-                    lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver,
-                    collectedCards: _collectedCards,
-                    hasPet: _hasPet, petLevel: _petLevel, lastRank: _lastRank,
+                    lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
-                    mbProfileLink: _mbProfileLink, clanData: _clanData,
+                    mbProfileLink: _mbProfileLink,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -4608,11 +3021,7 @@
                         _lastChestTime = d.lastChestTime || null;
                         _totalStrikesEver = d.totalStrikesEver || 0;
                         _mbProfileLink = d.mbProfileLink || null;
-                        _hasPet = d.hasPet || false;
-                        _petLevel = d.petLevel || 1;
-                        _collectedCards = d.collectedCards || {};
                         _lastRank = d.lastRank || null;
-                        _clanData = d.clanData || { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: {} };
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
@@ -4622,26 +3031,6 @@
                                 _lastCalendarDate = null;
                             }
                         }
-
-                        // === ВОССТАНОВЛЕНИЕ ДАННЫХ КЛАНА ===
-                        if (_clanData.clanId) {
-                            console.log('🔄 Найден сохранённый клан:', _clanData.clanName);
-                            if (!_clanData.clanMembers) _clanData.clanMembers = [];
-                            if (!_clanData.clanKCollected) _clanData.clanKCollected = {};
-                        } else {
-                            console.log('❌ Нет сохранённого клана');
-                        }
-                        restoreClanData();
-
-                        // Периодическое обновление данных клана (каждые 10 секунд)
-                        if (_clanData.clanId && _clanData.myRole === 'leader') {
-                            setInterval(() => {
-                                refreshClanData();
-                            }, 10000);
-                        }
-                        
-                        // Запускаем при загрузке игры
-                        setTimeout(() => checkMidnightReset(), 1000);
 
                     } catch(e) {
                         console.error('Ошибка загрузки сохранения:', e);
@@ -4831,11 +3220,7 @@
                     else if (tab === 'calendar') panelId = 'calendarPanel';
                     else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
-                    else if (tab === 'info') panelId = 'infoPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
-                    else if (tab === 'pets') panelId = 'petsPanel';
-                    else if (tab === 'collection') panelId = 'collectionPanel';
-                    else if (tab === 'clan') panelId = 'clanPanel';
                     
                     if (panelId) {
                         // Пытаемся открыть раздел с проверкой уровня
@@ -4862,45 +3247,21 @@
             document.getElementById('upgradePickaxeBtn').onclick = () => window.showPickaxeModal();
             document.getElementById('pickaxeModalCloseBtn').onclick = () => window.closePickaxeModal();
             document.getElementById('pickaxeModalUpgradeBtn').onclick = () => window.performPickaxeUpgrade();
-            document.getElementById('exchangeSlider').oninput = (e) => document.getElementById('exchangeAmount').innerText = e.target.value;
             document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
-            document.getElementById('buyPetBtn')?.addEventListener('click', () => buyPet());
-            document.getElementById('upgradePetBtn')?.addEventListener('click', () => showPetUpgradeModal());
-            document.getElementById('petModalCloseBtn')?.addEventListener('click', () => closePetUpgradeModal());
-            document.getElementById('petModalUpgradeBtn')?.addEventListener('click', () => performPetUpgrade());
-            document.getElementById('openQChestBtn')?.addEventListener('click', () => openQChest());
-            document.getElementById('openKChestBtn')?.addEventListener('click', () => openKChest());
-            document.getElementById('collectionQTab')?.addEventListener('click', () => switchCollectionRank('q'));
-            document.getElementById('collectionKTab')?.addEventListener('click', () => switchCollectionRank('k'));
 
-            document.getElementById('petUpgradeModal')?.addEventListener('click', (e) => {
-                if (e.target === document.getElementById('petUpgradeModal')) {
-                    closePetUpgradeModal();
-                }
-            });
-
-            console.log('searchClanBtn:', document.getElementById('searchClanBtn'));
-            console.log('createClanBtn:', document.getElementById('createClanBtn'));
-            console.log('leaveClanBtn:', document.getElementById('leaveClanBtn'));
-            // Магазин - сундук с картой (с модальным окном)
+            // Магазин - сундук с картой (S, X и A ранги)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
-                const cost = 50;
+                const cost = 70;
                 if (_diamonds >= cost) {
                     _diamonds -= cost;
                     
-                    // Определяем рандомный ранг карты (с E рангом)
                     const rand = Math.random() * 100;
-                    let rank = 'E';
-                    
-                    if (rand < 1) rank = 'A';       // 1%
-                    else if (rand < 4) rank = 'P';   // 3%
-                    else if (rand < 8) rank = 'G';   // 4%
-                    else if (rand < 15) rank = 'B';  // 7%
-                    else if (rand < 30) rank = 'C';  // 15%
-                    else if (rand < 60) rank = 'D';  // 30%
-                    else rank = 'E';                 // 40%
+                    let rank = 'A';
+                    if (rand < 1) rank = 'X';     
+                    else if (rand < 10) rank = 'S';
+                    else rank = 'A';   
                     
                     // Сохраняем карту
                     addCardToHistory(rank);
@@ -4911,18 +3272,25 @@
                     const modal = document.getElementById('chestRewardModal');
                     const cardDiv = document.getElementById('chestRewardCard');
                     
-                    // Цвета для всех рангов
+                    // Цвета для рангов
                     const rankColors = {
-                        'A': '#5a1a1a',
-                        'P': '#102b4e',
-                        'G': '#1c4620',
-                        'B': '#3a1e52',
-                        'C': '#b8a35c',
-                        'D': '#6e8f9e',
-                        'E': '#a17654'
+                        'X': 'linear-gradient(135deg, #ff00ff, #cc00cc)',
+                        'S': 'linear-gradient(135deg, #ffcc00, #ff9900)',
+                        'A': 'linear-gradient(135deg, #ff4444, #cc0000)'
                     };
-                    cardDiv.style.background = rankColors[rank] || '#2a3a3a';
+                    
+                    cardDiv.style.background = rankColors[rank];
                     cardDiv.innerHTML = `<span style="font-size: 36px;">🎴</span><br><span style="font-size: 28px;">${rank}</span>`;
+                    
+                    // Анимация и уведомления
+                    if (rank === 'X') {
+                        cardDiv.style.animation = 'xPulse 0.5s ease-in-out 3';
+                        showToast(`🌟 Карта ранга ${rank}!`, "#ffcc00");
+                    } else if (rank === 'S') {
+                        showToast(`✨ Карта ранга ${rank}!`, "#ffaa33");
+                    } else {
+                        showToast(`🎴 Карта ранга ${rank}`, "#aaffdd");
+                    }
                     
                     modal.style.display = 'flex';
                     
@@ -4938,7 +3306,7 @@
                     };
                     
                 } else {
-                    showToast(`❌ Нужно 50 алмазов!`, "#ff8888");
+                    showToast(`❌ Нужно 70 алмазов!`, "#ff8888");
                 }
             });
 
@@ -4968,30 +3336,6 @@
                     updateUI();
                 } else {
                     showToast(`❌ Нужно 30 алмазов!`, "#ff8888");
-                }
-            });
-
-            // Модальные окна клана
-            document.getElementById('leaveClanCancelBtn')?.addEventListener('click', () => {
-                document.getElementById('leaveClanConfirmModal').classList.remove('show');
-            });
-
-            document.getElementById('leaveClanConfirmBtn')?.addEventListener('click', () => {
-                leaveClanConfirmed();
-            });
-
-            document.getElementById('deleteClanCancelBtn')?.addEventListener('click', () => {
-                document.getElementById('deleteClanConfirmModal').classList.remove('show');
-            });
-
-            document.getElementById('deleteClanConfirmBtn')?.addEventListener('click', () => {
-                leaveClanConfirmed();
-            });
-
-            // Закрытие по клику вне модального окна
-            document.getElementById('leaveClanConfirmModal')?.addEventListener('click', (e) => {
-                if (e.target === document.getElementById('leaveClanConfirmModal')) {
-                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
                 }
             });
 
@@ -5072,7 +3416,6 @@
             initDropdowns();
             loadGame();
             initSupabase();
-            initClanButtons();
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
