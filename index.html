@@ -3934,19 +3934,25 @@
                     return `<div class="quest-item"><div><div>${q.name} ${_quests[q.id]?.completed ? '✅' : '📋'}</div><div>${q.desc} (${cur}/${q.target})</div><div style="background:#2a3a2a; border-radius:20px; height:4px; width:100%; margin-top:5px;"><div style="background:#ffcc66; width:${pct}%; height:4px; border-radius:20px;"></div></div></div><div>+${q.reward}💎</div></div>`;
                 }).join('');
             }
-                        
+                                    
             function checkCalendarReset() {
                 const now = new Date();
                 const todayStr = now.toDateString();
                 
-                // Получаем сохранённую дату последнего входа (если есть)
+                // Получаем сохранённую дату последнего входа
                 const lastVisitDate = localStorage.getItem('minebuff_last_visit');
                 
-                // Если календарь ещё не активирован и уровень >= 5
-                if (!_lastCalendarDate && _level >= 5) {
-                    // ПОЛНОСТЬЮ ОЧИЩАЕМ ВСЁ
+                // Календарь доступен только с 5 уровня
+                if (_level < 5) {
+                    updateCalendarUI();
+                    return;
+                }
+                
+                // ===== ЕСЛИ КАЛЕНДАРЬ ЕЩЁ НЕ АКТИВИРОВАН =====
+                if (!_lastCalendarDate) {
+                    // Активируем календарь
                     _lastCalendarDate = now.toISOString();
-                    _calendarClaimed = {};  // ← Очищаем
+                    _calendarClaimed = {};
                     
                     // Автоматически выдаём награду за 1 день
                     const firstDayReward = calendarRewards[0];
@@ -3957,16 +3963,12 @@
                         _ore += firstDayReward.amount;
                         showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
                     } else if (firstDayReward.type === 'card') {
-                        _cardHistory.unshift({ 
-                            id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                            text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
-                            rank: firstDayReward.rank 
-                        });
+                        addCardToHistory(firstDayReward.rank);
                         showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
                     }
                     
-                    _calendarClaimed[1] = true;  // ← Отмечаем 1 день
-                    showToast("📅 Календарь активирован! Награда за 1 день выдана автоматически!", "#aaffdd");
+                    _calendarClaimed[1] = true;
+                    showToast("📅 Календарь активирован! Награда за 1 день выдана!", "#aaffdd");
                     
                     localStorage.setItem('minebuff_last_visit', todayStr);
                     saveGame();
@@ -3974,48 +3976,50 @@
                     return;
                 }
                 
-                // Если уровень < 5 — календарь неактивен
-                if (_level < 5) {
+                // ===== ПРОВЕРЯЕМ, НАСТУПИЛ ЛИ НОВЫЙ ДЕНЬ =====
+                const lastDate = new Date(_lastCalendarDate);
+                const today = new Date();
+                
+                // Сбрасываем время до 00:00:00 для корректного сравнения
+                lastDate.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+                
+                const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+                
+                // Если прошло больше 1 дня (пропуск) — ПОЛНЫЙ СБРОС
+                if (diffDays > 1) {
+                    _calendarClaimed = {};
+                    _lastCalendarDate = now.toISOString();
+                    
+                    // Выдаём награду за 1 день заново
+                    const firstDayReward = calendarRewards[0];
+                    if (firstDayReward.type === 'diamonds') {
+                        _diamonds += firstDayReward.amount;
+                        showToast(`💎 +${firstDayReward.amount} алмазов (календарь сброшен, день 1)!`, "#aaffdd");
+                    } else if (firstDayReward.type === 'ore') {
+                        _ore += firstDayReward.amount;
+                        showToast(`⛏️ +${firstDayReward.amount} руды (календарь сброшен, день 1)!`, "#aaffdd");
+                    } else if (firstDayReward.type === 'card') {
+                        addCardToHistory(firstDayReward.rank);
+                        showToast(`✨ КАРТА ${firstDayReward.rank} (календарь сброшен, день 1)!`, "#ffd966");
+                    }
+                    
+                    _calendarClaimed[1] = true;
+                    showToast("📅 Вы пропустили день! Календарь сброшен. Награда за 1 день выдана!", "#ffaa88");
+                    saveGame();
                     updateCalendarUI();
                     return;
                 }
                 
-                // Проверка пропуска дня (только если календарь активирован)
-                if (_lastCalendarDate) {
-                    if (lastVisitDate) {
-                        const lastDate = new Date(lastVisitDate);
-                        const today = new Date(todayStr);
-                        const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-                        
-                        // Если пропущен хотя бы 1 день — ПОЛНЫЙ СБРОС
-                        if (diffDays > 1) {
-                            // ПОЛНОСТЬЮ ОЧИЩАЕМ КАЛЕНДАРЬ
-                            _calendarClaimed = {};
-                            _lastCalendarDate = now.toISOString();
-                            
-                            // Выдаём награду за 1 день заново
-                            const firstDayReward = calendarRewards[0];
-                            if (firstDayReward.type === 'diamonds') {
-                                _diamonds += firstDayReward.amount;
-                                showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
-                            } else if (firstDayReward.type === 'ore') {
-                                _ore += firstDayReward.amount;
-                                showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
-                            } else if (firstDayReward.type === 'card') {
-                                _cardHistory.unshift({ 
-                                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                                    text: `🎴 Карта ранга ${firstDayReward.rank} (календарь, день 1)`, 
-                                    rank: firstDayReward.rank 
-                                });
-                                showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
-                            }
-                            
-                            _calendarClaimed[1] = true;
-                            showToast("📅 Вы пропустили день! Календарь полностью сброшен. Награда за 1 день выдана!", "#ffaa88");
-                            saveGame();
-                        }
-                    }
+                // Если прошёл ровно 1 день — просто обновляем дату, НЕ сбрасывая
+                if (diffDays === 1) {
+                    _lastCalendarDate = now.toISOString();
+                    saveGame();
+                    updateCalendarUI();
+                    return;
                 }
+                
+                // Если diffDays === 0 — тот же день, ничего не делаем
                 
                 localStorage.setItem('minebuff_last_visit', todayStr);
                 updateCalendarUI();
@@ -4027,14 +4031,19 @@
                 const startDate = new Date(_lastCalendarDate);
                 const now = new Date();
                 
+                // Сбрасываем время до 00:00:00
                 startDate.setHours(0, 0, 0, 0);
                 now.setHours(0, 0, 0, 0);
                 
                 const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
                 
-                if (diffDays >= 30) return 31; // календарь завершён
+                // Календарь идёт последовательно: день 1,2,3... до 30
+                let currentDay = diffDays + 1;
                 
-                return diffDays + 1;
+                // Если дошли до 30 дня, остаёмся на нём
+                if (currentDay > 30) currentDay = 31; // 31 = завершён
+                
+                return currentDay;
             }
             
             function canClaimCalendar() { return _level >= 5; }
@@ -4518,6 +4527,7 @@
                         _petLevel = d.petLevel || 1;
                         _collectedCards = d.collectedCards || {};
                         _lastRank = d.lastRank || null;
+                        _clanData = d.clanData || { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: {} };
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
@@ -4527,11 +4537,10 @@
                                 _lastCalendarDate = null;
                             }
                         }
-                        _clanData = d.clanData || { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: {} };
 
+                        // === ВОССТАНОВЛЕНИЕ ДАННЫХ КЛАНА ===
                         if (_clanData.clanId) {
                             console.log('🔄 Найден сохранённый клан:', _clanData.clanName);
-                            // Убеждаемся, что структура данных правильная
                             if (!_clanData.clanMembers) _clanData.clanMembers = [];
                             if (!_clanData.clanKCollected) _clanData.clanKCollected = {};
                         } else {
@@ -4543,28 +4552,51 @@
                         if (_clanData.clanId && _clanData.myRole === 'leader') {
                             setInterval(() => {
                                 refreshClanData();
-                            }, 10000); // каждые 10 секунд
+                            }, 10000);
                         }
 
-                    } catch(e) {}
+                    } catch(e) {
+                        console.error('Ошибка загрузки сохранения:', e);
+                    }
                 }
+                
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                 for (const a of achievementsList) if (_achievements[a.id] === undefined) _achievements[a.id] = false;
+                
                 const now = new Date();
                 if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
                     for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
                     _lastQuestReset = now.toISOString();
-                } else { for (const q of questsList) if (!_quests[q.id]) _quests[q.id] = { current: 0, completed: false }; }
+                } else {
+                    for (const q of questsList) if (!_quests[q.id]) _quests[q.id] = { current: 0, completed: false };
+                }
+                
                 if (!_playerName || _playerName === "Игрок") showNameModal();
-                else { document.getElementById('playerName').innerText = _playerName; document.getElementById('playerId').innerText = _playerId.slice(-12); }
-                checkDailyReset(); updateUI(); checkAchievements(); checkQuests();
-                loadSettings(); applyTheme(getCurrentTheme());
+                else {
+                    document.getElementById('playerName').innerText = _playerName;
+                    document.getElementById('playerId').innerText = _playerId.slice(-12);
+                }
+                
+                // === ПРОВЕРКА КАЛЕНДАРЯ ПРИ ЗАГРУЗКЕ ===
+                const nowDate = new Date();
+                const lastVisit = localStorage.getItem('minebuff_last_visit');
+                if (lastVisit !== nowDate.toDateString()) {
+                    // Если игрок заходит в новый день — обновляем календарь
+                    checkCalendarReset();
+                }
+                
+                checkDailyReset();
+                updateUI();
+                checkAchievements();
+                checkQuests();
+                loadSettings();
+                applyTheme(getCurrentTheme());
                 updateProfileLinkUI();
                 checkAdminCommands();
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
-            }       
+            }     
 
             function checkRankUpgrade() {
             const currentRank = getCurrentRank();
