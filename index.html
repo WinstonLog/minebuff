@@ -3998,33 +3998,117 @@
                 updateCalendarUI();
             }
 
-            // Функция форсированного восстановления календаря
-            function forceFixCalendar() {
-                if (_level < 5) return;
+            // ФОРСИРОВАННЫЙ СБРОС КАЛЕНДАРЯ (вызвать один раз после обновления)
+            function forceResetCalendarForAll() {
+                const resetKey = 'calendar_reset_v2_done';
                 
-                // Если календарь залип на 1 дне (забран, но прошло больше дня)
-                const lastClaimedDay = getLastClaimedDay();
-                const currentRealDay = getCurrentCalendarDay();
+                // Проверяем, делали ли мы уже сброс
+                if (localStorage.getItem(resetKey)) {
+                    console.log('Календарь уже был сброшен ранее');
+                    return;
+                }
                 
-                // Если залип: последний полученный день = 1, а реальный день > 1
-                if (lastClaimedDay === 1 && currentRealDay > 1 && _calendarClaimed[1]) {
-                    console.log("🔧 Обнаружен залипший календарь! Восстанавливаем...");
+                console.log('🔧 Принудительный сброс календаря...');
+                
+                // Получаем текущее сохранение
+                const saved = localStorage.getItem('minebuff_save');
+                if (!saved) return;
+                
+                try {
+                    const data = JSON.parse(saved);
                     
-                    // Сохраняем реальный день как текущий
-                    _lastCalendarDate = new Date().toISOString();
+                    // ПОЛНОСТЬЮ ОЧИЩАЕМ КАЛЕНДАРЬ
+                    data.calendarClaimed = {};
+                    data.lastCalendarDate = null;
                     
-                    // Отмечаем все пропущенные дни как НЕ полученные (кроме 1 дня)
-                    for (let i = 2; i <= currentRealDay; i++) {
-                        if (_calendarClaimed[i]) {
-                            // Если день был отмечен как полученный, но это баг — снимаем отметку
-                            delete _calendarClaimed[i];
+                    // Сохраняем обратно
+                    localStorage.setItem('minebuff_save', JSON.stringify(data));
+                    
+                    // Ставим метку, что сброс сделан
+                    localStorage.setItem(resetKey, 'true');
+                    
+                    console.log('✅ Календарь принудительно сброшен!');
+                    
+                    // Обновляем переменные в текущей сессии
+                    _calendarClaimed = {};
+                    _lastCalendarDate = null;
+                    
+                    // Активируем календарь заново
+                    if (_level >= 5) {
+                        const now = new Date();
+                        _lastCalendarDate = now.toISOString();
+                        
+                        // Выдаём награду за 1 день
+                        const firstDayReward = calendarRewards[0];
+                        if (firstDayReward.type === 'diamonds') {
+                            _diamonds += firstDayReward.amount;
+                            showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
+                        } else if (firstDayReward.type === 'ore') {
+                            _ore += firstDayReward.amount;
+                            showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
+                        } else if (firstDayReward.type === 'card') {
+                            addCardToHistory(firstDayReward.rank);
+                            showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
                         }
+                        
+                        _calendarClaimed[1] = true;
+                        showToast("📅 Календарь перезапущен! Награда за 1 день выдана!", "#aaffdd");
+                        
+                        saveGame();
+                        updateCalendarUI();
                     }
                     
-                    saveGame();
-                    updateCalendarUI();
-                    showToast(`📅 Календарь восстановлен! Сегодня день ${currentRealDay}`, "#aaffdd");
+                    // Перезагружаем страницу, чтобы всё обновилось
+                    setTimeout(() => location.reload(), 2000);
+                    
+                } catch(e) {
+                    console.error('Ошибка сброса календаря:', e);
                 }
+            }
+
+            // Вызвать эту функцию ОДИН РАЗ при загрузке
+            // Добавьте в конец loadGame() или вызовите вручную через консоль
+
+            // Функция форсированного восстановления календаря
+            function forceFixCalendar() {
+                const fixKey = 'calendar_day2_fixed';
+                
+                // Проверяем, делали ли мы уже исправление
+                if (localStorage.getItem(fixKey)) {
+                    return;
+                }
+                
+                // Если уровень меньше 5 — календарь ещё не активен
+                if (_level < 5) {
+                    return;
+                }
+                
+                // Если календарь ещё не активирован
+                if (!_lastCalendarDate) {
+                    return;
+                }
+                
+                // Если 1 день получен, а 2 день — нет
+                if (_calendarClaimed[1] && !_calendarClaimed[2]) {
+                    console.log('🔧 Выдаём пропущенную награду за 2 день...');
+                    
+                    // Награда за 2 день (1 алмаз)
+                    _diamonds += 1;
+                    
+                    // Отмечаем 2 день как полученный
+                    _calendarClaimed[2] = true;
+                    
+                    // Сохраняем
+                    saveGame();
+                    
+                    // Показываем уведомление
+                    showToast(`💎 +1 алмаз (пропущенная награда календаря, день 2)!`, "#aaffdd");
+                    
+                    console.log('✅ Награда за 2 день выдана!');
+                }
+                
+                // Ставим метку, что исправление сделано
+                localStorage.setItem(fixKey, 'true');
             }
 
             // Вспомогательная функция активации календаря
@@ -4672,6 +4756,7 @@
                 checkRankUpgrade();
                 startNotificationChecker();
                 forceFixCalendar();
+                forceResetCalendarForAll();
             }     
 
             function checkRankUpgrade() {
