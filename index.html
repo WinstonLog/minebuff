@@ -3998,77 +3998,6 @@
                 updateCalendarUI();
             }
 
-            // ФОРСИРОВАННЫЙ СБРОС КАЛЕНДАРЯ (вызвать один раз после обновления)
-            function forceResetCalendarForAll() {
-                const resetKey = 'calendar_reset_v2_done';
-                
-                // Проверяем, делали ли мы уже сброс
-                if (localStorage.getItem(resetKey)) {
-                    console.log('Календарь уже был сброшен ранее');
-                    return;
-                }
-                
-                console.log('🔧 Принудительный сброс календаря...');
-                
-                // Получаем текущее сохранение
-                const saved = localStorage.getItem('minebuff_save');
-                if (!saved) return;
-                
-                try {
-                    const data = JSON.parse(saved);
-                    
-                    // ПОЛНОСТЬЮ ОЧИЩАЕМ КАЛЕНДАРЬ
-                    data.calendarClaimed = {};
-                    data.lastCalendarDate = null;
-                    
-                    // Сохраняем обратно
-                    localStorage.setItem('minebuff_save', JSON.stringify(data));
-                    
-                    // Ставим метку, что сброс сделан
-                    localStorage.setItem(resetKey, 'true');
-                    
-                    console.log('✅ Календарь принудительно сброшен!');
-                    
-                    // Обновляем переменные в текущей сессии
-                    _calendarClaimed = {};
-                    _lastCalendarDate = null;
-                    
-                    // Активируем календарь заново
-                    if (_level >= 5) {
-                        const now = new Date();
-                        _lastCalendarDate = now.toISOString();
-                        
-                        // Выдаём награду за 1 день
-                        const firstDayReward = calendarRewards[0];
-                        if (firstDayReward.type === 'diamonds') {
-                            _diamonds += firstDayReward.amount;
-                            showToast(`💎 +${firstDayReward.amount} алмазов (календарь, день 1)!`, "#aaffdd");
-                        } else if (firstDayReward.type === 'ore') {
-                            _ore += firstDayReward.amount;
-                            showToast(`⛏️ +${firstDayReward.amount} руды (календарь, день 1)!`, "#aaffdd");
-                        } else if (firstDayReward.type === 'card') {
-                            addCardToHistory(firstDayReward.rank);
-                            showToast(`✨ КАРТА ${firstDayReward.rank} (календарь, день 1)!`, "#ffd966");
-                        }
-                        
-                        _calendarClaimed[1] = true;
-                        showToast("📅 Календарь перезапущен! Награда за 1 день выдана!", "#aaffdd");
-                        
-                        saveGame();
-                        updateCalendarUI();
-                    }
-                    
-                    // Перезагружаем страницу, чтобы всё обновилось
-                    setTimeout(() => location.reload(), 2000);
-                    
-                } catch(e) {
-                    console.error('Ошибка сброса календаря:', e);
-                }
-            }
-
-            // Вызвать эту функцию ОДИН РАЗ при загрузке
-            // Добавьте в конец loadGame() или вызовите вручную через консоль
-
             // Функция форсированного восстановления календаря
             function forceFixCalendar() {
                 const fixKey = 'calendar_day2_fixed';
@@ -4756,7 +4685,6 @@
                 checkRankUpgrade();
                 startNotificationChecker();
                 forceFixCalendar();
-                forceResetCalendarForAll();
             }     
 
             function checkRankUpgrade() {
