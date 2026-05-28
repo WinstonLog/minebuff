@@ -3436,30 +3436,6 @@
                 }
             }
 
-            async function leaveClan() {
-                if (!supabaseClient || !_clanData.clanId) { showToast('❌ Вы не состоите в клане!', '#ff8888'); return false; }
-                if (_clanData.myRole === 'leader') {
-                    if (!confirm('Вы лидер клана! При выходе клан будет распущен. Вы уверены?')) return false;
-                    try { const { error } = await supabaseClient.from('clans').delete().eq('id', _clanData.clanId); if (error) throw error; }
-                    catch(e) { console.warn('deleteClan error:', e); showToast('❌ Ошибка при роспуске клана', '#ff8888'); return false; }
-                } else {
-                    if (!confirm('Вы уверены, что хотите покинуть клан?')) return false;
-                    try {
-                        const { data: clan, error } = await supabaseClient.from('clans').select('*').eq('id', _clanData.clanId).single();
-                        if (error) throw error;
-                        let members = clan.members || [], membersNames = clan.members_names || [], membersRoles = clan.members_roles || [];
-                        const index = members.indexOf(_playerId);
-                        if (index !== -1) { members.splice(index, 1); membersNames.splice(index, 1); membersRoles.splice(index, 1); }
-                        const { error: updateError } = await supabaseClient.from('clans').update({ members: members, members_names: membersNames, members_roles: membersRoles }).eq('id', _clanData.clanId);
-                        if (updateError) throw updateError;
-                    } catch(e) { console.warn('leaveClan error:', e); showToast('❌ Ошибка при выходе из клана', '#ff8888'); return false; }
-                }
-                _clanData = { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: _clanData.clanKCollected || {} };
-                saveGame(); showToast('👋 Вы покинули клан', '#ffaa88'); updateClanUI();
-                if (_activeCollectionRank === 'k') { const reqSpan = document.getElementById('kChestRequirement'); if (reqSpan) { reqSpan.innerHTML = '❌ Требуется клан!'; reqSpan.style.color = '#ff8888'; } }
-                return true;
-            }
-
             async function kickFromClan(targetPlayerId, targetPlayerName) {
                 if (!supabaseClient || !_clanData.clanId) {
                     showToast('❌ Вы не состоите в клане!', '#ff8888');
@@ -3579,8 +3555,6 @@
                         });
                     }
                     
-                    // Кнопка выхода - обработчик уже привязан в initClanButtons()
-                    
                 } else {
                     // Нет клана - показываем создание/поиск
                     noClanBlock.style.display = 'block';
@@ -3589,9 +3563,6 @@
                     // Очищаем результаты поиска при переключении
                     const resultsDiv = document.getElementById('clanSearchResults');
                     if (resultsDiv) resultsDiv.innerHTML = '';
-                    
-                    // Кнопки НЕ ПЕРЕСОЗДАЁМ, они уже есть в HTML
-                    // Обработчики привязаны один раз в initClanButtons()
                 }
             }
 
@@ -4886,6 +4857,68 @@
                     });
                 } catch(e) { console.warn('loadTopFromSupabase error:', e); }
             }
+
+            function restoreClanData() {
+                if (!_clanData.clanId) return;
+                
+                console.log('🔄 Восстановление данных клана из localStorage');
+                console.log('clanId:', _clanData.clanId);
+                console.log('clanName:', _clanData.clanName);
+                console.log('members:', _clanData.clanMembers.length);
+                console.log('myRole:', _clanData.myRole);
+                
+                // Обновляем UI
+                updateClanUI();
+                
+                // Обновляем сундук K, если открыта вкладка K
+                if (_activeCollectionRank === 'k') {
+                    const reqSpan = document.getElementById('kChestRequirement');
+                    if (reqSpan) {
+                        reqSpan.innerHTML = '✅ Вы в клане!';
+                        reqSpan.style.color = '#88ff88';
+                    }
+                }
+            }
+
+            async function refreshClanData() {
+                if (!_clanData.clanId) return;
+                
+                console.log('🔄 Обновление данных клана...');
+                
+                try {
+                    const { data: clan, error } = await supabaseClient
+                        .from('clans')
+                        .select('*')
+                        .eq('id', _clanData.clanId)
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    if (clan) {
+                        const members = clan.members || [];
+                        const membersNames = clan.members_names || [];
+                        const membersRoles = clan.members_roles || [];
+                        
+                        _clanData = {
+                            clanId: clan.id,
+                            clanName: clan.clan_name,
+                            clanMembers: members.map((id, idx) => ({
+                                playerId: id,
+                                playerName: membersNames[idx],
+                                role: membersRoles[idx]
+                            })),
+                            myRole: membersRoles[members.indexOf(_playerId)] || null,
+                            clanKCollected: _clanData.clanKCollected || {}
+                        };
+                        
+                        saveGame();
+                        updateClanUI();
+                        console.log('✅ Данные клана обновлены, участников:', _clanData.clanMembers.length);
+                    }
+                } catch(e) {
+                    console.error('Ошибка обновления данных клана:', e);
+                }
+            }
                         
             function initSupabase() {
                 const s = document.createElement('script');
@@ -4984,10 +5017,10 @@
                             // Убеждаемся, что структура данных правильная
                             if (!_clanData.clanMembers) _clanData.clanMembers = [];
                             if (!_clanData.clanKCollected) _clanData.clanKCollected = {};
-                            restoreClanData();
                         } else {
                             console.log('❌ Нет сохранённого клана');
                         }
+                        restoreClanData();
 
                         // Периодическое обновление данных клана (каждые 10 секунд)
                         if (_clanData.clanId && _clanData.myRole === 'leader') {
@@ -5014,69 +5047,7 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
-            }
-
-            function restoreClanData() {
-                if (!_clanData.clanId) return;
-                
-                console.log('🔄 Восстановление данных клана из localStorage');
-                console.log('clanId:', _clanData.clanId);
-                console.log('clanName:', _clanData.clanName);
-                console.log('members:', _clanData.clanMembers.length);
-                console.log('myRole:', _clanData.myRole);
-                
-                // Обновляем UI
-                updateClanUI();
-                
-                // Обновляем сундук K, если открыта вкладка K
-                if (_activeCollectionRank === 'k') {
-                    const reqSpan = document.getElementById('kChestRequirement');
-                    if (reqSpan) {
-                        reqSpan.innerHTML = '✅ Вы в клане!';
-                        reqSpan.style.color = '#88ff88';
-                    }
-                }
-            }
-
-            async function refreshClanData() {
-                if (!_clanData.clanId) return;
-                
-                console.log('🔄 Обновление данных клана...');
-                
-                try {
-                    const { data: clan, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .eq('id', _clanData.clanId)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    if (clan) {
-                        const members = clan.members || [];
-                        const membersNames = clan.members_names || [];
-                        const membersRoles = clan.members_roles || [];
-                        
-                        _clanData = {
-                            clanId: clan.id,
-                            clanName: clan.clan_name,
-                            clanMembers: members.map((id, idx) => ({
-                                playerId: id,
-                                playerName: membersNames[idx],
-                                role: membersRoles[idx]
-                            })),
-                            myRole: membersRoles[members.indexOf(_playerId)] || null,
-                            clanKCollected: _clanData.clanKCollected || {}
-                        };
-                        
-                        saveGame();
-                        updateClanUI();
-                        console.log('✅ Данные клана обновлены, участников:', _clanData.clanMembers.length);
-                    }
-                } catch(e) {
-                    console.error('Ошибка обновления данных клана:', e);
-                }
-            }
+            }       
 
             function checkRankUpgrade() {
             const currentRank = getCurrentRank();
