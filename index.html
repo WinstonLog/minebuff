@@ -1484,6 +1484,7 @@
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="calendar">📅 Календарь<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
+                <div class="menu-item" data-tab="clan">🏰 Клан<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="exchange">🔄 Обмен<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
@@ -1739,33 +1740,114 @@
             </div>
         </div>
 
-        <!-- КОЛЛЕКЦИЯ F-РАНГА -->
+        <!-- КЛАНЫ -->
+        <div class="tab-panel" id="clanPanel">
+            <div class="game-panel" style="min-height: 500px;">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🏰 КЛАНЫ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 16px;">Объединяйтесь с друзьями и собирайте K-ранг!</div>
+                
+                <!-- ЕСЛИ НЕТ КЛАНА - ПОКАЗЫВАЕМ СОЗДАНИЕ/ПОИСК -->
+                <div id="clanNoClanBlock" style="display: block;">
+                    <!-- ПОИСК КЛАНА -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">🔍 ПОИСК КЛАНА</div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <input type="text" id="clanSearchInput" placeholder="Название клана" style="flex: 2; padding: 12px; border-radius: 40px; background: #0f1a1f; border: 1px solid #ffcc66; color: white; font-size: 14px;">
+                            <button id="searchClanBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">🔍 НАЙТИ</button>
+                        </div>
+                        <div id="clanSearchResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                    
+                    <!-- СОЗДАНИЕ КЛАНА -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">✨ СОЗДАТЬ КЛАН</div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <input type="text" id="clanCreateInput" placeholder="Название клана (3-20 символов)" maxlength="20" style="flex: 2; padding: 12px; border-radius: 40px; background: #0f1a1f; border: 1px solid #ffcc66; color: white; font-size: 14px;">
+                            <button id="createClanBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">🚀 СОЗДАТЬ</button>
+                        </div>
+                        <div style="font-size: 11px; opacity: 0.7; margin-top: 6px;">Стоимость создания: <strong style="color: #ffcc66;">500💎</strong> | Максимум 10 участников</div>
+                    </div>
+                </div>
+                
+                <!-- ЕСЛИ ЕСТЬ КЛАН - ПОКАЗЫВАЕМ ИНФОРМАЦИЮ О КЛАНЕ -->
+                <div id="clanHasClanBlock" style="display: none;">
+                    <div id="clanInfoCard" style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 16px; border: 2px solid #ffcc66;">
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <div style="font-size: 64px;">🏰</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 20px;" id="clanNameDisplay">—</div>
+                                <div style="font-size: 12px; opacity: 0.8;" id="clanRoleDisplay">—</div>
+                                <div style="font-size: 12px; margin-top: 4px;" id="clanMembersCountDisplay">👥 0/10</div>
+                            </div>
+                            <button id="leaveClanBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; color: white; cursor: pointer;">❌ ПОКИНУТЬ</button>
+                        </div>
+                    </div>
+                    
+                    <!-- СПИСОК УЧАСТНИКОВ -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">👥 УЧАСТНИКИ КЛАНА</div>
+                        <div id="clanMembersList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;"></div>
+                    </div>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 20px; padding: 12px; text-align: center; font-size: 11px;">
+                    🏰 <strong>О кланах</strong><br>
+                    • Максимум 10 участников в клане<br>
+                    • Клановый сундук K доступен только участникам по средам с 8:00 до 23:00<br>
+                    • Стоимость открытия: 100💎<br>
+                    • K-ранг — эксклюзивная коллекция, 50 карт<br>
+                    • Дубликаты K-ранга превращаются в +7💎
+                </div>
+            </div>
+        </div>
+
+        <!-- КОЛЛЕКЦИЯ Q И K РАНГОВ (ОБЪЕДИНЁННАЯ) -->
         <div class="tab-panel" id="collectionPanel">
             <div class="collection-q-panel">
-                <!-- СУНДУК Q - НАВЕРХУ -->
-                <div style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #ffaa33;">
+                
+                <!-- ВКЛАДКИ ДЛЯ ПЕРЕКЛЮЧЕНИЯ МЕЖДУ Q И K -->
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 60px; padding: 4px;">
+                    <button id="collectionQTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: #ffcc66; border: none;">🎴 Q-РАНГ</button>
+                    <button id="collectionKTab" style="flex: 1; padding: 10px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; background: transparent; color: #fff; border: none;">🏰 K-РАНГ (КЛАН)</button>
+                </div>
+                
+                <!-- СУНДУК Q (обычный) -->
+                <div id="qChestBlock" style="background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #ffaa33;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <div style="font-size: 48px;">📦</div>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 16px;">МИСТИЧЕСКИЙ СУНДУК</div>
+                            <div style="font-weight: bold; font-size: 16px;">МИСТИЧЕСКИЙ СУНДУК Q</div>
                             <div style="font-size: 12px; opacity: 0.7;">Случайная карта Q или E!</div>
-                            <div style="font-size: 11px; margin-top: 4px;">🕐Доступен по средам с 8:00 до 23:00</div>
+                            <div style="font-size: 11px; margin-top: 4px;">🕐 Доступен по средам с 8:00 до 23:00</div>
                         </div>
-                        <button id="openFChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">100💎 ОТКРЫТЬ</button>
+                        <button id="openQChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">100💎 ОТКРЫТЬ</button>
+                    </div>
+                </div>
+                
+                <!-- СУНДУК K (клановый) -->
+                <div id="kChestBlock" style="display: none; background: linear-gradient(135deg, #2a1a2a, #1a0a1a); border-radius: 30px; padding: 16px; margin-bottom: 20px; border: 2px solid #8B0000;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div style="font-size: 48px;">🏰</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; font-size: 16px;">КЛАНОВЫЙ СУНДУК K</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Случайная карта K или E!</div>
+                            <div style="font-size: 11px; margin-top: 4px;">🕐 Доступен по средам с 8:00 до 23:00 | <span id="kChestRequirement">❌ Требуется клан!</span></div>
+                        </div>
+                        <button id="openKChestBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">100💎 ОТКРЫТЬ</button>
                     </div>
                 </div>
                 
                 <!-- СТАТИСТИКА -->
                 <div class="collection-q-header">
-                    <div class="collection-q-title">🎴 КОЛЛЕКЦИЯ Q-РАНГА</div>
-                    <div class="collection-q-stats" id="collectionFProgress">0/24</div>
+                    <div class="collection-q-title" id="collectionTitle">🎴 КОЛЛЕКЦИЯ Q-РАНГА</div>
+                    <div class="collection-q-stats" id="collectionProgress">0/50</div>
                 </div>
                 
                 <!-- СЕТКА КАРТ -->
-                <div id="collectionFGrid" class="collection-q-grid"></div>
+                <div id="collectionGrid" class="collection-q-grid"></div>
                 
-                <!-- ИНФОРМАЦИОННЫЙ БЛОК (ПРИЖАТ К НИЗУ) -->
-                <div class="collection-q-info">
+                <!-- ИНФОРМАЦИОННЫЙ БЛОК -->
+                <div class="collection-q-info" id="collectionInfo">
                     🎴 <strong>Q-ранг</strong> — эксклюзивные коллекционные карты.<br>
                     💰 Дубликаты Q-ранга превращаются в +7💎<br>
                     📦 Сундук Q доступен по <strong>средам с 8:00 до 23:00</strong>
@@ -2063,6 +2145,59 @@
         </div>
     </div>
 
+    <!-- Модальное окно для выхода из клана -->
+    <div class="modal" id="leaveClanConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
+                <div class="modal-icon">🏰</div>
+                <div class="modal-title">ПОКИНУТЬ КЛАН</div>
+            </div>
+            <div class="modal-body">
+                <div id="leaveClanMessage" style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите покинуть клан?</div>
+                <div id="leaveClanWarning" style="font-size: 12px; opacity: 0.7; margin-bottom: 16px;"></div>
+                <div class="modal-buttons" style="gap: 12px;">
+                    <button class="modal-btn close" id="leaveClanCancelBtn">❌ ОТМЕНА</button>
+                    <button class="modal-btn upgrade" id="leaveClanConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">✅ ПОДТВЕРДИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для удаления клана (лидер) -->
+    <div class="modal" id="deleteClanConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
+                <div class="modal-icon">⚠️</div>
+                <div class="modal-title">УДАЛИТЬ КЛАН</div>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите удалить клан?</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-bottom: 16px;">⚠️ Это действие НЕЛЬЗЯ отменить! Все участники будут выгнаны.</div>
+                <div class="modal-buttons" style="gap: 12px;">
+                    <button class="modal-btn close" id="deleteClanCancelBtn">❌ ОТМЕНА</button>
+                    <button class="modal-btn upgrade" id="deleteClanConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">🗑️ УДАЛИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для исключения игрока -->
+    <div class="modal" id="kickMemberConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
+                <div class="modal-icon">👢</div>
+                <div class="modal-title">ИСКЛЮЧИТЬ ИГРОКА</div>
+            </div>
+            <div class="modal-body">
+                <div id="kickMemberMessage" style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите исключить игрока?</div>
+                <div class="modal-buttons" style="gap: 12px;">
+                    <button class="modal-btn close" id="kickMemberCancelBtn">❌ ОТМЕНА</button>
+                    <button class="modal-btn upgrade" id="kickMemberConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">👢 ИСКЛЮЧИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Контейнер для уведомлений -->
     <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
     </div>
@@ -2168,7 +2303,7 @@
                 { day: 30, type: 'card', rank: 'C', text: 'Карта C' }
             ];
 
-            // ========== F РАНГ (КОЛЛЕКЦИЯ) ==========
+            // ========== Q РАНГ (КОЛЛЕКЦИЯ) ==========
             const qRankCards = [
                 { id: 1, name: '', image: 'q_1.png' },
                 { id: 2, name: '', image: 'q_2.png' },
@@ -2261,6 +2396,30 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
+            // ========== K РАНГ (КОЛЛЕКЦИЯ КЛАНА) ==========
+            const kRankCards = Array.from({ length: 50 }, (_, i) => ({
+                id: i + 1,
+                name: `K-${i + 1}`,
+                image: `k_${i + 1}.png`
+            }));
+
+            // ========== ПЕРЕМЕННЫЕ ДЛЯ КЛАНОВ ==========
+            let _clanData = {
+                clanId: null,
+                clanName: null,
+                clanMembers: [], // [{ playerId, playerName, role, joinDate }]
+                myRole: null, // 'leader', 'member'
+                clanKCollected: {} // { cardId: true } для K-ранга
+            };
+
+            // Переменные для хранения данных перед подтверждением
+            let _pendingLeaveClan = false;
+            let _pendingKickData = null;
+
+            const CLAN_CREATION_PRICE = 500;
+
+            // Текущий активный ранг в коллекции ('q' или 'k')
+            let _activeCollectionRank = 'q';
 
             // ========== ПИТОМЕЦ ==========
             let _hasPet = false;          // есть ли питомец
@@ -2280,6 +2439,7 @@
             const sectionLevelRequirements = {
                 'profile': 1,
                 'collection': 2,
+                'clan':5,
                 'pets': 3,
                 'calendar': 5,
                 'mine': 1,
@@ -2294,6 +2454,7 @@
             const sectionNames = {
                 'profile': 'Профиль',
                 'collection': 'Коллекция',
+                'clan': 'Клан',
                 'pets': 'Питомцы',
                 'calendar': 'Календарь',
                 'mine': 'Шахта',
@@ -2439,6 +2600,174 @@
                 }
             }
 
+            function switchCollectionRank(rank) {
+                _activeCollectionRank = rank;
+                
+                const qChestBlock = document.getElementById('qChestBlock');
+                const kChestBlock = document.getElementById('kChestBlock');
+                const collectionTitle = document.getElementById('collectionTitle');
+                const collectionInfo = document.getElementById('collectionInfo');
+                const qTab = document.getElementById('collectionQTab');
+                const kTab = document.getElementById('collectionKTab');
+                
+                if (rank === 'q') {
+                    if (qChestBlock) qChestBlock.style.display = 'flex';
+                    if (kChestBlock) kChestBlock.style.display = 'none';
+                    if (collectionTitle) collectionTitle.innerHTML = '🎴 КОЛЛЕКЦИЯ Q-РАНГА';
+                    if (collectionInfo) collectionInfo.innerHTML = `🎴 <strong>Q-ранг</strong> — эксклюзивные коллекционные карты.<br>💰 Дубликаты Q-ранга превращаются в +7💎<br>📦 Сундук Q доступен по <strong>средам с 8:00 до 23:00</strong>`;
+                    if (qTab) { qTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)'; qTab.style.color = '#ffcc66'; }
+                    if (kTab) { kTab.style.background = 'transparent'; kTab.style.color = '#fff'; }
+                    updateCollectionUI();
+                } else if (rank === 'k') {
+                    if (qChestBlock) qChestBlock.style.display = 'none';
+                    if (kChestBlock) kChestBlock.style.display = 'flex';
+                    if (collectionTitle) collectionTitle.innerHTML = '🏰 КОЛЛЕКЦИЯ K-РАНГА (КЛАН)';
+                    const requirementSpan = document.getElementById('kChestRequirement');
+                    if (requirementSpan) {
+                        requirementSpan.innerHTML = _clanData.clanId ? '✅ Вы в клане!' : '❌ Требуется клан!';
+                        requirementSpan.style.color = _clanData.clanId ? '#88ff88' : '#ff8888';
+                    }
+                    if (collectionInfo) collectionInfo.innerHTML = `🏰 <strong>K-ранг</strong> — эксклюзивные клановые карты.<br>💰 Дубликаты K-ранга превращаются в +7💎<br>📦 Клановый сундук доступен только участникам клана по <strong>средам с 8:00 до 23:00</strong>`;
+                    if (kTab) { kTab.style.background = 'linear-gradient(135deg, #3a6b58, #1e3e31)'; kTab.style.color = '#ffcc66'; }
+                    if (qTab) { qTab.style.background = 'transparent'; qTab.style.color = '#fff'; }
+                    updateCollectionUI();
+                }
+            }
+
+            // Проверка доступности сундука Q
+            function isQChestAvailable() {
+                const now = new Date();
+                const day = now.getDay();
+                const hours = now.getHours();
+                if (day !== 3) return { available: false, reason: '📦 Сундук Q доступен только по средам!' };
+                if (hours < 8 || hours >= 23) return { available: false, reason: '📦 Сундук Q доступен с 8:00 до 23:00 по средам!' };
+                return { available: true, reason: null };
+            }
+
+            // Проверка доступности сундука K
+            function isKChestAvailable() {
+                const now = new Date();
+                const day = now.getDay();
+                const hours = now.getHours();
+                if (!_clanData.clanId) return { available: false, reason: '❌ Вы не состоите в клане!' };
+                if (day !== 3) return { available: false, reason: '🏰 Клановый сундук доступен только по средам!' };
+                if (hours < 8 || hours >= 23) return { available: false, reason: '🏰 Клановый сундук доступен с 8:00 до 23:00 по средам!' };
+                if (_level < 5) return { available: false, reason: '🔒 Кланы доступны с 5 уровня!' };
+                return { available: true, reason: null };
+            }
+
+            // Открытие сундука Q
+            function openQChest() {
+                if (_level < 2) { showToast("🔒 Коллекция Q доступна с 2 уровня!", "#ffaa88"); return; }
+                const availability = isQChestAvailable();
+                if (!availability.available) { showToast(availability.reason, "#ffaa88"); return; }
+                if (_diamonds < 100) { showToast("❌ Нужно 100 алмазов для открытия сундука Q!", "#ff8888"); return; }
+                _diamonds -= 100;
+                const isQRank = Math.random() < 0.2;
+                if (isQRank) {
+                    const availableCards = qRankCards.filter(card => !_collectedCards[card.id]);
+                    let card;
+                    if (availableCards.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * availableCards.length);
+                        card = availableCards[randomIndex];
+                        _collectedCards[card.id] = true;
+                        showQRankRewardModal(card, false);
+                        showToast(`✨ НОВАЯ КАРТА Q: ${card.id}! ✨`, "#ffd966");
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * qRankCards.length);
+                        card = qRankCards[randomIndex];
+                        _diamonds += 7;
+                        showQRankRewardModal(card, true);
+                        showToast(`🔄 Дубликат Q-ранга! +7💎`, "#ffd966");
+                    }
+                    updateQuestProgress('daily_card', 1);
+                } else {
+                    addCardToHistory('E');
+                    showToast(`🎴 Вы получили карту E из сундука Q!`, "#aaffdd");
+                }
+                saveGame();
+                updateUI();
+                updateCollectionUI();
+            }
+
+            // Открытие сундука K
+            function openKChest() {
+                if (_level < 5) { showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); return; }
+                const availability = isKChestAvailable();
+                if (!availability.available) { showToast(availability.reason, '#ffaa88'); return; }
+                if (_diamonds < 100) { showToast('❌ Нужно 100 алмазов для открытия кланового сундука!', '#ff8888'); return; }
+                _diamonds -= 100;
+                const isKRank = Math.random() < 0.2;
+                if (isKRank) {
+                    const availableCards = kRankCards.filter(card => !_clanData.clanKCollected[card.id]);
+                    let card;
+                    if (availableCards.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * availableCards.length);
+                        card = availableCards[randomIndex];
+                        _clanData.clanKCollected[card.id] = true;
+                        showKRankRewardModal(card, false);
+                        showToast(`✨ НОВАЯ КАРТА K: ${card.id}! ✨`, '#ffd966');
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * kRankCards.length);
+                        card = kRankCards[randomIndex];
+                        _diamonds += 7;
+                        showKRankRewardModal(card, true);
+                        showToast(`🔄 Дубликат K-ранга! +7💎`, '#ffd966');
+                    }
+                    updateQuestProgress('daily_card', 1);
+                } else {
+                    addCardToHistory('E');
+                    showToast('🎴 Вы получили карту E из кланового сундука!', '#aaffdd');
+                }
+                saveGame();
+                updateUI();
+                updateCollectionUI();
+            }
+
+            function showQRankRewardModal(card, isDuplicate) {
+                const modalHtml = `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1100; display: flex; justify-content: center; align-items: center;">
+                    <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 2px solid #ffcc66;">
+                        <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
+                            <div style="font-size: 48px;">🎴</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #1a1a2e;">НОВАЯ КАРТА!</div>
+                        </div>
+                        <div style="padding: 24px 20px;">
+                            <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту Q-ранга:</div>
+                            <div style="font-size: 48px; font-weight: bold; background: linear-gradient(135deg, #ffcc66, #ffaa33); border-radius: 30px; padding: 20px; margin: 10px 0; color: #1a1a2e;">Карта #${card.id}</div>
+                            <div style="font-size: 14px; color: #ffcc66; margin-bottom: 16px;">${isDuplicate ? '🔄 Дубликат! +7💎' : '✨ НОВАЯ КАРТА В КОЛЛЕКЦИЮ! ✨'}</div>
+                            <button id="closeQRankModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
+                        </div>
+                    </div>
+                </div>`;
+                const modalDiv = document.createElement('div');
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                document.getElementById('closeQRankModalBtn').onclick = () => modalDiv.remove();
+                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+            }
+
+            function showKRankRewardModal(card, isDuplicate) {
+                const modalHtml = `<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 1100; display: flex; justify-content: center; align-items: center;">
+                    <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 340px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 2px solid #8B0000;">
+                        <div style="background: linear-gradient(135deg, #8B0000, #ff4444); padding: 20px;">
+                            <div style="font-size: 48px;">🏰</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #ffcc66;">КЛАНОВАЯ КАРТА!</div>
+                        </div>
+                        <div style="padding: 24px 20px;">
+                            <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту K-ранга:</div>
+                            <div style="font-size: 48px; font-weight: bold; background: linear-gradient(135deg, #8B0000, #ff4444); border-radius: 30px; padding: 20px; margin: 10px 0; color: white;">Карта #${card.id}</div>
+                            <div style="font-size: 14px; color: #ffcc66; margin-bottom: 16px;">${isDuplicate ? '🔄 Дубликат! +7💎' : '✨ НОВАЯ КАРТА В КОЛЛЕКЦИЮ КЛАНА! ✨'}</div>
+                            <button id="closeKRankModalBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
+                        </div>
+                    </div>
+                </div>`;
+                const modalDiv = document.createElement('div');
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                document.getElementById('closeKRankModalBtn').onclick = () => modalDiv.remove();
+                modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+            }
+
             function getCurrentRank() {
                 for (const rank of rankTitles) {
                     if (_level >= rank.minLevel && _level <= rank.maxLevel) {
@@ -2545,6 +2874,208 @@
                 updateCollectionUI();
             }
 
+            // Функция показа модального окна выхода из клана
+            function showLeaveClanConfirmModal() {
+                if (!_clanData.clanId) {
+                    showToast('❌ Вы не состоите в клане!', '#ff8888');
+                    return;
+                }
+                
+                const isLeader = _clanData.myRole === 'leader';
+                const warningDiv = document.getElementById('leaveClanWarning');
+                const messageDiv = document.getElementById('leaveClanMessage');
+                
+                if (isLeader) {
+                    messageDiv.innerHTML = '⚠️ ВЫ ЛИДЕР КЛАНА! ⚠️';
+                    warningDiv.innerHTML = 'Если вы покинете клан, он будет полностью УДАЛЁН вместе со всеми участниками. Это действие НЕЛЬЗЯ отменить!';
+                } else {
+                    messageDiv.innerHTML = 'Вы уверены, что хотите покинуть клан?';
+                    warningDiv.innerHTML = 'Вы сможете вступить в другой клан позже.';
+                }
+                
+                document.getElementById('leaveClanConfirmModal').classList.add('show');
+            }
+
+            // Функция показа модального окна исключения
+            function showKickMemberConfirmModal(playerId, playerName) {
+                _pendingKickData = { playerId, playerName };
+                document.getElementById('kickMemberMessage').innerHTML = `Вы уверены, что хотите исключить игрока <strong>${escapeHtml(playerName)}</strong> из клана?`;
+                document.getElementById('kickMemberConfirmModal').classList.add('show');
+            }
+
+            async function leaveClanConfirmed() {
+                if (!supabaseClient || !_clanData.clanId) { 
+                    showToast('❌ Вы не состоите в клане!', '#ff8888'); 
+                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
+                    return false; 
+                }
+                
+                const isLeader = _clanData.myRole === 'leader';
+                const clanIdToDelete = _clanData.clanId;
+                
+                try {
+                    if (isLeader) {
+                        // Лидер удаляет клан
+                        const { error } = await supabaseClient
+                            .from('clans')
+                            .delete()
+                            .eq('id', clanIdToDelete);
+                        
+                        if (error) throw error;
+                        showToast('🗑️ Клан удалён!', '#ffaa88');
+                    } else {
+                        // Обычный участник выходит
+                        const { data: clan, error } = await supabaseClient
+                            .from('clans')
+                            .select('*')
+                            .eq('id', clanIdToDelete)
+                            .single();
+                        
+                        if (error) throw error;
+                        
+                        let members = clan.members || [];
+                        let membersNames = clan.members_names || [];
+                        let membersRoles = clan.members_roles || [];
+                        
+                        const index = members.indexOf(_playerId);
+                        if (index !== -1) {
+                            members.splice(index, 1);
+                            membersNames.splice(index, 1);
+                            membersRoles.splice(index, 1);
+                        }
+                        
+                        const { error: updateError } = await supabaseClient
+                            .from('clans')
+                            .update({
+                                members: members,
+                                members_names: membersNames,
+                                members_roles: membersRoles
+                            })
+                            .eq('id', clanIdToDelete);
+                        
+                        if (updateError) throw updateError;
+                        showToast('👋 Вы покинули клан', '#ffaa88');
+                    }
+                    
+                    // === ПОЛНОСТЬЮ ОЧИЩАЕМ ДАННЫЕ КЛАНА ===
+                    _clanData = { 
+                        clanId: null, 
+                        clanName: null, 
+                        clanMembers: [], 
+                        myRole: null, 
+                        clanKCollected: _clanData?.clanKCollected || {} 
+                    };
+                    
+                    // === ОБЯЗАТЕЛЬНО СОХРАНЯЕМ ===
+                    saveGame();
+                    
+                    // === ОБНОВЛЯЕМ UI ===
+                    updateClanUI();
+                    updateUI();
+                    
+                    // === ОБНОВЛЯЕМ СУНДУК K ===
+                    if (_activeCollectionRank === 'k') { 
+                        const reqSpan = document.getElementById('kChestRequirement'); 
+                        if (reqSpan) { 
+                            reqSpan.innerHTML = '❌ Требуется клан!'; 
+                            reqSpan.style.color = '#ff8888'; 
+                        } 
+                    }
+                    
+                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
+                    
+                    // === ПРОВЕРКА В КОНСОЛИ ===
+                    console.log('✅ Выход из клана выполнен, _clanData.clanId:', _clanData.clanId);
+                    
+                    return true;
+                    
+                } catch(e) { 
+                    console.error('❌ leaveClan error:', e); 
+                    showToast('❌ Ошибка: ' + e.message, '#ff8888'); 
+                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
+                    return false; 
+                }
+            }
+
+            // Новая функция kickFromClan с подтверждением
+            async function kickFromClanConfirmed() {
+                if (!_pendingKickData) return;
+                
+                const { playerId, playerName } = _pendingKickData;
+                
+                if (!supabaseClient || !_clanData.clanId) {
+                    showToast('❌ Вы не состоите в клане!', '#ff8888');
+                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                    _pendingKickData = null;
+                    return false;
+                }
+                
+                if (_clanData.myRole !== 'leader') {
+                    showToast('❌ Только лидер может исключать участников!', '#ff8888');
+                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                    _pendingKickData = null;
+                    return false;
+                }
+                
+                try {
+                    const { data: clan, error } = await supabaseClient
+                        .from('clans')
+                        .select('*')
+                        .eq('id', _clanData.clanId)
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    let members = clan.members || [];
+                    let membersNames = clan.members_names || [];
+                    let membersRoles = clan.members_roles || [];
+                    
+                    const index = members.indexOf(playerId);
+                    if (index === -1) {
+                        showToast('❌ Игрок не найден в клане!', '#ff8888');
+                        document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                        _pendingKickData = null;
+                        return false;
+                    }
+                    
+                    members.splice(index, 1);
+                    membersNames.splice(index, 1);
+                    membersRoles.splice(index, 1);
+                    
+                    const { error: updateError } = await supabaseClient
+                        .from('clans')
+                        .update({
+                            members: members,
+                            members_names: membersNames,
+                            members_roles: membersRoles
+                        })
+                        .eq('id', _clanData.clanId);
+                    
+                    if (updateError) throw updateError;
+                    
+                    _clanData.clanMembers = members.map((id, idx) => ({
+                        playerId: id,
+                        playerName: membersNames[idx],
+                        role: membersRoles[idx]
+                    }));
+                    
+                    saveGame();
+                    updateClanUI();
+                    showToast(`👢 Игрок ${playerName} исключён из клана!`, '#ffaa88');
+                    
+                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                    _pendingKickData = null;
+                    return true;
+                    
+                } catch(e) {
+                    console.error('kickFromClan error:', e);
+                    showToast('❌ Ошибка при исключении игрока', '#ff8888');
+                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                    _pendingKickData = null;
+                    return false;
+                }
+            }
+
             function showFChestRewardModal(reward) {
                 const modal = document.getElementById('fCardModal');
                 if (!modal) return;
@@ -2632,61 +3163,504 @@
             }
 
             function updateCollectionUI() {
-                const gridContainer = document.getElementById('collectionFGrid');
+                const gridContainer = document.getElementById('collectionGrid');
                 if (!gridContainer) return;
                 
-                const collectedCount = Object.keys(_collectedCards).length;
-                const totalCards = qRankCards.length;
-                const percent = Math.floor((collectedCount / totalCards) * 100);
+                let cards, collectedCards, totalCards, rankName, borderColor;
                 
-                const progressSpan = document.getElementById('collectionFProgress');
-                if (progressSpan) {
-                    progressSpan.innerHTML = `${collectedCount}/${totalCards} (${percent}%)`;
+                if (_activeCollectionRank === 'q') {
+                    cards = qRankCards;
+                    collectedCards = _collectedCards;
+                    totalCards = qRankCards.length;
+                    rankName = 'Q';
+                    borderColor = '#ffcc66';
+                } else {
+                    cards = kRankCards;
+                    collectedCards = _clanData.clanKCollected || {};
+                    totalCards = kRankCards.length;
+                    rankName = 'K';
+                    borderColor = '#8B0000';
                 }
                 
-                // Очищаем контейнер
-                gridContainer.innerHTML = '';
+                const collectedCount = Object.keys(collectedCards).length;
+                const percent = Math.floor((collectedCount / totalCards) * 100);
+                const progressSpan = document.getElementById('collectionProgress');
+                if (progressSpan) progressSpan.innerHTML = `${collectedCount}/${totalCards} (${percent}%)`;
                 
-                // Показываем ВСЕ карты (без фильтрации)
-                qRankCards.forEach(card => {
-                    const isCollected = _collectedCards[card.id];
+                gridContainer.innerHTML = '';
+                cards.forEach(card => {
+                    const isCollected = collectedCards[card.id];
                     const cardDiv = document.createElement('div');
                     cardDiv.className = `collection-q-card ${isCollected ? 'collected' : 'missing'}`;
-                    cardDiv.setAttribute('data-card-id', card.id);
-                    cardDiv.setAttribute('data-card-name', card.name);
-                    cardDiv.setAttribute('data-card-image', `q_${card.id}.png`);
-                    
                     if (isCollected) {
                         cardDiv.innerHTML = `
                             <div class="collection-q-image-container">
-                                <img class="collection-q-image" src="cards/q_${card.id}.png" alt="${card.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' fill=\'%232a3a3a\'/%3E%3Ctext x=\'40\' y=\'45\' text-anchor=\'middle\' fill=\'%23ffcc66\' font-size=\'12\'%3E🎴%3C/text%3E%3C/svg%3E'">
-                                <div class="collection-q-rank-corner">Q</div>
+                                <img class="collection-q-image" src="cards/${rankName === 'Q' ? 'q' : 'k'}_${card.id}.png" alt="${rankName}-${card.id}" onerror="this.src='data:image/svg+xml,%3Csvg...'">
+                                <div class="collection-q-rank-corner" style="background: linear-gradient(135deg, ${borderColor}, ${rankName === 'K' ? '#ff4444' : '#ffaa33'});">${rankName}</div>
                             </div>
-                            <div class="collection-q-name">${card.name}</div>
+                            <div class="collection-q-name">${rankName === 'K' ? `Карта K-${card.id}` : (card.name || `Карта Q-${card.id}`)}</div>
                             <div class="collection-q-status">✅ Собрано</div>
                         `;
                     } else {
                         cardDiv.innerHTML = `
                             <div class="collection-q-image-container">
-                                <div style="width: 80px; height: 112px; background: #2a3a3a; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                    <span style="font-size: 32px;">❓</span>
-                                </div>
-                                <div class="collection-q-rank-corner" style="opacity:0.5;">Q</div>
+                                <div style="width: 80px; height: 112px; background: #2a3a3a; border-radius: 12px; display: flex; align-items: center; justify-content: center;"><span style="font-size: 32px;">❓</span></div>
+                                <div class="collection-q-rank-corner" style="background: linear-gradient(135deg, ${borderColor}, ${rankName === 'K' ? '#ff4444' : '#ffaa33'}); opacity:0.5;">${rankName}</div>
                             </div>
                             <div class="collection-q-name">???</div>
                             <div class="collection-q-status missing">❌ Не собрано</div>
                         `;
                     }
+                    gridContainer.appendChild(cardDiv);
+                });
+                checkAchievements();
+            }
+
+            // Поиск клана
+            async function searchClan(clanName) {
+                console.log('🔍 searchClan called with:', clanName);
+                console.log('supabaseClient exists?', !!supabaseClient);
+                
+                if (!supabaseClient) { 
+                    console.error('❌ supabaseClient is null!');
+                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
+                    return null; 
+                }
+                
+                try {
+                    console.log('📡 Sending request to Supabase...');
+                    const { data, error } = await supabaseClient
+                        .from('clans')
+                        .select('*')
+                        .ilike('clan_name', `%${clanName}%`)
+                        .limit(20);
                     
-                    if (isCollected) {
-                        cardDiv.addEventListener('click', () => {
-                            showCollectionCardModal(card.name, `cards/q_${card.id}.png`);
+                    if (error) {
+                        console.error('❌ Supabase error:', error);
+                        throw error;
+                    }
+                    
+                    console.log('✅ Search results:', data);
+                    showToast(`🔍 Найдено кланов: ${data?.length || 0}`, '#aaffdd');
+                    return data || [];
+                } catch(e) { 
+                    console.error('❌ searchClan error:', e); 
+                    showToast('❌ Ошибка поиска клана: ' + e.message, '#ff8888'); 
+                    return null; 
+                }
+            }
+
+            async function createClan(clanName) {
+                console.log('🚀 createClan НАЧАЛО, clanName:', clanName);
+                
+                if (!supabaseClient) { 
+                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
+                    return false; 
+                }
+                
+                if (_level < 5) { 
+                    showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); 
+                    return false; 
+                }
+                
+                if (_clanData.clanId) { 
+                    showToast('❌ Вы уже состоите в клане!', '#ff8888'); 
+                    return false; 
+                }
+                
+                if (!clanName || clanName.length < 3 || clanName.length > 20) { 
+                    showToast('❌ Название клана должно быть 3-20 символов!', '#ff8888'); 
+                    return false; 
+                }
+                
+                // === НОВАЯ ПРОВЕРКА НА АЛМАЗЫ ===
+                if (_diamonds < CLAN_CREATION_PRICE) {
+                    showToast(`❌ Недостаточно алмазов! Нужно ${CLAN_CREATION_PRICE}💎 для создания клана!`, '#ff8888');
+                    return false;
+                }
+                
+                // Проверка на существование
+                try {
+                    const { data: existing } = await supabaseClient
+                        .from('clans')
+                        .select('clan_name')
+                        .eq('clan_name', clanName)
+                        .maybeSingle();
+                    
+                    if (existing) { 
+                        showToast('❌ Клан с таким названием уже существует!', '#ff8888'); 
+                        return false; 
+                    }
+                } catch(e) {}
+                
+                try {
+                    // === СПИСЫВАЕМ АЛМАЗЫ ===
+                    _diamonds -= CLAN_CREATION_PRICE;
+                    
+                    const { data, error } = await supabaseClient
+                        .from('clans')
+                        .insert({
+                            clan_name: clanName,
+                            leader_id: _playerId,
+                            leader_name: _playerName,
+                            created_at: new Date().toISOString(),
+                            members: [_playerId],
+                            members_names: [_playerName],
+                            members_roles: ['leader']
+                        })
+                        .select()
+                        .single();
+                    
+                    if (error) {
+                        // Если ошибка - возвращаем алмазы
+                        _diamonds += CLAN_CREATION_PRICE;
+                        throw error;
+                    }
+                    
+                    showToast(`🎉 Клан "${clanName}" успешно создан! -${CLAN_CREATION_PRICE}💎`, '#aaffdd');
+                    
+                    _clanData = { 
+                        clanId: data.id, 
+                        clanName: data.clan_name, 
+                        clanMembers: [{ playerId: _playerId, playerName: _playerName, role: 'leader' }], 
+                        myRole: 'leader', 
+                        clanKCollected: _clanData.clanKCollected || {} 
+                    };
+                    
+                    saveGame();
+                    updateClanUI();
+                    updateUI(); // Обновляем отображение алмазов
+                    
+                    if (_activeCollectionRank === 'k') { 
+                        const reqSpan = document.getElementById('kChestRequirement'); 
+                        if (reqSpan) { 
+                            reqSpan.innerHTML = '✅ Вы в клане!'; 
+                            reqSpan.style.color = '#88ff88'; 
+                        } 
+                    }
+                    return true;
+                    
+                } catch(e) { 
+                    console.error('❌ createClan error:', e); 
+                    showToast('❌ Ошибка создания клана: ' + e.message, '#ff8888'); 
+                    return false; 
+                }
+            }
+            // Вступление в клан
+            async function joinClan(clanId, clanName) {
+                console.log('👋 joinClan called, clanId:', clanId);
+                console.log('Текущий _clanData.clanId:', _clanData.clanId);
+                
+                
+                if (!supabaseClient) { 
+                    showToast('❌ Нет соединения с сервером', '#ff8888'); 
+                    return false; 
+                }
+                if (_level < 5) { 
+                    showToast('🔒 Кланы доступны с 5 уровня!', '#ffaa88'); 
+                    return false; 
+                }
+
+                // === ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА ===
+                if (_clanData.clanId) { 
+                    showToast('❌ Вы уже состоите в клане! Выйдите из текущего клана.', '#ff8888'); 
+                    console.log('❌ Отказ: уже в клане', _clanData.clanId);
+                    return false; 
+                }
+
+                try {
+                    console.log('📡 Fetching clan data...');
+                    const { data: clan, error } = await supabaseClient
+                        .from('clans')
+                        .select('*')
+                        .eq('id', clanId)
+                        .single();
+                    
+                    if (error) {
+                        console.error('❌ Fetch error:', error);
+                        throw error;
+                    }
+                    
+                    console.log('📡 Clan data:', clan);
+                    
+                    let members = clan.members || [];
+                    let membersNames = clan.members_names || [];
+                    let membersRoles = clan.members_roles || [];
+                    
+                    if (members.length >= 10) { 
+                        showToast('❌ Клан уже полон (максимум 10 участников)!', '#ff8888'); 
+                        return false; 
+                    }
+                    if (members.includes(_playerId)) { 
+                        showToast('❌ Вы уже в этом клане!', '#ff8888'); 
+                        return false; 
+                    }
+                    
+                    members.push(_playerId);
+                    membersNames.push(_playerName);
+                    membersRoles.push('member');
+                    
+                    console.log('📡 Updating clan members...');
+                    const { error: updateError } = await supabaseClient
+                        .from('clans')
+                        .update({
+                            members: members,
+                            members_names: membersNames,
+                            members_roles: membersRoles
+                        })
+                        .eq('id', clanId);
+                    
+                    if (updateError) {
+                        console.error('❌ Update error:', updateError);
+                        throw updateError;
+                    }
+                    
+                    _clanData = { 
+                        clanId: clanId, 
+                        clanName: clan.clan_name, 
+                        clanMembers: members.map((id, idx) => ({ 
+                            playerId: id, 
+                            playerName: membersNames[idx], 
+                            role: membersRoles[idx] 
+                        })), 
+                        myRole: 'member', 
+                        clanKCollected: _clanData.clanKCollected || {} 
+                    };
+                    
+                    saveGame(); 
+                    showToast(`✅ Вы вступили в клан "${clanName}"!`, '#aaffdd'); 
+                    updateClanUI();
+                    
+                    if (_activeCollectionRank === 'k') { 
+                        const reqSpan = document.getElementById('kChestRequirement'); 
+                        if (reqSpan) { 
+                            reqSpan.innerHTML = '✅ Вы в клане!'; 
+                            reqSpan.style.color = '#88ff88'; 
+                        } 
+                    }
+                    return true;
+                    
+                } catch(e) { 
+                    console.error('❌ joinClan error:', e); 
+                    showToast('❌ Ошибка вступления в клан: ' + e.message, '#ff8888'); 
+                    return false; 
+                }
+            }
+
+            async function leaveClan() {
+                if (!supabaseClient || !_clanData.clanId) { showToast('❌ Вы не состоите в клане!', '#ff8888'); return false; }
+                if (_clanData.myRole === 'leader') {
+                    if (!confirm('Вы лидер клана! При выходе клан будет распущен. Вы уверены?')) return false;
+                    try { const { error } = await supabaseClient.from('clans').delete().eq('id', _clanData.clanId); if (error) throw error; }
+                    catch(e) { console.warn('deleteClan error:', e); showToast('❌ Ошибка при роспуске клана', '#ff8888'); return false; }
+                } else {
+                    if (!confirm('Вы уверены, что хотите покинуть клан?')) return false;
+                    try {
+                        const { data: clan, error } = await supabaseClient.from('clans').select('*').eq('id', _clanData.clanId).single();
+                        if (error) throw error;
+                        let members = clan.members || [], membersNames = clan.members_names || [], membersRoles = clan.members_roles || [];
+                        const index = members.indexOf(_playerId);
+                        if (index !== -1) { members.splice(index, 1); membersNames.splice(index, 1); membersRoles.splice(index, 1); }
+                        const { error: updateError } = await supabaseClient.from('clans').update({ members: members, members_names: membersNames, members_roles: membersRoles }).eq('id', _clanData.clanId);
+                        if (updateError) throw updateError;
+                    } catch(e) { console.warn('leaveClan error:', e); showToast('❌ Ошибка при выходе из клана', '#ff8888'); return false; }
+                }
+                _clanData = { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: _clanData.clanKCollected || {} };
+                saveGame(); showToast('👋 Вы покинули клан', '#ffaa88'); updateClanUI();
+                if (_activeCollectionRank === 'k') { const reqSpan = document.getElementById('kChestRequirement'); if (reqSpan) { reqSpan.innerHTML = '❌ Требуется клан!'; reqSpan.style.color = '#ff8888'; } }
+                return true;
+            }
+
+            async function kickFromClan(targetPlayerId, targetPlayerName) {
+                if (!supabaseClient || !_clanData.clanId) {
+                    showToast('❌ Вы не состоите в клане!', '#ff8888');
+                    return false;
+                }
+                
+                if (_clanData.myRole !== 'leader') {
+                    showToast('❌ Только лидер может исключать участников!', '#ff8888');
+                    return false;
+                }
+                
+                if (targetPlayerId === _playerId) {
+                    showToast('❌ Нельзя исключить самого себя!', '#ff8888');
+                    return false;
+                }
+                
+                if (!confirm(`Вы уверены, что хотите исключить игрока ${targetPlayerName} из клана?`)) {
+                    return false;
+                }
+                
+                try {
+                    const { data: clan, error } = await supabaseClient
+                        .from('clans')
+                        .select('*')
+                        .eq('id', _clanData.clanId)
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    let members = clan.members || [];
+                    let membersNames = clan.members_names || [];
+                    let membersRoles = clan.members_roles || [];
+                    
+                    const index = members.indexOf(targetPlayerId);
+                    if (index === -1) {
+                        showToast('❌ Игрок не найден в клане!', '#ff8888');
+                        return false;
+                    }
+                    
+                    members.splice(index, 1);
+                    membersNames.splice(index, 1);
+                    membersRoles.splice(index, 1);
+                    
+                    const { error: updateError } = await supabaseClient
+                        .from('clans')
+                        .update({
+                            members: members,
+                            members_names: membersNames,
+                            members_roles: membersRoles
+                        })
+                        .eq('id', _clanData.clanId);
+                    
+                    if (updateError) throw updateError;
+                    
+                    // Обновляем локальные данные
+                    _clanData.clanMembers = members.map((id, idx) => ({
+                        playerId: id,
+                        playerName: membersNames[idx],
+                        role: membersRoles[idx]
+                    }));
+                    
+                    saveGame();
+                    updateClanUI();
+                    showToast(`👢 Игрок ${targetPlayerName} исключён из клана!`, '#ffaa88');
+                    return true;
+                    
+                } catch(e) {
+                    console.error('kickFromClan error:', e);
+                    showToast('❌ Ошибка при исключении игрока', '#ff8888');
+                    return false;
+                }
+            }
+
+            function updateClanUI() {
+                const noClanBlock = document.getElementById('clanNoClanBlock');
+                const hasClanBlock = document.getElementById('clanHasClanBlock');
+                
+                if (!noClanBlock || !hasClanBlock) return;
+                
+                if (_clanData.clanId && _clanData.clanName) {
+                    // Есть клан - показываем информацию
+                    noClanBlock.style.display = 'none';
+                    hasClanBlock.style.display = 'block';
+                    
+                    const memberCount = _clanData.clanMembers.length;
+                    const isLeader = _clanData.myRole === 'leader';
+                    
+                    document.getElementById('clanNameDisplay').innerHTML = _clanData.clanName;
+                    document.getElementById('clanRoleDisplay').innerHTML = isLeader ? '👑 Лидер клана' : '👤 Участник';
+                    document.getElementById('clanMembersCountDisplay').innerHTML = `👥 ${memberCount}/10 участников`;
+                    
+                    // Список участников с кнопкой исключения для лидера
+                    const membersList = document.getElementById('clanMembersList');
+                    if (membersList) {
+                        membersList.innerHTML = _clanData.clanMembers.map(member => `
+                            <div style="background: #0f1a1fcc; border-radius: 30px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">${member.role === 'leader' ? '👑' : '👤'}</span>
+                                    <span style="font-weight: bold;">${escapeHtml(member.playerName)}</span>
+                                    ${member.role === 'leader' ? '<span style="font-size: 10px; background: #ffcc66; color: #1a1a2e; padding: 2px 8px; border-radius: 20px;">ЛИДЕР</span>' : ''}
+                                </div>
+                                ${isLeader && member.role !== 'leader' ? `
+                                    <button class="kick-member-btn" data-id="${member.playerId}" data-name="${escapeHtml(member.playerName)}" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 5px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 12px;">❌ ИСКЛЮЧИТЬ</button>
+                                ` : ''}
+                            </div>
+                        `).join('');
+                        
+                        // Привязываем обработчики к кнопкам исключения
+                        document.querySelectorAll('.kick-member-btn').forEach(btn => {
+                            if (!btn._hasListener) {
+                                btn._hasListener = true;
+                                btn.onclick = (e) => {
+                                    e.stopPropagation();
+                                    showKickMemberConfirmModal(btn.dataset.id, btn.dataset.name);
+                                };
+                            }
                         });
                     }
                     
-                    gridContainer.appendChild(cardDiv);
-                });
-                checkAchievements(); 
+                    // Кнопка выхода - обработчик уже привязан в initClanButtons()
+                    
+                } else {
+                    // Нет клана - показываем создание/поиск
+                    noClanBlock.style.display = 'block';
+                    hasClanBlock.style.display = 'none';
+                    
+                    // Очищаем результаты поиска при переключении
+                    const resultsDiv = document.getElementById('clanSearchResults');
+                    if (resultsDiv) resultsDiv.innerHTML = '';
+                    
+                    // Кнопки НЕ ПЕРЕСОЗДАЁМ, они уже есть в HTML
+                    // Обработчики привязаны один раз в initClanButtons()
+                }
+            }
+
+            function initClanButtons() {
+                console.log('🔧 Инициализация кнопок кланов (один раз)');
+                
+                // Кнопка поиска
+                const searchBtn = document.getElementById('searchClanBtn');
+                if (searchBtn && !searchBtn._initialized) {
+                    searchBtn._initialized = true;
+                    searchBtn.onclick = async function() {
+                        const query = document.getElementById('clanSearchInput').value.trim();
+                        if (!query) { showToast('❌ Введите название клана!', '#ff8888'); return; }
+                        showToast('🔍 Поиск...', '#aaffdd');
+                        const results = await searchClan(query);
+                        const resultsDiv = document.getElementById('clanSearchResults');
+                        if (results && results.length > 0) {
+                            resultsDiv.innerHTML = results.map(clan => `
+                                <div style="background:#0f1a1fcc; border-radius:30px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div><strong>🏰 ${escapeHtml(clan.clan_name)}</strong><br><span style="font-size:11px;">👑 ${escapeHtml(clan.leader_name)} | 👥 ${clan.members?.length || 0}/10</span></div>
+                                    <button class="join-clan-btn" data-id="${clan.id}" data-name="${escapeHtml(clan.clan_name)}" style="background:linear-gradient(135deg,#3a6b58,#1e3e31); border:none; padding:8px 20px; border-radius:30px; color:white; cursor:pointer;">ВСТУПИТЬ</button>
+                                </div>
+                            `).join('');
+                            document.querySelectorAll('.join-clan-btn').forEach(btn => {
+                                if (!btn._initialized) {
+                                    btn._initialized = true;
+                                    btn.onclick = () => joinClan(btn.dataset.id, btn.dataset.name);
+                                }
+                            });
+                        } else {
+                            resultsDiv.innerHTML = '<div style="text-align:center; padding:20px;">❌ Кланы не найдены</div>';
+                        }
+                    };
+                    console.log('✅ Кнопка поиска инициализирована');
+                }
+                
+                // Кнопка создания
+                const createBtn = document.getElementById('createClanBtn');
+                if (createBtn && !createBtn._initialized) {
+                    createBtn._initialized = true;
+                    createBtn.onclick = function() {
+                        const clanName = document.getElementById('clanCreateInput').value.trim();
+                        if (!clanName) { showToast('❌ Введите название клана!', '#ff8888'); return; }
+                        if (clanName.length < 3) { showToast('❌ Название должно быть минимум 3 символа!', '#ff8888'); return; }
+                        createClan(clanName);
+                    };
+                    console.log('✅ Кнопка создания инициализирована');
+                }
+                
+                // Кнопка выхода - ПОКАЗЫВАЕМ МОДАЛЬНОЕ ОКНО
+                const leaveBtn = document.getElementById('leaveClanBtn');
+                if (leaveBtn && !leaveBtn._initialized) {
+                    leaveBtn._initialized = true;
+                    leaveBtn.onclick = function() {
+                        showLeaveClanConfirmModal();
+                    };
+                    console.log('✅ Кнопка выхода инициализирована');
+                }
             }
 
             // Получить бонус питомца в процентах
@@ -3373,7 +4347,7 @@
                         // ========== НОВЫЕ ДОСТИЖЕНИЯ ==========
                         else if (a.id === 'q_collector_12') {
                             const collectedCount = Object.keys(_collectedCards).length;
-                            completed = collectedCount >= 6;
+                            completed = collectedCount >= 12;
                         }
                         else if (a.id === 'q_collector_25') {
                             const collectedCount = Object.keys(_collectedCards).length;
@@ -3977,7 +4951,7 @@
                     collectedCards: _collectedCards, lastFChanceTime: _lastFChanceTime,
                     hasPet: _hasPet, petLevel: _petLevel, lastRank: _lastRank,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
-                    mbProfileLink: _mbProfileLink,
+                    mbProfileLink: _mbProfileLink, clanData: _clanData,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -4014,6 +4988,7 @@
                                 _lastCalendarDate = null;
                             }
                         }
+                        _clanData = d.clanData || { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: {} };
 
                     } catch(e) {}
                 }
@@ -4185,6 +5160,7 @@
                     else if (tab === 'shop') panelId = 'shopPanel';
                     else if (tab === 'pets') panelId = 'petsPanel';
                     else if (tab === 'collection') panelId = 'collectionPanel';
+                    else if (tab === 'clan') panelId = 'clanPanel';
                     
                     if (panelId) {
                         // Пытаемся открыть раздел с проверкой уровня
@@ -4220,12 +5196,20 @@
             document.getElementById('upgradePetBtn')?.addEventListener('click', () => showPetUpgradeModal());
             document.getElementById('petModalCloseBtn')?.addEventListener('click', () => closePetUpgradeModal());
             document.getElementById('petModalUpgradeBtn')?.addEventListener('click', () => performPetUpgrade());
+            document.getElementById('openQChestBtn')?.addEventListener('click', () => openQChest());
+            document.getElementById('openKChestBtn')?.addEventListener('click', () => openKChest());
+            document.getElementById('collectionQTab')?.addEventListener('click', () => switchCollectionRank('q'));
+            document.getElementById('collectionKTab')?.addEventListener('click', () => switchCollectionRank('k'));
+
             document.getElementById('petUpgradeModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('petUpgradeModal')) {
                     closePetUpgradeModal();
                 }
             });
-            document.getElementById('openFChestBtn')?.addEventListener('click', () => openFChest());
+
+            console.log('searchClanBtn:', document.getElementById('searchClanBtn'));
+            console.log('createClanBtn:', document.getElementById('createClanBtn'));
+            console.log('leaveClanBtn:', document.getElementById('leaveClanBtn'));
             // Магазин - сундук с картой (с модальным окном)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
                 const cost = 50;
@@ -4313,6 +5297,46 @@
                 }
             });
 
+            // Модальные окна клана
+            document.getElementById('leaveClanCancelBtn')?.addEventListener('click', () => {
+                document.getElementById('leaveClanConfirmModal').classList.remove('show');
+            });
+
+            document.getElementById('leaveClanConfirmBtn')?.addEventListener('click', () => {
+                leaveClanConfirmed();
+            });
+
+            document.getElementById('deleteClanCancelBtn')?.addEventListener('click', () => {
+                document.getElementById('deleteClanConfirmModal').classList.remove('show');
+            });
+
+            document.getElementById('deleteClanConfirmBtn')?.addEventListener('click', () => {
+                leaveClanConfirmed();
+            });
+
+            document.getElementById('kickMemberCancelBtn')?.addEventListener('click', () => {
+                document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                _pendingKickData = null;
+            });
+
+            document.getElementById('kickMemberConfirmBtn')?.addEventListener('click', () => {
+                kickFromClanConfirmed();
+            });
+
+            // Закрытие по клику вне модального окна
+            document.getElementById('leaveClanConfirmModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('leaveClanConfirmModal')) {
+                    document.getElementById('leaveClanConfirmModal').classList.remove('show');
+                }
+            });
+
+            document.getElementById('kickMemberConfirmModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('kickMemberConfirmModal')) {
+                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
+                    _pendingKickData = null;
+                }
+            });
+
             // Переключение вкладок в магазине
             const shopGoodsTab = document.getElementById('shopGoodsTab');
             const shopDonateTab = document.getElementById('shopDonateTab');
@@ -4390,7 +5414,7 @@
             initDropdowns();
             loadGame();
             initSupabase();
-            setInterval(() => { checkDailyReset(); updateUI(); checkAdminCommands(); }, 30000);
+            initClanButtons();
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
