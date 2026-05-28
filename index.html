@@ -472,77 +472,6 @@
         .card-badge.D { background: #6e8f9e; }
         .card-badge.E { background: #a17654; }
 
-        .exchange-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .exchange-card {
-            background: linear-gradient(135deg, #1a2a2f, #0f1a1f);
-            border-radius: 28px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            border: 1px solid rgba(255, 204, 102, 0.3);
-        }
-
-        .exchange-card.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .exchange-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 2;
-        }
-
-        .exchange-arrows {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .exchange-from {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-
-        .exchange-to {
-            background: rgba(255, 204, 102, 0.2);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-weight: bold;
-            color: #ffcc66;
-        }
-
-        .exchange-count {
-            font-size: 12px;
-            color: #88aacc;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .exchange-action {
-            background: linear-gradient(135deg, #3a6b58, #1e3e31);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
         .dropdown-section {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 28px;
@@ -1485,7 +1414,6 @@
                 <div class="menu-item" data-tab="calendar">📅 Календарь<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
                 <div class="menu-item" data-tab="clan">🏰 Клан<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
-                <div class="menu-item" data-tab="exchange">🔄 Обмен<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="pets">🐾 Питомцы <span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
@@ -1593,16 +1521,6 @@
                     🎴 <strong style="color: #ffcc66;">L, V, N, H</strong> — эксклюзивные сезонные ранги.<br>
                     ❌ На реальные карты <strong>НЕ ОБМЕНИВАЮТСЯ</strong>.
                 </div>
-            </div>
-        </div>
-
-        <!-- Обменник -->
-        <div class="tab-panel" id="exchangePanel">
-            <div class="exchange-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">🔄 ОБМЕННИК КАРТ</div>
-                <div style="font-size: 12px; text-align: center; margin-bottom: 16px; opacity: 0.7;">Обменивай 3 карты одного ранга на 1 карту выше</div>
-                <div class="cards-stats" id="exchangeCardsStats"></div>
-                <div class="exchange-grid" id="exchangeGrid"></div>
             </div>
         </div>
 
@@ -2181,23 +2099,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для исключения игрока -->
-    <div class="modal" id="kickMemberConfirmModal">
-        <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #8B0000, #ff4444);">
-                <div class="modal-icon">👢</div>
-                <div class="modal-title">ИСКЛЮЧИТЬ ИГРОКА</div>
-            </div>
-            <div class="modal-body">
-                <div id="kickMemberMessage" style="margin-bottom: 16px; font-size: 16px;">Вы уверены, что хотите исключить игрока?</div>
-                <div class="modal-buttons" style="gap: 12px;">
-                    <button class="modal-btn close" id="kickMemberCancelBtn">❌ ОТМЕНА</button>
-                    <button class="modal-btn upgrade" id="kickMemberConfirmBtn" style="background: linear-gradient(135deg, #8B0000, #ff4444);">👢 ИСКЛЮЧИТЬ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Контейнер для уведомлений -->
     <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
     </div>
@@ -2220,15 +2121,6 @@
                 'V': 'linear-gradient(135deg, #4a8a4a, #2a5a2a)',
                 'L': 'linear-gradient(135deg, #f4d03f, #d4af37)'
             };
-
-            const exchangeRules = [
-                { from: 'E', to: 'D', need: 3 },
-                { from: 'D', to: 'C', need: 3 },
-                { from: 'C', to: 'B', need: 3 },
-                { from: 'B', to: 'G', need: 3 },
-                { from: 'G', to: 'P', need: 3 },
-                { from: 'P', to: 'A', need: 3 }
-            ];
 
             const achievementsList = [
                 // СУЩЕСТВУЮЩИЕ (оставляем)
@@ -2370,10 +2262,9 @@
 
             // Переменные для коллекции F-ранга
             let _collectedCards = {}; // { cardId: true }
-            let _lastFChanceTime = null; // время последнего шанса на сундук Q
 
             let _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0, _strikesLimit = 100;
-            let _lastBonusDate = null, _lastUpgradeDate = null, _cardHistory = [];
+            let _lastBonusDate = null, _cardHistory = [];
             let _playerId = null, _playerName = null;
             let _achievements = {}, _quests = {}, _lastQuestReset = null;
             let _pendingChest = null;
@@ -2414,7 +2305,6 @@
 
             // Переменные для хранения данных перед подтверждением
             let _pendingLeaveClan = false;
-            let _pendingKickData = null;
 
             const CLAN_CREATION_PRICE = 500;
 
@@ -2512,7 +2402,7 @@
                 const lastCheck = lastNotificationCheck ? new Date(lastNotificationCheck) : null;
                 
                 // Проверяем сундук Q (только по средам с 8:00 до 23:00)
-                const fChestAvail = isFChestAvailable();
+                const fChestAvail = isQChestAvailable();
                 const fChestKey = `notiq_fchest_${now.toDateString()}`;
                 if (fChestAvail.available && !localStorage.getItem(fChestKey)) {
                     showNotification('📦 МИСТИЧЕСКИЙ СУНДУК', 'Сундук Q доступен! Зайдите в коллекцию и откройте его!', '🎴', 'warning');
@@ -2794,86 +2684,6 @@
                 if (mineRankBonus) mineRankBonus.innerHTML = currentRank.bonus;
             }
 
-            function isFChestAvailable() {
-                const now = new Date();
-                const day = now.getDay(); // 0 - воскресенье, 3 - среда
-                const hours = now.getHours();
-                
-                // Только по средам с 8:00 до 23:00
-                if (day !== 3) {
-                    return { available: false, reason: 'Сундук Q доступен только по средам!' };
-                }
-                if (hours < 8 || hours >= 23) {
-                    return { available: false, reason: 'Сундук Q доступен с 8:00 до 23:00 по средам!' };
-                }
-                
-                return { available: true, reason: null };
-            }
-
-            function openFChest() {
-                // Проверка уровня
-                if (_level < 2) {
-                    showToast("🔒 Коллекция Q доступна с 2 уровня!", "#ffaa88");
-                    return;
-                }
-                
-                // Проверка доступности по времени
-                const availability = isFChestAvailable();
-                if (!availability.available) {
-                    showToast(availability.reason, "#ffaa88");
-                    return;
-                }
-                
-                // Проверка алмазов
-                if (_diamonds < 100) {
-                    showToast("❌ Нужно 100 алмазов для открытия сундука Q!", "#ff8888");
-                    return;
-                }
-                
-                _diamonds -= 100;
-                
-                // Определяем, что выпадет: Q-ранг (20%) или E-ранг (80%)
-                const isFRank = Math.random() < 0.2;
-                
-                let reward = null;
-                
-                if (isFRank) {
-                    const availableCards = qRankCards.filter(card => !_collectedCards[card.id]);
-                    let card;
-                    
-                    if (availableCards.length > 0) {
-                        const randomIndex = Math.floor(Math.random() * availableCards.length);
-                        card = availableCards[randomIndex];
-                        _collectedCards[card.id] = true;
-                        reward = { type: 'q_card', card: card, isDuplicate: false };
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * qRankCards.length);
-                        card = qRankCards[randomIndex];
-                        reward = { type: 'q_card', card: card, isDuplicate: true };
-                    }
-                    
-                    // ✅ ПОКАЗЫВАЕМ МОДАЛЬНОЕ ОКНО ТОЛЬКО ДЛЯ F-РАНГА
-                    showFChestRewardModal(reward);
-                    
-                    if (reward.isDuplicate) {
-                        _diamonds += 7;
-                        showToast(`🔄 Дубликат ${reward.card.name}! +7💎`, "#ffd966");
-                    } else {
-                        showToast(`✨ НОВАЯ КАРТА Q: ${reward.card.name}! ✨`, "#ffd966");
-                        updateQuestProgress('daily_card', 1);
-                    }
-                } else {
-                    // E-ранг — без модального окна, только тост
-                    addCardToHistory('E');
-                    showToast(`🎴 Вы получили карту E из сундука Q!`, "#aaffdd");
-                }
-                
-                _lastFChanceTime = Date.now();
-                saveGame();
-                updateUI();
-                updateCollectionUI();
-            }
-
             // Функция показа модального окна выхода из клана
             function showLeaveClanConfirmModal() {
                 if (!_clanData.clanId) {
@@ -2894,13 +2704,6 @@
                 }
                 
                 document.getElementById('leaveClanConfirmModal').classList.add('show');
-            }
-
-            // Функция показа модального окна исключения
-            function showKickMemberConfirmModal(playerId, playerName) {
-                _pendingKickData = { playerId, playerName };
-                document.getElementById('kickMemberMessage').innerHTML = `Вы уверены, что хотите исключить игрока <strong>${escapeHtml(playerName)}</strong> из клана?`;
-                document.getElementById('kickMemberConfirmModal').classList.add('show');
             }
 
             async function leaveClanConfirmed() {
@@ -2997,137 +2800,6 @@
                 }
             }
 
-            async function kickFromClanConfirmed() {
-                if (!_pendingKickData) return;
-                
-                const { playerId, playerName } = _pendingKickData;
-                
-                if (!supabaseClient || !_clanData.clanId) {
-                    showToast('❌ Вы не состоите в клане!', '#ff8888');
-                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                    _pendingKickData = null;
-                    return false;
-                }
-                
-                if (_clanData.myRole !== 'leader') {
-                    showToast('❌ Только лидер может исключать участников!', '#ff8888');
-                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                    _pendingKickData = null;
-                    return false;
-                }
-                
-                try {
-                    const { data: clan, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .eq('id', _clanData.clanId)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    let members = clan.members || [];
-                    let membersNames = clan.members_names || [];
-                    let membersRoles = clan.members_roles || [];
-                    
-                    const index = members.indexOf(playerId);
-                    if (index === -1) {
-                        showToast('❌ Игрок не найден в клане!', '#ff8888');
-                        document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                        _pendingKickData = null;
-                        return false;
-                    }
-                    
-                    members.splice(index, 1);
-                    membersNames.splice(index, 1);
-                    membersRoles.splice(index, 1);
-                    
-                    const { error: updateError } = await supabaseClient
-                        .from('clans')
-                        .update({
-                            members: members,
-                            members_names: membersNames,
-                            members_roles: membersRoles
-                        })
-                        .eq('id', _clanData.clanId);
-                    
-                    if (updateError) throw updateError;
-                    
-                    // === ОБНОВЛЯЕМ ДАННЫЕ ЛИДЕРА ===
-                    _clanData.clanMembers = members.map((id, idx) => ({
-                        playerId: id,
-                        playerName: membersNames[idx],
-                        role: membersRoles[idx]
-                    }));
-                    
-                    saveGame();
-                    updateClanUI();
-                    showToast(`👢 Игрок ${playerName} исключён из клана!`, '#ffaa88');
-                    
-                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                    _pendingKickData = null;
-                    return true;
-                    
-                } catch(e) {
-                    console.error('kickFromClan error:', e);
-                    showToast('❌ Ошибка при исключении игрока', '#ff8888');
-                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                    _pendingKickData = null;
-                    return false;
-                }
-            }
-
-            function showFChestRewardModal(reward) {
-                const modal = document.getElementById('fCardModal');
-                if (!modal) return;
-                
-                const imgContainer = document.getElementById('fCardImage');
-                const imgEl = document.getElementById('fCardImg');
-                const nameEl = document.getElementById('fCardName');
-                const statusEl = document.getElementById('fCardStatus');
-                const closeBtn = document.getElementById('closeFCardModalBtn');
-                
-                const card = reward.card;
-                nameEl.innerHTML = card.name;
-                
-                // ПРАВИЛЬНЫЙ ПУТЬ К ИЗОБРАЖЕНИЮ
-                const imagePath = `cards/q_${card.id}.png`;
-                
-                // АНИМАЦИЯ ПЕРЕВОРОТА
-                imgEl.style.opacity = '0';
-                imgEl.style.transform = 'rotateY(90deg)';
-                imgEl.style.transition = 'all 0.3s ease';
-                
-                setTimeout(() => {
-                    imgEl.src = imagePath;
-                    imgEl.style.display = 'block';
-                    imgContainer.innerHTML = '';
-                    imgContainer.appendChild(imgEl);
-                    
-                    setTimeout(() => {
-                        imgEl.style.opacity = '1';
-                        imgEl.style.transform = 'rotateY(0deg)';
-                    }, 50);
-                }, 150);
-                
-                // Обработчик ошибки загрузки
-                imgEl.onerror = function() {
-                    console.error('Не удалось загрузить изображение:', imagePath);
-                    imgEl.style.display = 'none';
-                    imgContainer.innerHTML = '<span style="font-size: 48px;">🎴</span><div style="font-size: 12px; color: #ff8888;">Изображение не найдено</div>';
-                };
-                
-                statusEl.innerHTML = reward.isDuplicate ? '🔄 Дубликат! +7 💎' : '✨ НОВАЯ КАРТА! ✨';
-                
-                modal.style.display = 'flex';
-                
-                closeBtn.onclick = function() {
-                    modal.style.display = 'none';
-                };
-                
-                modal.onclick = function(e) {
-                    if (e.target === modal) modal.style.display = 'none';
-                };
-            }
             function showCollectionCardModal(cardName, imageSrc) {
                 const modal = document.getElementById('collectionCardModal');
                 const imgEl = document.getElementById('collectionCardImg');
@@ -3436,79 +3108,6 @@
                 }
             }
 
-            async function kickFromClan(targetPlayerId, targetPlayerName) {
-                if (!supabaseClient || !_clanData.clanId) {
-                    showToast('❌ Вы не состоите в клане!', '#ff8888');
-                    return false;
-                }
-                
-                if (_clanData.myRole !== 'leader') {
-                    showToast('❌ Только лидер может исключать участников!', '#ff8888');
-                    return false;
-                }
-                
-                if (targetPlayerId === _playerId) {
-                    showToast('❌ Нельзя исключить самого себя!', '#ff8888');
-                    return false;
-                }
-                
-                if (!confirm(`Вы уверены, что хотите исключить игрока ${targetPlayerName} из клана?`)) {
-                    return false;
-                }
-                
-                try {
-                    const { data: clan, error } = await supabaseClient
-                        .from('clans')
-                        .select('*')
-                        .eq('id', _clanData.clanId)
-                        .single();
-                    
-                    if (error) throw error;
-                    
-                    let members = clan.members || [];
-                    let membersNames = clan.members_names || [];
-                    let membersRoles = clan.members_roles || [];
-                    
-                    const index = members.indexOf(targetPlayerId);
-                    if (index === -1) {
-                        showToast('❌ Игрок не найден в клане!', '#ff8888');
-                        return false;
-                    }
-                    
-                    members.splice(index, 1);
-                    membersNames.splice(index, 1);
-                    membersRoles.splice(index, 1);
-                    
-                    const { error: updateError } = await supabaseClient
-                        .from('clans')
-                        .update({
-                            members: members,
-                            members_names: membersNames,
-                            members_roles: membersRoles
-                        })
-                        .eq('id', _clanData.clanId);
-                    
-                    if (updateError) throw updateError;
-                    
-                    // Обновляем локальные данные
-                    _clanData.clanMembers = members.map((id, idx) => ({
-                        playerId: id,
-                        playerName: membersNames[idx],
-                        role: membersRoles[idx]
-                    }));
-                    
-                    saveGame();
-                    updateClanUI();
-                    showToast(`👢 Игрок ${targetPlayerName} исключён из клана!`, '#ffaa88');
-                    return true;
-                    
-                } catch(e) {
-                    console.error('kickFromClan error:', e);
-                    showToast('❌ Ошибка при исключении игрока', '#ff8888');
-                    return false;
-                }
-            }
-
             function updateClanUI() {
                 const noClanBlock = document.getElementById('clanNoClanBlock');
                 const hasClanBlock = document.getElementById('clanHasClanBlock');
@@ -3537,22 +3136,8 @@
                                     <span style="font-weight: bold;">${escapeHtml(member.playerName)}</span>
                                     ${member.role === 'leader' ? '<span style="font-size: 10px; background: #ffcc66; color: #1a1a2e; padding: 2px 8px; border-radius: 20px;">ЛИДЕР</span>' : ''}
                                 </div>
-                                ${isLeader && member.role !== 'leader' ? `
-                                    <button class="kick-member-btn" data-id="${member.playerId}" data-name="${escapeHtml(member.playerName)}" style="background: linear-gradient(135deg, #8B0000, #ff4444); border: none; padding: 5px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 12px;">❌ ИСКЛЮЧИТЬ</button>
-                                ` : ''}
                             </div>
                         `).join('');
-                        
-                        // Привязываем обработчики к кнопкам исключения
-                        document.querySelectorAll('.kick-member-btn').forEach(btn => {
-                            if (!btn._hasListener) {
-                                btn._hasListener = true;
-                                btn.onclick = (e) => {
-                                    e.stopPropagation();
-                                    showKickMemberConfirmModal(btn.dataset.id, btn.dataset.name);
-                                };
-                            }
-                        });
                     }
                     
                 } else {
@@ -3957,11 +3542,11 @@
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
             function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
             
-            function getRandomRank() {
+            // Получить случайную карту с учётом сезона
+            function getRandomCardRank() {
                 const season = getCurrentTheme();
-                const noCardChance = Math.random() * 1000;
-                if (noCardChance < 5) return null;
                 
+                // Сезонные карты (1% шанс в соответствующий сезон)
                 const seasonalChance = Math.random() * 100;
                 if (seasonalChance < 1) {
                     if (season === 'spring') return 'V';
@@ -3970,14 +3555,15 @@
                     if (season === 'winter') return 'N';
                 }
                 
+                // Обычные карты
                 const rand = Math.random() * 100;
-                if (rand < 1) return 'A';
-                if (rand < 2) return 'P';
-                if (rand < 3) return 'G';
-                if (rand < 11) return 'B';
-                if (rand < 19) return 'C';
-                if (rand < 39) return 'D';
-                return 'E';
+                if (rand < 1) return 'A';      // 1%
+                if (rand < 2) return 'P';      // 1%
+                if (rand < 3) return 'G';      // 1%
+                if (rand < 8) return 'B';      // 5%
+                if (rand < 15) return 'C';     // 7%
+                if (rand < 30) return 'D';     // 15%
+                return 'E';                    // 70%
             }
                         
             function isEventActive() {
@@ -4154,23 +3740,33 @@
                 
                 const isLegendary = Math.random() < 0.1;
                 let reward = {};
+                
                 if (isLegendary) {
-                    const legendaryRewards = [
-                        { type: 'diamonds', amount: 50, text: '💎 50 алмазов!' },
-                        { type: 'ore', amount: 1000, text: '⛏️ 1000 руды!' },
-                        { type: 'card', rank: 'A', text: '🎴 КАРТА РАНГА A!' }
-                    ];
-                    reward = legendaryRewards[Math.floor(Math.random() * legendaryRewards.length)];
+                    // 50% шанс на карту A/P, 50% на ресурсы
+                    if (Math.random() < 0.5) {
+                        const cardRank = Math.random() < 0.7 ? 'A' : 'P';
+                        reward = { type: 'card', rank: cardRank, text: `🎴 КАРТА РАНГА ${cardRank}!` };
+                    } else {
+                        const isDiamonds = Math.random() < 0.5;
+                        if (isDiamonds) {
+                            reward = { type: 'diamonds', amount: 50, text: '💎 50 алмазов!' };
+                        } else {
+                            reward = { type: 'ore', amount: 1000, text: '⛏️ 1000 руды!' };
+                        }
+                    }
                 } else {
-                    const normalRewards = [
-                        { type: 'diamonds', amount: 5, text: '💎 5 алмазов' },
-                        { type: 'diamonds', amount: 10, text: '💎 10 алмазов' },
-                        { type: 'ore', amount: 50, text: '⛏️ 50 руды' },
-                        { type: 'ore', amount: 100, text: '⛏️ 100 руды' },
-                        { type: 'card', rank: 'D', text: '🎴 Карта ранга D' },
-                        { type: 'card', rank: 'C', text: '🎴 Карта ранга C' }
-                    ];
-                    reward = normalRewards[Math.floor(Math.random() * normalRewards.length)];
+                    const rand = Math.random() * 100;
+                    
+                    if (rand < 20) {
+                        const cardRank = getRandomCardRank();
+                        reward = { type: 'card', rank: cardRank, text: `🎴 Карта ранга ${cardRank}` };
+                    } else if (rand < 60) {
+                        const amount = Math.floor(Math.random() * 11) + 5;
+                        reward = { type: 'diamonds', amount: amount, text: `💎 ${amount} алмазов` };
+                    } else {
+                        const amount = Math.floor(Math.random() * 151) + 50;
+                        reward = { type: 'ore', amount: amount, text: `⛏️ ${amount} руды` };
+                    }
                 }
                 
                 _pendingChest = { ...reward, isOpened: true };
@@ -4178,15 +3774,14 @@
                 if (reward.type === 'diamonds') { 
                     _diamonds += reward.amount; 
                     showToast(`💎 +${reward.amount} алмазов!`, "#ffcc66"); 
-                } else if (reward.type === 'ore') { 
+                } 
+                else if (reward.type === 'ore') { 
                     _ore += reward.amount; 
                     showToast(`⛏️ +${reward.amount} руды!`, "#ffcc66"); 
-                } else if (reward.type === 'card') {
-                    _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${reward.rank} (из сундука)`, rank: reward.rank });
-                    showToast(`✨ КАРТА ${reward.rank} из сундука!`, "#ffd966");
-                    
-                    // ✅ ДОБАВИТЬ ЭТУ СТРОКУ:
-                    updateQuestProgress('daily_card', 1);
+                } 
+                else if (reward.type === 'card') {
+                    addCardToHistory(reward.rank);
+                    showToast(`✨ ${reward.text} ✨`, "#ffd966");
                 }
                 
                 _lastChestTime = Date.now();
@@ -4197,32 +3792,6 @@
                 document.getElementById('chestModal').classList.remove('show');
                 _pendingChest = null;
             }
-
-            function performExchange(rule) {
-                const counts = getCardCounts();
-                if (counts[rule.from] < rule.need) { showToast(`❌ Нужно ${rule.need} карт ${rule.from}!`, "#ff8888"); return; }
-                let removed = 0;
-                const newHistory = [];
-                for (const card of _cardHistory) {
-                    if (card.rank === rule.from && removed < rule.need) { removed++; continue; }
-                    newHistory.push(card);
-                }
-                _cardHistory = newHistory;
-                _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🔄 Обмен: ${rule.need}x${rule.from} → ${rule.to}`, rank: rule.to });
-                saveGame(); updateUI(); checkAchievements();
-                showToast(`✅ Обмен выполнен! +1 карта ${rule.to}`, "#aaffdd");
-            }
-            
-            function updateExchangeGrid() {
-                const container = document.getElementById('exchangeGrid');
-                if (!container) return;
-                const counts = getCardCounts();
-                container.innerHTML = exchangeRules.map(rule => {
-                    const available = counts[rule.from] || 0;
-                    return `<div class="exchange-card ${available < rule.need ? 'disabled' : ''}"><div class="exchange-info"><div class="exchange-arrows"><span class="exchange-from">${rule.need}x ${rule.from}</span><span>→</span><span class="exchange-to">1x ${rule.to}</span></div><div class="exchange-count">📊 есть: ${available}/${rule.need}</div></div><button class="exchange-action" ${available < rule.need ? 'disabled' : ''} onclick="window.performExchangeWrapper({from:'${rule.from}',to:'${rule.to}',need:${rule.need}})">ОБМЕНЯТЬ</button></div>`;
-                }).join('');
-            }
-            window.performExchangeWrapper = performExchange;
 
             function addCardToHistory(rank) { 
                 _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${rank}`, rank }); 
@@ -4659,54 +4228,6 @@
                 }
             }
             
-            async function getPlayerCards(playerId) {
-                if (!supabaseClient) return null;
-                
-                try {
-                    const { data } = await supabaseClient
-                        .from('leaderboard')
-                        .select('username, level, cards_json')
-                        .eq('player_id', playerId)
-                        .single();
-                    
-                    if (!data) return null;
-                    
-                    // Подсчитываем количество каждой карты
-                    const counts = {
-                        'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0,
-                        'V':0, 'L':0, 'H':0, 'N':0
-                    };
-                    
-                    let totalCards = 0;
-                    
-                    if (data.cards_json && Array.isArray(data.cards_json)) {
-                        data.cards_json.forEach(card => {
-                            if (card.rank && counts[card.rank] !== undefined) {
-                                counts[card.rank]++;
-                                totalCards++;
-                            }
-                        });
-                    }
-                    
-                    // Генерируем HTML только для тех рангов, которые ЕСТЬ у игрока
-                    const rankOrder = ['A', 'P', 'G', 'B', 'C', 'D', 'E', 'V', 'L', 'H', 'N'];
-                    const cardsHtml = rankOrder
-                        .filter(rank => counts[rank] > 0) // показываем ТОЛЬКО те ранги, которые есть
-                        .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
-                        .join('');
-                    
-                    return {
-                        level: data.level || 1,
-                        totalCards: totalCards,
-                        cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                        cardsCounts: counts
-                    };
-                } catch(e) {
-                    console.warn('getPlayerCards error:', e);
-                    return null;
-                }
-            }
-
             function showPlayerProfileModal(data) {
                 const modalHtml = `
                     <div class="profile-link-content" style="max-width: 380px;">
@@ -4953,8 +4474,6 @@
                 const counts = getCardCounts();
                 const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
                 if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
-                if (document.getElementById('exchangeCardsStats')) document.getElementById('exchangeCardsStats').innerHTML = cardsHtml;
-                updateExchangeGrid();
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updatePetUI();
@@ -4965,12 +4484,12 @@
             function saveGame() {
                 const saveData = {
                     ore: _ore, diamonds: _diamonds, level: _level, strikesDone: _strikesDone, strikesLimit: _strikesLimit,
-                    lastBonusDate: _lastBonusDate?.toISOString(), lastUpgradeDate: _lastUpgradeDate?.toISOString(),
+                    lastBonusDate: _lastBonusDate?.toISOString(),
                     cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver,
-                    collectedCards: _collectedCards, lastFChanceTime: _lastFChanceTime,
+                    collectedCards: _collectedCards,
                     hasPet: _hasPet, petLevel: _petLevel, lastRank: _lastRank,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink, clanData: _clanData,
@@ -4987,7 +4506,6 @@
                         _ore = d.ore || 0; _diamonds = d.diamonds || 0; _level = d.level || 1;
                         _strikesDone = d.strikesDone || 0; _strikesLimit = d.strikesLimit || 100;
                         if (d.lastBonusDate) _lastBonusDate = new Date(d.lastBonusDate);
-                        if (d.lastUpgradeDate) _lastUpgradeDate = new Date(d.lastUpgradeDate);
                         _cardHistory = d.cardHistory || []; _playerId = d.playerId; _playerName = d.playerName;
                         _achievements = d.achievements || {}; _quests = d.quests || {}; _lastQuestReset = d.lastQuestReset;
                         _pickaxeLevel = d.pickaxeLevel || 1;
@@ -4999,7 +4517,6 @@
                         _hasPet = d.hasPet || false;
                         _petLevel = d.petLevel || 1;
                         _collectedCards = d.collectedCards || {};
-                        _lastFChanceTime = d.lastFChanceTime || null;
                         _lastRank = d.lastRank || null;
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
@@ -5140,7 +4657,6 @@
                 if (_diamonds >= cost) {
                     _diamonds -= cost; 
                     _level++; 
-                    _lastUpgradeDate = new Date();
                     updateQuestProgress('daily_upgrade', 1);
                     saveGame(); 
                     updateUI(); 
@@ -5191,7 +4707,6 @@
                     let panelId = '';
                     if (tab === 'mine') panelId = 'minePanel';
                     else if (tab === 'profile') panelId = 'profilePanel';
-                    else if (tab === 'exchange') panelId = 'exchangePanel';
                     else if (tab === 'calendar') panelId = 'calendarPanel';
                     else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
@@ -5210,7 +4725,6 @@
                     
                     // Дополнительные действия при открытии
                     if (tab === 'top') loadTopFromSupabase();
-                    if (tab === 'exchange') updateExchangeGrid();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
                 };
@@ -5353,26 +4867,10 @@
                 leaveClanConfirmed();
             });
 
-            document.getElementById('kickMemberCancelBtn')?.addEventListener('click', () => {
-                document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                _pendingKickData = null;
-            });
-
-            document.getElementById('kickMemberConfirmBtn')?.addEventListener('click', () => {
-                kickFromClanConfirmed();
-            });
-
             // Закрытие по клику вне модального окна
             document.getElementById('leaveClanConfirmModal')?.addEventListener('click', (e) => {
                 if (e.target === document.getElementById('leaveClanConfirmModal')) {
                     document.getElementById('leaveClanConfirmModal').classList.remove('show');
-                }
-            });
-
-            document.getElementById('kickMemberConfirmModal')?.addEventListener('click', (e) => {
-                if (e.target === document.getElementById('kickMemberConfirmModal')) {
-                    document.getElementById('kickMemberConfirmModal').classList.remove('show');
-                    _pendingKickData = null;
                 }
             });
 
