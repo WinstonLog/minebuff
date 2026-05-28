@@ -4990,6 +4990,16 @@
                         }
                         _clanData = d.clanData || { clanId: null, clanName: null, clanMembers: [], myRole: null, clanKCollected: {} };
 
+                        if (_clanData.clanId) {
+                            console.log('🔄 Найден сохранённый клан:', _clanData.clanName);
+                            // Убеждаемся, что структура данных правильная
+                            if (!_clanData.clanMembers) _clanData.clanMembers = [];
+                            if (!_clanData.clanKCollected) _clanData.clanKCollected = {};
+                            restoreClanData();
+                        } else {
+                            console.log('❌ Нет сохранённого клана');
+                        }
+
                     } catch(e) {}
                 }
                 if (!_playerId) _playerId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -5008,6 +5018,28 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
+            }
+
+            function restoreClanData() {
+                if (!_clanData.clanId) return;
+                
+                console.log('🔄 Восстановление данных клана из localStorage');
+                console.log('clanId:', _clanData.clanId);
+                console.log('clanName:', _clanData.clanName);
+                console.log('members:', _clanData.clanMembers.length);
+                console.log('myRole:', _clanData.myRole);
+                
+                // Обновляем UI
+                updateClanUI();
+                
+                // Обновляем сундук K, если открыта вкладка K
+                if (_activeCollectionRank === 'k') {
+                    const reqSpan = document.getElementById('kChestRequirement');
+                    if (reqSpan) {
+                        reqSpan.innerHTML = '✅ Вы в клане!';
+                        reqSpan.style.color = '#88ff88';
+                    }
+                }
             }
 
             function checkRankUpgrade() {
