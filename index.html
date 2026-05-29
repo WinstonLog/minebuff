@@ -2148,25 +2148,22 @@
                 return 'E';                    // 70%
             }
 
-            // Запланировать следующий подарок (через 1 час)
             function scheduleNextGift() {
-                const minDelay = 5 * 1000;   // 5 секунд
-                const maxDelay = 10 * 1000;  // 10 секунд
+                const minDelay = 10 * 60 * 1000;  // 10 минут
+                const maxDelay = 25 * 60 * 1000;  // 25 минут
                 const delay = minDelay + Math.random() * (maxDelay - minDelay);
                 
                 _nextGiftTime = Date.now() + delay;
                 _giftAvailable = false;
                 
-                // Скрываем подарок
                 const giftDiv = document.getElementById('floatingGift');
                 if (giftDiv) giftDiv.style.display = 'none';
                 
-                // Сохраняем в localStorage
                 saveGame();
                 
-                console.log(`🎁 Следующий подарок через 1 час (${new Date(_nextGiftTime).toLocaleTimeString()})`);
+                const minutes = Math.round(delay / 60000);
+                console.log(`🎁 Следующий подарок через ${minutes} минут (10-25 мин)`);
                 
-                // Устанавливаем таймер
                 if (_giftTimer) clearTimeout(_giftTimer);
                 _giftTimer = setTimeout(() => showGift(), delay);
             }
