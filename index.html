@@ -1827,16 +1827,7 @@
                     showNotification('🎁 ЕЖЕДНЕВНЫЙ БОНУС', 'Не забудьте забрать +5💎 в шахте!', '💎', 'info');
                     localStorage.setItem(dailyBonusKey, 'true');
                 }
-                
-                // ДОПОЛНИТЕЛЬНО: проверяем, что сундук Q скоро закроется
-                const hours = now.getHours();
-                const day = now.getDay();
-                const closingKey = `notiq_fchest_closing_${now.toDateString()}`;
-                if (day === 3 && hours >= 22 && hours < 23 && !localStorage.getItem(closingKey)) {
-                    showNotification('⚠️ СУНДУК Q СКОРО ЗАКРОЕТСЯ', 'Остался 1 час! Успейте открыть!', '⏰', 'warning');
-                    localStorage.setItem(closingKey, 'true');
-                }
-                
+                                
                 // ДОПОЛНИТЕЛЬНО: проверяем, что удары почти закончились
                 const strikesLowKey = `notiq_strikes_low_${now.toDateString()}`;
                 const remainingStrikes = _strikesLimit - _strikesDone;
@@ -2185,7 +2176,7 @@
                 }
                 
                 // Уведомление
-                showNotification('🎁', 'warning');
+                showNotification('🎁', 'Вам выпал подарок!');
                 
                 saveGame();
             }
