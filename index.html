@@ -1664,6 +1664,8 @@
             let _totalStrikesEver = 0;
 
             let _lastRank = null;
+
+            let _lastActive = null;
             
             let _mbProfileLink = null;
 
@@ -1705,6 +1707,48 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Обновление последней активности
+            function updateLastActive() {
+                _lastActive = new Date().toISOString();
+                saveGame(); // сохраняем локально
+                
+                // Обновляем в Supabase
+                if (supabaseClient && _playerId) {
+                    supabaseClient.from('leaderboard').upsert({
+                        player_id: _playerId,
+                        last_active: _lastActive
+                    }, { onConflict: 'player_id' }).then(() => {
+                        // успешно
+                    }).catch(e => {
+                        console.warn('Ошибка обновления last_active:', e);
+                    });
+                }
+            }
+
+            // Получение статуса онлайн
+            function getOnlineStatus(lastActiveTime) {
+                if (!lastActiveTime) return { text: '🕐 Неизвестно', color: '#888888' };
+                
+                const now = new Date();
+                const last = new Date(lastActiveTime);
+                const diffSeconds = Math.floor((now - last) / 1000);
+                
+                if (diffSeconds < 60) {
+                    return { text: '🟢 Онлайн', color: '#44ff44' };
+                } else if (diffSeconds < 300) { // 5 минут
+                    return { text: `🟡 Был ${Math.floor(diffSeconds / 60)} мин назад`, color: '#ffaa44' };
+                } else if (diffSeconds < 3600) { // час
+                    const minutes = Math.floor(diffSeconds / 60);
+                    return { text: `🟠 Был ${minutes} мин назад`, color: '#ff8844' };
+                } else if (diffSeconds < 86400) { // день
+                    const hours = Math.floor(diffSeconds / 3600);
+                    return { text: `⚫ Был ${hours} ч назад`, color: '#888888' };
+                } else {
+                    const days = Math.floor(diffSeconds / 86400);
+                    return { text: `⚫ Был ${days} д назад`, color: '#666666' };
+                }
             }
 
             function showNotification(title, text, icon = '🔔', type = 'info') {
@@ -2234,6 +2278,7 @@
             }
 
             function openChest() {
+                updateLastActive();
                 if (!_pendingChest || _pendingChest.isOpened) return;
                 
                 const isLegendary = Math.random() < 0.1;
@@ -2292,6 +2337,7 @@
             }
 
             function addCardToHistory(rank) { 
+                updateLastActive();
                 _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${rank}`, rank }); 
                 if (_cardHistory.length > 30) _cardHistory.pop(); 
                 updateUI(); saveGame(); showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966"); 
@@ -2790,14 +2836,15 @@
                         diamonds: _diamonds,
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
+                        last_active: _lastActive || new Date().toISOString(), // ← ДОБАВИТЬ ЭТУ СТРОКУ
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                     
-                    hideDBError(); // Скрываем баннер при успехе
+                    hideDBError();
                     
                 } catch(e) { 
                     console.warn('syncToSupabase error:', e);
-                    showDBError(); // Показываем баннер при ошибке
+                    showDBError();
                 }
             }
             
@@ -2879,7 +2926,20 @@
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
-                        return `<li class="${isCurrent ? 'current-player' : ''}" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" data-player-level="${p.level}" data-mb-link="${p.mb_link || ''}" data-cards-json='${JSON.stringify(p.cards_json || [])}'><span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span><span>⭐ Ур.${p.level}</span></li>`;
+                        const status = getOnlineStatus(p.last_active);
+                        
+                        return `<li class="${isCurrent ? 'current-player' : ''}" 
+                                    data-player-id="${p.player_id}"
+                                    data-player-name="${escapeHtml(p.username)}"
+                                    data-player-level="${p.level}"
+                                    data-mb-link="${p.mb_link || ''}"
+                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                                        <span style="font-size: 9px; color: ${status.color};">${status.text}</span>
+                                    </div>
+                                    <span>⭐ Ур.${p.level}</span>
+                                </li>`;
                     }).join('');
                     const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
                     if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`; rankBlock.style.display = 'block'; }
@@ -2997,7 +3057,7 @@
                     cardHistory: _cardHistory, playerId: _playerId, playerName: _playerName,
                     achievements: _achievements, quests: _quests, lastQuestReset: _lastQuestReset,
                     pickaxeLevel: _pickaxeLevel,
-                    lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank,
+                    lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank, last_active: _lastActive,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                 };
@@ -3022,6 +3082,7 @@
                         _totalStrikesEver = d.totalStrikesEver || 0;
                         _mbProfileLink = d.mbProfileLink || null;
                         _lastRank = d.lastRank || null;
+                        _lastActive = d.last_active || null;
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
@@ -3106,6 +3167,7 @@
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
 
             window.mineOre = function() {
+                updateLastActive(); 
                 if (_strikesDone >= _strikesLimit) { 
                     showToast("⛔ Лимит ударов", "#ff8c6e"); 
                     return; 
@@ -3138,12 +3200,14 @@
             };
             
             window.claimBonus = function() {
+                updateLastActive(); 
                 const today = new Date().toDateString();
                 if (_lastBonusDate && _lastBonusDate.toDateString() === today) { showToast("❗ Бонус уже получен", "#ffaa88"); return; }
                 _diamonds += 5; _lastBonusDate = new Date(); saveGame(); updateUI(); showToast("💎 +5 АЛМАЗОВ", "#aaffdd"); checkAchievements();
             };
             
             window.exchangeOreToDiamonds = function() {
+                updateLastActive(); 
                 let amt = parseInt(document.getElementById('exchangeSlider').value);
                 if (amt <= 0) { showToast("Выберите количество", "#ffaa88"); return; }
                 const gain = Math.floor(amt / 100);
@@ -3163,6 +3227,7 @@
             };
             
             window.performUpgrade = function() {
+                updateLastActive(); 
                 const cost = getLevelUpCost(_level);
                 if (_diamonds >= cost) {
                     _diamonds -= cost; 
@@ -3410,6 +3475,20 @@
                     document.getElementById('pricePreview').innerHTML = `${diamonds} 💎 = ${rubles} ₽`;
                 } else {
                     document.getElementById('pricePreview').innerHTML = `Введите алмазы для расчёта`;
+                }
+            });
+
+            // Периодическое обновление статуса (каждую минуту)
+            setInterval(() => {
+                if (!document.hidden) { // обновляем только если вкладка активна
+                    updateLastActive();
+                }
+            }, 60000); // 60 секунд
+
+            // Также обновляем при возвращении на вкладку
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    updateLastActive();
                 }
             });
 
