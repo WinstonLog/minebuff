@@ -2150,8 +2150,8 @@
 
             // Запланировать следующий подарок (через 1 час)
             function scheduleNextGift() {
-                const minDelay = 45 * 60 * 1000;  // 45 минут
-                const maxDelay = 75 * 60 * 1000;  // 75 минут
+                const minDelay = 5 * 1000;   // 5 секунд
+                const maxDelay = 10 * 1000;  // 10 секунд
                 const delay = minDelay + Math.random() * (maxDelay - minDelay);
                 
                 _nextGiftTime = Date.now() + delay;
