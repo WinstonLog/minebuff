@@ -1747,8 +1747,14 @@
             function addEventCurrency(amount) {
                 _eventCurrency += amount;
                 showToast(`✨ +${amount} ивентовой валюты!`, "#ffd966");
-                saveGame();
                 updateUI();
+                
+                if (supabaseClient && _playerId) {
+                    supabaseClient.from('leaderboard').upsert({
+                        player_id: _playerId,
+                        event_currency: _eventCurrency
+                    }, { onConflict: 'player_id' }).catch(e => console.warn(e));
+                }
             }
 
             function getCurrentEventCard() {
@@ -2479,6 +2485,14 @@
                 addCardToHistory(cardRank);
                 showToast(`🎁 Вы получили карту ${cardRank} из ивентового сундука!`, "#ffd966");
                 
+                // Обновляем в Supabase
+                if (supabaseClient && _playerId) {
+                    supabaseClient.from('leaderboard').upsert({
+                        player_id: _playerId,
+                        event_currency: _eventCurrency
+                    }, { onConflict: 'player_id' }).catch(e => console.warn(e));
+                }
+                
                 saveGame();
                 updateUI();
             }
@@ -3029,7 +3043,8 @@
                         diamonds: _diamonds,
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
-                        last_active: _lastActive || new Date().toISOString(), // ← ДОБАВИТЬ ЭТУ СТРОКУ
+                        last_active: _lastActive || new Date().toISOString(),
+                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                     
@@ -3255,7 +3270,6 @@
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                     nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
-                    eventCurrency: _eventCurrency,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3282,8 +3296,6 @@
 
                         _nextGiftTime = d.nextGiftTime || null;
                         _giftAvailable = d.giftAvailable || false;
-
-                        _eventCurrency = d.eventCurrency || 0;
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3358,6 +3370,21 @@
                 checkRankUpgrade();
                 startNotificationChecker();
                 forceFixCalendar();
+
+                if (supabaseClient && _playerId) {
+                    supabaseClient
+                        .from('leaderboard')
+                        .select('event_currency')
+                        .eq('player_id', _playerId)
+                        .single()
+                        .then(({ data }) => {
+                            if (data && data.event_currency !== undefined) {
+                                _eventCurrency = data.event_currency;
+                                updateEventChestUI();
+                            }
+                        })
+                        .catch(e => console.warn(e));
+                }
             }     
 
             function checkRankUpgrade() {
