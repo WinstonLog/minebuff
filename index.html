@@ -1720,7 +1720,10 @@
                         player_id: _playerId,
                         last_active: _lastActive
                     }, { onConflict: 'player_id' }).then(() => {
-                        // успешно
+                        // Если открыта вкладка топа — обновляем
+                        if (document.getElementById('topPanel').classList.contains('active')) {
+                            loadTopFromSupabase();
+                        }
                     }).catch(e => {
                         console.warn('Ошибка обновления last_active:', e);
                     });
@@ -1731,14 +1734,16 @@
             function getOnlineStatus(lastActiveTime) {
                 if (!lastActiveTime) return { text: '🕐 Неизвестно', color: '#888888' };
                 
-                // Проверка, что дата валидна
                 const last = new Date(lastActiveTime);
                 if (isNaN(last.getTime())) return { text: '🕐 Ошибка даты', color: '#888888' };
                 
                 const now = new Date();
                 const diffSeconds = Math.floor((now - last) / 1000);
                 
-                console.log('lastActiveTime:', lastActiveTime, 'diffSeconds:', diffSeconds); // для отладки
+                console.log('БД время:', lastActiveTime);
+                console.log('Преобразовано в локальное:', last.toString());
+                console.log('Сейчас локальное:', now.toString());
+                console.log('Разница в секундах:', diffSeconds);
                 
                 if (diffSeconds < 60) {
                     return { text: '🟢 Онлайн', color: '#44ff44' };
@@ -3500,6 +3505,9 @@
             initDropdowns();
             loadGame();
             initSupabase();
+
+            window.updateLastActive = updateLastActive;
+            window.getOnlineStatus = getOnlineStatus;
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
