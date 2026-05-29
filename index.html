@@ -3338,14 +3338,6 @@
                     else if (rand < 10) rank = 'S';
                     else rank = 'A';   
                     
-                    const cardText = `🎴 Карта ранга ${rank} (Таинственный сундук)`;
-                    _cardHistory.unshift({ 
-                        id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                        text: cardText, 
-                        rank: rank 
-                    });
-                    if (_cardHistory.length > 30) _cardHistory.pop();
-                    
                     // Сохраняем карту
                     addCardToHistory(rank);
                     saveGame();
