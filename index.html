@@ -2913,7 +2913,7 @@
             async function loadTopFromSupabase() {
                 if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
                 try {
-                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link, cards_json').order('level', { ascending: false }).order('updated_at', { ascending: true });
+                    const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link, cards_json, last_active').order('level', { ascending: false }).order('updated_at', { ascending: true });
                     const container = document.getElementById('topList');
                     const rankBlock = document.getElementById('playerRankBlock');
                     const rankSpan = document.getElementById('playerRank');
