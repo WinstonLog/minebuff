@@ -1264,6 +1264,22 @@
                             <button id="openCardChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 24px; border-radius: 40px; font-weight: bold; color: white; font-size: 16px; cursor: pointer;">70💎 ОТКРЫТЬ</button>
                         </div>
                     </div>
+
+<!--Ивентовый сундук
+                    <div style="background: linear-gradient(135deg, #2a4a2a, #1a3a1a); border-radius: 30px; padding: 16px; margin-bottom: 12px; border: 2px solid #ffaa33;" id="eventChestBlock">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <div style="font-size: 48px;" id="eventChestIcon">🌸</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; font-size: 16px;">СЕЗОННЫЙ СУНДУК</div>
+                                <div style="font-size: 12px; opacity: 0.7;">Cезонная карта! <span id="eventName">Лето</span></div>
+                                <div style="font-size: 11px; margin-top: 4px;">🎴 Карты: <span id="eventCards">L</span></div>
+                            </div>
+                            <button id="openEventChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">10🎫 ОТКРЫТЬ</button>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 11px; text-align: center;">
+                            🎫 Ивентовая валюта: <span id="eventCurrencyDisplay">0</span>
+                        </div>
+                    </div> -->
                     
                     <!-- Бустер на удары -->
                     <div style="background: linear-gradient(135deg, #1a2a2a, #0a1a1a); border-radius: 30px; padding: 16px; margin-bottom: 12px; border: 1px solid #ffcc6633;">
@@ -1667,7 +1683,7 @@
             // Переменные для коллекции F-ранга
             let _collectedCards = {}; // { cardId: true }
 
-            let _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0, _strikesLimit = 100;
+            let _eventCurrency = 0, _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0,  _strikesLimit = 100;
             let _lastBonusDate = null, _cardHistory = [];
             let _playerId = null, _playerName = null;
             let _achievements = {}, _quests = {}, _lastQuestReset = null;
@@ -1726,6 +1742,22 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            function addEventCurrency(amount) {
+                _eventCurrency += amount;
+                showToast(`✨ +${amount} ивентовой валюты!`, "#ffd966");
+                saveGame();
+                updateUI();
+            }
+
+            function getCurrentEventCard() {
+                const season = getCurrentTheme();
+                if (season === 'spring') return 'V';
+                if (season === 'summer') return 'L';
+                if (season === 'halloween') return 'H';
+                if (season === 'winter') return 'N';
+                return 'L';
             }
 
             // Обновление последней активности
@@ -2433,6 +2465,52 @@
                 
                 document.getElementById('chestModal').classList.remove('show');
                 _pendingChest = null;
+            }
+
+            function openEventChest() {
+                const cost = 10;
+                if (_eventCurrency < cost) {
+                    showToast(`❌ Нужно ${cost} ивентовой валюты! Получите её в шахте!`, "#ff8888");
+                    return;
+                }
+                
+                _eventCurrency -= cost;
+                const cardRank = getCurrentEventCard();
+                addCardToHistory(cardRank);
+                showToast(`🎁 Вы получили карту ${cardRank} из ивентового сундука!`, "#ffd966");
+                
+                saveGame();
+                updateUI();
+            }
+
+            function updateEventChestUI() {
+                const season = getCurrentTheme();
+                const chestIcon = document.getElementById('eventChestIcon');
+                const eventName = document.getElementById('eventName');
+                const eventCards = document.getElementById('eventCards');
+                const currencyDisplay = document.getElementById('eventCurrencyDisplay');
+                
+                if (!chestIcon) return;
+                
+                if (season === 'spring') {
+                    chestIcon.textContent = '🌸';
+                    eventName.textContent = 'Весна';
+                    eventCards.textContent = 'V';
+                } else if (season === 'summer') {
+                    chestIcon.textContent = '☀️';
+                    eventName.textContent = 'Лето';
+                    eventCards.textContent = 'L';
+                } else if (season === 'halloween') {
+                    chestIcon.textContent = '🎃';
+                    eventName.textContent = 'Хеллоуин';
+                    eventCards.textContent = 'H';
+                } else if (season === 'winter') {
+                    chestIcon.textContent = '❄️';
+                    eventName.textContent = 'Зима';
+                    eventCards.textContent = 'N';
+                }
+                
+                if (currencyDisplay) currencyDisplay.textContent = _eventCurrency;
             }
 
             function addCardToHistory(rank) { 
@@ -3163,6 +3241,7 @@
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updateRankUI(); 
+                updateEventChestUI();
             }
             
             function saveGame() {
@@ -3176,6 +3255,7 @@
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
                     nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
+                    eventCurrency: _eventCurrency,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3202,6 +3282,8 @@
 
                         _nextGiftTime = d.nextGiftTime || null;
                         _giftAvailable = d.giftAvailable || false;
+
+                        _eventCurrency = d.eventCurrency || 0;
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3328,6 +3410,12 @@
                     document.getElementById('chestModal').classList.add('show');
                     showToast("🎁 ВАМ ВЫПАЛ СУНДУК! 🎁", "#ffd966");
                 }
+
+/*                // Шанс выпадения ивентовой валюты (2%)
+                if (Math.random() < 0.02) {
+                    const currencyAmount = Math.floor(Math.random() * 3) + 1; // 1-3
+                    addEventCurrency(currencyAmount);
+                }*/
                             
                 showToast(`⛏️ +${gain} руды`, "#ffdd99"); 
                 saveGame(); 
@@ -3456,6 +3544,7 @@
             document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
+/*            document.getElementById('openEventChestBtn')?.addEventListener('click', () => openEventChest());*/
 
             // Магазин - сундук с картой (S, X и A ранги)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
