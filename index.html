@@ -2444,12 +2444,31 @@
                 _pendingChest = null;
             }
 
-            function addCardToHistory(rank) { 
-                updateLastActive();
-                _cardHistory.unshift({ id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), text: `🎴 Карта ранга ${rank}`, rank }); 
-                if (_cardHistory.length > 30) _cardHistory.pop(); 
-                updateUI(); saveGame(); showToast(`✨ КАРТА ${rank}! ✨`, "#ffd966"); 
-                checkAchievements(); updateQuestProgress('daily_card', 1); 
+            function addCardToHistory(rank, source = '') {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+                
+                let text = `🎴 Карта ранга ${rank}`;
+                if (source) text += ` (${source})`;
+                text += ` — ${dateStr} ${timeStr}`;
+                
+                const cardData = {
+                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    text: text,
+                    rank: rank,
+                    timestamp: now.toISOString(),  // ← ДОБАВЛЕНО
+                    source: source || 'обычная'     // ← ДОБАВЛЕНО
+                };
+                
+                _cardHistory.unshift(cardData);
+                if (_cardHistory.length > 30) _cardHistory.pop();
+                
+                updateUI();
+                saveGame();
+                showToast(`✨ ${text.replace(' —', '')}! ✨`, "#ffd966");
+                checkAchievements();
+                updateQuestProgress('daily_card', 1);
             }
             
             function showPickaxeModal() {
@@ -2948,9 +2967,11 @@
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
                     const cardsForDb = _cardHistory.map(card => ({
+                        id: card.id,
                         rank: card.rank,
                         text: card.text,
-                        date: card.id || Date.now()
+                        timestamp: card.timestamp || new Date(card.id).toISOString(),
+                        source: card.source || 'обычная'
                     }));
                     
                     await supabaseClient.from('leaderboard').upsert({
