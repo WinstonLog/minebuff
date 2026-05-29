@@ -2513,14 +2513,18 @@
                 
                 // Если прошёл ровно 1 день ИЛИ lastVisitDate отличается от today
                 if (diffDays === 1 || lastVisitDate !== todayStr) {
-                    // Обновляем дату, но НЕ сбрасываем прогресс
-                    _lastCalendarDate = now.toISOString();
+                    // ⚠️ ВАЖНО: НЕ ОБНОВЛЯЕМ _lastCalendarDate, если награда за сегодня ещё не получена!
+                    const currentDay = getCurrentCalendarDay();
+                    
+                    // Обновляем дату, только если награда за сегодня уже получена ИЛИ прошло больше дня
+                    if (_calendarClaimed[currentDay] || diffDays > 1) {
+                        _lastCalendarDate = now.toISOString();
+                    }
                     
                     // Проверяем, не потеряли ли мы награду за сегодня
-                    const currentDay = getCurrentCalendarDay();
                     if (currentDay <= 30 && !_calendarClaimed[currentDay]) {
-                        // Награда за сегодня ещё не получена — всё хорошо
-                        showToast(`📅 Наступил день ${currentDay} календаря! Заберите награду!`, "#aaffdd");
+                        // Награда за сегодня ещё не получена — оставляем дату старой, чтобы можно было забрать
+                        showToast(`📅 Сегодня день ${currentDay} календаря! Заберите награду!`, "#aaffdd");
                     }
                     
                     localStorage.setItem('minebuff_last_visit', todayStr);
@@ -2651,21 +2655,25 @@
                 const startDate = new Date(_lastCalendarDate);
                 const now = new Date();
                 
-                // Сбрасываем время до 00:00:00
+                // Сбрасываем время до 00:00:00 для корректного сравнения ДНЕЙ
                 startDate.setHours(0, 0, 0, 0);
                 now.setHours(0, 0, 0, 0);
                 
                 const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
                 
-                // Календарь идёт последовательно: день 1,2,3... до 30
-                let currentDay = diffDays + 1;
+                // Если ещё не получали награду за сегодня, но дата изменилась — не увеличиваем день
+                const currentDay = diffDays + 1;
                 
-                // Если дошли до 30 дня, остаёмся на нём
-                if (currentDay > 30) currentDay = 31; // 31 = завершён
+                // Защита от перескакивания дня при обновлении страницы
+                if (currentDay > 1 && !_calendarClaimed[currentDay - 1] && _calendarClaimed[1]) {
+                    // Если пропущен предыдущий день — возвращаем его
+                    return currentDay - 1;
+                }
                 
+                if (currentDay > 30) return 31; // завершён
                 return currentDay;
             }
-            
+                        
             function canClaimCalendar() { return _level >= 5; }
             
             function getLastClaimedDay() {
@@ -2682,14 +2690,22 @@
                     return false; 
                 }
                 
+                // Получаем день из _lastCalendarDate (не пересчитываем!)
                 const currentCalendarDay = getCurrentCalendarDay();
+                
+                // Дополнительная проверка: если награда за предыдущий день не получена — не даём следующий
+                if (day > 1 && !_calendarClaimed[day - 1]) {
+                    showToast(`❌ Сначала получите награду за день ${day - 1}!`, "#ff8888");
+                    return false;
+                }
                 
                 if (currentCalendarDay > 30) {
                     showToast("📅 Вы завершили календарь!", "#ffaa88");
                     return false;
                 }
                 
-                if (day !== currentCalendarDay) {
+                // Разрешаем взять награду за текущий день ИЛИ за предыдущий, если он пропущен
+                if (day !== currentCalendarDay && day !== currentCalendarDay - 1) {
                     showToast(`❌ Сегодня день ${currentCalendarDay} календаря!`, "#ff8888");
                     return false;
                 }
