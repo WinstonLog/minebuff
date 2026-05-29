@@ -1090,6 +1090,14 @@
                 transform: translateX(50px);
             }
         }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        #floatingGift:hover {
+            animation: none;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -1549,6 +1557,13 @@
         </div>
     </div>
 
+    <!-- Плавающий подарок -->
+    <div id="floatingGift" style="position: fixed; bottom: 20px; left: 20px; z-index: 1000; cursor: pointer; animation: bounce 1s infinite; display: none;">
+        <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #fff;">
+            <div style="font-size: 32px;">🎁</div>
+        </div>
+    </div>
+
     <!-- Контейнер для уведомлений -->
     <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
     </div>
@@ -1677,6 +1692,10 @@
             // ========== СИСТЕМА УВЕДОМЛЕНИЙ ==========
             let notificationInterval = null;
             let lastNotificationCheck = null;
+
+            let _nextGiftTime = null;      // время следующего подарка
+            let _giftAvailable = false;    // доступен ли подарок
+            let _giftTimer = null;         // таймер для проверки
 
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
@@ -2121,7 +2140,94 @@
                 if (rand < 30) return 'D';     // 15%
                 return 'E';                    // 70%
             }
+
+            // Получить случайную карту от E до A
+            function getRandomGiftCard() {
+                const rand = Math.random() * 100;
+                if (rand < 1) return 'A';      // 1%
+                if (rand < 2) return 'P';      // 1%
+                if (rand < 3) return 'G';      // 1%
+                if (rand < 8) return 'B';      // 5%
+                if (rand < 15) return 'C';     // 7%
+                if (rand < 30) return 'D';     // 15%
+                return 'E';                    // 70%
+            }
+
+            // Запланировать следующий подарок (через 1 час)
+            function scheduleNextGift() {
+                const minDelay = 45 * 60 * 1000;  // 45 минут
+                const maxDelay = 75 * 60 * 1000;  // 75 минут
+                const delay = minDelay + Math.random() * (maxDelay - minDelay);
+                
+                _nextGiftTime = Date.now() + delay;
+                _giftAvailable = false;
+                
+                // Скрываем подарок
+                const giftDiv = document.getElementById('floatingGift');
+                if (giftDiv) giftDiv.style.display = 'none';
+                
+                // Сохраняем в localStorage
+                saveGame();
+                
+                console.log(`🎁 Следующий подарок через 1 час (${new Date(_nextGiftTime).toLocaleTimeString()})`);
+                
+                // Устанавливаем таймер
+                if (_giftTimer) clearTimeout(_giftTimer);
+                _giftTimer = setTimeout(() => showGift(), delay);
+            }
                         
+            // Показать подарок
+            function showGift() {
+                if (_giftAvailable) return;
+                
+                _giftAvailable = true;
+                const giftDiv = document.getElementById('floatingGift');
+                if (giftDiv) {
+                    giftDiv.style.display = 'block';
+                    
+                    // Добавляем эффект "пульсации" для привлечения внимания
+                    giftDiv.style.animation = 'bounce 0.5s ease-in-out 3';
+                    setTimeout(() => {
+                        if (giftDiv) giftDiv.style.animation = 'bounce 1s infinite';
+                    }, 1500);
+                }
+                
+                // Уведомление
+                showNotification('🎁', 'warning');
+                
+                saveGame();
+            }
+
+            // Забрать подарок
+            function claimGift() {
+                if (!_giftAvailable) return;
+                
+                const rank = getRandomGiftCard();
+                const cardText = `🎴 Карта ранга ${rank} (Подарок)`;
+                
+                _cardHistory.unshift({ 
+                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                    text: cardText, 
+                    rank: rank 
+                });
+                if (_cardHistory.length > 30) _cardHistory.pop();
+                
+                // Показываем уведомление
+                showToast(`✨ ${cardText}! ✨`, "#ffd966");
+                
+                // Скрываем подарок
+                _giftAvailable = false;
+                document.getElementById('floatingGift').style.display = 'none';
+                
+                // Планируем следующий подарок
+                scheduleNextGift();
+                
+                saveGame();
+                updateUI();
+                checkAchievements();
+                updateQuestProgress('daily_card', 1);
+            }
+
             function isEventActive() {
                 const now = new Date();
                 const day = now.getDay();
@@ -3086,6 +3192,7 @@
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank, last_active: _lastActive,
                     calendarClaimed: _calendarClaimed, lastCalendarDate: _lastCalendarDate,
                     mbProfileLink: _mbProfileLink,
+                    nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3109,6 +3216,31 @@
                         _mbProfileLink = d.mbProfileLink || null;
                         _lastRank = d.lastRank || null;
                         _lastActive = d.last_active || null;
+
+                        _nextGiftTime = d.nextGiftTime || null;
+                        _giftAvailable = d.giftAvailable || false;
+
+                        // Восстанавливаем таймер, если есть запланированное время
+                        if (_nextGiftTime && !_giftAvailable) {
+                            const now = Date.now();
+                            if (_nextGiftTime > now) {
+                                const delay = _nextGiftTime - now;
+                                if (delay > 0) {
+                                    _giftTimer = setTimeout(() => showGift(), delay);
+                                } else {
+                                    showGift();
+                                }
+                            } else if (_nextGiftTime <= now) {
+                                showGift();
+                            }
+                        } else if (_giftAvailable) {
+                            showGift(); // показываем, если был активен
+                        }
+
+                        // Если нет запланированного времени — создаём
+                        if (!_nextGiftTime && !_giftAvailable) {
+                            scheduleNextGift();
+                        }
 
                         // ПРОВЕРКА НА СТАРЫЕ ДАННЫЕ КАЛЕНДАРЯ
                         if (_calendarClaimed && Object.keys(_calendarClaimed).length > 0) {
@@ -3502,6 +3634,11 @@
                 } else {
                     document.getElementById('pricePreview').innerHTML = `Введите алмазы для расчёта`;
                 }
+            });
+
+            // Обработчик для подарка
+            document.getElementById('floatingGift')?.addEventListener('click', () => {
+                claimGift();
             });
 
             // Периодическое обновление статуса (каждую минуту)
