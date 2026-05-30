@@ -3571,6 +3571,7 @@
             document.getElementById('levelModal').onclick = (e) => { if (e.target === document.getElementById('levelModal')) window.closeModal(); };
             document.getElementById('pickaxeModal').onclick = (e) => { if (e.target === document.getElementById('pickaxeModal')) window.closePickaxeModal(); };
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
+            document.getElementById('exchangeSlider').oninput = (e) => { document.getElementById('exchangeAmount').innerText = e.target.value; };
 /*            document.getElementById('openEventChestBtn')?.addEventListener('click', () => openEventChest());*/
 
             // Магазин - сундук с картой (S, X и A ранги)
