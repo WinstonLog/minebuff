@@ -988,6 +988,37 @@
             animation: none;
             transform: scale(1.05);
         }
+        /* Анимация вылетающих цифр */
+        .floating-number {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffcc66;
+            text-shadow: 0 0 10px #ffaa33;
+            animation: floatUp 1s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            30% { opacity: 1; transform: translate(-50%, -80px) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -150px) scale(1.5); }
+        }
+
+        .floating-number.critical {
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
+            font-size: 36px;
+            animation: floatUpCritical 1.2s ease-out forwards;
+        }
+
+        @keyframes floatUpCritical {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.3); }
+            20% { transform: translate(-50%, -60px) scale(1.5); }
+            100% { opacity: 0; transform: translate(-50%, -180px) scale(2); }
+        }
     </style>
 </head>
 <body>
@@ -2960,6 +2991,13 @@
                 _ore += gain; 
                 _strikesDone++;
                 _totalStrikesEver++;
+                
+                // Анимация цифр (получаем координаты кирки)
+                const pickaxe = document.getElementById('pickaxeBtn');
+                const rect = pickaxe.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                showFloatingNumber(gain, centerX, centerY, gain >= 20);
                 
                 // Прогрессивный шанс: первые 30 ударов 0%, потом 1-3%
                 let chestChancePercent = _totalStrikesEver < 30 ? 0 : Math.min(3, Math.floor((_totalStrikesEver - 30) / 20));
