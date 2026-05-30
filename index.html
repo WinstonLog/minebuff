@@ -2718,48 +2718,6 @@
                 updateCalendarUI();
             }
 
-            // Функция форсированного восстановления календаря
-            function forceFixCalendar() {
-                const fixKey = 'calendar_day2_fixed';
-                
-                // Проверяем, делали ли мы уже исправление
-                if (localStorage.getItem(fixKey)) {
-                    return;
-                }
-                
-                // Если уровень меньше 5 — календарь ещё не активен
-                if (_level < 5) {
-                    return;
-                }
-                
-                // Если календарь ещё не активирован
-                if (!_lastCalendarDate) {
-                    return;
-                }
-                
-                // Если 1 день получен, а 2 день — нет
-                if (_calendarClaimed[1] && !_calendarClaimed[2]) {
-                    console.log('🔧 Выдаём пропущенную награду за 2 день...');
-                    
-                    // Награда за 2 день (1 алмаз)
-                    _diamonds += 1;
-                    
-                    // Отмечаем 2 день как полученный
-                    _calendarClaimed[2] = true;
-                    
-                    // Сохраняем
-                    saveGame();
-                    
-                    // Показываем уведомление
-                    showToast(`💎 +1 алмаз (пропущенная награда календаря, день 2)!`, "#aaffdd");
-                    
-                    console.log('✅ Награда за 2 день выдана!');
-                }
-                
-                // Ставим метку, что исправление сделано
-                localStorage.setItem(fixKey, 'true');
-            }
-
             // Вспомогательная функция активации календаря
             function activateCalendar(now) {
                 _lastCalendarDate = now.toISOString();
@@ -3369,7 +3327,6 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
-                forceFixCalendar();
 
                 if (supabaseClient && _playerId) {
                     supabaseClient
