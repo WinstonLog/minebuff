@@ -2120,9 +2120,6 @@
                     }, 1500);
                 }
                 
-                // Уведомление
-                showNotification('🎁', 'Вам выпал подарок!');
-                
                 saveGame();
             }
 
@@ -2213,63 +2210,112 @@
             async function checkAdminCommands() {
                 if (!supabaseClient) return;
                 try {
-                    const { data } = await supabaseClient
+                    // Добавляем проверку существования таблицы
+                    const { error: tableCheckError } = await supabaseClient
+                        .from('admin_actions')
+                        .select('id')
+                        .limit(1)
+                        .maybeSingle();
+                    
+                    // Если таблица не существует (ошибка 42P01), просто выходим
+                    if (tableCheckError && tableCheckError.code === '42P01') {
+                        console.log('Таблица admin_actions не существует, пропускаем проверку');
+                        return;
+                    }
+                    
+                    const { data, error } = await supabaseClient
                         .from('admin_actions')
                         .select('*')
                         .eq('target_player_id', _playerId)
                         .eq('status', 'pending');
                     
+                    if (error) {
+                        console.warn('Ошибка запроса admin_actions:', error);
+                        return;
+                    }
+                    
                     for (const action of data || []) {
                         let needUpdate = false;
                         
-                        if (action.action_type === 'remove_card') {
-                            const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
-                            if (index !== -1) {
-                                _cardHistory.splice(index, 1);
-                                showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
-                            } else {
-                                showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
-                            }
-                            needUpdate = true;
-                        }
-                        else if (action.action_type === 'add_card') {
-                            addCardToHistory(action.card_rank);
-                            showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
-                            needUpdate = true;
-                        }
-                        else if (action.action_type === 'add_diamonds') {
-                            const amount = action.amount || 0;
-                            _diamonds += amount;
-                            showToast(`💎 Администратор выдал ${amount} алмазов!`, "#ffd966");
-                            needUpdate = true;
-                        }
-                        else if (action.action_type === 'remove_diamonds') {
-                            const amount = action.amount || 0;
-                            if (_diamonds >= amount) {
-                                _diamonds -= amount;
-                                showToast(`💎 Администратор списал ${amount} алмазов!`, "#ffaa88");
-                            } else {
-                                showToast(`⚠️ Недостаточно алмазов!`, "#ff8888");
-                            }
-                            needUpdate = true;
+                        // Валидация action_type
+                        if (!action.action_type) {
+                            console.warn('Unknown action type:', action);
+                            // Отмечаем как completed, чтобы не зависло в pending
+                            await supabaseClient
+                                .from('admin_actions')
+                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .eq('id', action.id);
+                            continue;
                         }
                         
+                        switch (action.action_type) {
+                            case 'remove_card':
+                                if (action.card_rank) {
+                                    const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
+                                    if (index !== -1) {
+                                        _cardHistory.splice(index, 1);
+                                        showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
+                                    } else {
+                                        showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
+                                    }
+                                    needUpdate = true;
+                                }
+                                break;
+                                
+                            case 'add_card':
+                                if (action.card_rank) {
+                                    addCardToHistory(action.card_rank);
+                                    showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
+                                    needUpdate = true;
+                                }
+                                break;
+                                
+                            case 'add_diamonds':
+                                const addAmount = action.amount || 0;
+                                if (addAmount > 0) {
+                                    _diamonds += addAmount;
+                                    showToast(`💎 Администратор выдал ${addAmount} алмазов!`, "#ffd966");
+                                    needUpdate = true;
+                                }
+                                break;
+                                
+                            case 'remove_diamonds':
+                                const removeAmount = action.amount || 0;
+                                if (removeAmount > 0) {
+                                    if (_diamonds >= removeAmount) {
+                                        _diamonds -= removeAmount;
+                                        showToast(`💎 Администратор списал ${removeAmount} алмазов!`, "#ffaa88");
+                                    } else {
+                                        showToast(`⚠️ Недостаточно алмазов! (нужно ${removeAmount}, есть ${_diamonds})`, "#ff8888");
+                                    }
+                                    needUpdate = true;
+                                }
+                                break;
+                                
+                            default:
+                                console.warn(`Неизвестный тип действия: ${action.action_type}`);
+                                break;
+                        }
+                        
+                        // Отмечаем действие как выполненное
+                        await supabaseClient
+                            .from('admin_actions')
+                            .update({ 
+                                status: 'completed', 
+                                completed_at: new Date().toISOString() 
+                            })
+                            .eq('id', action.id);
+                        
                         if (needUpdate) {
-                            await supabaseClient
-                                .from('admin_actions')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
-                                .eq('id', action.id);
-                            
                             saveGame();
                             updateUI();
-                        } else {
-                            await supabaseClient
-                                .from('admin_actions')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
-                                .eq('id', action.id);
+                            checkAchievements(); // Добавляем проверку достижений
                         }
                     }
-                } catch(e) { console.warn('Check admin commands error:', e); }
+                } catch(e) { 
+                    console.warn('Check admin commands error:', e);
+                    // Не показываем ошибку пользователю, просто логируем
+                }
             }
 
             function updateProfileLinkUI() {
@@ -2565,21 +2611,19 @@
                 const maxLimit = 200;
                 const finalBaseLimit = Math.min(baseLimit, maxLimit);
                 
-                // Получаем сохранённый бустер (если есть)
-                let activeBoost = 0;
                 const boostKey = `strikes_boost_${today}`;
                 const hasBoostToday = localStorage.getItem(boostKey) === 'true';
+                let wasReset = false;
                 
                 if (lastReset !== today) {
                     // НОВЫЙ ДЕНЬ - сбрасываем всё
                     _strikesDone = 0;
                     _strikesLimit = finalBaseLimit;
-                    // Добавляем бустер, если куплен сегодня
                     if (hasBoostToday) {
                         _strikesLimit += 20;
-                        activeBoost = 20;
                     }
                     localStorage.setItem('minebuff_last_reset', today);
+                    wasReset = true;
                     saveGame();
                 } else {
                     // ТОТ ЖЕ ДЕНЬ - обновляем лимит с учётом бустера
@@ -2596,37 +2640,51 @@
                 
                 if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
                 
+                // Сброс квестов, если день изменился
                 const now = new Date();
                 if (!_lastQuestReset || new Date(_lastQuestReset).toDateString() !== now.toDateString()) {
                     for (const q of questsList) _quests[q.id] = { current: 0, completed: false };
                     _lastQuestReset = now.toISOString();
                     saveGame();
                     updateQuestsUI();
+                    wasReset = true;
+                }
+                
+                if (wasReset) {
+                    updateUI(); // Обновляем UI, если был сброс
                 }
                 updatePickaxeVisual();
+                return wasReset;
             }
             
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    const cardsForDb = _cardHistory.map(card => ({
-                        rank: card.rank,
-                        text: card.text,
-                        date: card.id || Date.now()
-                    }));
-                    
-                    await supabaseClient.from('leaderboard').upsert({
+                    // Упрощаем данные - отправляем только то, что точно есть
+                    const updateData = {
                         player_id: _playerId,
                         username: _playerName,
                         level: _level,
                         diamonds: _diamonds,
-                        mb_link: _mbProfileLink || null,
-                        cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
-                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
                         updated_at: new Date().toISOString()
-                    }, { onConflict: 'player_id' });
+                    };
                     
+                    // Добавляем только если есть
+                    if (_mbProfileLink) updateData.mb_link = _mbProfileLink;
+                    
+                    // cards_json отправляем отдельно, если нужно
+                    if (_cardHistory.length > 0) {
+                        updateData.cards_json = _cardHistory.map(card => ({
+                            rank: card.rank,
+                            text: card.text,
+                            date: card.id || Date.now()
+                        }));
+                    } else {
+                        updateData.cards_json = [];
+                    }
+                    
+                    await supabaseClient.from('leaderboard').upsert(updateData, { onConflict: 'player_id' });
                     hideDBError();
                     
                 } catch(e) { 
@@ -2692,24 +2750,50 @@
                 modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
             }
 
+            let topLoadAttempts = 0;
+            const MAX_TOP_LOAD_ATTEMPTS = 10;
+
+            // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ---
             async function loadTopFromSupabase() {
-                if (!supabaseClient) { setTimeout(loadTopFromSupabase, 500); return; }
+                if (!supabaseClient) {
+                    if (topLoadAttempts < MAX_TOP_LOAD_ATTEMPTS) {
+                        topLoadAttempts++;
+                        console.log(`⚠️ Supabase не готов, повторная попытка ${topLoadAttempts}/${MAX_TOP_LOAD_ATTEMPTS}...`);
+                        setTimeout(loadTopFromSupabase, 500);
+                    } else {
+                        console.error('❌ Не удалось загрузить топ: Supabase не инициализирован.');
+                        const container = document.getElementById('topList');
+                        if (container) container.innerHTML = '<li style="justify-content: center; opacity: 0.5;">❌ Ошибка загрузки топа</li>';
+                    }
+                    return;
+                }
+                
+                // Сброс счётчика при успешной инициализации
+                topLoadAttempts = 0;
+                
                 try {
                     const { data } = await supabaseClient.from('leaderboard').select('username, level, player_id, updated_at, mb_link, cards_json, last_active').order('level', { ascending: false }).order('updated_at', { ascending: true });
                     const container = document.getElementById('topList');
                     const rankBlock = document.getElementById('playerRankBlock');
                     const rankSpan = document.getElementById('playerRank');
                     const totalSpan = document.getElementById('totalPlayersCount');
+                    
                     if (!data || !data.length) {
-                        container.innerHTML = '<li>Пока никого</li>';
+                        container.innerHTML = '<li style="justify-content: center; opacity: 0.5;">Пока никого</li>';
                         if (rankBlock) rankBlock.style.display = 'none';
                         if (totalSpan) totalSpan.innerText = '👥 Всего: 0';
                         return;
                     }
+                    
                     const sorted = [...data];
-                    sorted.sort((a, b) => { if (a.level !== b.level) return b.level - a.level; return new Date(a.updated_at) - new Date(b.updated_at); });
+                    sorted.sort((a, b) => { 
+                        if (a.level !== b.level) return b.level - a.level; 
+                        return new Date(a.updated_at) - new Date(b.updated_at); 
+                    });
+                    
                     if (totalSpan) totalSpan.innerText = `👥 Всего: ${sorted.length}`;
                     const top10 = sorted.slice(0, 10);
+                    
                     container.innerHTML = top10.map((p, i) => {
                         const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                         const isCurrent = p.player_id === _playerId;
@@ -2728,75 +2812,20 @@
                                     <span>⭐ Ур.${p.level}</span>
                                 </li>`;
                     }).join('');
-                    const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
-                    if (playerIndex !== -1) { rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`; rankBlock.style.display = 'block'; }
-                    else { rankBlock.style.display = 'none'; }
                     
-                    document.querySelectorAll('#topList li[data-player-id]').forEach(li => {
-                        li.style.cursor = 'pointer';
-                        li.onclick = async (e) => {
-                            e.stopPropagation();
-                            const targetPlayerId = li.getAttribute('data-player-id');
-                            const targetPlayerName = li.getAttribute('data-player-name');
-                            const targetMbLink = li.getAttribute('data-mb-link');
-                            const targetCardsJson = li.getAttribute('data-cards-json');
-                            
-                            if (targetPlayerId === _playerId) {
-                                // Свой профиль - показываем из локальных данных
-                                const myCounts = getCardCounts();
-                                const myCardsHtml = rankNames
-                                    .filter(rank => myCounts[rank] > 0)
-                                    .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
-                                    .join('');
-                                
-                                showPlayerProfileModal({
-                                    playerName: _playerName,
-                                    level: _level,
-                                    totalCards: _cardHistory.length,
-                                    cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                                    mbLink: _mbProfileLink
-                                });
-                            } else {
-                                // Чужой профиль - используем данные из БД
-                                showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
-                                
-                                // Парсим карты из атрибута
-                                let playerCards = [];
-                                try {
-                                    if (targetCardsJson && targetCardsJson !== '[]') {
-                                        playerCards = JSON.parse(targetCardsJson);
-                                    }
-                                } catch(e) { console.warn('Parse cards error:', e); }
-                                
-                                // Подсчитываем карты
-                                const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
-                                let totalCards = 0;
-                                
-                                if (playerCards && Array.isArray(playerCards)) {
-                                    playerCards.forEach(card => {
-                                        if (card.rank && counts[card.rank] !== undefined) {
-                                            counts[card.rank]++;
-                                            totalCards++;
-                                        }
-                                    });
-                                }
-                                
-                                const cardsHtml = rankNames
-                                    .filter(rank => counts[rank] > 0)
-                                    .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
-                                    .join('');
-                                
-                                showPlayerProfileModal({
-                                    playerName: targetPlayerName,
-                                    level: li.getAttribute('data-player-level') || '?',
-                                    totalCards: totalCards,
-                                    cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                                    mbLink: targetMbLink
-                                });
-                            }
-                        };
-                    });
-                } catch(e) { console.warn('loadTopFromSupabase error:', e); }
+                    const playerIndex = sorted.findIndex(p => p.player_id === _playerId);
+                    if (playerIndex !== -1) { 
+                        rankSpan.innerText = `${playerIndex + 1} место (${_level} ур.) из ${sorted.length}`; 
+                        rankBlock.style.display = 'block'; 
+                    } else { 
+                        rankBlock.style.display = 'none'; 
+                    }
+                    
+                } catch(e) { 
+                    console.warn('loadTopFromSupabase error:', e); 
+                    const container = document.getElementById('topList');
+                    if (container) container.innerHTML = '<li style="justify-content: center; opacity: 0.5;">⚠️ Ошибка загрузки данных</li>';
+                }
             }
                         
             function initSupabase() {
@@ -2978,10 +3007,97 @@
                 };
             }
 
+            // Функция анимации цифр
+            function showFloatingNumber(value, x, y, isCritical = false) {
+                const div = document.createElement('div');
+                div.className = 'floating-number' + (isCritical ? ' critical' : '');
+                div.textContent = `+${value}`;
+                div.style.left = x + 'px';
+                div.style.top = y + 'px';
+                document.body.appendChild(div);
+                setTimeout(() => div.remove(), 1000);
+            }
+
+            // Делегирование событий для топа (один обработчик вместо многих)
+            function initTopListClickHandler() {
+                const topListContainer = document.getElementById('topList');
+                if (!topListContainer) return;
+                
+                topListContainer.addEventListener('click', async (e) => {
+                    const li = e.target.closest('li[data-player-id]');
+                    if (!li) return;
+                    
+                    e.stopPropagation();
+                    
+                    const targetPlayerId = li.getAttribute('data-player-id');
+                    const targetPlayerName = li.getAttribute('data-player-name');
+                    const targetMbLink = li.getAttribute('data-mb-link');
+                    const targetCardsJson = li.getAttribute('data-cards-json');
+                    const targetPlayerLevel = li.getAttribute('data-player-level');
+                    
+                    if (targetPlayerId === _playerId) {
+                        // Свой профиль - показываем из локальных данных
+                        const myCounts = getCardCounts();
+                        const myCardsHtml = rankNames
+                            .filter(rank => myCounts[rank] > 0)
+                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
+                            .join('');
+                        
+                        showPlayerProfileModal({
+                            playerName: _playerName,
+                            level: _level,
+                            totalCards: _cardHistory.length,
+                            cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                            mbLink: _mbProfileLink
+                        });
+                    } else {
+                        // Чужой профиль - используем данные из БД
+                        showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
+                        
+                        // Парсим карты из атрибута
+                        let playerCards = [];
+                        try {
+                            if (targetCardsJson && targetCardsJson !== '[]') {
+                                playerCards = JSON.parse(targetCardsJson);
+                            }
+                        } catch(e) { 
+                            console.warn('Parse cards error:', e); 
+                        }
+                        
+                        // Подсчитываем карты
+                        const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
+                        let totalCards = 0;
+                        
+                        if (playerCards && Array.isArray(playerCards)) {
+                            playerCards.forEach(card => {
+                                if (card.rank && counts[card.rank] !== undefined) {
+                                    counts[card.rank]++;
+                                    totalCards++;
+                                }
+                            });
+                        }
+                        
+                        const cardsHtml = rankNames
+                            .filter(rank => counts[rank] > 0)
+                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
+                            .join('');
+                        
+                        showPlayerProfileModal({
+                            playerName: targetPlayerName,
+                            level: targetPlayerLevel || '?',
+                            totalCards: totalCards,
+                            cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                            mbLink: targetMbLink
+                        });
+                    }
+                });
+            }
+            
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
 
             window.mineOre = function() {
                 updateLastActive(); 
+                checkDailyReset();
                 if (_strikesDone >= _strikesLimit) { 
                     showToast("⛔ Лимит ударов", "#ff8c6e"); 
                     return; 
@@ -3079,7 +3195,10 @@
                 window.open(`https://t.me/minebuff?text=${encodeURIComponent(msg)}`, '_blank');
                 showToast("✅ Отправьте скриншот в Telegram!", "#aaffdd");
             };
-            
+            window.showPickaxeModal = showPickaxeModal;
+            window.performPickaxeUpgrade = performPickaxeUpgrade;
+            window.openChest = openChest;
+
             document.getElementById('saveProfileLinkBtn')?.addEventListener('click', () => {
                 const inputVal = document.getElementById('profileLinkInput').value.trim();
                 if (!inputVal) { showToast("❌ Введите ID профиля!", "#ff8888"); return; }
@@ -3321,9 +3440,17 @@
                 }
             });
 
+            setInterval(() => {
+                checkAdminCommands();
+            }, 30000);
+
             initDropdowns();
             loadGame();
             initSupabase();
+            initTopListClickHandler();
+
+            window.updateLastActive = updateLastActive;
+            window.getOnlineStatus = getOnlineStatus;
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
