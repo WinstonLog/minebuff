@@ -1132,6 +1132,21 @@
                 </div>
                 <div class="cards-stats" id="cardsStats"></div>
                 
+                <!-- Ежедневный календарь -->
+                <div class="dropdown-section">
+                    <div class="dropdown-header">
+                        <div class="dropdown-title">📅 ЕЖЕДНЕВНЫЙ КАЛЕНДАРЬ <span id="calendarStreak">(День 1)</span></div>
+                        <div class="dropdown-arrow">▼</div>
+                    </div>
+                    <div class="dropdown-content" id="calendarContent">
+                        <!-- Добавьте обёртку с фиксированной высотой -->
+                        <div class="calendar-wrapper" style="max-height: 300px; overflow-y: auto;">
+                            <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;"></div>
+                            <div id="calendarBonus" style="margin-top: 12px; text-align: center; font-size: 12px; color: #ffcc66;"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">🏅 ДОСТИЖЕНИЯ <span id="achievementsCount">(0/12)</span></div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content" id="achievementsContent"></div>
@@ -1546,39 +1561,6 @@
                 { id: 'daily_card', name: 'Удача', desc: 'Получить карту', target: 1, reward: 4 }
             ];
 
-            const calendarRewards = [
-                { day: 1, type: 'ore', amount: 30, text: '30 руды' },
-                { day: 2, type: 'diamonds', amount: 1, text: '1 алмаз' },
-                { day: 3, type: 'ore', amount: 40, text: '40 руды' },
-                { day: 4, type: 'diamonds', amount: 1, text: '1 алмаз' },
-                { day: 5, type: 'ore', amount: 50, text: '50 руды' },
-                { day: 6, type: 'diamonds', amount: 1, text: '1 алмаз' },
-                { day: 7, type: 'ore', amount: 60, text: '60 руды' },
-                { day: 8, type: 'diamonds', amount: 2, text: '2 алмаза' },
-                { day: 9, type: 'ore', amount: 70, text: '70 руды' },
-                { day: 10, type: 'ore', amount: 80, text: '80 руды' },
-                { day: 11, type: 'diamonds', amount: 2, text: '2 алмаза' },
-                { day: 12, type: 'ore', amount: 90, text: '90 руды' },
-                { day: 13, type: 'diamonds', amount: 2, text: '2 алмаза' },
-                { day: 14, type: 'card', rank: 'D', text: 'Карта D' },
-                { day: 15, type: 'ore', amount: 100, text: '100 руды' },
-                { day: 16, type: 'diamonds', amount: 3, text: '3 алмаза' },
-                { day: 17, type: 'ore', amount: 120, text: '120 руды' },
-                { day: 18, type: 'diamonds', amount: 3, text: '3 алмаза' },
-                { day: 19, type: 'ore', amount: 150, text: '150 руды' },
-                { day: 20, type: 'diamonds', amount: 3, text: '3 алмаза' },
-                { day: 21, type: 'ore', amount: 180, text: '180 руды' },
-                { day: 22, type: 'diamonds', amount: 4, text: '4 алмаза' },
-                { day: 23, type: 'ore', amount: 200, text: '200 руды' },
-                { day: 24, type: 'diamonds', amount: 4, text: '4 алмаза' },
-                { day: 25, type: 'ore', amount: 250, text: '250 руды' },
-                { day: 26, type: 'diamonds', amount: 5, text: '5 алмазов' },
-                { day: 27, type: 'ore', amount: 300, text: '300 руды' },
-                { day: 28, type: 'diamonds', amount: 5, text: '5 алмазов' },
-                { day: 29, type: 'ore', amount: 400, text: '400 руды' },
-                { day: 30, type: 'card', rank: 'C', text: 'Карта C' }
-            ];
-
             // ========== СИСТЕМА РАНГОВ/ЗВАНИЙ ==========
             const rankTitles = [
                 { minLevel: 1, maxLevel: 4, name: 'Новичок', icon: '🪨', bonus: 0 },
@@ -1589,9 +1571,6 @@
                 { minLevel: 75, maxLevel: 99, name: 'Король шахты', icon: '👑', bonus: 20 },
                 { minLevel: 100, maxLevel: 100, name: 'Легенда', icon: '🏆', bonus: 30 }
             ];
-
-            // Переменные для коллекции F-ранга
-            let _collectedCards = {}; // { cardId: true }
 
             let _eventCurrency = 0, _ore = 0, _diamonds = 0, _level = 1, _strikesDone = 0,  _strikesLimit = 100;
             let _lastBonusDate = null, _cardHistory = [];
@@ -1613,6 +1592,11 @@
 
             let dbErrorCount = 0;
             let dbErrorBanner = null;
+
+            // ========== КАЛЕНДАРЬ ==========
+            let _dailyStreak = 0;
+            let _lastLoginDate = null;
+            let _calendarClaimed = {};
 
             // ========== СИСТЕМА УВЕДОМЛЕНИЙ ==========
             let notificationInterval = null;
@@ -1649,6 +1633,163 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Функция проверки ежедневного входа
+            function checkDailyLogin() {
+                const today = new Date().toDateString();
+                
+                if (!_lastLoginDate) {
+                    _lastLoginDate = today;
+                    _dailyStreak = 1;
+                    saveGame();
+                    updateCalendarUI();
+                    return;
+                }
+                
+                const lastDate = new Date(_lastLoginDate);
+                const currentDate = new Date(today);
+                const diffDays = Math.floor((currentDate - lastDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    // Следующий день - увеличиваем стрик
+                    _dailyStreak = Math.min(_dailyStreak + 1, 30);
+                    _lastLoginDate = today;
+                    saveGame();
+                } else if (diffDays > 1) {
+                    // Пропустил день - сбрасываем стрик
+                    _dailyStreak = 1;
+                    _lastLoginDate = today;
+                    saveGame();
+                    showToast("⚠️ Вы пропустили день! Стрик сброшен!", "#ffaa88");
+                }
+                
+                updateCalendarUI();
+            }
+
+            // Функция получения награды за день
+            function getDailyReward(day) {
+                const rewards = {
+                    1: { type: 'ore', amount: 50, text: '50' },
+                    2: { type: 'diamonds', amount: 2, text: '2' },
+                    3: { type: 'ore', amount: 100, text: '100' },
+                    4: { type: 'diamonds', amount: 3, text: '3' },
+                    5: { type: 'ore', amount: 150, text: '150' },
+                    6: { type: 'diamonds', amount: 5, text: '5' },
+                    7: { type: 'card', rank: 'E', text: 'Карта E' },
+                    8: { type: 'ore', amount: 200, text: '200' },
+                    9: { type: 'diamonds', amount: 5, text: '5' },
+                    10: { type: 'ore', amount: 250, text: '250' },
+                    11: { type: 'diamonds', amount: 7, text: '7' },
+                    12: { type: 'ore', amount: 300, text: '300' },
+                    13: { type: 'diamonds', amount: 10, text: '10' },
+                    14: { type: 'card', rank: 'D', text: 'Карта D' },
+                    15: { type: 'ore', amount: 400, text: '400' },
+                    16: { type: 'diamonds', amount: 12, text: '12' },
+                    17: { type: 'ore', amount: 500, text: '500' },
+                    18: { type: 'diamonds', amount: 15, text: '15' },
+                    19: { type: 'ore', amount: 600, text: '600' },
+                    20: { type: 'diamonds', amount: 20, text: '20' },
+                    21: { type: 'card', rank: 'C', text: 'Карта C' },
+                    22: { type: 'ore', amount: 800, text: '800' },
+                    23: { type: 'diamonds', amount: 25, text: '25' },
+                    24: { type: 'ore', amount: 1000, text: '1000' },
+                    25: { type: 'diamonds', amount: 30, text: '30' },
+                    26: { type: 'ore', amount: 1200, text: '1200' },
+                    27: { type: 'diamonds', amount: 40, text: '40' },
+                    28: { type: 'card', rank: 'B', text: 'Карта B' },
+                    29: { type: 'ore', amount: 1500, text: '1500' },
+                    30: { type: 'card', rank: 'A', text: 'Карта A' }
+                };
+                return rewards[day] || { type: 'ore', amount: 50, text: '50' };
+            }
+
+            // Функция получения награды
+            function claimDailyReward() {
+                const today = new Date().toDateString();
+                
+                // Проверяем, не получал ли уже сегодня
+                if (_calendarClaimed[today]) {
+                    showToast("❌ Вы уже получили награду сегодня!", "#ffaa88");
+                    return;
+                }
+                
+                // Проверяем стрик
+                checkDailyLogin();
+                
+                const reward = getDailyReward(_dailyStreak);
+                
+                // Выдаём награду
+                if (reward.type === 'ore') {
+                    _ore += reward.amount;
+                    showToast(`⛏️ +${reward.text}! (День ${_dailyStreak})`, "#ffdd99");
+                } else if (reward.type === 'diamonds') {
+                    _diamonds += reward.amount;
+                    showToast(`💎 +${reward.text}! (День ${_dailyStreak})`, "#aaffdd");
+                } else if (reward.type === 'card') {
+                    addCardToHistory(reward.rank);
+                    showToast(`🎴 ${reward.text}! (День ${_dailyStreak})`, "#ffd966");
+                }
+                
+                // Отмечаем как полученное
+                _calendarClaimed[today] = true;
+                saveGame();
+                updateUI();
+                updateCalendarUI();
+            }
+
+            // Обновление UI календаря
+            function updateCalendarUI() {
+                const calendarGrid = document.getElementById('calendarGrid');
+                const streakSpan = document.getElementById('calendarStreak');
+                const bonusSpan = document.getElementById('calendarBonus');
+                
+                if (!calendarGrid) return;
+                
+                const today = new Date().toDateString();
+                const isClaimed = _calendarClaimed[today];
+                
+                if (streakSpan) streakSpan.innerHTML = `(День ${_dailyStreak})`;
+                
+                // Показываем ближайшие 7 дней
+                let html = '';
+                for (let i = 0; i < 7; i++) {
+                    const dayNum = _dailyStreak + i;
+                    if (dayNum > 30) break;
+                    
+                    const reward = getDailyReward(dayNum);
+                    const isToday = (i === 0);
+                    const isClaimedDay = (i === 0 && isClaimed);
+                    
+                    html += `
+                        <div style="
+                            background: ${isToday ? 'linear-gradient(135deg, #3a6b58, #1e3e31)' : '#0f1a1f'};
+                            border-radius: 12px;
+                            padding: 8px 4px;
+                            border: ${isToday ? '2px solid #ffcc66' : '1px solid #2a4a3a'};
+                            opacity: ${isClaimedDay ? '0.5' : '1'};
+                            cursor: ${isToday && !isClaimed ? 'pointer' : 'default'};
+                        " onclick="${isToday && !isClaimed ? 'claimDailyReward()' : ''}">
+                            <div style="font-size: 11px; opacity: 0.7;">День ${dayNum}</div>
+                            <div style="font-size: 20px; margin: 4px 0;">
+                                ${reward.type === 'ore' ? '⛏️' : reward.type === 'diamonds' ? '💎' : '🎴'}
+                            </div>
+                            <div style="font-size: 10px;">${reward.text}</div>
+                            ${isClaimedDay ? '<div style="font-size: 10px; color: #44ff44;">✅</div>' : ''}
+                        </div>
+                    `;
+                }
+                
+                calendarGrid.innerHTML = html;
+                
+                // Бонус за стрик
+                if (bonusSpan) {
+                    if (_dailyStreak >= 7) {
+                        bonusSpan.innerHTML = `🔥 Бонус за стрик ${_dailyStreak} дней: +${Math.floor(_dailyStreak / 7) * 5}% к добыче!`;
+                    } else {
+                        bonusSpan.innerHTML = `⭐ Ещё ${7 - _dailyStreak} дней до первого бонуса!`;
+                    }
+                }
             }
 
             function addEventCurrency(amount) {
@@ -2176,7 +2317,11 @@
                     const rankMultiplier = 1 + rankBonusPercent / 100;
                     oreGain = Math.floor(oreGain * rankMultiplier);
                 }
-                
+
+                // Бонус от стрик
+                const streakBonus = 1 + (Math.floor(_dailyStreak / 7) * 0.05);
+                oreGain = Math.floor(oreGain * streakBonus);
+
                 if (oreGain < 1) oreGain = 1;
                 return oreGain;
             }
@@ -2210,112 +2355,63 @@
             async function checkAdminCommands() {
                 if (!supabaseClient) return;
                 try {
-                    // Добавляем проверку существования таблицы
-                    const { error: tableCheckError } = await supabaseClient
-                        .from('admin_actions')
-                        .select('id')
-                        .limit(1)
-                        .maybeSingle();
-                    
-                    // Если таблица не существует (ошибка 42P01), просто выходим
-                    if (tableCheckError && tableCheckError.code === '42P01') {
-                        console.log('Таблица admin_actions не существует, пропускаем проверку');
-                        return;
-                    }
-                    
-                    const { data, error } = await supabaseClient
+                    const { data } = await supabaseClient
                         .from('admin_actions')
                         .select('*')
                         .eq('target_player_id', _playerId)
                         .eq('status', 'pending');
                     
-                    if (error) {
-                        console.warn('Ошибка запроса admin_actions:', error);
-                        return;
-                    }
-                    
                     for (const action of data || []) {
                         let needUpdate = false;
                         
-                        // Валидация action_type
-                        if (!action.action_type) {
-                            console.warn('Unknown action type:', action);
-                            // Отмечаем как completed, чтобы не зависло в pending
+                        if (action.action_type === 'remove_card') {
+                            const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
+                            if (index !== -1) {
+                                _cardHistory.splice(index, 1);
+                                showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
+                            } else {
+                                showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
+                            }
+                            needUpdate = true;
+                        }
+                        else if (action.action_type === 'add_card') {
+                            addCardToHistory(action.card_rank);
+                            showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
+                            needUpdate = true;
+                        }
+                        else if (action.action_type === 'add_diamonds') {
+                            const amount = action.amount || 0;
+                            _diamonds += amount;
+                            showToast(`💎 Администратор выдал ${amount} алмазов!`, "#ffd966");
+                            needUpdate = true;
+                        }
+                        else if (action.action_type === 'remove_diamonds') {
+                            const amount = action.amount || 0;
+                            if (_diamonds >= amount) {
+                                _diamonds -= amount;
+                                showToast(`💎 Администратор списал ${amount} алмазов!`, "#ffaa88");
+                            } else {
+                                showToast(`⚠️ Недостаточно алмазов!`, "#ff8888");
+                            }
+                            needUpdate = true;
+                        }
+                        
+                        if (needUpdate) {
                             await supabaseClient
                                 .from('admin_actions')
                                 .update({ status: 'completed', completed_at: new Date().toISOString() })
                                 .eq('id', action.id);
-                            continue;
-                        }
-                        
-                        switch (action.action_type) {
-                            case 'remove_card':
-                                if (action.card_rank) {
-                                    const index = _cardHistory.findIndex(card => card.rank === action.card_rank);
-                                    if (index !== -1) {
-                                        _cardHistory.splice(index, 1);
-                                        showToast(`🗑️ Администратор списал карту ${action.card_rank}!`, "#ff8888");
-                                    } else {
-                                        showToast(`⚠️ Карта ${action.card_rank} не найдена`, "#ffaa88");
-                                    }
-                                    needUpdate = true;
-                                }
-                                break;
-                                
-                            case 'add_card':
-                                if (action.card_rank) {
-                                    addCardToHistory(action.card_rank);
-                                    showToast(`🎁 Администратор выдал карту ${action.card_rank}!`, "#aaffdd");
-                                    needUpdate = true;
-                                }
-                                break;
-                                
-                            case 'add_diamonds':
-                                const addAmount = action.amount || 0;
-                                if (addAmount > 0) {
-                                    _diamonds += addAmount;
-                                    showToast(`💎 Администратор выдал ${addAmount} алмазов!`, "#ffd966");
-                                    needUpdate = true;
-                                }
-                                break;
-                                
-                            case 'remove_diamonds':
-                                const removeAmount = action.amount || 0;
-                                if (removeAmount > 0) {
-                                    if (_diamonds >= removeAmount) {
-                                        _diamonds -= removeAmount;
-                                        showToast(`💎 Администратор списал ${removeAmount} алмазов!`, "#ffaa88");
-                                    } else {
-                                        showToast(`⚠️ Недостаточно алмазов! (нужно ${removeAmount}, есть ${_diamonds})`, "#ff8888");
-                                    }
-                                    needUpdate = true;
-                                }
-                                break;
-                                
-                            default:
-                                console.warn(`Неизвестный тип действия: ${action.action_type}`);
-                                break;
-                        }
-                        
-                        // Отмечаем действие как выполненное
-                        await supabaseClient
-                            .from('admin_actions')
-                            .update({ 
-                                status: 'completed', 
-                                completed_at: new Date().toISOString() 
-                            })
-                            .eq('id', action.id);
-                        
-                        if (needUpdate) {
+                            
                             saveGame();
                             updateUI();
-                            checkAchievements(); // Добавляем проверку достижений
+                        } else {
+                            await supabaseClient
+                                .from('admin_actions')
+                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .eq('id', action.id);
                         }
                     }
-                } catch(e) { 
-                    console.warn('Check admin commands error:', e);
-                    // Не показываем ошибку пользователю, просто логируем
-                }
+                } catch(e) { console.warn('Check admin commands error:', e); }
             }
 
             function updateProfileLinkUI() {
@@ -2660,31 +2756,24 @@
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
-                    // Упрощаем данные - отправляем только то, что точно есть
-                    const updateData = {
+                    const cardsForDb = _cardHistory.map(card => ({
+                        rank: card.rank,
+                        text: card.text,
+                        date: card.id || Date.now()
+                    }));
+                    
+                    await supabaseClient.from('leaderboard').upsert({
                         player_id: _playerId,
                         username: _playerName,
                         level: _level,
                         diamonds: _diamonds,
+                        mb_link: _mbProfileLink || null,
+                        cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
+                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
                         updated_at: new Date().toISOString()
-                    };
+                    }, { onConflict: 'player_id' });
                     
-                    // Добавляем только если есть
-                    if (_mbProfileLink) updateData.mb_link = _mbProfileLink;
-                    
-                    // cards_json отправляем отдельно, если нужно
-                    if (_cardHistory.length > 0) {
-                        updateData.cards_json = _cardHistory.map(card => ({
-                            rank: card.rank,
-                            text: card.text,
-                            date: card.id || Date.now()
-                        }));
-                    } else {
-                        updateData.cards_json = [];
-                    }
-                    
-                    await supabaseClient.from('leaderboard').upsert(updateData, { onConflict: 'player_id' });
                     hideDBError();
                     
                 } catch(e) { 
@@ -2877,6 +2966,10 @@
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank, last_active: _lastActive,
                     mbProfileLink: _mbProfileLink,
                     nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
+                    dailyStreak: _dailyStreak,
+                    lastLoginDate: _lastLoginDate,
+                    calendarClaimed: _calendarClaimed,
+                    luckBoostEndTime: _luckBoostEndTime,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -2901,6 +2994,11 @@
 
                         _nextGiftTime = d.nextGiftTime || null;
                         _giftAvailable = d.giftAvailable || false;
+
+                        _dailyStreak = d.dailyStreak || 1;
+                        _lastLoginDate = d.lastLoginDate || null;
+                        _calendarClaimed = d.calendarClaimed || {};
+                        _luckBoostEndTime = d.luckBoostEndTime || null;
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3198,6 +3296,7 @@
             window.showPickaxeModal = showPickaxeModal;
             window.performPickaxeUpgrade = performPickaxeUpgrade;
             window.openChest = openChest;
+            window.claimDailyReward = claimDailyReward;
 
             document.getElementById('saveProfileLinkBtn')?.addEventListener('click', () => {
                 const inputVal = document.getElementById('profileLinkInput').value.trim();
@@ -3440,14 +3539,12 @@
                 }
             });
 
-            setInterval(() => {
-                checkAdminCommands();
-            }, 30000);
-
             initDropdowns();
             loadGame();
             initSupabase();
             initTopListClickHandler();
+            checkDailyLogin();
+            updateCalendarUI();
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
