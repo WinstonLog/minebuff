@@ -2897,20 +2897,46 @@
                 document.getElementById('pickaxeModal').classList.add('show');
             }
             
-            function performPickaxeUpgrade() {
+            window.performPickaxeUpgrade = function() {
+                updateLastActive(); 
                 const cost = getPickaxeUpgradeCost(_pickaxeLevel);
-                if (_pickaxeLevel >= 10) { showToast("🔧 Кирка уже максимального уровня!", "#ff8888"); document.getElementById('pickaxeModal').classList.remove('show'); return; }
-                if (_diamonds >= cost) { _diamonds -= cost; _pickaxeLevel++; showToast(`🔧 Кирка улучшена до ${_pickaxeLevel} уровня!`, "#ffcc66"); saveGame(); updateUI(); document.getElementById('pickaxeModal').classList.remove('show'); }
-                else { showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c"); document.getElementById('pickaxeModal').classList.remove('show'); }
-            }
+                if (_pickaxeLevel >= 10) { 
+                    showToast("🔧 Кирка уже максимального уровня!", "#ff8888"); 
+                    document.getElementById('pickaxeModal').classList.remove('show'); 
+                    return; 
+                }
+                if (_diamonds >= cost) { 
+                    _diamonds -= cost; 
+                    _pickaxeLevel++; 
+                    showToast(`🔧 Кирка улучшена до ${_pickaxeLevel} уровня!`, "#ffcc66"); 
+                    saveGame(); 
+                    updateUI(); 
+                    document.getElementById('pickaxeModal').classList.remove('show'); 
+                }
+                else { 
+                    showToast(`❗ Нужно ${cost} алмазов для улучшения`, "#ffb37c"); 
+                    document.getElementById('pickaxeModal').classList.remove('show'); 
+                }
+            };
             
             function updatePickaxeVisual() {
                 const pickaxe = document.getElementById('pickaxeBtn');
+                // Убираем все классы уровней
                 pickaxe.classList.remove('pickaxe-lvl1', 'pickaxe-lvl2', 'pickaxe-lvl3', 'pickaxe-lvl4', 'pickaxe-lvl5');
-                pickaxe.classList.add(`pickaxe-lvl${_pickaxeLevel}`);
+                // Добавляем класс для текущего уровня (если уровень больше 5, показываем стиль 5 уровня)
+                const visualLevel = Math.min(_pickaxeLevel, 5);
+                pickaxe.classList.add(`pickaxe-lvl${visualLevel}`);
                 document.getElementById('pickaxeLevel').innerText = `Ур.${_pickaxeLevel}`;
-                if (_pickaxeLevel >= 10) { document.getElementById('upgradePickaxeBtn').style.opacity = '0.5'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none'; }
-                else { document.getElementById('upgradePickaxeBtn').style.opacity = '1'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'auto'; }
+                
+                // Кнопка улучшения: блокируем только на 10 уровне
+                if (_pickaxeLevel >= 10) { 
+                    document.getElementById('upgradePickaxeBtn').style.opacity = '0.5'; 
+                    document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none'; 
+                } else { 
+                    document.getElementById('upgradePickaxeBtn').style.opacity = '1'; 
+                    document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'auto'; 
+                }
+                
                 const eventX2 = document.getElementById('eventX2');
                 if (isEventActive()) eventX2.style.display = 'flex';
                 else eventX2.style.display = 'none';
