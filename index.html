@@ -2635,7 +2635,10 @@
                 if (level < 5) return Math.floor(10 + level * 5);
                 else return Math.floor(35 + (level - 1) * 8 + Math.pow(level, 1.2));
             }
-            function getPickaxeUpgradeCost(level) { return Math.floor(30 + (level - 1) * 15); }
+            function getPickaxeUpgradeCost(level) { 
+                if (level <= 5) return Math.floor(30 + (level - 1) * 15);
+                else return Math.floor(100 + (level - 5) * 25);
+            }
 
             function getCardCounts() { 
                 const c = { 'X':0, 'S':0, 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 }; 
@@ -2906,7 +2909,7 @@
                 pickaxe.classList.remove('pickaxe-lvl1', 'pickaxe-lvl2', 'pickaxe-lvl3', 'pickaxe-lvl4', 'pickaxe-lvl5');
                 pickaxe.classList.add(`pickaxe-lvl${_pickaxeLevel}`);
                 document.getElementById('pickaxeLevel').innerText = `Ур.${_pickaxeLevel}`;
-                if (_pickaxeLevel >= 5) { document.getElementById('upgradePickaxeBtn').style.opacity = '0.5'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none'; }
+                if (_pickaxeLevel >= 10) { document.getElementById('upgradePickaxeBtn').style.opacity = '0.5'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'none'; }
                 else { document.getElementById('upgradePickaxeBtn').style.opacity = '1'; document.getElementById('upgradePickaxeBtn').style.pointerEvents = 'auto'; }
                 const eventX2 = document.getElementById('eventX2');
                 if (isEventActive()) eventX2.style.display = 'flex';
