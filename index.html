@@ -2748,8 +2748,8 @@
             function isChestAvailable() {
                 if (!_lastChestTime) return true;
                 const now = Date.now();
-                const minutesSinceLast = (now - _lastChestTime) / (1000 * 60);
-                return minutesSinceLast >= 30; // кулдаун 30 минут
+                const hoursSinceLast = (now - _lastChestTime) / (1000 * 60 * 60);
+                return minutesSinceLast >= 24; // кулдаун 30 минут
             }
 
             function openChest() {
@@ -3030,9 +3030,11 @@
                     // НОВЫЙ ДЕНЬ - сбрасываем всё
                     _strikesDone = 0;
                     _strikesLimit = finalBaseLimit;
+
                     if (hasBoostToday) {
                         _strikesLimit += 20;
                     }
+                    _lastChestTime = null;
                     localStorage.setItem('minebuff_last_reset', today);
                     wasReset = true;
                     saveGame();
