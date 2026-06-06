@@ -2511,13 +2511,30 @@
             // Получить случайную карту от E до A
             function getRandomGiftCard() {
                 const rand = Math.random() * 100;
-                if (rand < 1) return 'A';      // 1%
-                if (rand < 2) return 'P';      // 1%
-                if (rand < 3) return 'G';      // 1%
-                if (rand < 8) return 'B';      // 5%
-                if (rand < 15) return 'C';     // 7%
-                if (rand < 30) return 'D';     // 15%
-                return 'E';                    // 70%
+                
+                // 50% - руда
+                if (rand < 50) {
+                    const amount = Math.floor(Math.random() * 100) + 50; // 50-149 руды
+                    return { type: 'ore', amount: amount, text: `⛏️ ${amount} руды` };
+                }
+                // 30% - алмазы
+                else if (rand < 80) {
+                    const amount = Math.floor(Math.random() * 3) + 1; // 1-3 алмаза
+                    return { type: 'diamonds', amount: amount, text: `💎 ${amount} алмаза` };
+                }
+                // 20% - карта (редкий выпад)
+                else {
+                    const cardRand = Math.random() * 100;
+                    let rank = 'E';
+                    if (cardRand < 1) rank = 'A';
+                    else if (cardRand < 3) rank = 'P';
+                    else if (cardRand < 6) rank = 'G';
+                    else if (cardRand < 12) rank = 'B';
+                    else if (cardRand < 20) rank = 'C';
+                    else if (cardRand < 35) rank = 'D';
+                    else rank = 'E';
+                    return { type: 'card', rank: rank, text: `🎴 Карта ранга ${rank}` };
+                }
             }
 
             function scheduleNextGift() {
@@ -2563,30 +2580,33 @@
             function claimGift() {
                 if (!_giftAvailable) return;
                 
-                const rank = getRandomGiftCard();
-                const cardText = `🎴 Карта ранга ${rank} (Подарок)`;
+                const reward = getRandomGiftCard();
+
+                if (reward.type === 'ore') {
+                    _ore += reward.amount;
+                    showToast(`✨ ${reward.text}! ✨`, "#ffdd99");
+                } else if (reward.type === 'diamonds') {
+                    _diamonds += reward.amount;
+                    showToast(`✨ ${reward.text}! ✨`, "#aaffdd");
+                } else if (reward.type === 'card') {
+                    _cardHistory.unshift({ 
+                        id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                        text: reward.text, 
+                        rank: reward.rank 
+                    });
+                    if (_cardHistory.length > 30) _cardHistory.pop();
+                    showToast(`✨ ${reward.text}! ✨`, "#ffd966");
+                    checkAchievements();
+                    updateQuestProgress('daily_card', 1);
+                }
                 
-                _cardHistory.unshift({ 
-                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                    text: cardText, 
-                    rank: rank 
-                });
-                if (_cardHistory.length > 30) _cardHistory.pop();
-                
-                // Показываем уведомление
-                showToast(`✨ ${cardText}! ✨`, "#ffd966");
-                
-                // Скрываем подарок
                 _giftAvailable = false;
                 document.getElementById('floatingGift').style.display = 'none';
                 
-                // Планируем следующий подарок
-                scheduleNextGift();
+                scheduleNextGift();  // ← старая система, подарки даже когда игра закрыта
                 
                 saveGame();
                 updateUI();
-                checkAchievements();
-                updateQuestProgress('daily_card', 1);
             }
 
             function isEventActive() {
@@ -2893,7 +2913,7 @@
                 const nextRange = getNextMiningRange();
                 const cost = getPickaxeUpgradeCost(_pickaxeLevel);
                 document.getElementById('pickaxeModalCurrentLevel').innerText = _pickaxeLevel;
-                document.getElementById('pickaxeModalNextLevel').innerText = Math.min(_pickaxeLevel + 1, 5);
+                document.getElementById('pickaxeModalNextLevel').innerText = Math.min(_pickaxeLevel + 1, 10);
                 document.getElementById('pickaxeModalCost').innerText = cost;
                 document.getElementById('pickaxeModalDiamonds').innerText = _diamonds;
                 document.getElementById('pickaxeModalMinOre').innerText = currentRange.min;
