@@ -1019,19 +1019,6 @@
             20% { transform: translate(-50%, -60px) scale(1.5); }
             100% { opacity: 0; transform: translate(-50%, -180px) scale(2); }
         }
-
-        #rouletteWheel {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #rouletteWheel:active {
-            transform: scale(0.95);
-        }
-
-        @keyframes spinWheel {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(1440deg); }
-        }
     </style>
 </head>
 <body>
@@ -1058,7 +1045,6 @@
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
-                <div class="menu-item" data-tab="casino">🎰 Казино</div>
                 <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
                 <div class="menu-item" data-tab="settings">⚙️ Настройки</div>
             </div>
@@ -1369,99 +1355,6 @@
             </div>
         </div>
 
-        <!-- Добавьте после существующих вкладок в магазине -->
-        <div id="casinoPanel" class="tab-panel">
-            <div class="game-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">🎰 РУЛЕТКА УДАЧИ 🎰</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 16px;">Крути и выигрывай алмазы!</div>
-                
-                <!-- Анимация рулетки -->
-                <div id="rouletteWheel" style="
-                    width: 200px;
-                    height: 200px;
-                    margin: 20px auto;
-                    background: linear-gradient(135deg, #2a1a0a, #1a0a00);
-                    border-radius: 50%;
-                    border: 5px solid #ffcc66;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    position: relative;
-                    transition: transform 0.1s;
-                    cursor: pointer;
-                    box-shadow: 0 0 20px rgba(255,204,102,0.3);
-                ">
-                    <div style="text-align: center; z-index: 2;">
-                        <div style="font-size: 48px;">🎰</div>
-                        <div style="font-size: 12px; margin-top: 5px; color: #ffcc66;">Крутить = 10💎</div>
-                    </div>
-                    <div id="rouletteSpinner" style="
-                        position: absolute;
-                        width: 30px;
-                        height: 30px;
-                        background: #ffcc66;
-                        border-radius: 50%;
-                        top: -15px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                    "></div>
-                </div>
-                
-                <!-- Кнопка крутить -->
-                <button id="spinRouletteBtn" style="
-                    width: 100%;
-                    padding: 15px;
-                    background: linear-gradient(135deg, #ffaa33, #ff6600);
-                    border: none;
-                    border-radius: 60px;
-                    font-weight: bold;
-                    font-size: 18px;
-                    color: white;
-                    cursor: pointer;
-                    margin: 10px 0;
-                ">
-                    🎲 КРУТИТЬ РУЛЕТКУ (10💎)
-                </button>
-                
-                <!-- Результат -->
-                <div id="rouletteResult" style="
-                    background: rgba(0,0,0,0.5);
-                    border-radius: 30px;
-                    padding: 15px;
-                    margin: 15px 0;
-                    text-align: center;
-                    font-size: 14px;
-                    min-height: 80px;
-                ">
-                    <div style="color: #ffcc66; margin-bottom: 5px;">🎯 ПОСЛЕДНИЙ РЕЗУЛЬТАТ:</div>
-                    <div id="lastSpinResult" style="font-size: 16px; font-weight: bold;">—</div>
-                </div>
-                
-                <!-- Статистика -->
-                <div style="display: flex; gap: 10px; margin: 10px 0;">
-                    <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 10px; text-align: center;">
-                        <div style="font-size: 11px;">🎲 Сделано ставок</div>
-                        <div id="totalSpins" style="font-size: 24px; font-weight: bold; color: #ffcc66;">0</div>
-                    </div>
-                    <div style="flex: 1; background: #0f1a1f; border-radius: 20px; padding: 10px; text-align: center;">
-                        <div style="font-size: 11px;">🏆 Выиграно всего</div>
-                        <div id="totalWon" style="font-size: 24px; font-weight: bold; color: #44ff44;">0💎</div>
-                    </div>
-                </div>
-                
-                <!-- История выигрышей -->
-                <div class="history" style="max-height: 150px;">
-                    <div class="history-title">📜 ИСТОРИЯ ВЫИГРЫШЕЙ</div>
-                    <div id="rouletteHistory">—</div>
-                </div>
-                
-                <!-- Предупреждение -->
-                <div style="background: #071217cc; border-radius: 20px; padding: 8px; margin-top: 12px; text-align: center; font-size: 10px; opacity: 0.7;">
-                    ⚠️ Шансы не гарантируют выигрыш. Играйте ответственно!
-                </div>
-            </div>
-        </div>
-
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
             <div style="margin-top: 8px;">
@@ -1733,26 +1626,6 @@
                 'settings': 'Настройки'
             };
 
-            // Переменные для рулетки
-            let _totalSpins = 0;
-            let _totalWon = 0;
-            let _rouletteHistory = [];
-
-            // Шансы выигрыша
-            const rouletteRewards = [
-                { chance: 55, reward: 0, text: "Увы, ничего...", emoji: "💔", color: "#888" },
-                { chance: 20, reward: 3, text: "Мелочь, но приятно", emoji: "🎉", color: "#aaffdd" },
-                { chance: 12, reward: 5, text: "Неплохо!", emoji: "⭐", color: "#ffd966" },
-                { chance: 6, reward: 8, text: "Хороший улов!", emoji: "✨", color: "#ffcc66" },
-                { chance: 3.5, reward: 12, text: "Алмазы сыпятся!", emoji: "💎", color: "#88ff88" },
-                { chance: 2, reward: 20, text: "ДЖЕКПОТ!", emoji: "🔥", color: "#ffaa44" },
-                { chance: 0.8, reward: 35, text: "КРУПНЫЙ ВЫИГРЫШ!", emoji: "🏆", color: "#ff6600" },
-                { chance: 0.4, reward: 60, text: "МЕГА ДЖЕКПОТ!", emoji: "🌟", color: "#ff3300" },
-                { chance: 0.2, reward: 100, text: "ЛЕГЕНДАРНЫЙ ВЫИГРЫШ!", emoji: "👑", color: "#ff00ff" },
-                { chance: 0.08, reward: 200, text: "ГЛАВНЫЙ ДЖЕКПОТ! ✨🎰", emoji: "🎰", color: "#ff0000" },
-                { chance: 0.02, reward: 500, text: "ЭПИЧЕСКИЙ ВЫИГРЫШ! 💎", emoji: "⚡", color: "#ff0000" }
-            ];
-
             function loadSettings() {
                 const saved = localStorage.getItem('minebuff_settings');
                 if (saved) {
@@ -1762,172 +1635,6 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
-            }
-
-            // Функция кручения рулетки
-            function spinRoulette() {
-                const cost = 10;
-                
-                if (_diamonds < cost) {
-                    showToast(`❌ Нужно ${cost} алмазов для игры в рулетку!`, "#ff8888");
-                    return;
-                }
-                
-                // Анимация кручения
-                const wheel = document.getElementById('rouletteWheel');
-                if (wheel) {
-                    let spins = 0;
-                    const spinInterval = setInterval(() => {
-                        const randomRotate = Math.floor(Math.random() * 360);
-                        wheel.style.transform = `rotate(${randomRotate}deg)`;
-                        spins++;
-                        if (spins > 20) {
-                            clearInterval(spinInterval);
-                            wheel.style.transform = '';
-                        }
-                    }, 50);
-                }
-                
-                _diamonds -= cost;
-                _totalSpins++;
-                
-                // Расчёт выигрыша
-                const rand = Math.random() * 100;
-                let cumulative = 0;
-                let selected = rouletteRewards[0];
-                
-                for (const reward of rouletteRewards) {
-                    cumulative += reward.chance;
-                    if (rand < cumulative) {
-                        selected = reward;
-                        break;
-                    }
-                }
-                
-                // Выдача награды
-                let winAmount = selected.reward;
-                let winText = selected.text;
-                let winEmoji = selected.emoji;
-                
-                if (winAmount > 0) {
-                    _diamonds += winAmount;
-                    _totalWon += winAmount;
-                    
-                    // Специальная анимация для большого выигрыша
-                    if (winAmount >= 500) {
-                        createConfetti();
-                        showToast(`🎉✨ ${winEmoji} ${winText} +${winAmount}💎 ✨🎉`, "#ffd966");
-                    } else if (winAmount >= 100) {
-                        showToast(`${winEmoji} ${winText} +${winAmount}💎`, "#ffcc66");
-                    } else {
-                        showToast(`${winEmoji} ${winText} +${winAmount}💎`, "#aaffdd");
-                    }
-                } else {
-                    showToast(`${winEmoji} ${winText}`, "#ffaa88");
-                }
-                
-                // Добавляем в историю
-                const historyEntry = {
-                    time: new Date().toLocaleTimeString(),
-                    win: winAmount,
-                    text: winText,
-                    emoji: winEmoji
-                };
-                
-                _rouletteHistory.unshift(historyEntry);
-                if (_rouletteHistory.length > 10) _rouletteHistory.pop();
-                
-                // Обновляем UI
-                updateRouletteUI();
-                
-                // Показываем результат
-                const resultDiv = document.getElementById('lastSpinResult');
-                if (resultDiv) {
-                    resultDiv.innerHTML = `
-                        <div style="color: ${selected.color}; font-size: 20px;">
-                            ${winEmoji} ${winText}
-                        </div>
-                        <div style="font-size: 18px; margin-top: 5px;">
-                            ${winAmount > 0 ? `+${winAmount}💎` : '0💎'}
-                        </div>
-                    `;
-                    
-                    // Анимация
-                    resultDiv.style.animation = 'none';
-                    resultDiv.offsetHeight;
-                    resultDiv.style.animation = 'modalSlideIn 0.3s ease';
-                }
-                
-                saveGame();
-                updateUI();
-                checkRouletteAchievements();
-            }
-
-            // Обновление UI рулетки
-            function updateRouletteUI() {
-                const spinsElem = document.getElementById('totalSpins');
-                const wonElem = document.getElementById('totalWon');
-                const historyElem = document.getElementById('rouletteHistory');
-                
-                if (spinsElem) spinsElem.innerText = _totalSpins;
-                if (wonElem) wonElem.innerText = `${_totalWon}💎`;
-                
-                if (historyElem) {
-                    if (_rouletteHistory.length === 0) {
-                        historyElem.innerHTML = '<span style="opacity:0.6;">— нет записей —</span>';
-                    } else {
-                        historyElem.innerHTML = _rouletteHistory.map(h => `
-                            <div class="history-item" style="background: rgba(0,0,0,0.3);">
-                                <span style="opacity:0.6;">${h.time}</span> ${h.emoji} ${h.text} 
-                                ${h.win > 0 ? `<span style="color:#44ff44;">+${h.win}💎</span>` : '<span style="color:#ff8888;">0💎</span>'}
-                            </div>
-                        `).join('');
-                    }
-                }
-            }
-
-            // Создание конфетти для больших выигрышей
-            function createConfetti() {
-                for (let i = 0; i < 50; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.innerHTML = ['🎉', '✨', '💎', '🎰', '⭐', '🎲'][Math.floor(Math.random() * 6)];
-                    confetti.style.position = 'fixed';
-                    confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.top = '-50px';
-                    confetti.style.fontSize = (Math.random() * 20 + 15) + 'px';
-                    confetti.style.pointerEvents = 'none';
-                    confetti.style.zIndex = '10000';
-                    confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
-                    document.body.appendChild(confetti);
-                    setTimeout(() => confetti.remove(), 5000);
-                }
-            }
-
-            // Достижения за рулетку
-            function checkRouletteAchievements() {
-                if (!_achievements['roulette_10'] && _totalSpins >= 10) {
-                    _achievements['roulette_10'] = true;
-                    _diamonds += 20;
-                    showToast("🏆 Достижение: Завсегдатай казино! +20💎", "#ffd966");
-                }
-                
-                if (!_achievements['roulette_100'] && _totalSpins >= 100) {
-                    _achievements['roulette_100'] = true;
-                    _diamonds += 100;
-                    showToast("🏆 Достижение: Профессионал рулетки! +100💎", "#ffd966");
-                }
-                
-                if (!_achievements['roulette_big_win'] && _totalWon >= 1000) {
-                    _achievements['roulette_big_win'] = true;
-                    _diamonds += 150;
-                    showToast("🏆 Достижение: Король азарта! +150💎", "#ffd966");
-                }
-                
-                if (!_achievements['roulette_jackpot'] && _totalWon >= 5000) {
-                    _achievements['roulette_jackpot'] = true;
-                    _diamonds += 500;
-                    showToast("🏆 Достижение: Легенда казино! +500💎", "#ffcc00");
-                }
             }
 
             // Функция проверки ежедневного входа
@@ -3320,9 +3027,6 @@
                     lastLoginDate: _lastLoginDate,
                     calendarClaimed: _calendarClaimed,
                     luckBoostEndTime: _luckBoostEndTime,
-                    totalSpins: _totalSpins,
-                    totalWon: _totalWon,
-                    rouletteHistory: _rouletteHistory,
                     eventCurrency: _eventCurrency 
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
@@ -3353,11 +3057,7 @@
                         _lastLoginDate = d.lastLoginDate || null;
                         _calendarClaimed = d.calendarClaimed || {};
                         _luckBoostEndTime = d.luckBoostEndTime || null;
-
-                        _totalSpins = d.totalSpins || 0;
-                        _totalWon = d.totalWon || 0;
-                        _rouletteHistory = d.rouletteHistory || [];
-
+                        
                         _eventCurrency = d.eventCurrency || 0; 
 
                         // Восстанавливаем таймер, если есть запланированное время
@@ -3686,7 +3386,6 @@
                     else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
-                    else if (tab === 'casino') panelId = 'casinoPanel';
                     
                     if (panelId) {
                         // Пытаемся открыть раздел с проверкой уровня
@@ -3806,11 +3505,6 @@
                     showToast(`❌ Нужно 30 алмазов!`, "#ff8888");
                 }
             });
-
-            const spinBtn = document.getElementById('spinRouletteBtn');
-            if (spinBtn) {
-                spinBtn.onclick = () => spinRoulette();
-            }
 
             // Переключение вкладок в магазине
             const shopGoodsTab = document.getElementById('shopGoodsTab');
