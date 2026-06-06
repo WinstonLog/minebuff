@@ -1225,8 +1225,8 @@
                             </div>
                             <button id="openEventChestBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">20🍉 ОТКРЫТЬ</button>
                         </div>
-                        <div style="margin-top: 10px; font-size: 16px; text-align: center;">
-                            🍉: <span id="eventCurrencyDisplay">0</span>
+                        <div style="margin-top: 10px; font-size: 11px; text-align: center;">
+                           🍉 Ивентовая валюта: <span id="eventCurrencyDisplay">0</span>
                         </div>
                     </div> 
                     
@@ -1711,8 +1711,8 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
-            let _giftAvailable = false; 
-            let _giftIntervalTime = 3600000; // 5 минут (300000 мс)
+            let _nextGiftTime = null;      // время следующего подарка
+            let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
 
             // Блокировка разделов по уровню
@@ -1764,25 +1764,9 @@
                 updateSettingsUI();
             }
 
-            function startGiftTimer() {
-                if (_giftTimer) clearTimeout(_giftTimer);
-                
-                _giftAvailable = false;
-                _giftTimer = setTimeout(() => {
-                    showGift();
-                }, _giftIntervalTime);
-                
-                console.log(`🎁 Следующий подарок через ${_giftIntervalTime / 60000} минут (только в игре)`);
-            }
-
-            function resetGiftTimer() {
-                if (_giftTimer) clearTimeout(_giftTimer);
-                startGiftTimer();
-            }
-
             // Функция кручения рулетки
             function spinRoulette() {
-                const cost = 20;
+                const cost = 10;
                 
                 if (_diamonds < cost) {
                     showToast(`❌ Нужно ${cost} алмазов для игры в рулетку!`, "#ff8888");
@@ -2535,6 +2519,26 @@
                 if (rand < 30) return 'D';     // 15%
                 return 'E';                    // 70%
             }
+
+            function scheduleNextGift() {
+                const minDelay = 120 * 60 * 1000;  // 2 часа
+                const maxDelay = 240 * 60 * 1000;  // 4 часа
+                const delay = minDelay + Math.random() * (maxDelay - minDelay);
+                
+                _nextGiftTime = Date.now() + delay;
+                _giftAvailable = false;
+                
+                const giftDiv = document.getElementById('floatingGift');
+                if (giftDiv) giftDiv.style.display = 'none';
+                
+                saveGame();
+                
+                const minutes = Math.round(delay / 60000);
+                console.log(`🎁 Следующий подарок через ${minutes} минут (10-25 мин)`);
+                
+                if (_giftTimer) clearTimeout(_giftTimer);
+                _giftTimer = setTimeout(() => showGift(), delay);
+            }
                         
             // Показать подарок
             function showGift() {
@@ -2544,12 +2548,15 @@
                 const giftDiv = document.getElementById('floatingGift');
                 if (giftDiv) {
                     giftDiv.style.display = 'block';
+                    
+                    // Добавляем эффект "пульсации" для привлечения внимания
                     giftDiv.style.animation = 'bounce 0.5s ease-in-out 3';
                     setTimeout(() => {
                         if (giftDiv) giftDiv.style.animation = 'bounce 1s infinite';
                     }, 1500);
                 }
                 
+                saveGame();
             }
 
             // Забрать подарок
@@ -2566,13 +2573,15 @@
                 });
                 if (_cardHistory.length > 30) _cardHistory.pop();
                 
+                // Показываем уведомление
                 showToast(`✨ ${cardText}! ✨`, "#ffd966");
                 
+                // Скрываем подарок
                 _giftAvailable = false;
                 document.getElementById('floatingGift').style.display = 'none';
                 
-                // Запускаем новый таймер
-                startGiftTimer();
+                // Планируем следующий подарок
+                scheduleNextGift();
                 
                 saveGame();
                 updateUI();
@@ -2684,6 +2693,12 @@
                             }
                             needUpdate = true;
                         }
+                        else if (action.action_type === 'add_event_currency') {
+                            const amount = action.amount || 0;
+                            _eventCurrency += amount;
+                            showToast(`🍉 Администратор выдал ${amount} ивентовой валюты!`, "#ffd966");
+                            needUpdate = true;
+                        }
                         
                         if (needUpdate) {
                             await supabaseClient
@@ -2748,8 +2763,8 @@
             function isChestAvailable() {
                 if (!_lastChestTime) return true;
                 const now = Date.now();
-                const hoursSinceLast = (now - _lastChestTime) / (1000 * 60 * 60);
-                return minutesSinceLast >= 24; // кулдаун 30 минут
+                const minutesSinceLast = (now - _lastChestTime) / (1000 * 60);
+                return minutesSinceLast >= 30; // кулдаун 30 минут
             }
 
             function openChest() {
@@ -2812,7 +2827,7 @@
             }
 
             function openEventChest() {
-                const cost = 10;
+                const cost = 20;
                 if (_eventCurrency < cost) {
                     showToast(`❌ Нужно ${cost} ивентовой валюты! Получите её в шахте!`, "#ff8888");
                     return;
@@ -2878,7 +2893,7 @@
                 const nextRange = getNextMiningRange();
                 const cost = getPickaxeUpgradeCost(_pickaxeLevel);
                 document.getElementById('pickaxeModalCurrentLevel').innerText = _pickaxeLevel;
-                document.getElementById('pickaxeModalNextLevel').innerText = Math.min(_pickaxeLevel + 1, 10);
+                document.getElementById('pickaxeModalNextLevel').innerText = Math.min(_pickaxeLevel + 1, 5);
                 document.getElementById('pickaxeModalCost').innerText = cost;
                 document.getElementById('pickaxeModalDiamonds').innerText = _diamonds;
                 document.getElementById('pickaxeModalMinOre').innerText = currentRange.min;
@@ -3030,11 +3045,9 @@
                     // НОВЫЙ ДЕНЬ - сбрасываем всё
                     _strikesDone = 0;
                     _strikesLimit = finalBaseLimit;
-
                     if (hasBoostToday) {
                         _strikesLimit += 20;
                     }
-                    _lastChestTime = null;
                     localStorage.setItem('minebuff_last_reset', today);
                     wasReset = true;
                     saveGame();
@@ -3282,6 +3295,7 @@
                     pickaxeLevel: _pickaxeLevel,
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank, last_active: _lastActive,
                     mbProfileLink: _mbProfileLink,
+                    nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
                     dailyStreak: _dailyStreak,
                     lastLoginDate: _lastLoginDate,
                     calendarClaimed: _calendarClaimed,
@@ -3289,6 +3303,7 @@
                     totalSpins: _totalSpins,
                     totalWon: _totalWon,
                     rouletteHistory: _rouletteHistory,
+                    eventCurrency: _eventCurrency 
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3311,6 +3326,9 @@
                         _lastRank = d.lastRank || null;
                         _lastActive = d.last_active || null;
 
+                        _nextGiftTime = d.nextGiftTime || null;
+                        _giftAvailable = d.giftAvailable || false;
+
                         _dailyStreak = d.dailyStreak || 1;
                         _lastLoginDate = d.lastLoginDate || null;
                         _calendarClaimed = d.calendarClaimed || {};
@@ -3319,6 +3337,30 @@
                         _totalSpins = d.totalSpins || 0;
                         _totalWon = d.totalWon || 0;
                         _rouletteHistory = d.rouletteHistory || [];
+
+                        _eventCurrency = d.eventCurrency || 0; 
+
+                        // Восстанавливаем таймер, если есть запланированное время
+                        if (_nextGiftTime && !_giftAvailable) {
+                            const now = Date.now();
+                            if (_nextGiftTime > now) {
+                                const delay = _nextGiftTime - now;
+                                if (delay > 0) {
+                                    _giftTimer = setTimeout(() => showGift(), delay);
+                                } else {
+                                    showGift();
+                                }
+                            } else if (_nextGiftTime <= now) {
+                                showGift();
+                            }
+                        } else if (_giftAvailable) {
+                            showGift(); // показываем, если был активен
+                        }
+
+                        // Если нет запланированного времени — создаём
+                        if (!_nextGiftTime && !_giftAvailable) {
+                            scheduleNextGift();
+                        }
 
                     } catch(e) {
                         console.error('Ошибка загрузки сохранения:', e);
@@ -3348,10 +3390,6 @@
                 if (lastVisit !== nowDate.toDateString()) {
                 }
                 
-                if (document.visibilityState === 'visible') {
-                    startGiftTimer();
-                }
-
                 checkDailyReset();
                 updateUI();
                 checkAchievements();
@@ -3525,11 +3563,11 @@
                     showToast("🎁 ВАМ ВЫПАЛ СУНДУК! 🎁", "#ffd966");
                 }
 
-                // Шанс выпадения ивентовой валюты (2%)
-                if (Math.random() < 0.01) {
+/*                // Шанс выпадения ивентовой валюты (2%)
+                if (Math.random() < 0.02) {
                     const currencyAmount = Math.floor(Math.random() * 3) + 1; // 1-3
                     addEventCurrency(currencyAmount);
-                }
+                }*/
                             
                 showToast(`⛏️ +${gain} руды`, "#ffdd99"); 
                 saveGame(); 
@@ -3660,34 +3698,6 @@
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('exchangeSlider').oninput = (e) => { document.getElementById('exchangeAmount').innerText = e.target.value; };
             document.getElementById('openEventChestBtn')?.addEventListener('click', () => openEventChest());
-
-            // Когда пользователь возвращается на вкладку
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    // Игрок вернулся в игру
-                    if (!_giftTimer && !_giftAvailable) {
-                        startGiftTimer();
-                    }
-                } else {
-                    // Игрок ушёл - очищаем таймер
-                    if (_giftTimer) {
-                        clearTimeout(_giftTimer);
-                        _giftTimer = null;
-                    }
-                    // Скрываем подарок, если он был
-                    if (_giftAvailable) {
-                        _giftAvailable = false;
-                        document.getElementById('floatingGift').style.display = 'none';
-                    }
-                }
-            });
-
-            // При загрузке страницы
-            window.addEventListener('load', () => {
-                if (document.visibilityState === 'visible') {
-                    startGiftTimer();
-                }
-            });
 
 /*            // Магазин - сундук с картой (S, X и A ранги)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
