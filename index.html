@@ -2320,7 +2320,7 @@
                 const now = new Date();
                 const day = now.getDay();
                 const hours = now.getHours();
-                if (day === 6 && hours >= 9) return true;
+                if (day === 6 && hours >= 0) return true;
                 if (day === 0 && hours <= 23) return true;
                 return false;
             }
