@@ -1019,25 +1019,6 @@
             20% { transform: translate(-50%, -60px) scale(1.5); }
             100% { opacity: 0; transform: translate(-50%, -180px) scale(2); }
         }
-        /* НОВЫЕ СТИЛИ ДЛЯ КНОПКИ ПИНГА */
-        .ping-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 2px 6px;
-            border-radius: 20px;
-            transition: all 0.1s ease;
-            opacity: 0.7;
-        }
-        .ping-btn:hover {
-            transform: scale(1.1);
-            opacity: 1;
-            background: rgba(255, 204, 102, 0.2);
-        }
-        .ping-btn:active {
-            transform: scale(0.95);
-        }
     </style>
 </head>
 <body>
@@ -1627,6 +1608,8 @@
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
 
+            let _lastGiftToPlayer = {}; // { playerId: timestamp }
+
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
                 'profile': 1,
@@ -1645,9 +1628,6 @@
                 'settings': 'Настройки'
             };
 
-            // ========== СИСТЕМА ПЕНДЕЛЕЙ (PING) ==========
-            let _pendingPings = []; // Храним пендели для оффлайн игроков
-
             function loadSettings() {
                 const saved = localStorage.getItem('minebuff_settings');
                 if (saved) {
@@ -1659,200 +1639,104 @@
                 updateSettingsUI();
             }
 
-            // Отправка пенделя (с сохранением в БД)
-            async function sendPing(targetPlayerId, targetPlayerName) {
-                // Проверяем лимит (1 раз в минуту)
-                const lastPingKey = `last_ping_${_playerId}`;
-                const lastPing = localStorage.getItem(lastPingKey);
-                const now = Date.now();
-                
-                if (lastPing && (now - parseInt(lastPing)) < 60000) {
-                    showToast("⏰ Подождите минутку перед следующим пенделем!", "#ffaa88");
+            // Отправка ударов другому игроку
+            async function sendStrikesToPlayer(targetPlayerId, targetPlayerName, amount = 5) {
+                // Проверка на повторную отправку тому же игроку (раз в час)
+                const lastGift = _lastGiftToPlayer[targetPlayerId];
+                if (lastGift && (Date.now() - lastGift) < 3600000) {
+                    const minutesLeft = Math.ceil((3600000 - (Date.now() - lastGift)) / 60000);
+                    showToast(`⏰ Вы уже отправляли удары ${targetPlayerName}. Подождите ${minutesLeft} мин.`, "#ffaa88");
                     return false;
                 }
                 
-                // Проверяем алмазы
+                // Проверка алмазов
                 if (_diamonds < 1) {
-                    showToast("💎 Нужен 1 алмаз, чтобы пнуть игрока!", "#ff8888");
+                    showToast(`❌ Нужен 1 💎 для отправки ударов!`, "#ff8888");
                     return false;
                 }
                 
-                // Списываем алмаз
+                // Списываем алмазы
                 _diamonds -= 1;
+                _lastGiftToPlayer[targetPlayerId] = Date.now();
                 saveGame();
                 updateUI();
                 
-                // Сохраняем в локальное хранилище как резервную копию
-                let pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
-                pings.push({
-                    from_id: _playerId,
-                    from_name: _playerName,
-                    to_id: targetPlayerId,
-                    to_name: targetPlayerName,
-                    timestamp: now,
-                    claimed: false
-                });
-                localStorage.setItem('pending_pings', JSON.stringify(pings));
-                
-                // Пытаемся сохранить в Supabase
-                if (supabaseClient) {
+                // Добавляем получателю удары (через Supabase)
+                if (supabaseClient && targetPlayerId) {
                     try {
-                        const { error } = await supabaseClient
-                            .from('pings')
-                            .insert({
-                                from_player_id: _playerId,
-                                from_player_name: _playerName,
-                                to_player_id: targetPlayerId,
-                                to_player_name: targetPlayerName,
-                                created_at: new Date().toISOString(),
-                                claimed: false
-                            });
+                        // Получаем текущее количество ударов получателя
+                        const { data } = await supabaseClient
+                            .from('leaderboard')
+                            .select('strikes_extra')
+                            .eq('player_id', targetPlayerId)
+                            .single();
                         
-                        if (error) {
-                            console.warn('Supabase ping error:', error);
-                            // Продолжаем, локальное сохранение уже есть
-                        } else {
-                            console.log('Ping saved to Supabase');
-                            // Удаляем из локального резерва, если сохранилось в БД
-                            const updatedPings = pings.filter(p => 
-                                !(p.to_id === targetPlayerId && p.timestamp === now)
-                            );
-                            localStorage.setItem('pending_pings', JSON.stringify(updatedPings));
-                        }
+                        const currentExtra = data?.strikes_extra || 0;
+                        
+                        await supabaseClient.from('leaderboard').upsert({
+                            player_id: targetPlayerId,
+                            strikes_extra: currentExtra + amount
+                        }, { onConflict: 'player_id' });
+                        
+                        showToast(`✅ Вы отправили +${amount} ударов игроку ${targetPlayerName}!`, "#aaffdd");
+                        
+                        // Отправляем уведомление получателю
+                        await supabaseClient.from('notifications').insert({
+                            player_id: targetPlayerId,
+                            type: 'gift_strikes',
+                            message: `${_playerName} подарил вам +${amount} ударов!`,
+                            amount: amount,
+                            sender_name: _playerName,  // ← было 'from', стало 'sender_name'
+                            created_at: new Date().toISOString(),
+                            is_read: false
+                        });
+                        
+                        return true;
                     } catch(e) {
-                        console.warn('Ping save error:', e);
+                        console.warn('Send strikes error:', e);
+                        showToast(`❌ Ошибка отправки`, "#ff8888");
+                        return false;
                     }
                 }
                 
-                localStorage.setItem(lastPingKey, now.toString());
-                showToast(`📢 Вы пнули ${targetPlayerName}! Они получат +5 ударов!`, "#aaffdd");
-                
-                return true;
+                return false;
             }
 
-            // Проверка онлайн статуса
-            function checkIfOnline(lastActive) {
-                if (!lastActive) return false;
-                const last = new Date(lastActive);
-                const now = new Date();
-                const diffMinutes = (now - last) / 1000 / 60;
-                return diffMinutes < 5;
-            }
-
-            // Получение и отображение пенделей (из БД и локально)
-            async function checkPendingPings() {
-                let allPings = [];
+            // Функция получения и применения подарков
+            async function checkGiftNotifications() {
+                if (!supabaseClient || !_playerId) return;
                 
-                // 1. Сначала проверяем локальные пендели (резерв)
-                const localPings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
-                const myLocalPings = localPings.filter(p => p.to_id === _playerId && !p.claimed);
-                allPings.push(...myLocalPings);
-                
-                // 2. Проверяем пендели в Supabase
-                if (supabaseClient) {
-                    try {
-                        const { data, error } = await supabaseClient
-                            .from('pings')
-                            .select('*')
-                            .eq('to_player_id', _playerId)
-                            .eq('claimed', false)
-                            .order('created_at', { ascending: true });
-                        
-                        if (!error && data && data.length > 0) {
-                            allPings.push(...data);
-                            
-                            // Отмечаем как прочитанные в БД
-                            for (const ping of data) {
-                                await supabaseClient
-                                    .from('pings')
-                                    .update({ claimed: true, claimed_at: new Date().toISOString() })
-                                    .eq('id', ping.id);
-                            }
+                try {
+                    const { data } = await supabaseClient
+                        .from('notifications')
+                        .select('*')
+                        .eq('player_id', _playerId)
+                        .eq('is_read', false)
+                        .order('created_at', { ascending: false });
+                    
+                    let hasUpdates = false;
+                    
+                    for (const notif of data || []) {
+                        if (notif.type === 'gift_strikes') {
+                            // Добавляем удары
+                            _strikesLimit += notif.amount || 5;
+                            showToast(`🎁 ${notif.message}`, "#ffd966");
+                            hasUpdates = true;
                         }
-                    } catch(e) {
-                        console.warn('Supabase check pings error:', e);
-                    }
-                }
-                
-                // 3. Обрабатываем все найденные пендели
-                if (allPings.length > 0) {
-                    for (const ping of allPings) {
-                        showPingNotification(ping);
                         
-                        // Даём бонус получателю (+5 ударов)
-                        _strikesLimit += 5;
-                        showToast(`🎁 +5 ударов от ${ping.from_name || ping.from_player_name}!`, "#ffcc66");
+                        // Отмечаем как прочитанное
+                        await supabaseClient.from('notifications').update({ is_read: true }).eq('id', notif.id);
+                    }
+                    
+                    if (hasUpdates) {
                         saveGame();
                         updateUI();
                     }
-                    
-                    // Очищаем локальные обработанные пендели
-                    const remainingPings = localPings.filter(p => 
-                        !(p.to_id === _playerId && !p.claimed)
-                    );
-                    localStorage.setItem('pending_pings', JSON.stringify(remainingPings));
+                } catch(e) {
+                    console.warn('Check gift notifications error:', e);
                 }
             }
 
-            // Показать уведомление о пенделе
-            function showPingNotification(ping) {
-                const fromName = ping.from_name || ping.from_player_name;
-                const timestamp = ping.timestamp || (ping.created_at ? new Date(ping.created_at).getTime() : Date.now());
-                
-                const notification = document.createElement('div');
-                notification.className = 'notification-toast success';
-                notification.style.animation = 'slideInRight 0.3s ease';
-                notification.innerHTML = `
-                    <div class="notification-icon">🔔</div>
-                    <div class="notification-content">
-                        <div class="notification-title">🔨 ВАС ПНУЛИ В ШАХТЕ!</div>
-                        <div class="notification-text">${fromName} отправил вам пендель! +5 ударов!</div>
-                        <div class="notification-time">${new Date(timestamp).toLocaleTimeString()}</div>
-                    </div>
-                `;
-                
-                notification.onclick = () => {
-                    notification.style.animation = 'slideOutRight 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                    // Переключаем на вкладку шахты
-                    const mineTab = document.querySelector('.menu-item[data-tab="mine"]');
-                    if (mineTab) mineTab.click();
-                };
-                
-                const container = document.getElementById('notificationContainer');
-                if (container) {
-                    container.appendChild(notification);
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.style.animation = 'slideOutRight 0.3s ease';
-                            setTimeout(() => notification.remove(), 300);
-                        }
-                    }, 8000);
-                }
-            }
-
-            // Инициализация кнопок пинга
-            function initPingButtons() {
-                document.addEventListener('click', async (e) => {
-                    const pingBtn = e.target.closest('.ping-btn');
-                    if (pingBtn) {
-                        e.stopPropagation();
-                        const targetId = pingBtn.getAttribute('data-player-id');
-                        const targetName = pingBtn.getAttribute('data-player-name');
-                        
-                        if (targetId === _playerId) {
-                            showToast("😂 Нельзя пнуть самого себя!", "#ffaa88");
-                            return;
-                        }
-                        
-                        const confirmed = confirm(`Отправить пендель ${targetName}? (-1💎, они получат +5 ударов)`);
-                        if (confirmed) {
-                            await sendPing(targetId, targetName);
-                            loadTopFromSupabase();
-                        }
-                    }
-                });
-            }
 
             // Функция проверки ежедневного входа
             function checkDailyLogin() {
@@ -3026,7 +2910,7 @@
                 updatePickaxeVisual();
                 return wasReset;
             }
-                        
+            
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
@@ -3036,7 +2920,7 @@
                         date: card.id || Date.now()
                     }));
                     
-                    const { error } = await supabaseClient.from('leaderboard').upsert({
+                    await supabaseClient.from('leaderboard').upsert({
                         player_id: _playerId,
                         username: _playerName,
                         level: _level,
@@ -3044,16 +2928,11 @@
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                        event_currency: _eventCurrency || 0  // Добавляем event_currency
+                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
+                        updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                     
-                    if (error) {
-                        console.warn('Sync error:', error);
-                        showDBError();
-                    } else {
-                        hideDBError();
-                    }
+                    hideDBError();
                     
                 } catch(e) { 
                     console.warn('syncToSupabase error:', e);
@@ -3062,9 +2941,6 @@
             }
             
             function showPlayerProfileModal(data) {
-                const isCurrentPlayer = data.playerId === _playerId;
-                const status = getOnlineStatus(data.lastActive);
-                
                 const modalHtml = `
                     <div class="profile-link-content" style="max-width: 380px;">
                         <div class="profile-link-header">
@@ -3074,7 +2950,6 @@
                         <div class="profile-link-body">
                             <div style="margin-bottom: 12px; text-align: center;">
                                 <strong style="font-size: 20px; color: #ffcc66;">${escapeHtml(data.playerName)}</strong>
-                                <div style="font-size: 12px; margin-top: 5px; color: ${status.color};">${status.text}</div>
                             </div>
                             
                             <div style="display: flex; gap: 12px; margin: 12px 0;">
@@ -3102,7 +2977,6 @@
                             ` : ''}
                             
                             <div class="modal-buttons" style="gap: 12px; margin-top: 16px;">
-                                ${!isCurrentPlayer ? `<button class="modal-btn upgrade" id="pingPlayerBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600);">⏰ ПНУТЬ ИГРОКА (-1💎)</button>` : ''}
                                 <button class="modal-btn close" id="profileModalCloseBtn">ЗАКРЫТЬ</button>
                             </div>
                         </div>
@@ -3119,23 +2993,8 @@
                 modalDiv.innerHTML = modalHtml;
                 document.body.appendChild(modalDiv);
                 
-                // Закрытие по кнопке
                 modalDiv.querySelector('#profileModalCloseBtn').onclick = () => modalDiv.remove();
-                
-                // Закрытие по клику на фон
                 modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
-                
-                // Кнопка пинга (если есть)
-                const pingBtn = modalDiv.querySelector('#pingPlayerBtn');
-                if (pingBtn) {
-                    pingBtn.onclick = async () => {
-                        modalDiv.remove();
-                        const confirmed = confirm(`Отправить пендель ${data.playerName}? (-1💎, они получат +5 ударов)`);
-                        if (confirmed) {
-                            await sendPing(data.playerId, data.playerName);
-                        }
-                    };
-                }
             }
 
             let topLoadAttempts = 0;
@@ -3190,29 +3049,27 @@
                         return `<li class="${isCurrent ? 'current-player' : ''}" 
                                     data-player-id="${p.player_id}"
                                     data-player-name="${escapeHtml(p.username)}"
-                                    data-player-level="${p.level}"
-                                    data-mb-link="${p.mb_link || ''}"
-                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'
-                                    data-last-active="${p.last_active || ''}">
-                                    <div style="display: flex; flex-direction: column; flex: 1;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                                            <!-- ЧАСЫ ТЕПЕРЬ ПРОСТО ВЫЗЫВАЮТ ПРОФИЛЬ -->
-                                            <button class="profile-view-btn" 
-                                                    data-player-id="${p.player_id}"
-                                                    data-player-name="${escapeHtml(p.username)}"
-                                                    data-player-level="${p.level}"
-                                                    data-mb-link="${p.mb_link || ''}"
-                                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'
-                                                    data-last-active="${p.last_active || ''}"
-                                                    style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px;" 
-                                                    title="Просмотр профиля">
-                                                👤
-                                            </button>
+                                    style="flex-wrap: wrap; gap: 8px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; flex: 1;">
+                                        <div>
+                                            <div>${medal} ${escapeHtml(p.username.slice(0, 15))}</div>
+                                            <div style="font-size: 9px; color: ${status.color};">${status.text}</div>
                                         </div>
-                                        <span style="font-size: 9px; color: ${status.color};">${status.text}</span>
+                                        ${!isCurrent ? `<button class="gift-strikes-btn" 
+                                            data-id="${p.player_id}" 
+                                            data-name="${escapeHtml(p.username)}" 
+                                            style="background: linear-gradient(135deg, #ffaa33, #ff6600); 
+                                                   border: none; 
+                                                   padding: 6px 12px; 
+                                                   border-radius: 20px; 
+                                                   font-size: 12px; 
+                                                   font-weight: bold;
+                                                   cursor: pointer;
+                                                   color: white;">
+                                            🎁 +5🔨 (1💎)
+                                        </button>` : ''}
                                     </div>
-                                    <span>⭐ Ур.${p.level}</span>
+                                    <div>⭐ Ур.${p.level}</div>
                                 </li>`;
                     }).join('');
                     
@@ -3317,8 +3174,6 @@
                         
                         _eventCurrency = d.eventCurrency || 0; 
 
-                        _pendingPings = d.pendingPings || [];
-
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
                             const now = Date.now();
@@ -3395,6 +3250,26 @@
                         })
                         .catch(e => console.warn(e));
                 }
+
+                // Загружаем бонусные удары из базы
+                if (supabaseClient && _playerId) {
+                    const { data } = await supabaseClient
+                        .from('leaderboard')
+                        .select('strikes_extra')
+                        .eq('player_id', _playerId)
+                        .single();
+                    
+                    if (data?.strikes_extra) {
+                        _strikesLimit += data.strikes_extra;
+                        // Обнуляем использованные бонусы
+                        await supabaseClient.from('leaderboard')
+                            .update({ strikes_extra: 0 })
+                            .eq('player_id', _playerId);
+                        saveGame();
+                        updateUI();
+                        showToast(`🎁 Вам подарили +${data.strikes_extra} ударов!`, "#ffd966");
+                    }
+}
             }     
 
             function checkRankUpgrade() {
@@ -3441,82 +3316,71 @@
                 if (!topListContainer) return;
                 
                 topListContainer.addEventListener('click', async (e) => {
-                    // Проверяем, не нажата ли кнопка профиля
-                    const profileBtn = e.target.closest('.profile-view-btn');
                     const li = e.target.closest('li[data-player-id]');
-                    
                     if (!li) return;
+                    
+                    e.stopPropagation();
                     
                     const targetPlayerId = li.getAttribute('data-player-id');
                     const targetPlayerName = li.getAttribute('data-player-name');
                     const targetMbLink = li.getAttribute('data-mb-link');
                     const targetCardsJson = li.getAttribute('data-cards-json');
                     const targetPlayerLevel = li.getAttribute('data-player-level');
-                    const targetLastActive = li.getAttribute('data-last-active');
                     
-                    // Если нажата кнопка профиля ИЛИ вся строка (но не пингуем сами себя)
-                    if (profileBtn || targetPlayerId !== _playerId) {
-                        e.stopPropagation();
+                    if (targetPlayerId === _playerId) {
+                        // Свой профиль - показываем из локальных данных
+                        const myCounts = getCardCounts();
+                        const myCardsHtml = rankNames
+                            .filter(rank => myCounts[rank] > 0)
+                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
+                            .join('');
                         
-                        if (targetPlayerId === _playerId) {
-                            // Свой профиль - показываем из локальных данных
-                            const myCounts = getCardCounts();
-                            const myCardsHtml = rankNames
-                                .filter(rank => myCounts[rank] > 0)
-                                .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
-                                .join('');
-                            
-                            showPlayerProfileModal({
-                                playerId: _playerId,
-                                playerName: _playerName,
-                                level: _level,
-                                totalCards: _cardHistory.length,
-                                cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                                mbLink: _mbProfileLink,
-                                lastActive: _lastActive
-                            });
-                        } else {
-                            // Чужой профиль - используем данные из БД
-                            showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
-                            
-                            // Парсим карты из атрибута
-                            let playerCards = [];
-                            try {
-                                if (targetCardsJson && targetCardsJson !== '[]') {
-                                    playerCards = JSON.parse(targetCardsJson);
+                        showPlayerProfileModal({
+                            playerName: _playerName,
+                            level: _level,
+                            totalCards: _cardHistory.length,
+                            cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                            mbLink: _mbProfileLink
+                        });
+                    } else {
+                        // Чужой профиль - используем данные из БД
+                        showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
+                        
+                        // Парсим карты из атрибута
+                        let playerCards = [];
+                        try {
+                            if (targetCardsJson && targetCardsJson !== '[]') {
+                                playerCards = JSON.parse(targetCardsJson);
+                            }
+                        } catch(e) { 
+                            console.warn('Parse cards error:', e); 
+                        }
+                        
+                        // Подсчитываем карты
+                        const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
+                        let totalCards = 0;
+                        
+                        if (playerCards && Array.isArray(playerCards)) {
+                            playerCards.forEach(card => {
+                                if (card.rank && counts[card.rank] !== undefined) {
+                                    counts[card.rank]++;
+                                    totalCards++;
                                 }
-                            } catch(e) { 
-                                console.warn('Parse cards error:', e); 
-                            }
-                            
-                            // Подсчитываем карты
-                            const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
-                            let totalCards = 0;
-                            
-                            if (playerCards && Array.isArray(playerCards)) {
-                                playerCards.forEach(card => {
-                                    if (card.rank && counts[card.rank] !== undefined) {
-                                        counts[card.rank]++;
-                                        totalCards++;
-                                    }
-                                });
-                            }
-                            
-                            const cardsHtml = rankNames
-                                .filter(rank => counts[rank] > 0)
-                                .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
-                                .join('');
-                            
-                            showPlayerProfileModal({
-                                playerId: targetPlayerId,
-                                playerName: targetPlayerName,
-                                level: targetPlayerLevel || '?',
-                                totalCards: totalCards,
-                                cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                                mbLink: targetMbLink,
-                                lastActive: targetLastActive
                             });
                         }
+                        
+                        const cardsHtml = rankNames
+                            .filter(rank => counts[rank] > 0)
+                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
+                            .join('');
+                        
+                        showPlayerProfileModal({
+                            playerName: targetPlayerName,
+                            level: targetPlayerLevel || '?',
+                            totalCards: totalCards,
+                            cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                            mbLink: targetMbLink
+                        });
                     }
                 });
             }
@@ -3876,19 +3740,15 @@
             checkDailyLogin();
             updateCalendarUI();
 
-            initPingButtons();
-            
-            // Проверяем пендели через 3 секунды после загрузки
-            setTimeout(() => {
-                checkPendingPings();
-            }, 3000);
-
-            // Также проверяем при возвращении на вкладку
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) {
-                    checkPendingPings();
+            // Проверка подарков каждые 30 секунд
+            setInterval(() => {
+                if (supabaseClient && _playerId) {
+                    checkGiftNotifications();
                 }
-            });
+            }, 30000);
+
+            // При загрузке
+            setTimeout(() => checkGiftNotifications(), 2000);
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
