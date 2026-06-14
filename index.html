@@ -1043,6 +1043,7 @@
                     <div class="close-menu" id="closeMenu">✕</div>
                 </div>
                 <div class="menu-item" data-tab="profile">🏆 Профиль</div>
+                <div class="menu-item" data-tab="social">🤝 Друзья</div>
                 <div class="menu-item active" data-tab="mine">⛏️ Шахта</div>
                 <div class="menu-item" data-tab="top">🏆 Топ игроков</div>
                 <div class="menu-item" data-tab="shop">🛒 Магазин<span style="color: #ffaa33; font-size: 12px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 20px;">Бета</span></div>
@@ -1307,53 +1308,54 @@
             </div>
         </div>
 
-        <!-- ИНФОРМАЦИЯ / ПОМОЩЬ -->
-        <div class="tab-panel" id="infoPanel">
+        <!-- Социальная панель (Друзья) -->
+        <div class="tab-panel" id="socialPanel">
             <div class="game-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">📚 ИНФОРМАЦИЯ</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Что за что отвечает</div>
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">🤝 ЭНЕРГИЯ ШАХТЫ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 16px;">
+                    💡 Отправляйте удары друзьям за 1💎 = +5 ударов<br>
+                    ⚡ Полученные удары можно использовать в тот же день!
+                </div>
                 
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">⛏️ ШАХТА</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Кирка</strong> — улучшается за алмазы, увеличивает добычу руды за удар<br>
-                            • <strong>Уровень</strong> — повышается за алмазы, увеличивает лимит ударов в день<br>
-                            • <strong>Бонус +5💎</strong> — ежедневный бесплатный бонус<br>
-                            • <strong>Обмен</strong> — 100 руды = 1 алмаз<br>
-                            • <strong>x2 событие</strong> — по выходным (сб-вс) добыча руды удваивается
-                        </div>
+                <!-- Баланс отправленных/полученных ударов -->
+                <div class="stats" style="margin-bottom: 16px;">
+                    <div class="stat-card">
+                        <div class="stat-label">📤 ОТПРАВЛЕНО</div>
+                        <div class="stat-value" id="sentStrikesCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">📥 ПОЛУЧЕНО</div>
+                        <div class="stat-value" id="receivedStrikesCount">0</div>
                     </div>
                 </div>
                 
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">🎴 КАРТЫ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Ранги (от слабого к сильному):</strong> E → D → C → B → G → P → A<br>
-                            • <strong>Сезонные ранги:</strong> V(весна), L(лето), H(хеллоуин), N(зима) — сила 12<br>
-                            • <strong>Обмен 3:1</strong> — три карты одного ранга = одна карта выше рангом<br>
-                            • <strong>Получение карт:</strong> через Telegram @minebuff 
+                <!-- Список игроков для отправки -->
+                <div style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-weight: bold;">👥 ИГРОКИ</span>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="searchPlayerInput" placeholder="🔍 Поиск по имени" style="background: #0f1a1f; border: 1px solid #ffcc66; border-radius: 20px; padding: 6px 12px; color: white; font-size: 12px;">
+                            <button id="refreshPlayersBtn" style="background: #3a6b58; border: none; border-radius: 20px; padding: 6px 12px; cursor: pointer;">🔄</button>
                         </div>
+                    </div>
+                    <div id="playersListContainer" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="text-align: center; padding: 20px; opacity: 0.7;">Загрузка игроков...</div>
                     </div>
                 </div>
                 
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • Заходи каждый день и получай награды!<br>
-                            • Доступен с 5 уровня<br>
-                            • На 14 день — карта D, на 30 день — карта C
-                        </div>
+                <!-- История отправок -->
+                <div class="dropdown-section" style="margin-top: 16px;">
+                    <div class="dropdown-header">
+                        <div class="dropdown-title">📜 ИСТОРИЯ ОТПРАВОК</div>
+                        <div class="dropdown-arrow">▼</div>
                     </div>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    📢 По всем вопросам: <a href="https://t.me/b_loody" target="_blank" style="color: #ffcc66;">@b_loody</a>
+                    <div class="dropdown-content" id="socialHistoryContainer">
+                        <div style="padding: 12px; text-align: center; opacity: 0.6;">Нет истории</div>
+                    </div>
                 </div>
             </div>
         </div>
+
 
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
@@ -1608,9 +1610,14 @@
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
 
+            let _sentStrikesHistory = []; // История отправок [{to: playerId, toName: name, amount: 5, date: timestamp}]
+            let _receivedStrikesToday = 0; // Сколько ударов получено сегодня (сбрасывается в 0 каждый день)
+            let _playersList = []; // Кэш списка игроков
+
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
                 'profile': 1,
+                'social': 5,
                 'mine': 1,
                 'shop': 2,
                 'top': 1,
@@ -1620,6 +1627,7 @@
             // Названия разделов для уведомлений
             const sectionNames = {
                 'profile': 'Профиль',
+                'social': 'Друзья',
                 'mine': 'Шахта',
                 'shop': 'Магазин',
                 'top': 'Топ игроков',
@@ -1635,6 +1643,255 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Отправка ударов игроку
+            async function sendStrikesToPlayer(targetPlayerId, targetPlayerName) {
+                // Проверка: нельзя отправить самому себе
+                if (targetPlayerId === _playerId) {
+                    showToast("❌ Нельзя отправить удары самому себе!", "#ff8888");
+                    return false;
+                }
+                
+                // Проверка: хватает ли алмазов
+                if (_diamonds < 1) {
+                    showToast("❌ Недостаточно алмазов! Нужен 1💎", "#ff8888");
+                    return false;
+                }
+                
+                // Проверка: не отправляли ли этому игроку сегодня (anti-spam)
+                const today = new Date().toDateString();
+                const sentTodayToThis = _sentStrikesHistory.filter(h => 
+                    h.to === targetPlayerId && new Date(h.date).toDateString() === today
+                ).length;
+                
+                if (sentTodayToThis >= 3) {
+                    showToast(`⚠️ Вы можете отправить удары ${targetPlayerName} не более 3 раз в день!`, "#ffaa88");
+                    return false;
+                }
+                
+                // Списываем алмаз
+                _diamonds -= 1;
+                
+                // Добавляем в историю
+                _sentStrikesHistory.unshift({
+                    to: targetPlayerId,
+                    toName: targetPlayerName,
+                    amount: 5,
+                    date: new Date().toISOString()
+                });
+                if (_sentStrikesHistory.length > 50) _sentStrikesHistory.pop();
+                
+                saveGame();
+                updateUI();
+                
+                // Отправляем в Supabase
+                if (supabaseClient) {
+                    try {
+                        // 1. Добавляем запись в таблицу strikes_transactions
+                        await supabaseClient.from('strikes_transactions').insert({
+                            from_player_id: _playerId,
+                            from_player_name: _playerName,
+                            to_player_id: targetPlayerId,
+                            to_player_name: targetPlayerName,
+                            amount: 5,
+                            status: 'pending'
+                        });
+                        
+                        // 2. Обновляем статистику отправителя
+                        await supabaseClient.from('leaderboard').upsert({
+                            player_id: _playerId,
+                            sent_strikes: (await getSentStrikesCount()) + 5
+                        }, { onConflict: 'player_id' });
+                        
+                    } catch(e) { console.warn('Send strikes error:', e); }
+                }
+                
+                showToast(`✅ Отправлено +5 ударов игроку ${targetPlayerName}!`, "#aaffdd");
+                updateSocialUI();
+                return true;
+            }
+
+            // Получение количества отправленных ударов
+            async function getSentStrikesCount() {
+                if (!supabaseClient || !_playerId) return _sentStrikesHistory.reduce((sum, h) => sum + h.amount, 0);
+                
+                try {
+                    const { data } = await supabaseClient
+                        .from('leaderboard')
+                        .select('sent_strikes')
+                        .eq('player_id', _playerId)
+                        .single();
+                    return data?.sent_strikes || 0;
+                } catch(e) {
+                    return _sentStrikesHistory.reduce((sum, h) => sum + h.amount, 0);
+                }
+            }
+
+            // Загрузка списка игроков для социальной вкладки
+            async function loadPlayersList() {
+                if (!supabaseClient) {
+                    setTimeout(() => loadPlayersList(), 1000);
+                    return;
+                }
+                
+                try {
+                    const { data } = await supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, username, level, last_active')
+                        .order('level', { ascending: false })
+                        .limit(100);
+                    
+                    _playersList = data || [];
+                    renderPlayersList();
+                } catch(e) {
+                    console.warn('Load players list error:', e);
+                    const container = document.getElementById('playersListContainer');
+                    if (container) container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">⚠️ Ошибка загрузки игроков</div>';
+                }
+            }
+
+            // Рендер списка игроков с поиском
+            function renderPlayersList() {
+                const container = document.getElementById('playersListContainer');
+                if (!container) return;
+                
+                const searchQuery = document.getElementById('searchPlayerInput')?.value.toLowerCase() || '';
+                let filteredPlayers = _playersList.filter(p => p.player_id !== _playerId);
+                
+                if (searchQuery) {
+                    filteredPlayers = filteredPlayers.filter(p => 
+                        p.username.toLowerCase().includes(searchQuery)
+                    );
+                }
+                
+                if (filteredPlayers.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">👥 Нет других игроков</div>';
+                    return;
+                }
+                
+                container.innerHTML = filteredPlayers.map(player => {
+                    const status = getOnlineStatus(player.last_active);
+                    const sentToday = _sentStrikesHistory.filter(h => 
+                        h.to === player.player_id && 
+                        new Date(h.date).toDateString() === new Date().toDateString()
+                    ).length;
+                    
+                    const remainingSends = 3 - sentToday;
+                    
+                    return `
+                        <div style="background: linear-gradient(135deg, #0f1a1f, #071217); border-radius: 20px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <div style="flex: 2; min-width: 120px;">
+                                <div style="font-weight: bold; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    ${escapeHtml(player.username)}
+                                    <span style="font-size: 10px; color: ${status.color};">${status.text}</span>
+                                </div>
+                                <div style="font-size: 10px; opacity: 0.6;">⭐ Ур.${player.level}</div>
+                                <div style="font-size: 9px; margin-top: 4px;">
+                                    📤 ${sentToday}/3 сегодня
+                                    ${remainingSends > 0 ? `<span style="color: #44ff44;"> (ещё ${remainingSends})</span>` : '<span style="color: #ff8888;"> (лимит)</span>'}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div style="background: #2a4a3a; border-radius: 15px; padding: 4px 8px; font-size: 12px;">
+                                    1💎 = +5⚡
+                                </div>
+                                <button class="send-strikes-btn" 
+                                        data-id="${player.player_id}"
+                                        data-name="${escapeHtml(player.username)}"
+                                        ${remainingSends <= 0 ? 'disabled' : ''}
+                                        style="background: linear-gradient(135deg, #ffaa33, #ff6600); border: none; padding: 8px 16px; border-radius: 30px; font-weight: bold; color: white; cursor: pointer; ${remainingSends <= 0 ? 'opacity: 0.5;' : ''}">
+                                    📤 ОТПРАВИТЬ
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Привязываем обработчики к кнопкам
+                document.querySelectorAll('.send-strikes-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const targetId = btn.getAttribute('data-id');
+                        const targetName = btn.getAttribute('data-name');
+                        await sendStrikesToPlayer(targetId, targetName);
+                        // Обновляем список после отправки
+                        setTimeout(() => renderPlayersList(), 500);
+                    });
+                });
+            }
+
+            // Обновление истории отправок в UI
+            function updateSocialHistoryUI() {
+                const container = document.getElementById('socialHistoryContainer');
+                if (!container) return;
+                
+                if (_sentStrikesHistory.length === 0) {
+                    container.innerHTML = '<div style="padding: 12px; text-align: center; opacity: 0.6;">Нет истории отправок</div>';
+                    return;
+                }
+                
+                container.innerHTML = _sentStrikesHistory.slice(0, 20).map(h => {
+                    const date = new Date(h.date);
+                    const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                    return `
+                        <div style="padding: 8px 12px; border-bottom: 1px solid #2a4a3a; display: flex; justify-content: space-between;">
+                            <span>📤 +${h.amount} ударов → ${escapeHtml(h.toName)}</span>
+                            <span style="font-size: 10px; opacity: 0.6;">${formattedDate}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Обновление всей социальной UI
+            function updateSocialUI() {
+                renderPlayersList();
+                updateSocialHistoryUI();
+                
+                // Обновляем счётчики
+                const sentCount = _sentStrikesHistory.reduce((sum, h) => sum + h.amount, 0);
+                document.getElementById('sentStrikesCount').innerText = sentCount;
+                document.getElementById('receivedStrikesCount').innerText = _receivedStrikesToday;
+            }
+
+            // Функция для проверки и получения ударов от других игроков
+            async function checkPendingStrikes() {
+                if (!supabaseClient || !_playerId) return;
+                
+                try {
+                    // Получаем все неподтверждённые транзакции для этого игрока
+                    const { data } = await supabaseClient
+                        .from('strikes_transactions')
+                        .select('*')
+                        .eq('to_player_id', _playerId)
+                        .eq('status', 'pending');
+                    
+                    for (const transaction of data || []) {
+                        // Добавляем удары к текущему дню
+                        _strikesLimit += transaction.amount;
+                        _receivedStrikesToday += transaction.amount;
+                        
+                        // Обновляем статус транзакции
+                        await supabaseClient
+                            .from('strikes_transactions')
+                            .update({ status: 'completed', completed_at: new Date().toISOString() })
+                            .eq('id', transaction.id);
+                        
+                        // Показываем уведомление
+                        showNotification(
+                            '⚡ ПОЛУЧЕНЫ УДАРЫ!',
+                            `${transaction.from_player_name} отправил вам +${transaction.amount} ударов!`,
+                            '🎁',
+                            'success'
+                        );
+                    }
+                    
+                    if (data && data.length > 0) {
+                        saveGame();
+                        updateUI();
+                    }
+                } catch(e) {
+                    console.warn('Check pending strikes error:', e);
+                }
             }
 
             // Функция проверки ежедневного входа
@@ -3027,7 +3284,9 @@
                     lastLoginDate: _lastLoginDate,
                     calendarClaimed: _calendarClaimed,
                     luckBoostEndTime: _luckBoostEndTime,
-                    eventCurrency: _eventCurrency 
+                    eventCurrency: _eventCurrency,
+                    sentStrikesHistory: _sentStrikesHistory,
+                    receivedStrikesToday: _receivedStrikesToday
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3059,6 +3318,9 @@
                         _luckBoostEndTime = d.luckBoostEndTime || null;
                         
                         _eventCurrency = d.eventCurrency || 0; 
+
+                        _sentStrikesHistory = d.sentStrikesHistory || [];
+                        _receivedStrikesToday = d.receivedStrikesToday || 0;
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3386,6 +3648,7 @@
                     else if (tab === 'top') panelId = 'topPanel';
                     else if (tab === 'settings') panelId = 'settingsPanel';
                     else if (tab === 'shop') panelId = 'shopPanel';
+                    else if (tab === 'social') panelId = 'socialPanel';  // ← ДОБАВИТЬ ЭТУ СТРОКУ
                     
                     if (panelId) {
                         // Пытаемся открыть раздел с проверкой уровня
@@ -3398,6 +3661,10 @@
                     if (tab === 'top') loadTopFromSupabase();
                     if (tab === 'calendar') updateCalendarUI();
                     if (tab === 'profile') updateProfileLinkUI();
+                    if (tab === 'social') {
+                        loadPlayersList();
+                        updateSocialUI();
+                    }
                 };
             });
             
@@ -3608,6 +3875,11 @@
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
+
+            // В функцию startNotificationChecker() добавь:
+            setInterval(() => {
+                checkPendingStrikes();
+            }, 30000); // Каждые 30 секунд
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
