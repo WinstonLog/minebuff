@@ -1608,8 +1608,6 @@
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
 
-            let _lastGiftToPlayer = {}; // { playerId: timestamp }
-
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
                 'profile': 1,
@@ -1638,105 +1636,6 @@
                 }
                 updateSettingsUI();
             }
-
-            // Отправка ударов другому игроку
-            async function sendStrikesToPlayer(targetPlayerId, targetPlayerName, amount = 5) {
-                // Проверка на повторную отправку тому же игроку (раз в час)
-                const lastGift = _lastGiftToPlayer[targetPlayerId];
-                if (lastGift && (Date.now() - lastGift) < 3600000) {
-                    const minutesLeft = Math.ceil((3600000 - (Date.now() - lastGift)) / 60000);
-                    showToast(`⏰ Вы уже отправляли удары ${targetPlayerName}. Подождите ${minutesLeft} мин.`, "#ffaa88");
-                    return false;
-                }
-                
-                // Проверка алмазов
-                if (_diamonds < 1) {
-                    showToast(`❌ Нужен 1 💎 для отправки ударов!`, "#ff8888");
-                    return false;
-                }
-                
-                // Списываем алмазы
-                _diamonds -= 1;
-                _lastGiftToPlayer[targetPlayerId] = Date.now();
-                saveGame();
-                updateUI();
-                
-                // Добавляем получателю удары (через Supabase)
-                if (supabaseClient && targetPlayerId) {
-                    try {
-                        // Получаем текущее количество ударов получателя
-                        const { data } = await supabaseClient
-                            .from('leaderboard')
-                            .select('strikes_extra')
-                            .eq('player_id', targetPlayerId)
-                            .single();
-                        
-                        const currentExtra = data?.strikes_extra || 0;
-                        
-                        await supabaseClient.from('leaderboard').upsert({
-                            player_id: targetPlayerId,
-                            strikes_extra: currentExtra + amount
-                        }, { onConflict: 'player_id' });
-                        
-                        showToast(`✅ Вы отправили +${amount} ударов игроку ${targetPlayerName}!`, "#aaffdd");
-                        
-                        // Отправляем уведомление получателю
-                        await supabaseClient.from('notifications').insert({
-                            player_id: targetPlayerId,
-                            type: 'gift_strikes',
-                            message: `${_playerName} подарил вам +${amount} ударов!`,
-                            amount: amount,
-                            sender_name: _playerName,  // ← было 'from', стало 'sender_name'
-                            created_at: new Date().toISOString(),
-                            is_read: false
-                        });
-                        
-                        return true;
-                    } catch(e) {
-                        console.warn('Send strikes error:', e);
-                        showToast(`❌ Ошибка отправки`, "#ff8888");
-                        return false;
-                    }
-                }
-                
-                return false;
-            }
-
-            // Функция получения и применения подарков
-            async function checkGiftNotifications() {
-                if (!supabaseClient || !_playerId) return;
-                
-                try {
-                    const { data } = await supabaseClient
-                        .from('notifications')
-                        .select('*')
-                        .eq('player_id', _playerId)
-                        .eq('is_read', false)
-                        .order('created_at', { ascending: false });
-                    
-                    let hasUpdates = false;
-                    
-                    for (const notif of data || []) {
-                        if (notif.type === 'gift_strikes') {
-                            // Добавляем удары
-                            _strikesLimit += notif.amount || 5;
-                            showToast(`🎁 ${notif.message}`, "#ffd966");
-                            hasUpdates = true;
-                        }
-                        
-                        // Отмечаем как прочитанное
-                        await supabaseClient.from('notifications').update({ is_read: true }).eq('id', notif.id);
-                    }
-                    
-                    if (hasUpdates) {
-                        saveGame();
-                        updateUI();
-                    }
-                } catch(e) {
-                    console.warn('Check gift notifications error:', e);
-                }
-            }
-
 
             // Функция проверки ежедневного входа
             function checkDailyLogin() {
@@ -3049,27 +2948,14 @@
                         return `<li class="${isCurrent ? 'current-player' : ''}" 
                                     data-player-id="${p.player_id}"
                                     data-player-name="${escapeHtml(p.username)}"
-                                    style="flex-wrap: wrap; gap: 8px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; flex: 1;">
-                                        <div>
-                                            <div>${medal} ${escapeHtml(p.username.slice(0, 15))}</div>
-                                            <div style="font-size: 9px; color: ${status.color};">${status.text}</div>
-                                        </div>
-                                        ${!isCurrent ? `<button class="gift-strikes-btn" 
-                                            data-id="${p.player_id}" 
-                                            data-name="${escapeHtml(p.username)}" 
-                                            style="background: linear-gradient(135deg, #ffaa33, #ff6600); 
-                                                   border: none; 
-                                                   padding: 6px 12px; 
-                                                   border-radius: 20px; 
-                                                   font-size: 12px; 
-                                                   font-weight: bold;
-                                                   cursor: pointer;
-                                                   color: white;">
-                                            🎁 +5🔨 (1💎)
-                                        </button>` : ''}
+                                    data-player-level="${p.level}"
+                                    data-mb-link="${p.mb_link || ''}"
+                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'>
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                                        <span style="font-size: 9px; color: ${status.color};">${status.text}</span>
                                     </div>
-                                    <div>⭐ Ур.${p.level}</div>
+                                    <span>⭐ Ур.${p.level}</span>
                                 </li>`;
                     }).join('');
                     
@@ -3147,7 +3033,7 @@
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
             }
             
-            async function loadGame() {
+            function loadGame() {
                 const saved = localStorage.getItem('minebuff_save');
                 if (saved) {
                     try {
@@ -3218,6 +3104,12 @@
                     document.getElementById('playerId').innerText = _playerId.slice(-12);
                 }
                 
+                // === ПРОВЕРКА КАЛЕНДАРЯ ПРИ ЗАГРУЗКЕ ===
+                const nowDate = new Date();
+                const lastVisit = localStorage.getItem('minebuff_last_visit');
+                if (lastVisit !== nowDate.toDateString()) {
+                }
+                
                 checkDailyReset();
                 updateUI();
                 checkAchievements();
@@ -3244,39 +3136,17 @@
                         })
                         .catch(e => console.warn(e));
                 }
-
-                if (supabaseClient && _playerId) {
-                    try {
-                        const { data } = await supabaseClient
-                            .from('leaderboard')
-                            .select('strikes_extra')
-                            .eq('player_id', _playerId)
-                            .single();
-                        
-                        if (data?.strikes_extra) {
-                            _strikesLimit += data.strikes_extra;
-                            await supabaseClient.from('leaderboard')
-                                .update({ strikes_extra: 0 })
-                                .eq('player_id', _playerId);
-                            saveGame();
-                            updateUI();
-                            showToast(`🎁 Вам подарили +${data.strikes_extra} ударов!`, "#ffd966");
-                        }
-                    } catch(e) {
-                        console.warn('Ошибка загрузки бонусных ударов:', e);
-                    }
-                }
-            }   
+            }     
 
             function checkRankUpgrade() {
-                const currentRank = getCurrentRank();
-                // Сохраняем предыдущий ранг в отдельную переменную
-                if (!_lastRank) _lastRank = currentRank.name;
+            const currentRank = getCurrentRank();
+            // Сохраняем предыдущий ранг в отдельную переменную
+            if (!_lastRank) _lastRank = currentRank.name;
 
-                if (_lastRank !== currentRank.name) {
-                    _lastRank = currentRank.name;
-                    showToast(`🏆 НОВЫЙ РАНГ: ${currentRank.icon} ${currentRank.name}! +${currentRank.bonus}% к добыче! 🏆`, "#ffd966");
-                }
+            if (_lastRank !== currentRank.name) {
+                _lastRank = currentRank.name;
+                showToast(`🏆 НОВЫЙ РАНГ: ${currentRank.icon} ${currentRank.name}! +${currentRank.bonus}% к добыче! 🏆`, "#ffd966");
+            }
             }
 
             function showNameModal() {
@@ -3305,26 +3175,13 @@
                 document.body.appendChild(div);
                 setTimeout(() => div.remove(), 1000);
             }
-            
-            // Делегирование событий для топа
+
+            // Делегирование событий для топа (один обработчик вместо многих)
             function initTopListClickHandler() {
                 const topListContainer = document.getElementById('topList');
                 if (!topListContainer) return;
                 
                 topListContainer.addEventListener('click', async (e) => {
-                    // Проверяем, нажата ли кнопка подарка
-                    const giftBtn = e.target.closest('.gift-strikes-btn');
-                    if (giftBtn) {
-                        e.stopPropagation();
-                        const targetPlayerId = giftBtn.getAttribute('data-id');
-                        const targetPlayerName = giftBtn.getAttribute('data-name');
-                        
-                        // Открываем модальное окно с информацией об игроке
-                        showGiftConfirmModal(targetPlayerId, targetPlayerName);
-                        return;
-                    }
-                    
-                    // Обычный клик по элементу списка (открытие профиля)
                     const li = e.target.closest('li[data-player-id]');
                     if (!li) return;
                     
@@ -3392,74 +3249,6 @@
                         });
                     }
                 });
-            }
-
-            // Показать модальное окно для подтверждения отправки ударов
-            function showGiftConfirmModal(targetPlayerId, targetPlayerName) {
-                // Создаём модальное окно
-                const modalHtml = `
-                    <div class="gift-confirm-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 400; display: flex; justify-content: center; align-items: center;">
-                        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 360px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 1px solid #ffcc66;">
-                            <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
-                                <div style="font-size: 48px;">🎁</div>
-                                <div style="font-size: 20px; font-weight: 800; color: #1a1a2e;">ПОДАРОК ИГРОКУ</div>
-                            </div>
-                            <div style="padding: 24px 20px;">
-                                <div style="margin-bottom: 16px;">
-                                    <div style="font-size: 14px; opacity: 0.8;">Вы хотите отправить</div>
-                                    <div style="font-size: 32px; font-weight: bold; color: #ffcc66; margin: 8px 0;">+5 УДАРОВ</div>
-                                    <div style="font-size: 14px; opacity: 0.8;">игроку</div>
-                                    <div style="font-size: 20px; font-weight: bold; color: #ffaa33; margin: 8px 0;">${escapeHtml(targetPlayerName)}</div>
-                                </div>
-                                
-                                <div style="background: rgba(0,0,0,0.3); border-radius: 30px; padding: 12px; margin: 16px 0;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span>💰 Стоимость:</span>
-                                        <span style="font-size: 20px; font-weight: bold; color: #ffcc66;">1 💎</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                                        <span>💎 Ваш баланс:</span>
-                                        <span style="font-size: 20px; font-weight: bold; color: ${_diamonds >= 1 ? '#44ff44' : '#ff8888'};">${_diamonds} 💎</span>
-                                    </div>
-                                </div>
-                                
-                                <div style="font-size: 11px; opacity: 0.6; margin: 12px 0;">
-                                    ⏰ Отправлять одному игроку можно раз в час
-                                </div>
-                                
-                                <div style="display: flex; gap: 12px; margin-top: 20px;">
-                                    <button class="modal-btn close" id="cancelGiftBtn" style="flex: 1; background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; color: white; cursor: pointer;">ОТМЕНА</button>
-                                    <button class="modal-btn upgrade" id="confirmGiftBtn" style="flex: 1; background: linear-gradient(135deg, #ffcc66, #ffaa33); border: none; padding: 14px; border-radius: 60px; font-weight: bold; color: #1a1a2e; cursor: pointer;">ОТПРАВИТЬ</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Добавляем модальное окно на страницу
-                const modalDiv = document.createElement('div');
-                modalDiv.innerHTML = modalHtml;
-                document.body.appendChild(modalDiv);
-                
-                const modal = modalDiv.firstElementChild;
-                
-                // Закрытие по клику на фон
-                modal.onclick = (e) => {
-                    if (e.target === modal) {
-                        modalDiv.remove();
-                    }
-                };
-                
-                // Кнопка отмены
-                modal.querySelector('#cancelGiftBtn').onclick = () => {
-                    modalDiv.remove();
-                };
-                
-                // Кнопка подтверждения
-                modal.querySelector('#confirmGiftBtn').onclick = async () => {
-                    modalDiv.remove();
-                    await sendStrikesToPlayer(targetPlayerId, targetPlayerName, 5);
-                };
             }
             
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
@@ -3816,16 +3605,6 @@
             initTopListClickHandler();
             checkDailyLogin();
             updateCalendarUI();
-
-            // Проверка подарков каждые 30 секунд
-            setInterval(() => {
-                if (supabaseClient && _playerId) {
-                    checkGiftNotifications();
-                }
-            }, 30000);
-
-            // При загрузке
-            setTimeout(() => checkGiftNotifications(), 2000);
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
