@@ -3147,7 +3147,7 @@
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
             }
             
-            function loadGame() {
+            async function loadGame() {
                 const saved = localStorage.getItem('minebuff_save');
                 if (saved) {
                     try {
@@ -3218,12 +3218,6 @@
                     document.getElementById('playerId').innerText = _playerId.slice(-12);
                 }
                 
-                // === ПРОВЕРКА КАЛЕНДАРЯ ПРИ ЗАГРУЗКЕ ===
-                const nowDate = new Date();
-                const lastVisit = localStorage.getItem('minebuff_last_visit');
-                if (lastVisit !== nowDate.toDateString()) {
-                }
-                
                 checkDailyReset();
                 updateUI();
                 checkAchievements();
@@ -3253,34 +3247,38 @@
 
                 // Загружаем бонусные удары из базы
                 if (supabaseClient && _playerId) {
-                    const { data } = await supabaseClient
-                        .from('leaderboard')
-                        .select('strikes_extra')
-                        .eq('player_id', _playerId)
-                        .single();
-                    
-                    if (data?.strikes_extra) {
-                        _strikesLimit += data.strikes_extra;
-                        // Обнуляем использованные бонусы
-                        await supabaseClient.from('leaderboard')
-                            .update({ strikes_extra: 0 })
-                            .eq('player_id', _playerId);
-                        saveGame();
-                        updateUI();
-                        showToast(`🎁 Вам подарили +${data.strikes_extra} ударов!`, "#ffd966");
+                    try {
+                        const { data } = await supabaseClient
+                            .from('leaderboard')
+                            .select('strikes_extra')
+                            .eq('player_id', _playerId)
+                            .single();
+                        
+                        if (data?.strikes_extra) {
+                            _strikesLimit += data.strikes_extra;
+                            // Обнуляем использованные бонусы
+                            await supabaseClient.from('leaderboard')
+                                .update({ strikes_extra: 0 })
+                                .eq('player_id', _playerId);
+                            saveGame();
+                            updateUI();
+                            showToast(`🎁 Вам подарили +${data.strikes_extra} ударов!`, "#ffd966");
+                        }
+                    } catch(e) {
+                        console.warn('Ошибка загрузки бонусных ударов:', e);
                     }
-}
-            }     
+                }
+            }   
 
             function checkRankUpgrade() {
-            const currentRank = getCurrentRank();
-            // Сохраняем предыдущий ранг в отдельную переменную
-            if (!_lastRank) _lastRank = currentRank.name;
+                const currentRank = getCurrentRank();
+                // Сохраняем предыдущий ранг в отдельную переменную
+                if (!_lastRank) _lastRank = currentRank.name;
 
-            if (_lastRank !== currentRank.name) {
-                _lastRank = currentRank.name;
-                showToast(`🏆 НОВЫЙ РАНГ: ${currentRank.icon} ${currentRank.name}! +${currentRank.bonus}% к добыче! 🏆`, "#ffd966");
-            }
+                if (_lastRank !== currentRank.name) {
+                    _lastRank = currentRank.name;
+                    showToast(`🏆 НОВЫЙ РАНГ: ${currentRank.icon} ${currentRank.name}! +${currentRank.bonus}% к добыче! 🏆`, "#ffd966");
+                }
             }
 
             function showNameModal() {
