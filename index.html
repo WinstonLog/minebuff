@@ -1659,8 +1659,9 @@
                 updateSettingsUI();
             }
 
-            // Отправка пенделя
+            // Отправка пенделя (с сохранением в БД)
             async function sendPing(targetPlayerId, targetPlayerName) {
+                // Проверяем лимит (1 раз в минуту)
                 const lastPingKey = `last_ping_${_playerId}`;
                 const lastPing = localStorage.getItem(lastPingKey);
                 const now = Date.now();
@@ -1670,22 +1671,30 @@
                     return false;
                 }
                 
+                // Проверяем алмазы
                 if (_diamonds < 1) {
                     showToast("💎 Нужен 1 алмаз, чтобы пнуть игрока!", "#ff8888");
                     return false;
                 }
                 
+                // Списываем алмаз
                 _diamonds -= 1;
+                saveGame();
+                updateUI();
                 
-                const pingData = {
+                // Сохраняем в локальное хранилище как резервную копию
+                let pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
+                pings.push({
                     from_id: _playerId,
                     from_name: _playerName,
                     to_id: targetPlayerId,
                     to_name: targetPlayerName,
                     timestamp: now,
                     claimed: false
-                };
+                });
+                localStorage.setItem('pending_pings', JSON.stringify(pings));
                 
+                // Пытаемся сохранить в Supabase
                 if (supabaseClient) {
                     try {
                         const { error } = await supabaseClient
@@ -1699,28 +1708,26 @@
                                 claimed: false
                             });
                         
-                        if (error) throw error;
-                        showToast(`📢 Вы пнули ${targetPlayerName}!`, "#aaffdd");
-                        
-                        localStorage.setItem(lastPingKey, now.toString());
-                        saveGame();
-                        updateUI();
-                        return true;
-                        
+                        if (error) {
+                            console.warn('Supabase ping error:', error);
+                            // Продолжаем, локальное сохранение уже есть
+                        } else {
+                            console.log('Ping saved to Supabase');
+                            // Удаляем из локального резерва, если сохранилось в БД
+                            const updatedPings = pings.filter(p => 
+                                !(p.to_id === targetPlayerId && p.timestamp === now)
+                            );
+                            localStorage.setItem('pending_pings', JSON.stringify(updatedPings));
+                        }
                     } catch(e) {
-                        console.warn('Ping error:', e);
-                        showToast("❌ Не удалось отправить пендель", "#ff8888");
-                        return false;
+                        console.warn('Ping save error:', e);
                     }
-                } else {
-                    let pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
-                    pings.push(pingData);
-                    localStorage.setItem('pending_pings', JSON.stringify(pings));
-                    showToast(`📢 Пендель для ${targetPlayerName} сохранён!`, "#ffdd99");
-                    localStorage.setItem(lastPingKey, now.toString());
-                    saveGame();
-                    return true;
                 }
+                
+                localStorage.setItem(lastPingKey, now.toString());
+                showToast(`📢 Вы пнули ${targetPlayerName}! Они получат +5 ударов!`, "#aaffdd");
+                
+                return true;
             }
 
             // Проверка онлайн статуса
@@ -1732,66 +1739,84 @@
                 return diffMinutes < 5;
             }
 
-            // Получение и отображение пенделей
+            // Получение и отображение пенделей (из БД и локально)
             async function checkPendingPings() {
-                if (!supabaseClient) {
-                    const pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
-                    const myPings = pings.filter(p => p.to_id === _playerId && !p.claimed);
-                    
-                    if (myPings.length > 0) {
-                        showPingNotification(myPings[0]);
-                        myPings.forEach(p => p.claimed = true);
-                        localStorage.setItem('pending_pings', JSON.stringify(pings));
+                let allPings = [];
+                
+                // 1. Сначала проверяем локальные пендели (резерв)
+                const localPings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
+                const myLocalPings = localPings.filter(p => p.to_id === _playerId && !p.claimed);
+                allPings.push(...myLocalPings);
+                
+                // 2. Проверяем пендели в Supabase
+                if (supabaseClient) {
+                    try {
+                        const { data, error } = await supabaseClient
+                            .from('pings')
+                            .select('*')
+                            .eq('to_player_id', _playerId)
+                            .eq('claimed', false)
+                            .order('created_at', { ascending: true });
+                        
+                        if (!error && data && data.length > 0) {
+                            allPings.push(...data);
+                            
+                            // Отмечаем как прочитанные в БД
+                            for (const ping of data) {
+                                await supabaseClient
+                                    .from('pings')
+                                    .update({ claimed: true, claimed_at: new Date().toISOString() })
+                                    .eq('id', ping.id);
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('Supabase check pings error:', e);
                     }
-                    return;
                 }
                 
-                try {
-                    const { data } = await supabaseClient
-                        .from('pings')
-                        .select('*')
-                        .eq('to_player_id', _playerId)
-                        .eq('claimed', false)
-                        .order('created_at', { ascending: false });
-                    
-                    if (data && data.length > 0) {
-                        for (const ping of data) {
-                            showPingNotification(ping);
-                            
-                            await supabaseClient
-                                .from('pings')
-                                .update({ claimed: true, claimed_at: new Date().toISOString() })
-                                .eq('id', ping.id);
-                            
-                            _strikesLimit += 5;
-                            showToast(`🎁 +5 ударов от ${ping.from_player_name}!`, "#ffcc66");
-                            saveGame();
-                            updateUI();
-                        }
+                // 3. Обрабатываем все найденные пендели
+                if (allPings.length > 0) {
+                    for (const ping of allPings) {
+                        showPingNotification(ping);
+                        
+                        // Даём бонус получателю (+5 ударов)
+                        _strikesLimit += 5;
+                        showToast(`🎁 +5 ударов от ${ping.from_name || ping.from_player_name}!`, "#ffcc66");
+                        saveGame();
+                        updateUI();
                     }
-                } catch(e) {
-                    console.warn('Check pending pings error:', e);
+                    
+                    // Очищаем локальные обработанные пендели
+                    const remainingPings = localPings.filter(p => 
+                        !(p.to_id === _playerId && !p.claimed)
+                    );
+                    localStorage.setItem('pending_pings', JSON.stringify(remainingPings));
                 }
             }
 
             // Показать уведомление о пенделе
             function showPingNotification(ping) {
+                const fromName = ping.from_name || ping.from_player_name;
+                const timestamp = ping.timestamp || (ping.created_at ? new Date(ping.created_at).getTime() : Date.now());
+                
                 const notification = document.createElement('div');
                 notification.className = 'notification-toast success';
                 notification.style.animation = 'slideInRight 0.3s ease';
                 notification.innerHTML = `
                     <div class="notification-icon">🔔</div>
                     <div class="notification-content">
-                        <div class="notification-title">ВАС ПНУЛИ В ШАХТЕ!</div>
-                        <div class="notification-text">${ping.from_player_name} отправил вам пендель! +5 ударов!</div>
-                        <div class="notification-time">${new Date(ping.created_at).toLocaleTimeString()}</div>
+                        <div class="notification-title">🔨 ВАС ПНУЛИ В ШАХТЕ!</div>
+                        <div class="notification-text">${fromName} отправил вам пендель! +5 ударов!</div>
+                        <div class="notification-time">${new Date(timestamp).toLocaleTimeString()}</div>
                     </div>
                 `;
                 
                 notification.onclick = () => {
                     notification.style.animation = 'slideOutRight 0.3s ease';
                     setTimeout(() => notification.remove(), 300);
-                    tryOpenSection('mine', 'minePanel');
+                    // Переключаем на вкладку шахты
+                    const mineTab = document.querySelector('.menu-item[data-tab="mine"]');
+                    if (mineTab) mineTab.click();
                 };
                 
                 const container = document.getElementById('notificationContainer');
@@ -3001,7 +3026,7 @@
                 updatePickaxeVisual();
                 return wasReset;
             }
-            
+                        
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
@@ -3011,7 +3036,7 @@
                         date: card.id || Date.now()
                     }));
                     
-                    await supabaseClient.from('leaderboard').upsert({
+                    const { error } = await supabaseClient.from('leaderboard').upsert({
                         player_id: _playerId,
                         username: _playerName,
                         level: _level,
@@ -3019,11 +3044,16 @@
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
-                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
-                        updated_at: new Date().toISOString()
+                        updated_at: new Date().toISOString(),
+                        event_currency: _eventCurrency || 0  // Добавляем event_currency
                     }, { onConflict: 'player_id' });
                     
-                    hideDBError();
+                    if (error) {
+                        console.warn('Sync error:', error);
+                        showDBError();
+                    } else {
+                        hideDBError();
+                    }
                     
                 } catch(e) { 
                     console.warn('syncToSupabase error:', e);
@@ -3847,9 +3877,18 @@
             updateCalendarUI();
 
             initPingButtons();
+            
+            // Проверяем пендели через 3 секунды после загрузки
             setTimeout(() => {
                 checkPendingPings();
-            }, 2000);
+            }, 3000);
+
+            // Также проверяем при возвращении на вкладку
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    checkPendingPings();
+                }
+            });
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
