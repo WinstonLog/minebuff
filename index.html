@@ -1617,7 +1617,7 @@
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
                 'profile': 1,
-                'social': 5,
+                'social': 1,
                 'mine': 1,
                 'shop': 2,
                 'top': 1,
@@ -1673,13 +1673,14 @@
                 // Списываем алмаз
                 _diamonds -= 1;
                 
-                // Добавляем в историю
-                _sentStrikesHistory.unshift({
+                // Добавляем в историю локально
+                const newTransaction = {
                     to: targetPlayerId,
                     toName: targetPlayerName,
                     amount: 5,
                     date: new Date().toISOString()
-                });
+                };
+                _sentStrikesHistory.unshift(newTransaction);
                 if (_sentStrikesHistory.length > 50) _sentStrikesHistory.pop();
                 
                 saveGame();
@@ -1688,26 +1689,35 @@
                 // Отправляем в Supabase
                 if (supabaseClient) {
                     try {
-                        // 1. Добавляем запись в таблицу strikes_transactions
-                        await supabaseClient.from('strikes_transactions').insert({
+                        const { data, error } = await supabaseClient.from('strikes_transactions').insert({
                             from_player_id: _playerId,
                             from_player_name: _playerName,
                             to_player_id: targetPlayerId,
                             to_player_name: targetPlayerName,
                             amount: 5,
                             status: 'pending'
-                        });
+                        }).select();
                         
-                        // 2. Обновляем статистику отправителя
-                        await supabaseClient.from('leaderboard').upsert({
-                            player_id: _playerId,
-                            sent_strikes: (await getSentStrikesCount()) + 5
-                        }, { onConflict: 'player_id' });
-                        
-                    } catch(e) { console.warn('Send strikes error:', e); }
+                        if (error) {
+                            console.error('Insert error:', error);
+                            showToast("⚠️ Ошибка базы данных! Удары сохранены локально.", "#ffaa88");
+                        } else {
+                            console.log('✅ Транзакция создана:', data);
+                            showToast(`✅ Отправлено +5 ударов игроку ${targetPlayerName}!`, "#aaffdd");
+                            
+                            // Обновляем sent_strikes в leaderboard
+                            await supabaseClient.from('leaderboard').update({
+                                sent_strikes: supabaseClient.rpc('increment', { row_id: _playerId, amount: 5 })
+                            }).eq('player_id', _playerId);
+                        }
+                    } catch(e) { 
+                        console.error('Send strikes error:', e);
+                        showToast("⚠️ Ошибка отправки!", "#ff8888");
+                    }
+                } else {
+                    showToast(`✅ Отправлено +5 ударов игроку ${targetPlayerName}! (локально)`, "#aaffdd");
                 }
                 
-                showToast(`✅ Отправлено +5 ударов игроку ${targetPlayerName}!`, "#aaffdd");
                 updateSocialUI();
                 return true;
             }
@@ -1859,39 +1869,68 @@
                 
                 try {
                     // Получаем все неподтверждённые транзакции для этого игрока
-                    const { data } = await supabaseClient
+                    const { data, error } = await supabaseClient
                         .from('strikes_transactions')
                         .select('*')
                         .eq('to_player_id', _playerId)
                         .eq('status', 'pending');
                     
-                    for (const transaction of data || []) {
-                        // Добавляем удары к текущему дню
-                        _strikesLimit += transaction.amount;
-                        _receivedStrikesToday += transaction.amount;
-                        
-                        // Обновляем статус транзакции
-                        await supabaseClient
-                            .from('strikes_transactions')
-                            .update({ status: 'completed', completed_at: new Date().toISOString() })
-                            .eq('id', transaction.id);
-                        
-                        // Показываем уведомление
-                        showNotification(
-                            '⚡ ПОЛУЧЕНЫ УДАРЫ!',
-                            `${transaction.from_player_name} отправил вам +${transaction.amount} ударов!`,
-                            '🎁',
-                            'success'
-                        );
+                    if (error) {
+                        console.error('Check pending strikes error:', error);
+                        return;
                     }
                     
                     if (data && data.length > 0) {
+                        console.log(`📦 Найдено ${data.length} новых транзакций!`);
+                        
+                        for (const transaction of data) {
+                            // Добавляем удары к текущему лимиту
+                            const newStrikesAmount = transaction.amount;
+                            _strikesLimit += newStrikesAmount;
+                            _receivedStrikesToday += newStrikesAmount;
+                            
+                            console.log(`⚡ +${newStrikesAmount} ударов от ${transaction.from_player_name}`);
+                            
+                            // Обновляем статус транзакции
+                            const { error: updateError } = await supabaseClient
+                                .from('strikes_transactions')
+                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .eq('id', transaction.id);
+                            
+                            if (updateError) {
+                                console.error('Update transaction error:', updateError);
+                            }
+                            
+                            // Показываем уведомление
+                            showNotification(
+                                '⚡ ПОЛУЧЕНЫ УДАРЫ!',
+                                `${transaction.from_player_name} отправил вам +${newStrikesAmount} ударов!`,
+                                '🎁',
+                                'success'
+                            );
+                        }
+                        
+                        // Сохраняем изменения
                         saveGame();
                         updateUI();
+                        
+                        // Показываем тост о получении
+                        showToast(`🎉 Вы получили +${data.reduce((sum, t) => sum + t.amount, 0)} ударов от друзей!`, "#ffd966");
                     }
                 } catch(e) {
-                    console.warn('Check pending strikes error:', e);
+                    console.error('Check pending strikes error:', e);
                 }
+            }
+
+            // Автоматическая проверка новых ударов (каждые 10 секунд вместо 30)
+            function startStrikesChecker() {
+                // Проверяем сразу при загрузке
+                setTimeout(() => checkPendingStrikes(), 2000);
+                
+                // Проверяем каждые 10 секунд
+                setInterval(() => {
+                    checkPendingStrikes();
+                }, 10000);
             }
 
             // Функция проверки ежедневного входа
@@ -3236,7 +3275,12 @@
                 s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
                 s.onload = () => {
                     supabaseClient = window.supabase.createClient('https://eixtvvioqolqeveellvn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpeHR2dmlvcW9scWV2ZWVsbHZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzAzODksImV4cCI6MjA5NDkwNjM4OX0.MIfQwCRudKNMBirDvIluxxFoFZtYeCpHmxgY-cHHrL4');
-                    setTimeout(() => { syncToSupabase(); loadTopFromSupabase(); checkAdminCommands(); }, 500);
+                    setTimeout(() => { 
+                        syncToSupabase(); 
+                        loadTopFromSupabase(); 
+                        checkAdminCommands();
+                        loadPlayersList(); // ← АВТОМАТИЧЕСКАЯ ЗАГРУЗКА
+                    }, 500);
                 };
                 document.head.appendChild(s);
             }
@@ -3876,10 +3920,22 @@
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
 
+            startStrikesChecker();
             // В функцию startNotificationChecker() добавь:
             setInterval(() => {
                 checkPendingStrikes();
             }, 30000); // Каждые 30 секунд
+
+            // Обновление списка по кнопке
+            document.getElementById('refreshPlayersBtn')?.addEventListener('click', () => {
+                loadPlayersList();
+                showToast("🔄 Список игроков обновлён!", "#aaffdd");
+            });
+
+            // Поиск игроков в реальном времени
+            document.getElementById('searchPlayerInput')?.addEventListener('input', () => {
+                renderPlayersList();
+            });
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
