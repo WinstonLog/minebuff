@@ -1019,6 +1019,25 @@
             20% { transform: translate(-50%, -60px) scale(1.5); }
             100% { opacity: 0; transform: translate(-50%, -180px) scale(2); }
         }
+        /* НОВЫЕ СТИЛИ ДЛЯ КНОПКИ ПИНГА */
+        .ping-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            transition: all 0.1s ease;
+            opacity: 0.7;
+        }
+        .ping-btn:hover {
+            transform: scale(1.1);
+            opacity: 1;
+            background: rgba(255, 204, 102, 0.2);
+        }
+        .ping-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -1626,6 +1645,9 @@
                 'settings': 'Настройки'
             };
 
+            // ========== СИСТЕМА ПЕНДЕЛЕЙ (PING) ==========
+            let _pendingPings = []; // Храним пендели для оффлайн игроков
+
             function loadSettings() {
                 const saved = localStorage.getItem('minebuff_settings');
                 if (saved) {
@@ -1635,6 +1657,176 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Отправка пенделя
+            async function sendPing(targetPlayerId, targetPlayerName) {
+                const lastPingKey = `last_ping_${_playerId}`;
+                const lastPing = localStorage.getItem(lastPingKey);
+                const now = Date.now();
+                
+                if (lastPing && (now - parseInt(lastPing)) < 60000) {
+                    showToast("⏰ Подождите минутку перед следующим пенделем!", "#ffaa88");
+                    return false;
+                }
+                
+                if (_diamonds < 1) {
+                    showToast("💎 Нужен 1 алмаз, чтобы пнуть игрока!", "#ff8888");
+                    return false;
+                }
+                
+                _diamonds -= 1;
+                
+                const pingData = {
+                    from_id: _playerId,
+                    from_name: _playerName,
+                    to_id: targetPlayerId,
+                    to_name: targetPlayerName,
+                    timestamp: now,
+                    claimed: false
+                };
+                
+                if (supabaseClient) {
+                    try {
+                        const { error } = await supabaseClient
+                            .from('pings')
+                            .insert({
+                                from_player_id: _playerId,
+                                from_player_name: _playerName,
+                                to_player_id: targetPlayerId,
+                                to_player_name: targetPlayerName,
+                                created_at: new Date().toISOString(),
+                                claimed: false
+                            });
+                        
+                        if (error) throw error;
+                        showToast(`📢 Вы пнули ${targetPlayerName}!`, "#aaffdd");
+                        
+                        localStorage.setItem(lastPingKey, now.toString());
+                        saveGame();
+                        updateUI();
+                        return true;
+                        
+                    } catch(e) {
+                        console.warn('Ping error:', e);
+                        showToast("❌ Не удалось отправить пендель", "#ff8888");
+                        return false;
+                    }
+                } else {
+                    let pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
+                    pings.push(pingData);
+                    localStorage.setItem('pending_pings', JSON.stringify(pings));
+                    showToast(`📢 Пендель для ${targetPlayerName} сохранён!`, "#ffdd99");
+                    localStorage.setItem(lastPingKey, now.toString());
+                    saveGame();
+                    return true;
+                }
+            }
+
+            // Проверка онлайн статуса
+            function checkIfOnline(lastActive) {
+                if (!lastActive) return false;
+                const last = new Date(lastActive);
+                const now = new Date();
+                const diffMinutes = (now - last) / 1000 / 60;
+                return diffMinutes < 5;
+            }
+
+            // Получение и отображение пенделей
+            async function checkPendingPings() {
+                if (!supabaseClient) {
+                    const pings = JSON.parse(localStorage.getItem('pending_pings') || '[]');
+                    const myPings = pings.filter(p => p.to_id === _playerId && !p.claimed);
+                    
+                    if (myPings.length > 0) {
+                        showPingNotification(myPings[0]);
+                        myPings.forEach(p => p.claimed = true);
+                        localStorage.setItem('pending_pings', JSON.stringify(pings));
+                    }
+                    return;
+                }
+                
+                try {
+                    const { data } = await supabaseClient
+                        .from('pings')
+                        .select('*')
+                        .eq('to_player_id', _playerId)
+                        .eq('claimed', false)
+                        .order('created_at', { ascending: false });
+                    
+                    if (data && data.length > 0) {
+                        for (const ping of data) {
+                            showPingNotification(ping);
+                            
+                            await supabaseClient
+                                .from('pings')
+                                .update({ claimed: true, claimed_at: new Date().toISOString() })
+                                .eq('id', ping.id);
+                            
+                            _strikesLimit += 5;
+                            showToast(`🎁 +5 ударов от ${ping.from_player_name}!`, "#ffcc66");
+                            saveGame();
+                            updateUI();
+                        }
+                    }
+                } catch(e) {
+                    console.warn('Check pending pings error:', e);
+                }
+            }
+
+            // Показать уведомление о пенделе
+            function showPingNotification(ping) {
+                const notification = document.createElement('div');
+                notification.className = 'notification-toast success';
+                notification.style.animation = 'slideInRight 0.3s ease';
+                notification.innerHTML = `
+                    <div class="notification-icon">🔔</div>
+                    <div class="notification-content">
+                        <div class="notification-title">ВАС ПНУЛИ В ШАХТЕ!</div>
+                        <div class="notification-text">${ping.from_player_name} отправил вам пендель! +5 ударов!</div>
+                        <div class="notification-time">${new Date(ping.created_at).toLocaleTimeString()}</div>
+                    </div>
+                `;
+                
+                notification.onclick = () => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                    tryOpenSection('mine', 'minePanel');
+                };
+                
+                const container = document.getElementById('notificationContainer');
+                if (container) {
+                    container.appendChild(notification);
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.style.animation = 'slideOutRight 0.3s ease';
+                            setTimeout(() => notification.remove(), 300);
+                        }
+                    }, 8000);
+                }
+            }
+
+            // Инициализация кнопок пинга
+            function initPingButtons() {
+                document.addEventListener('click', async (e) => {
+                    const pingBtn = e.target.closest('.ping-btn');
+                    if (pingBtn) {
+                        e.stopPropagation();
+                        const targetId = pingBtn.getAttribute('data-player-id');
+                        const targetName = pingBtn.getAttribute('data-player-name');
+                        
+                        if (targetId === _playerId) {
+                            showToast("😂 Нельзя пнуть самого себя!", "#ffaa88");
+                            return;
+                        }
+                        
+                        const confirmed = confirm(`Отправить пендель ${targetName}? (-1💎, они получат +5 ударов)`);
+                        if (confirmed) {
+                            await sendPing(targetId, targetName);
+                            loadTopFromSupabase();
+                        }
+                    }
+                });
             }
 
             // Функция проверки ежедневного входа
@@ -2951,8 +3143,11 @@
                                     data-player-level="${p.level}"
                                     data-mb-link="${p.mb_link || ''}"
                                     data-cards-json='${JSON.stringify(p.cards_json || [])}'>
-                                    <div style="display: flex; flex-direction: column;">
-                                        <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                                    <div style="display: flex; flex-direction: column; flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
+                                            ${!isCurrent ? `<button class="ping-btn" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px;" title="Пнуть игрока (+5 ударов ему, -1💎 вам)">⏰</button>` : ''}
+                                        </div>
                                         <span style="font-size: 9px; color: ${status.color};">${status.text}</span>
                                     </div>
                                     <span>⭐ Ур.${p.level}</span>
@@ -3059,6 +3254,8 @@
                         _luckBoostEndTime = d.luckBoostEndTime || null;
                         
                         _eventCurrency = d.eventCurrency || 0; 
+
+                        _pendingPings = d.pendingPings || [];
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3605,6 +3802,11 @@
             initTopListClickHandler();
             checkDailyLogin();
             updateCalendarUI();
+
+            initPingButtons();
+            setTimeout(() => {
+                checkPendingPings();
+            }, 2000);
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
