@@ -3245,7 +3245,6 @@
                         .catch(e => console.warn(e));
                 }
 
-                // Загружаем бонусные удары из базы
                 if (supabaseClient && _playerId) {
                     try {
                         const { data } = await supabaseClient
@@ -3256,7 +3255,6 @@
                         
                         if (data?.strikes_extra) {
                             _strikesLimit += data.strikes_extra;
-                            // Обнуляем использованные бонусы
                             await supabaseClient.from('leaderboard')
                                 .update({ strikes_extra: 0 })
                                 .eq('player_id', _playerId);
@@ -3307,13 +3305,26 @@
                 document.body.appendChild(div);
                 setTimeout(() => div.remove(), 1000);
             }
-
-            // Делегирование событий для топа (один обработчик вместо многих)
+            
+            // Делегирование событий для топа
             function initTopListClickHandler() {
                 const topListContainer = document.getElementById('topList');
                 if (!topListContainer) return;
                 
                 topListContainer.addEventListener('click', async (e) => {
+                    // Проверяем, нажата ли кнопка подарка
+                    const giftBtn = e.target.closest('.gift-strikes-btn');
+                    if (giftBtn) {
+                        e.stopPropagation();
+                        const targetPlayerId = giftBtn.getAttribute('data-id');
+                        const targetPlayerName = giftBtn.getAttribute('data-name');
+                        
+                        // Открываем модальное окно с информацией об игроке
+                        showGiftConfirmModal(targetPlayerId, targetPlayerName);
+                        return;
+                    }
+                    
+                    // Обычный клик по элементу списка (открытие профиля)
                     const li = e.target.closest('li[data-player-id]');
                     if (!li) return;
                     
@@ -3381,6 +3392,74 @@
                         });
                     }
                 });
+            }
+
+            // Показать модальное окно для подтверждения отправки ударов
+            function showGiftConfirmModal(targetPlayerId, targetPlayerName) {
+                // Создаём модальное окно
+                const modalHtml = `
+                    <div class="gift-confirm-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 400; display: flex; justify-content: center; align-items: center;">
+                        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 56px; width: 90%; max-width: 360px; text-align: center; overflow: hidden; animation: modalSlideIn 0.3s ease; border: 1px solid #ffcc66;">
+                            <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); padding: 20px;">
+                                <div style="font-size: 48px;">🎁</div>
+                                <div style="font-size: 20px; font-weight: 800; color: #1a1a2e;">ПОДАРОК ИГРОКУ</div>
+                            </div>
+                            <div style="padding: 24px 20px;">
+                                <div style="margin-bottom: 16px;">
+                                    <div style="font-size: 14px; opacity: 0.8;">Вы хотите отправить</div>
+                                    <div style="font-size: 32px; font-weight: bold; color: #ffcc66; margin: 8px 0;">+5 УДАРОВ</div>
+                                    <div style="font-size: 14px; opacity: 0.8;">игроку</div>
+                                    <div style="font-size: 20px; font-weight: bold; color: #ffaa33; margin: 8px 0;">${escapeHtml(targetPlayerName)}</div>
+                                </div>
+                                
+                                <div style="background: rgba(0,0,0,0.3); border-radius: 30px; padding: 12px; margin: 16px 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>💰 Стоимость:</span>
+                                        <span style="font-size: 20px; font-weight: bold; color: #ffcc66;">1 💎</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                        <span>💎 Ваш баланс:</span>
+                                        <span style="font-size: 20px; font-weight: bold; color: ${_diamonds >= 1 ? '#44ff44' : '#ff8888'};">${_diamonds} 💎</span>
+                                    </div>
+                                </div>
+                                
+                                <div style="font-size: 11px; opacity: 0.6; margin: 12px 0;">
+                                    ⏰ Отправлять одному игроку можно раз в час
+                                </div>
+                                
+                                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                                    <button class="modal-btn close" id="cancelGiftBtn" style="flex: 1; background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; color: white; cursor: pointer;">ОТМЕНА</button>
+                                    <button class="modal-btn upgrade" id="confirmGiftBtn" style="flex: 1; background: linear-gradient(135deg, #ffcc66, #ffaa33); border: none; padding: 14px; border-radius: 60px; font-weight: bold; color: #1a1a2e; cursor: pointer;">ОТПРАВИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Добавляем модальное окно на страницу
+                const modalDiv = document.createElement('div');
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+                
+                const modal = modalDiv.firstElementChild;
+                
+                // Закрытие по клику на фон
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        modalDiv.remove();
+                    }
+                };
+                
+                // Кнопка отмены
+                modal.querySelector('#cancelGiftBtn').onclick = () => {
+                    modalDiv.remove();
+                };
+                
+                // Кнопка подтверждения
+                modal.querySelector('#confirmGiftBtn').onclick = async () => {
+                    modalDiv.remove();
+                    await sendStrikesToPlayer(targetPlayerId, targetPlayerName, 5);
+                };
             }
             
             function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
