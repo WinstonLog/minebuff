@@ -3032,6 +3032,9 @@
             }
             
             function showPlayerProfileModal(data) {
+                const isCurrentPlayer = data.playerId === _playerId;
+                const status = getOnlineStatus(data.lastActive);
+                
                 const modalHtml = `
                     <div class="profile-link-content" style="max-width: 380px;">
                         <div class="profile-link-header">
@@ -3041,6 +3044,7 @@
                         <div class="profile-link-body">
                             <div style="margin-bottom: 12px; text-align: center;">
                                 <strong style="font-size: 20px; color: #ffcc66;">${escapeHtml(data.playerName)}</strong>
+                                <div style="font-size: 12px; margin-top: 5px; color: ${status.color};">${status.text}</div>
                             </div>
                             
                             <div style="display: flex; gap: 12px; margin: 12px 0;">
@@ -3068,6 +3072,7 @@
                             ` : ''}
                             
                             <div class="modal-buttons" style="gap: 12px; margin-top: 16px;">
+                                ${!isCurrentPlayer ? `<button class="modal-btn upgrade" id="pingPlayerBtn" style="background: linear-gradient(135deg, #ffaa33, #ff6600);">⏰ ПНУТЬ ИГРОКА (-1💎)</button>` : ''}
                                 <button class="modal-btn close" id="profileModalCloseBtn">ЗАКРЫТЬ</button>
                             </div>
                         </div>
@@ -3084,8 +3089,23 @@
                 modalDiv.innerHTML = modalHtml;
                 document.body.appendChild(modalDiv);
                 
+                // Закрытие по кнопке
                 modalDiv.querySelector('#profileModalCloseBtn').onclick = () => modalDiv.remove();
+                
+                // Закрытие по клику на фон
                 modalDiv.onclick = (e) => { if (e.target === modalDiv) modalDiv.remove(); };
+                
+                // Кнопка пинга (если есть)
+                const pingBtn = modalDiv.querySelector('#pingPlayerBtn');
+                if (pingBtn) {
+                    pingBtn.onclick = async () => {
+                        modalDiv.remove();
+                        const confirmed = confirm(`Отправить пендель ${data.playerName}? (-1💎, они получат +5 ударов)`);
+                        if (confirmed) {
+                            await sendPing(data.playerId, data.playerName);
+                        }
+                    };
+                }
             }
 
             let topLoadAttempts = 0;
@@ -3142,11 +3162,23 @@
                                     data-player-name="${escapeHtml(p.username)}"
                                     data-player-level="${p.level}"
                                     data-mb-link="${p.mb_link || ''}"
-                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'>
+                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'
+                                    data-last-active="${p.last_active || ''}">
                                     <div style="display: flex; flex-direction: column; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span>${medal} ${escapeHtml(p.username.slice(0, 15))}</span>
-                                            ${!isCurrent ? `<button class="ping-btn" data-player-id="${p.player_id}" data-player-name="${escapeHtml(p.username)}" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px;" title="Пнуть игрока (+5 ударов ему, -1💎 вам)">⏰</button>` : ''}
+                                            <!-- ЧАСЫ ТЕПЕРЬ ПРОСТО ВЫЗЫВАЮТ ПРОФИЛЬ -->
+                                            <button class="profile-view-btn" 
+                                                    data-player-id="${p.player_id}"
+                                                    data-player-name="${escapeHtml(p.username)}"
+                                                    data-player-level="${p.level}"
+                                                    data-mb-link="${p.mb_link || ''}"
+                                                    data-cards-json='${JSON.stringify(p.cards_json || [])}'
+                                                    data-last-active="${p.last_active || ''}"
+                                                    style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 5px;" 
+                                                    title="Просмотр профиля">
+                                                👤
+                                            </button>
                                         </div>
                                         <span style="font-size: 9px; color: ${status.color};">${status.text}</span>
                                     </div>
@@ -3379,71 +3411,82 @@
                 if (!topListContainer) return;
                 
                 topListContainer.addEventListener('click', async (e) => {
+                    // Проверяем, не нажата ли кнопка профиля
+                    const profileBtn = e.target.closest('.profile-view-btn');
                     const li = e.target.closest('li[data-player-id]');
-                    if (!li) return;
                     
-                    e.stopPropagation();
+                    if (!li) return;
                     
                     const targetPlayerId = li.getAttribute('data-player-id');
                     const targetPlayerName = li.getAttribute('data-player-name');
                     const targetMbLink = li.getAttribute('data-mb-link');
                     const targetCardsJson = li.getAttribute('data-cards-json');
                     const targetPlayerLevel = li.getAttribute('data-player-level');
+                    const targetLastActive = li.getAttribute('data-last-active');
                     
-                    if (targetPlayerId === _playerId) {
-                        // Свой профиль - показываем из локальных данных
-                        const myCounts = getCardCounts();
-                        const myCardsHtml = rankNames
-                            .filter(rank => myCounts[rank] > 0)
-                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
-                            .join('');
+                    // Если нажата кнопка профиля ИЛИ вся строка (но не пингуем сами себя)
+                    if (profileBtn || targetPlayerId !== _playerId) {
+                        e.stopPropagation();
                         
-                        showPlayerProfileModal({
-                            playerName: _playerName,
-                            level: _level,
-                            totalCards: _cardHistory.length,
-                            cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                            mbLink: _mbProfileLink
-                        });
-                    } else {
-                        // Чужой профиль - используем данные из БД
-                        showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
-                        
-                        // Парсим карты из атрибута
-                        let playerCards = [];
-                        try {
-                            if (targetCardsJson && targetCardsJson !== '[]') {
-                                playerCards = JSON.parse(targetCardsJson);
-                            }
-                        } catch(e) { 
-                            console.warn('Parse cards error:', e); 
-                        }
-                        
-                        // Подсчитываем карты
-                        const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
-                        let totalCards = 0;
-                        
-                        if (playerCards && Array.isArray(playerCards)) {
-                            playerCards.forEach(card => {
-                                if (card.rank && counts[card.rank] !== undefined) {
-                                    counts[card.rank]++;
-                                    totalCards++;
+                        if (targetPlayerId === _playerId) {
+                            // Свой профиль - показываем из локальных данных
+                            const myCounts = getCardCounts();
+                            const myCardsHtml = rankNames
+                                .filter(rank => myCounts[rank] > 0)
+                                .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${myCounts[rank]} шт.</div>`)
+                                .join('');
+                            
+                            showPlayerProfileModal({
+                                playerId: _playerId,
+                                playerName: _playerName,
+                                level: _level,
+                                totalCards: _cardHistory.length,
+                                cardsHtml: myCardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                                mbLink: _mbProfileLink,
+                                lastActive: _lastActive
+                            });
+                        } else {
+                            // Чужой профиль - используем данные из БД
+                            showToast(`📥 Загрузка профиля ${targetPlayerName}...`, "#aaffdd");
+                            
+                            // Парсим карты из атрибута
+                            let playerCards = [];
+                            try {
+                                if (targetCardsJson && targetCardsJson !== '[]') {
+                                    playerCards = JSON.parse(targetCardsJson);
                                 }
+                            } catch(e) { 
+                                console.warn('Parse cards error:', e); 
+                            }
+                            
+                            // Подсчитываем карты
+                            const counts = { 'A':0, 'P':0, 'G':0, 'B':0, 'C':0, 'D':0, 'E':0, 'V':0, 'L':0, 'H':0, 'N':0 };
+                            let totalCards = 0;
+                            
+                            if (playerCards && Array.isArray(playerCards)) {
+                                playerCards.forEach(card => {
+                                    if (card.rank && counts[card.rank] !== undefined) {
+                                        counts[card.rank]++;
+                                        totalCards++;
+                                    }
+                                });
+                            }
+                            
+                            const cardsHtml = rankNames
+                                .filter(rank => counts[rank] > 0)
+                                .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
+                                .join('');
+                            
+                            showPlayerProfileModal({
+                                playerId: targetPlayerId,
+                                playerName: targetPlayerName,
+                                level: targetPlayerLevel || '?',
+                                totalCards: totalCards,
+                                cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
+                                mbLink: targetMbLink,
+                                lastActive: targetLastActive
                             });
                         }
-                        
-                        const cardsHtml = rankNames
-                            .filter(rank => counts[rank] > 0)
-                            .map(rank => `<div class="card-badge ${rank}" style="font-size: 12px; padding: 4px 10px;">${rank}: ${counts[rank]} шт.</div>`)
-                            .join('');
-                        
-                        showPlayerProfileModal({
-                            playerName: targetPlayerName,
-                            level: targetPlayerLevel || '?',
-                            totalCards: totalCards,
-                            cardsHtml: cardsHtml || '<div style="text-align: center; opacity: 0.6;">🎴 Нет карт</div>',
-                            mbLink: targetMbLink
-                        });
                     }
                 });
             }
