@@ -1075,7 +1075,7 @@
                     </div>
                 </div>
 
-                <div class="strikes-counter">💥 УДАРОВ: <span id="strikesDone">0</span> / <span id="strikesLimit">100</span></div>
+                <div class="strikes-counter">💥 УДАРОВ: <span id="strikesDone">0</span> / <span id="strikesLimit">100</span><span id="boosterDisplay" style="font-size: 10px; margin-left: 8px; color: #ffaa33;"></span></div>
 
                 <div class="player-info" style="margin-top: 8px; background: linear-gradient(135deg, #3a6b58, #1e3e31);">
                     <span>🏅 <span id="mineRankName">Новичок</span></span>
@@ -1613,6 +1613,9 @@
             let _sentStrikesHistory = []; // История отправок [{to: playerId, toName: name, amount: 5, date: timestamp}]
             let _receivedStrikesToday = 0; // Сколько ударов получено сегодня (сбрасывается в 0 каждый день)
             let _playersList = []; // Кэш списка игроков
+
+            let _boosterStrikes = 0;      // Бустерные удары от друзей (добавляются к лимиту)
+            let _baseStrikesLimit = 100;  // Базовый лимит (зависит от уровня)
 
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
@@ -3127,7 +3130,11 @@
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
-                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
+                        event_currency: _eventCurrency,
+                        sent_strikes: _sentStrikesHistory.reduce((sum, h) => sum + h.amount, 0),
+                        booster_strikes: _boosterStrikes,  // ← ДОБАВИТЬ
+                        base_strikes_limit: _baseStrikesLimit,  // ← ДОБАВИТЬ
+                        received_booster_today: _receivedStrikesToday,  // ← ДОБАВИТЬ
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                     
@@ -3294,24 +3301,45 @@
                 document.getElementById('diamondValue').innerText = Math.floor(_diamonds);
                 document.getElementById('levelValue').innerText = _level;
                 document.getElementById('strikesDone').innerText = _strikesDone;
-                document.getElementById('strikesLimit').innerText = _strikesLimit;
+                
+                // Общий лимит = базовый + бустер
+                const totalLimit = _baseStrikesLimit + _boosterStrikes;
+                document.getElementById('strikesLimit').innerHTML = totalLimit;
+                
+                // Показываем бустер, если он есть
+                const boosterSpan = document.getElementById('boosterDisplay');
+                if (boosterSpan) {
+                    if (_boosterStrikes > 0) {
+                        boosterSpan.innerHTML = ` (+${_boosterStrikes} бонус)`;
+                        boosterSpan.style.display = 'inline';
+                    } else {
+                        boosterSpan.style.display = 'none';
+                    }
+                }
+                
+                // Остальной код...
                 document.getElementById('profileLevel').innerText = _level;
                 document.getElementById('profileDiamonds').innerText = Math.floor(_diamonds);
                 document.getElementById('profileCards').innerText = _cardHistory.length;
+                
                 const maxS = Math.min(_ore, 10000);
                 const slider = document.getElementById('exchangeSlider');
                 if (slider) { slider.max = maxS; if (slider.value > maxS) slider.value = maxS; document.getElementById('exchangeAmount').innerText = slider.value; }
+                
                 const today = new Date().toDateString();
                 const bonusBlock = document.getElementById('bonusBlock');
                 if (bonusBlock) { if (_lastBonusDate && _lastBonusDate.toDateString() === today) bonusBlock.classList.add('hidden'); else bonusBlock.classList.remove('hidden'); }
+                
                 const historyContainer = document.getElementById('historyContainer');
                 if (historyContainer) {
                     if (!_cardHistory.length) historyContainer.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
                     else historyContainer.innerHTML = _cardHistory.map(i => `<div class="history-item" style="background: ${rankGradients[i.rank] || '#3a2a2a'};">${escapeHtml(i.text)}</div>`).join('');
                 }
+                
                 const counts = getCardCounts();
                 const cardsHtml = rankNames.map(r => `<div class="card-badge ${r}">${r}: ${counts[r]} шт.</div>`).join('');
                 if (document.getElementById('cardsStats')) document.getElementById('cardsStats').innerHTML = cardsHtml;
+                
                 updatePickaxeVisual();
                 updateMiningInProfile();
                 updateRankUI(); 
@@ -3369,6 +3397,9 @@
 
                         _sentStrikesHistory = d.sentStrikesHistory || [];
                         _receivedStrikesToday = d.receivedStrikesToday || 0;
+
+                        _boosterStrikes = d.boosterStrikes || 0;
+                        _baseStrikesLimit = d.baseStrikesLimit || 100;
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
