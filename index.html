@@ -1686,7 +1686,7 @@
                 saveGame();
                 updateUI();
                 
-                // Отправляем в Supabase
+                // Отправляем в Supabase со статусом 'pending' (ВАЖНО!)
                 if (supabaseClient) {
                     try {
                         const { data, error } = await supabaseClient.from('strikes_transactions').insert({
@@ -1695,20 +1695,15 @@
                             to_player_id: targetPlayerId,
                             to_player_name: targetPlayerName,
                             amount: 5,
-                            status: 'pending'
+                            status: 'pending'  // ← ДОЛЖНО БЫТЬ 'pending', НЕ 'completed'!
                         }).select();
                         
                         if (error) {
                             console.error('Insert error:', error);
                             showToast("⚠️ Ошибка базы данных! Удары сохранены локально.", "#ffaa88");
                         } else {
-                            console.log('✅ Транзакция создана:', data);
+                            console.log('✅ Транзакция создана со статусом pending:', data);
                             showToast(`✅ Отправлено +5 ударов игроку ${targetPlayerName}!`, "#aaffdd");
-                            
-                            // Обновляем sent_strikes в leaderboard
-                            await supabaseClient.from('leaderboard').update({
-                                sent_strikes: supabaseClient.rpc('increment', { row_id: _playerId, amount: 5 })
-                            }).eq('player_id', _playerId);
                         }
                     } catch(e) { 
                         console.error('Send strikes error:', e);
@@ -1721,7 +1716,6 @@
                 updateSocialUI();
                 return true;
             }
-
             // Получение количества отправленных ударов
             async function getSentStrikesCount() {
                 if (!supabaseClient || !_playerId) return _sentStrikesHistory.reduce((sum, h) => sum + h.amount, 0);
@@ -1868,12 +1862,12 @@
                 if (!supabaseClient || !_playerId) return;
                 
                 try {
-                    // Получаем все неподтверждённые транзакции для этого игрока
+                    // Получаем ВСЕ неподтверждённые транзакции для этого игрока
                     const { data, error } = await supabaseClient
                         .from('strikes_transactions')
                         .select('*')
                         .eq('to_player_id', _playerId)
-                        .eq('status', 'pending');
+                        .eq('status', 'pending');  // ← ТОЛЬКО PENDING!
                     
                     if (error) {
                         console.error('Check pending strikes error:', error);
@@ -1881,27 +1875,35 @@
                     }
                     
                     if (data && data.length > 0) {
-                        console.log(`📦 Найдено ${data.length} новых транзакций!`);
+                        console.log(`📦 Найдено ${data.length} новых транзакций!`, data);
+                        
+                        let totalStrikes = 0;
                         
                         for (const transaction of data) {
                             // Добавляем удары к текущему лимиту
                             const newStrikesAmount = transaction.amount;
                             _strikesLimit += newStrikesAmount;
                             _receivedStrikesToday += newStrikesAmount;
+                            totalStrikes += newStrikesAmount;
                             
                             console.log(`⚡ +${newStrikesAmount} ударов от ${transaction.from_player_name}`);
                             
-                            // Обновляем статус транзакции
+                            // Обновляем статус транзакции на 'completed'
                             const { error: updateError } = await supabaseClient
                                 .from('strikes_transactions')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
+                                .update({ 
+                                    status: 'completed', 
+                                    completed_at: new Date().toISOString() 
+                                })
                                 .eq('id', transaction.id);
                             
                             if (updateError) {
                                 console.error('Update transaction error:', updateError);
+                            } else {
+                                console.log(`✅ Транзакция ${transaction.id} помечена как completed`);
                             }
                             
-                            // Показываем уведомление
+                            // Показываем уведомление для каждой транзакции
                             showNotification(
                                 '⚡ ПОЛУЧЕНЫ УДАРЫ!',
                                 `${transaction.from_player_name} отправил вам +${newStrikesAmount} ударов!`,
@@ -1915,7 +1917,9 @@
                         updateUI();
                         
                         // Показываем тост о получении
-                        showToast(`🎉 Вы получили +${data.reduce((sum, t) => sum + t.amount, 0)} ударов от друзей!`, "#ffd966");
+                        if (totalStrikes > 0) {
+                            showToast(`🎉 Вы получили +${totalStrikes} ударов от друзей! Новый лимит: ${_strikesLimit}`, "#ffd966");
+                        }
                     }
                 } catch(e) {
                     console.error('Check pending strikes error:', e);
