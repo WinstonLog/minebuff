@@ -1162,10 +1162,10 @@
                     <div id="profileLinkStatus"></div>
                 </div>
 
-                <div style="background: #071217cc; border-radius: 30px; padding: 8px 12px; margin-top: 12px; text-align: center; font-size: 11px;">
+<!--                 <div style="background: #071217cc; border-radius: 30px; padding: 8px 12px; margin-top: 12px; text-align: center; font-size: 11px;">
                     🎴 <strong style="color: #ffcc66;">L, V, N, H</strong> — эксклюзивные сезонные ранги.<br>
                     ❌ На реальные карты <strong>НЕ ОБМЕНИВАЮТСЯ</strong>.
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -2511,7 +2511,59 @@
                         showToast(`✅ Профиль ${_mbProfileLink} действителен!`, "#aaffdd");
                     });
             }
+                            
+            // Функция для обработки дубликатов mb_link
+            async function handleDuplicateMbLink() {
+                if (!supabaseClient || !_mbProfileLink) return;
                 
+                try {
+                    // Ищем ВСЕХ игроков с этим mb_link
+                    const { data, error } = await supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, username')
+                        .eq('mb_link', _mbProfileLink);
+                    
+                    if (error) throw error;
+                    
+                    if (data && data.length > 1) {
+                        // Найдено несколько игроков с одинаковым mb_link!
+                        console.warn(`⚠️ Обнаружены дубликаты mb_link ${_mbProfileLink}:`, data);
+                        
+                        // Находим самого старого игрока (по дате создания или по id)
+                        // или просто оставляем привязку только у первого
+                        const keepPlayer = data[0]; // первый по алфавиту или порядку
+                        
+                        if (keepPlayer.player_id !== _playerId) {
+                            // Текущий игрок НЕ является "владельцем" - сбрасываем привязку
+                            showToast(`⚠️ Профиль ${_mbProfileLink} принадлежит другому игроку! Привязка удалена.`, "#ff8888");
+                            _mbProfileLink = null;
+                            saveGame();
+                            updateProfileLinkUI();
+                            
+                            // ОПЦИОНАЛЬНО: исправляем дубликат в БД
+                            await supabaseClient
+                                .from('leaderboard')
+                                .update({ mb_link: null })
+                                .eq('player_id', _playerId);
+                        } else {
+                            // Текущий игрок - владелец, сбрасываем дубликаты у других
+                            showToast(`⚠️ Обнаружен дубликат профиля! Исправление...`, "#ffaa88");
+                            
+                            for (const player of data) {
+                                if (player.player_id !== _playerId) {
+                                    await supabaseClient
+                                        .from('leaderboard')
+                                        .update({ mb_link: null })
+                                        .eq('player_id', player.player_id);
+                                }
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.error('handleDuplicateMbLink error:', e);
+                }
+            }
+
             function saveMbProfileLink(linkId) {
                 // Проверка: нельзя привязать пустую ссылку
                 if (!linkId || linkId.trim() === '') {
@@ -3141,7 +3193,7 @@
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
             }
             
-            function loadGame() {
+            async function loadGame() {
                 const saved = localStorage.getItem('minebuff_save');
                 if (saved) {
                     try {
@@ -3219,25 +3271,51 @@
                 }
 
                 if (_mbProfileLink && supabaseClient) {
-                    supabaseClient
+                    // Проверяем, нет ли дубликатов
+                    const { data: allWithSameLink, error: dupError } = await supabaseClient
                         .from('leaderboard')
                         .select('player_id, username')
-                        .eq('mb_link', _mbProfileLink)
-                        .neq('player_id', _playerId)  // Не равно текущему игроку
-                        .single()
-                        .then(({ data }) => {
-                            if (data) {
-                                // Этот профиль уже привязан к другому игроку!
-                                console.warn(`⚠️ Профиль ${_mbProfileLink} теперь принадлежит игроку ${data.username}`);
-                                showToast(`⚠️ Ваша привязка профиля устарела! Профиль ${_mbProfileLink} занят другим игроком.`, "#ffaa88");
-                                _mbProfileLink = null;
-                                saveGame();
-                                updateProfileLinkUI();
+                        .eq('mb_link', _mbProfileLink);
+                    
+                    if (dupError) {
+                        console.error('Check mb_link error:', dupError);
+                        return;
+                    }
+                    
+                    if (allWithSameLink && allWithSameLink.length > 1) {
+                        // Есть дубликаты!
+                        console.warn(`⚠️ Профиль ${_mbProfileLink} привязан к ${allWithSameLink.length} аккаунтам!`);
+                        
+                        // Оставляем привязку только у самого "старого" игрока
+                        const keepPlayer = allWithSameLink[0];
+                        
+                        if (keepPlayer.player_id !== _playerId) {
+                            showToast(`⚠️ Профиль ${_mbProfileLink} принадлежит другому игроку! Привязка удалена.`, "#ff8888");
+                            _mbProfileLink = null;
+                            saveGame();
+                            updateProfileLinkUI();
+                        } else {
+                            showToast(`⚠️ Обнаружен дубликат профиля! Лишние привязки удалены.`, "#ffaa88");
+                        }
+                        
+                        // Очищаем дубликаты в БД
+                        for (const player of allWithSameLink) {
+                            if (player.player_id !== keepPlayer.player_id) {
+                                await supabaseClient
+                                    .from('leaderboard')
+                                    .update({ mb_link: null })
+                                    .eq('player_id', player.player_id);
                             }
-                        })
-                        .catch(() => {
-                            // Профиль свободен или не найден - всё ок
-                        });
+                        }
+                    } else if (allWithSameLink && allWithSameLink.length === 1) {
+                        // Всё нормально, только один игрок
+                        if (allWithSameLink[0].player_id !== _playerId) {
+                            showToast(`⚠️ Профиль ${_mbProfileLink} занят другим игроком!`, "#ffaa88");
+                            _mbProfileLink = null;
+                            saveGame();
+                            updateProfileLinkUI();
+                        }
+                    }
                 }
                 
                 checkDailyReset();
