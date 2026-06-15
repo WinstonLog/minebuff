@@ -2448,15 +2448,70 @@
             function updateProfileLinkUI() {
                 const section = document.getElementById('profileLinkSection');
                 if (!section) return;
+                
                 if (_mbProfileLink) {
-                    section.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРОФИЛЬ ПРИВЯЗАН</div><div style="background: #0f1a1f; border-radius: 30px; padding: 8px;"><a href="https://mangabuff.ru/users/${_mbProfileLink}" target="_blank" style="color: #ffcc66; text-decoration: none; font-size: 14px;">📎 mangabuff.ru/users/${_mbProfileLink}</a></div><div class="profile-link-info" style="margin-top: 8px;">✅ Привязан навсегда</div>`;
+                    section.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРОФИЛЬ ПРИВЯЗАН</div>
+                        <div style="background: #0f1a1f; border-radius: 30px; padding: 8px;">
+                            <a href="https://mangabuff.ru/users/${_mbProfileLink}" target="_blank" style="color: #ffcc66; text-decoration: none; font-size: 14px;">
+                                📎 mangabuff.ru/users/${_mbProfileLink}
+                            </a>
+                        </div>
+                        <div class="profile-link-info" style="margin-top: 8px;">
+                            ✅ Привязан навсегда
+                            <button id="checkProfileLinkBtn" style="background: #3a6b58; border: none; border-radius: 20px; padding: 4px 12px; margin-left: 8px; cursor: pointer; font-size: 10px;">
+                                🔍 Проверить
+                            </button>
+                        </div>
+                    `;
+                    
+                    const checkBtn = document.getElementById('checkProfileLinkBtn');
+                    if (checkBtn) {
+                        checkBtn.onclick = () => checkProfileLinkValidity();
+                    }
                 } else {
-                    section.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div><button class="profile-link-btn" id="openProfileLinkModalBtn">ПРИВЯЗАТЬ</button><div class="profile-link-info">Привяжите профиль, чтобы другие могли открыть его в топе</div>`;
+                    section.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 8px;">🔗 ПРИВЯЗАТЬ ПРОФИЛЬ MANGABUFF</div>
+                        <button class="profile-link-btn" id="openProfileLinkModalBtn">ПРИВЯЗАТЬ</button>
+                        <div class="profile-link-info">Привяжите профиль, чтобы другие могли открыть его в топе</div>
+                    `;
                     const btn = document.getElementById('openProfileLinkModalBtn');
                     if (btn) btn.onclick = () => document.getElementById('profileLinkModal').classList.add('show');
                 }
             }
-            
+
+            function checkProfileLinkValidity() {
+                if (!_mbProfileLink) {
+                    showToast("❌ Профиль не привязан!", "#ff8888");
+                    return;
+                }
+                
+                if (!supabaseClient) {
+                    showToast("⚠️ Подождите, соединение с сервером...", "#ffaa88");
+                    return;
+                }
+                
+                supabaseClient
+                    .from('leaderboard')
+                    .select('player_id, username')
+                    .eq('mb_link', _mbProfileLink)
+                    .neq('player_id', _playerId)
+                    .single()
+                    .then(({ data }) => {
+                        if (data) {
+                            showToast(`⚠️ ВНИМАНИЕ! Профиль ${_mbProfileLink} теперь принадлежит игроку ${data.username}! Привязка будет удалена.`, "#ff8888");
+                            _mbProfileLink = null;
+                            saveGame();
+                            updateProfileLinkUI();
+                        } else {
+                            showToast(`✅ Профиль ${_mbProfileLink} всё ещё ваш!`, "#aaffdd");
+                        }
+                    })
+                    .catch(() => {
+                        showToast(`✅ Профиль ${_mbProfileLink} действителен!`, "#aaffdd");
+                    });
+            }
+                
             function saveMbProfileLink(linkId) {
                 // Проверка: нельзя привязать пустую ссылку
                 if (!linkId || linkId.trim() === '') {
