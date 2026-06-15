@@ -2458,11 +2458,64 @@
             }
             
             function saveMbProfileLink(linkId) {
+                // Проверка: нельзя привязать пустую ссылку
+                if (!linkId || linkId.trim() === '') {
+                    showToast("❌ Введите ID профиля!", "#ff8888");
+                    return false;
+                }
+                
+                // Проверка: нельзя привязать, если уже привязан
+                if (_mbProfileLink) {
+                    showToast("❌ Вы уже привязали профиль! Это нельзя изменить!", "#ff8888");
+                    return false;
+                }
+                
+                // Проверяем через Supabase, не привязан ли уже этот ID к другому игроку
+                if (supabaseClient) {
+                    supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, username')
+                        .eq('mb_link', linkId)
+                        .single()
+                        .then(({ data }) => {
+                            if (data) {
+                                // Профиль уже привязан к другому игроку
+                                showToast(`❌ Профиль ${linkId} уже привязан к игроку ${data.username}!`, "#ff8888");
+                                return false;
+                            } else {
+                                // Профиль свободен - привязываем
+                                executeProfileLink(linkId);
+                            }
+                        })
+                        .catch((error) => {
+                            // Ошибка означает, что запись не найдена - можно привязывать
+                            if (error.code === 'PGRST116') {
+                                executeProfileLink(linkId);
+                            } else {
+                                console.error('Check mb_link error:', error);
+                                showToast("❌ Ошибка проверки профиля!", "#ff8888");
+                            }
+                        });
+                } else {
+                    // Если Supabase ещё не готов, сохраняем локально с проверкой позже
+                    showToast("⚠️ Проверка уникальности будет выполнена позже", "#ffaa88");
+                    executeProfileLink(linkId);
+                }
+                
+                return true;
+            }
+            
+            function executeProfileLink(linkId) {
                 _mbProfileLink = linkId;
                 saveGame();
                 updateProfileLinkUI();
                 showToast(`✅ Профиль привязан: ${linkId}`, "#aaffdd");
                 document.getElementById('profileLinkModal').classList.remove('show');
+                
+                // Синхронизируем с Supabase
+                if (supabaseClient) {
+                    syncToSupabase();
+                }
             }
             
             function showProfileLinkModalForPlayer(playerMbLink, playerName) {
@@ -3108,6 +3161,28 @@
                 const nowDate = new Date();
                 const lastVisit = localStorage.getItem('minebuff_last_visit');
                 if (lastVisit !== nowDate.toDateString()) {
+                }
+
+                if (_mbProfileLink && supabaseClient) {
+                    supabaseClient
+                        .from('leaderboard')
+                        .select('player_id, username')
+                        .eq('mb_link', _mbProfileLink)
+                        .neq('player_id', _playerId)  // Не равно текущему игроку
+                        .single()
+                        .then(({ data }) => {
+                            if (data) {
+                                // Этот профиль уже привязан к другому игроку!
+                                console.warn(`⚠️ Профиль ${_mbProfileLink} теперь принадлежит игроку ${data.username}`);
+                                showToast(`⚠️ Ваша привязка профиля устарела! Профиль ${_mbProfileLink} занят другим игроком.`, "#ffaa88");
+                                _mbProfileLink = null;
+                                saveGame();
+                                updateProfileLinkUI();
+                            }
+                        })
+                        .catch(() => {
+                            // Профиль свободен или не найден - всё ок
+                        });
                 }
                 
                 checkDailyReset();
