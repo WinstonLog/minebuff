@@ -1295,6 +1295,37 @@
     .ad-image:hover {
         transform: scale(1.02);
     }
+
+    .ad-reward-btn, .ad-link-btn {
+        flex: 1;
+        min-width: 120px;
+        max-width: 200px;
+        padding: 14px 20px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        text-align: center;
+    }
+
+    .ad-reward-btn {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        color: #1a1a2e;
+        box-shadow: 0 4px 20px rgba(255, 170, 51, 0.3);
+    }
+
+    .ad-link-btn {
+        background: linear-gradient(135deg, #3a6b58, #1e3e31);
+        color: white;
+    }
+
+    @media (max-width: 400px) {
+        .ad-reward-btn, .ad-link-btn {
+            min-width: 100%;
+            max-width: 100%;
+        }
+    }
     </style>
 </head>
 <body>
@@ -1783,23 +1814,21 @@
             <!-- Шапка -->
             <div class="ad-header">
                 <div class="ad-header-title">
-                    <span>📺</span> ПРОСМОТР РЕКЛАМЫ
+                    <span id="adTitle">📺 РЕКЛАМА</span>
                 </div>
                 <button class="ad-close-btn" id="adCloseBtn">✕</button>
             </div>
 
             <!-- Тело рекламы -->
             <div class="ad-body" id="adBody">
-                <!-- Рекламный контент -->
                 <div class="ad-video-placeholder" id="adVideoPlaceholder">
-                    <!-- КАРТИНКА ИЛИ ГИФКА -->
                     <div class="ad-image-container">
-                        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Реклама" class="ad-image">
+                        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Реклама" class="ad-image" id="adImage">
                     </div>
                     
-                    <div class="ad-sponsor-logo">🎮</div>
-                    <div class="ad-sponsor-name">MINEBUFF</div>
-                    <div class="ad-sponsor-text">ЛУЧШАЯ ШАХТА В МИРЕ!</div>
+                    <div class="ad-sponsor-logo" id="adSponsorLogo">🎮</div>
+                    <div class="ad-sponsor-name" id="adSponsorName">MINEBUFF</div>
+                    <div class="ad-sponsor-text" id="adSponsorText">ЛУЧШАЯ ШАХТА В МИРЕ!</div>
                     
                     <div class="ad-progress-ring">
                         <svg viewBox="0 0 36 36" class="ad-progress-svg">
@@ -1814,16 +1843,18 @@
                     <div class="ad-tip">⏳ Досмотрите до конца, чтобы получить награду!</div>
                 </div>
 
-                <!-- Блок с наградой (показывается после просмотра) -->
                 <div class="ad-reward-block" id="adRewardBlock" style="display: none;">
                     <div class="ad-reward-icon">🎁</div>
                     <div class="ad-reward-title">НАГРАДА ПОЛУЧЕНА!</div>
                     <div class="ad-reward-desc" id="adRewardDesc">+50 руды</div>
-                    <button class="ad-reward-btn" id="adRewardBtn">ЗАБРАТЬ</button>
+                    
+                    <!-- Контейнер для кнопок - одинаковые размеры -->
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+                        <button class="ad-reward-btn" id="adRewardBtn" style="flex: 1; min-width: 120px; max-width: 200px;">ЗАБРАТЬ</button>
+                        <button class="ad-link-btn" id="adLinkBtn" style="display: none; flex: 1; min-width: 120px; max-width: 200px; background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px 20px; border-radius: 60px; font-weight: 700; font-size: 16px; color: white; cursor: pointer;">ПЕРЕЙТИ</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Подвал с предупреждением -->
             <div class="ad-footer">
                 <span>⚠️ Закрытие до окончания = отказ от награды</span>
             </div>
@@ -1939,6 +1970,7 @@
             let adLastWatchDate = null;    // дата последнего просмотра
             const MAX_AD_PER_DAY = 3;      // максимум реклам в день
             const AD_REWARD_DIAMONDS = 7;  // награда за рекламу
+            let adStats = {};
 
             // ========== КАЛЕНДАРЬ ==========
             let _dailyStreak = 0;
@@ -1962,6 +1994,18 @@
             const adRewardBlock = document.getElementById('adRewardBlock');
             const adRewardDesc = document.getElementById('adRewardDesc');
             const adRewardBtn = document.getElementById('adRewardBtn');
+
+            // ========== РЕКЛАМНЫЕ ОБЪЯВЛЕНИЯ ==========
+            const adList = [
+                {
+                    id: 1,
+                    title: '📺 РЕКЛАМА',
+                    text: 'Стань легендой шахты!',
+                    image: 'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+                    link: 'https://t.me/minebuff',
+                    sponsor: 'MINEBUFF'
+                }
+            ];
 
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
@@ -1990,6 +2034,49 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+                        // Загрузить статистику
+            function loadAdStats() {
+                const saved = localStorage.getItem('ad_stats');
+                if (saved) {
+                    try {
+                        adStats = JSON.parse(saved);
+                    } catch(e) {}
+                }
+            }
+            
+            // Сохранить статистику
+            function saveAdStats() {
+                localStorage.setItem('ad_stats', JSON.stringify(adStats));
+            }
+            
+            // Увеличить счётчик показов для рекламы
+            function trackAdView(adId) {
+                if (!adStats[adId]) {
+                    adStats[adId] = { views: 0, clicks: 0 };
+                }
+                adStats[adId].views++;
+                saveAdStats();
+            }
+            
+            // Увеличить счётчик кликов
+            function trackAdClick(adId) {
+                if (adStats[adId]) {
+                    adStats[adId].clicks++;
+                    saveAdStats();
+                }
+            }
+
+            // Получить случайную рекламу
+            function getRandomAd() {
+                const randomIndex = Math.floor(Math.random() * adList.length);
+                return adList[randomIndex];
+            }
+            
+            // Получить рекламу по ID (для тестирования)
+            function getAdById(id) {
+                return adList.find(ad => ad.id === id);
             }
 
             function updateAdButton() {
@@ -2050,10 +2137,24 @@
                     return;
                 }
                 
+                // Выбираем случайную рекламу
+                const currentAd = getRandomAd();
+                
                 adIsActive = true;
                 adIsWatched = false;
                 adRewardClaimed = false;
                 adTimer = 20;
+
+                // Обновляем контент рекламы
+                const adImage = document.querySelector('.ad-image');
+                const adSponsorName = document.querySelector('.ad-sponsor-name');
+                const adSponsorText = document.querySelector('.ad-sponsor-text');
+                const adTitle = document.querySelector('.ad-header-title span');
+                
+                if (adImage) adImage.src = currentAd.image;
+                if (adSponsorName) adSponsorName.textContent = currentAd.sponsor;
+                if (adSponsorText) adSponsorText.textContent = currentAd.text;
+                if (adTitle) adTitle.textContent = currentAd.title;
 
                 // Сбрасываем UI
                 adVideoPlaceholder.style.display = 'block';
@@ -2071,7 +2172,6 @@
                     adTimer--;
                     adTimerDisplay.textContent = adTimer;
 
-                    // Обновляем прогресс (100 -> 0)
                     const progress = (adTimer / 20) * 100;
                     adProgressFill.style.strokeDashoffset = progress;
 
@@ -2084,7 +2184,6 @@
                 }, 1000);
             }
 
-            // Реклама завершена (досмотрели до конца)
             function onAdComplete() {
                 adIsActive = false;
                 
@@ -2103,28 +2202,34 @@
                 adRewardDesc.textContent = reward.text;
                 adRewardDesc.style.color = reward.color || '#ffcc66';
                 
+                // Показываем кнопку "Перейти" с ссылкой на рекламу
+                const linkBtn = document.getElementById('adLinkBtn');
+                const currentAd = getRandomAd(); // или сохраните текущую рекламу в переменную
+                if (linkBtn && currentAd.link) {
+                    linkBtn.style.display = 'inline-block';
+                    linkBtn.onclick = () => {
+                        trackAdClick(currentAd.id);
+                        window.open(currentAd.link, '_blank');
+                    };
+                }
+                
                 // Кнопка "забрать"
                 adRewardBtn.onclick = function() {
                     if (adRewardClaimed) return;
                     adRewardClaimed = true;
                     
-                    // Увеличиваем счётчик просмотренных реклам
                     adWatchedToday++;
                     adLastWatchDate = new Date().toDateString();
                     
-                    // Применяем награду
                     applyReward(reward);
                     
-                    // Закрываем модалку
                     closeAd();
                     
-                    // Показываем остаток реклам
                     const remaining = getRemainingAds();
                     showToast(`🎁 ${reward.text}! Осталось реклам: ${remaining}`, '#44ff44');
                     updateUI();
                 };
 
-                // Блокируем крестик, чтобы нельзя было закрыть без получения награды
                 adCloseBtn.style.opacity = '0.5';
                 adCloseBtn.style.pointerEvents = 'none';
             }
