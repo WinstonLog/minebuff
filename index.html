@@ -1271,6 +1271,30 @@
         85% { opacity: 1; transform: translateX(-50%) translateY(0); }
         100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     }
+
+    /* Контейнер для картинки */
+    .ad-image-container {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 12px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 2px solid rgba(255, 204, 102, 0.3);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Сама картинка */
+    .ad-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .ad-image:hover {
+        transform: scale(1.02);
+    }
     </style>
 </head>
 <body>
@@ -1768,9 +1792,15 @@
             <div class="ad-body" id="adBody">
                 <!-- Рекламный контент -->
                 <div class="ad-video-placeholder" id="adVideoPlaceholder">
+                    <!-- КАРТИНКА ИЛИ ГИФКА -->
+                    <div class="ad-image-container">
+                        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Реклама" class="ad-image">
+                    </div>
+                    
                     <div class="ad-sponsor-logo">🎮</div>
                     <div class="ad-sponsor-name">MineBuff</div>
                     <div class="ad-sponsor-text">ЛУЧШАЯ ШАХТА В МИРЕ!</div>
+                    
                     <div class="ad-progress-ring">
                         <svg viewBox="0 0 36 36" class="ad-progress-svg">
                             <path class="ad-progress-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
