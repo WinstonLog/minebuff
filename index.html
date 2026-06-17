@@ -1326,6 +1326,104 @@
             max-width: 100%;
         }
     }
+
+    /* Модальное окно поддержки */
+    .support-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        animation: adFadeIn 0.3s ease;
+    }
+    .support-modal.show { display: flex; }
+
+    .support-content {
+        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+        border-radius: 48px;
+        width: 92%;
+        max-width: 400px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 204, 102, 0.3);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+        animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    .support-header {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        padding: 24px 20px;
+        text-align: center;
+    }
+    .support-header .support-icon {
+        font-size: 56px;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .support-header .support-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a1a2e;
+    }
+
+    .support-body {
+        padding: 24px 20px;
+        text-align: center;
+    }
+    .support-body p {
+        font-size: 15px;
+        line-height: 1.6;
+        opacity: 0.9;
+        margin-bottom: 16px;
+    }
+    .support-body .highlight {
+        color: #ffcc66;
+        font-weight: bold;
+    }
+
+    .support-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .support-btn {
+        padding: 14px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: 0.15s;
+    }
+    .support-btn.primary {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        color: #1a1a2e;
+        box-shadow: 0 4px 15px rgba(255, 170, 51, 0.3);
+    }
+    .support-btn.primary:hover {
+        transform: scale(1.02);
+    }
+    .support-btn.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .support-btn.secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .support-footer {
+        padding: 12px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: center;
+        font-size: 11px;
+        opacity: 0.5;
+    }
     </style>
 </head>
 <body>
@@ -1809,6 +1907,35 @@
         </div>
     </div>
 
+    <!-- Модальное окно поддержки -->
+    <div class="support-modal" id="supportModal">
+        <div class="support-content">
+            <div class="support-header">
+                <span class="support-icon">❤️</span>
+                <div class="support-title">ПОДДЕРЖАТЬ ПРОЕКТ</div>
+            </div>
+            <div class="support-body">
+                <p>
+                    Если вам нравится <span class="highlight">MINEBUFF</span> и вы хотите помочь проекту развиваться, 
+                    вы можете поддержать нас материально!
+                </p>
+                <p style="font-size: 13px; opacity: 0.7;">
+                    💎 <span class="highlight">1 ₽ = 5 алмазов</span> + бонус!
+                </p>
+                <div class="support-buttons">
+                    <button class="support-btn primary" id="supportDonateBtn">❤️ ПОДДЕРЖАТЬ</button>
+                    <button class="support-btn secondary" id="supportCloseBtn">ЗАКРЫТЬ</button>
+                </div>
+<!--                 <div style="margin-top: 12px; font-size: 11px; opacity: 0.5;">
+                    Модальное окно показывается раз в сутки
+                </div> -->
+            </div>
+            <div class="support-footer">
+                Спасибо, что играете в MineBuff! ⛏️
+            </div>
+        </div>
+    </div>
+
     <div class="ad-modal" id="adModal">
         <div class="ad-content">
             <!-- Шапка -->
@@ -2036,7 +2163,65 @@
                 updateSettingsUI();
             }
 
-                        // Загрузить статистику
+            // ========== СИСТЕМА ПОДДЕРЖКИ (раз в сутки) ==========
+            
+            // Показать модальное окно поддержки
+            function showSupportModal() {
+                const modal = document.getElementById('supportModal');
+                if (modal) {
+                    modal.classList.add('show');
+                }
+            }
+
+            // Закрыть модальное окно поддержки
+            function closeSupportModal() {
+                const modal = document.getElementById('supportModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
+            }
+
+            // Проверить, нужно ли показывать поддержку
+            function checkSupportModal() {
+                const today = new Date().toDateString();
+                const lastSupportShow = localStorage.getItem('minebuff_last_support_show');
+
+                // Если сегодня ещё не показывали
+                if (lastSupportShow !== today) {
+                    showSupportModal();
+                    // Сохраняем, что показали сегодня
+                    localStorage.setItem('minebuff_last_support_show', today);
+                }
+            }
+
+            // Инициализация обработчиков поддержки
+            function initSupportHandlers() {
+                const donateBtn = document.getElementById('supportDonateBtn');
+                const closeBtn = document.getElementById('supportCloseBtn');
+                const modal = document.getElementById('supportModal');
+
+                if (donateBtn) {
+                    donateBtn.onclick = () => {
+                        // Открываем ссылку на поддержку
+                        window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
+                        closeSupportModal();
+                    };
+                }
+
+                if (closeBtn) {
+                    closeBtn.onclick = closeSupportModal;
+                }
+
+                if (modal) {
+                    modal.onclick = (e) => {
+                        if (e.target === modal) {
+                            closeSupportModal();
+                        }
+                    };
+                }
+            }
+
+            // Загрузить статистику
             function loadAdStats() {
                 const saved = localStorage.getItem('ad_stats');
                 if (saved) {
@@ -2921,7 +3106,6 @@
             }
 
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-            function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
             
             function getRandomCardRank() {
                 const season = getCurrentTheme();
@@ -4090,6 +4274,8 @@
                         })
                         .catch(e => console.warn(e));
                 }
+                initSupportHandlers();
+                setTimeout(() => checkSupportModal(), 2000);
             }     
 
             function checkRankUpgrade() {
