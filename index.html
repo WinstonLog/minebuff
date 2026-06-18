@@ -1326,285 +1326,6 @@
             max-width: 100%;
         }
     }
-
-    /* Модальное окно поддержки */
-    .support-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(12px);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        animation: adFadeIn 0.3s ease;
-    }
-    .support-modal.show { display: flex; }
-
-    .support-content {
-        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
-        border-radius: 48px;
-        width: 92%;
-        max-width: 400px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 204, 102, 0.3);
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
-        animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
-    }
-
-    .support-header {
-        background: linear-gradient(135deg, #ffcc66, #ffaa33);
-        padding: 24px 20px;
-        text-align: center;
-    }
-    .support-header .support-icon {
-        font-size: 56px;
-        display: block;
-        margin-bottom: 8px;
-    }
-    .support-header .support-title {
-        font-size: 22px;
-        font-weight: 800;
-        color: #1a1a2e;
-    }
-
-    .support-body {
-        padding: 24px 20px;
-        text-align: center;
-    }
-    .support-body p {
-        font-size: 15px;
-        line-height: 1.6;
-        opacity: 0.9;
-        margin-bottom: 16px;
-    }
-    .support-body .highlight {
-        color: #ffcc66;
-        font-weight: bold;
-    }
-
-    .support-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 8px;
-    }
-    .support-btn {
-        padding: 14px;
-        border-radius: 60px;
-        font-weight: 700;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        transition: 0.15s;
-    }
-    .support-btn.primary {
-        background: linear-gradient(135deg, #ffcc66, #ffaa33);
-        color: #1a1a2e;
-        box-shadow: 0 4px 15px rgba(255, 170, 51, 0.3);
-    }
-    .support-btn.primary:hover {
-        transform: scale(1.02);
-    }
-    .support-btn.secondary {
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-    .support-btn.secondary:hover {
-        background: rgba(255, 255, 255, 0.15);
-    }
-    .support-footer {
-        padding: 12px 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        text-align: center;
-        font-size: 11px;
-        opacity: 0.5;
-    }
-
-    /* ===== БЛОК СБОРА СРЕДСТВ ===== */
-    .fundraiser-block {
-        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
-        border-radius: 24px;
-        padding: 14px 16px;
-        margin-bottom: 14px;
-        border: 1px solid rgba(255, 204, 102, 0.25);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .fundraiser-block::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle at 30% 50%, rgba(255, 204, 102, 0.05), transparent 70%);
-        pointer-events: none;
-    }
-
-    .fundraiser-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .fundraiser-icon {
-        font-size: 22px;
-    }
-
-    .fundraiser-title {
-        font-weight: 700;
-        font-size: 15px;
-        color: #ffcc66;
-        flex: 1;
-    }
-
-    .fundraiser-target {
-        font-size: 13px;
-        font-weight: 700;
-        color: #fff;
-        background: rgba(255, 204, 102, 0.15);
-        padding: 2px 12px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 204, 102, 0.2);
-    }
-
-    .fundraiser-progress-wrap {
-        margin: 6px 0 8px;
-    }
-
-    .fundraiser-progress-bar {
-        width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    .fundraiser-progress-fill {
-        height: 100%;
-        border-radius: 20px;
-        background: linear-gradient(90deg, #ffaa33, #ffcc66, #ffaa33);
-        background-size: 200% 100%;
-        animation: shimmer 2s ease-in-out infinite;
-        transition: width 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
-        width: 0%;
-    }
-
-    @keyframes shimmer {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
-    }
-
-    .fundraiser-stats {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 6px;
-        font-size: 13px;
-    }
-
-    .fundraiser-current {
-        font-weight: 800;
-        color: #ffcc66;
-        font-size: 16px;
-    }
-
-    .fundraiser-separator {
-        color: rgba(255, 255, 255, 0.3);
-    }
-
-    .fundraiser-total {
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 500;
-    }
-
-    .fundraiser-percent {
-        margin-left: auto;
-        font-weight: 700;
-        color: #88ddbb;
-        font-size: 13px;
-        background: rgba(136, 221, 187, 0.1);
-        padding: 0 10px;
-        border-radius: 20px;
-    }
-
-    .fundraiser-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        gap: 12px;
-    }
-
-    .fundraiser-footer span {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
-    }
-
-    .fundraiser-donate-btn {
-        background: linear-gradient(135deg, #ffaa33, #ff6600);
-        border: none;
-        padding: 6px 18px;
-        border-radius: 30px;
-        font-weight: 700;
-        font-size: 12px;
-        color: #fff;
-        cursor: pointer;
-        transition: 0.2s;
-        box-shadow: 0 2px 12px rgba(255, 102, 0, 0.3);
-        white-space: nowrap;
-    }
-
-    .fundraiser-donate-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 20px rgba(255, 102, 0, 0.5);
-    }
-
-    .fundraiser-donate-btn:active {
-        transform: scale(0.95);
-    }
-
-    @media (max-width: 480px) {
-        .fundraiser-block {
-            padding: 12px 14px;
-        }
-        .fundraiser-title {
-            font-size: 13px;
-        }
-        .fundraiser-target {
-            font-size: 11px;
-            padding: 1px 10px;
-        }
-        .fundraiser-current {
-            font-size: 14px;
-        }
-        .fundraiser-stats {
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
-        .fundraiser-footer {
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .fundraiser-footer span {
-            font-size: 11px;
-        }
-        .fundraiser-donate-btn {
-            font-size: 11px;
-            padding: 5px 14px;
-        }
-    }
     </style>
 </head>
 <body>
@@ -1620,30 +1341,6 @@
         <div id="dbErrorBanner" style="display: none; background: linear-gradient(135deg, #ff4444, #990000); color: white; text-align: center; padding: 10px; margin-bottom: 12px; border-radius: 20px; font-size: 12px; animation: pulse 1s infinite;">
             ⚠️ СЕРВЕР ВРЕМЕННО НЕДОСТУПЕН ⚠️<br>
             <span style="font-size: 10px; opacity: 0.8;">Данные сохраняются локально. Скоро всё заработает!</span>
-        </div>
-
-        <!-- БЛОК СБОРА СРЕДСТВ -->
-        <div class="fundraiser-block" id="fundraiserBlock">
-            <div class="fundraiser-header">
-                <span class="fundraiser-icon">🎯</span>
-                <span class="fundraiser-title">СБОР НА ПРОЕКТ</span>
-                <span class="fundraiser-target">15 000 ₽</span>
-            </div>
-            <div class="fundraiser-progress-wrap">
-                <div class="fundraiser-progress-bar">
-                    <div class="fundraiser-progress-fill" id="fundraiserProgressFill" style="width: 0.75%;"></div>
-                </div>
-                <div class="fundraiser-stats">
-                    <span class="fundraiser-current" id="fundraiserCurrent">150</span>
-                    <span class="fundraiser-separator">/</span>
-                    <span class="fundraiser-total">15 000 ₽</span>
-                    <span class="fundraiser-percent" id="fundraiserPercent">0.75%</span>
-                </div>
-            </div>
-            <div class="fundraiser-footer">
-                <span>❤️ Поддержи развитие проекта!</span>
-                <button class="fundraiser-donate-btn" id="fundraiserDonateBtn">ПОМОЧЬ</button>
-            </div>
         </div>
 
         <div class="side-menu" id="sideMenu">
@@ -1921,6 +1618,54 @@
             </div>
         </div>
 
+        <!-- ИНФОРМАЦИЯ / ПОМОЩЬ -->
+        <div class="tab-panel" id="infoPanel">
+            <div class="game-panel">
+                <div style="font-weight: bold; font-size: 18px; text-align: center;">📚 ИНФОРМАЦИЯ</div>
+                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Что за что отвечает</div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">⛏️ ШАХТА</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • <strong>Кирка</strong> — улучшается за алмазы, увеличивает добычу руды за удар<br>
+                            • <strong>Уровень</strong> — повышается за алмазы, увеличивает лимит ударов в день<br>
+                            • <strong>Бонус +5💎</strong> — ежедневный бесплатный бонус<br>
+                            • <strong>Обмен</strong> — 100 руды = 1 алмаз<br>
+                            • <strong>x2 событие</strong> — по выходным (сб-вс) добыча руды удваивается
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">🎴 КАРТЫ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • <strong>Ранги (от слабого к сильному):</strong> E → D → C → B → G → P → A<br>
+                            • <strong>Сезонные ранги:</strong> V(весна), L(лето), H(хеллоуин), N(зима) — сила 12<br>
+                            • <strong>Обмен 3:1</strong> — три карты одного ранга = одна карта выше рангом<br>
+                            • <strong>Получение карт:</strong> через Telegram @minebuff 
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-section">
+                    <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
+                    <div class="dropdown-content">
+                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
+                            • Заходи каждый день и получай награды!<br>
+                            • Доступен с 5 уровня<br>
+                            • На 14 день — карта D, на 30 день — карта C
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
+                    📢 По всем вопросам: <a href="https://t.me/b_loody" target="_blank" style="color: #ffcc66;">@b_loody</a>
+                </div>
+            </div>
+        </div>
+
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
             <div style="margin-top: 8px;">
@@ -2060,35 +1805,6 @@
                 <div style="font-size: 16px; margin-bottom: 16px;">Вы получили карту:</div>
                 <div id="chestRewardCard" style="font-size: 48px; font-weight: bold; background: #2a3a3a; border-radius: 30px; padding: 20px; margin: 10px 0; display: inline-block; width: 100%; box-sizing: border-box;">?</div>
                 <button id="closeChestRewardBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px; border-radius: 60px; font-weight: bold; font-size: 16px; color: white; width: 100%; cursor: pointer; margin-top: 16px;">ЗАКРЫТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно поддержки -->
-    <div class="support-modal" id="supportModal">
-        <div class="support-content">
-            <div class="support-header">
-                <span class="support-icon">❤️</span>
-                <div class="support-title">ПОДДЕРЖАТЬ ПРОЕКТ</div>
-            </div>
-            <div class="support-body">
-                <p>
-                    Если вам нравится <span class="highlight">MINEBUFF</span> и вы хотите помочь проекту развиваться, 
-                    вы можете поддержать нас материально!
-                </p>
-                <p style="font-size: 13px; opacity: 0.7;">
-                    💎 <span class="highlight">1 ₽ = 5 алмазов</span> + бонус!
-                </p>
-                <div class="support-buttons">
-                    <button class="support-btn primary" id="supportDonateBtn">❤️ ПОДДЕРЖАТЬ</button>
-                    <button class="support-btn secondary" id="supportCloseBtn">ЗАКРЫТЬ</button>
-                </div>
-<!--                 <div style="margin-top: 12px; font-size: 11px; opacity: 0.5;">
-                    Модальное окно показывается раз в сутки
-                </div> -->
-            </div>
-            <div class="support-footer">
-                Спасибо, что играете в MineBuff! ⛏️
             </div>
         </div>
     </div>
@@ -2265,9 +1981,6 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
-            const FUNDRAISER_TARGET = 15000; // Цель в рублях
-            let fundraiserCurrent = 750; // Текущая сумма (можно менять)
-
             let _nextGiftTime = null;      // время следующего подарка
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
@@ -2323,100 +2036,7 @@
                 updateSettingsUI();
             }
 
-            function updateFundraiserUI() {
-                const percent = Math.min((fundraiserCurrent / FUNDRAISER_TARGET) * 100, 100);
-                
-                const fill = document.getElementById('fundraiserProgressFill');
-                const currentSpan = document.getElementById('fundraiserCurrent');
-                const percentSpan = document.getElementById('fundraiserPercent');
-                
-                if (fill) fill.style.width = percent + '%';
-                if (currentSpan) currentSpan.textContent = fundraiserCurrent.toLocaleString('ru-RU');
-                if (percentSpan) percentSpan.textContent = percent.toFixed(2) + '%';
-            }
-
-            // Кнопка "ПОМОЧЬ" — открывает донат
-            document.getElementById('fundraiserDonateBtn')?.addEventListener('click', () => {
-                window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
-                showToast('❤️ Спасибо за поддержку проекта!', '#ffcc66');
-            });
-
-            // Функция для обновления суммы (вызывайте, когда нужно увеличить сбор)
-            function addFundraiserAmount(amount) {
-                fundraiserCurrent += amount;
-                updateFundraiserUI();
-                // Сохраняем в localStorage
-                localStorage.setItem('fundraiser_current', fundraiserCurrent.toString());
-            }
-
-            // Загружаем сохранённую сумму
-            function loadFundraiserData() {
-                const saved = localStorage.getItem('fundraiser_current');
-                if (saved) {
-                    fundraiserCurrent = parseFloat(saved) || 150;
-                }
-                updateFundraiserUI();
-            }
-
-            // ========== СИСТЕМА ПОДДЕРЖКИ (раз в сутки) ==========
-            
-            // Показать модальное окно поддержки
-            function showSupportModal() {
-                const modal = document.getElementById('supportModal');
-                if (modal) {
-                    modal.classList.add('show');
-                }
-            }
-
-            // Закрыть модальное окно поддержки
-            function closeSupportModal() {
-                const modal = document.getElementById('supportModal');
-                if (modal) {
-                    modal.classList.remove('show');
-                }
-            }
-
-            // Проверить, нужно ли показывать поддержку
-            function checkSupportModal() {
-                const today = new Date().toDateString();
-                const lastSupportShow = localStorage.getItem('minebuff_last_support_show');
-
-                // Если сегодня ещё не показывали
-                if (lastSupportShow !== today) {
-                    showSupportModal();
-                    // Сохраняем, что показали сегодня
-                    localStorage.setItem('minebuff_last_support_show', today);
-                }
-            }
-
-            // Инициализация обработчиков поддержки
-            function initSupportHandlers() {
-                const donateBtn = document.getElementById('supportDonateBtn');
-                const closeBtn = document.getElementById('supportCloseBtn');
-                const modal = document.getElementById('supportModal');
-
-                if (donateBtn) {
-                    donateBtn.onclick = () => {
-                        // Открываем ссылку на поддержку
-                        window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
-                        closeSupportModal();
-                    };
-                }
-
-                if (closeBtn) {
-                    closeBtn.onclick = closeSupportModal;
-                }
-
-                if (modal) {
-                    modal.onclick = (e) => {
-                        if (e.target === modal) {
-                            closeSupportModal();
-                        }
-                    };
-                }
-            }
-
-            // Загрузить статистику
+                        // Загрузить статистику
             function loadAdStats() {
                 const saved = localStorage.getItem('ad_stats');
                 if (saved) {
@@ -3301,6 +2921,7 @@
             }
 
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+            function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
             
             function getRandomCardRank() {
                 const season = getCurrentTheme();
@@ -4469,8 +4090,6 @@
                         })
                         .catch(e => console.warn(e));
                 }
-                initSupportHandlers();
-                setTimeout(() => checkSupportModal(), 2000);
             }     
 
             function checkRankUpgrade() {
@@ -4973,11 +4592,9 @@
             initTopListClickHandler();
             checkDailyLogin();
             updateCalendarUI();
-            loadFundraiserData();
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
-            window.addFundraiserAmount = addFundraiserAmount;
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
