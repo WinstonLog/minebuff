@@ -1424,6 +1424,187 @@
         font-size: 11px;
         opacity: 0.5;
     }
+
+    /* ===== БЛОК СБОРА СРЕДСТВ ===== */
+    .fundraiser-block {
+        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+        border-radius: 24px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        border: 1px solid rgba(255, 204, 102, 0.25);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .fundraiser-block::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 50%, rgba(255, 204, 102, 0.05), transparent 70%);
+        pointer-events: none;
+    }
+
+    .fundraiser-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .fundraiser-icon {
+        font-size: 22px;
+    }
+
+    .fundraiser-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: #ffcc66;
+        flex: 1;
+    }
+
+    .fundraiser-target {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        background: rgba(255, 204, 102, 0.15);
+        padding: 2px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 204, 102, 0.2);
+    }
+
+    .fundraiser-progress-wrap {
+        margin: 6px 0 8px;
+    }
+
+    .fundraiser-progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .fundraiser-progress-fill {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #ffaa33, #ffcc66, #ffaa33);
+        background-size: 200% 100%;
+        animation: shimmer 2s ease-in-out infinite;
+        transition: width 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+        width: 0%;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .fundraiser-stats {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .fundraiser-current {
+        font-weight: 800;
+        color: #ffcc66;
+        font-size: 16px;
+    }
+
+    .fundraiser-separator {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .fundraiser-total {
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+    }
+
+    .fundraiser-percent {
+        margin-left: auto;
+        font-weight: 700;
+        color: #88ddbb;
+        font-size: 13px;
+        background: rgba(136, 221, 187, 0.1);
+        padding: 0 10px;
+        border-radius: 20px;
+    }
+
+    .fundraiser-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        gap: 12px;
+    }
+
+    .fundraiser-footer span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .fundraiser-donate-btn {
+        background: linear-gradient(135deg, #ffaa33, #ff6600);
+        border: none;
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 12px;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 2px 12px rgba(255, 102, 0, 0.3);
+        white-space: nowrap;
+    }
+
+    .fundraiser-donate-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(255, 102, 0, 0.5);
+    }
+
+    .fundraiser-donate-btn:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 480px) {
+        .fundraiser-block {
+            padding: 12px 14px;
+        }
+        .fundraiser-title {
+            font-size: 13px;
+        }
+        .fundraiser-target {
+            font-size: 11px;
+            padding: 1px 10px;
+        }
+        .fundraiser-current {
+            font-size: 14px;
+        }
+        .fundraiser-stats {
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+        .fundraiser-footer {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .fundraiser-footer span {
+            font-size: 11px;
+        }
+        .fundraiser-donate-btn {
+            font-size: 11px;
+            padding: 5px 14px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -1439,6 +1620,30 @@
         <div id="dbErrorBanner" style="display: none; background: linear-gradient(135deg, #ff4444, #990000); color: white; text-align: center; padding: 10px; margin-bottom: 12px; border-radius: 20px; font-size: 12px; animation: pulse 1s infinite;">
             ⚠️ СЕРВЕР ВРЕМЕННО НЕДОСТУПЕН ⚠️<br>
             <span style="font-size: 10px; opacity: 0.8;">Данные сохраняются локально. Скоро всё заработает!</span>
+        </div>
+
+        <!-- БЛОК СБОРА СРЕДСТВ -->
+        <div class="fundraiser-block" id="fundraiserBlock">
+            <div class="fundraiser-header">
+                <span class="fundraiser-icon">🎯</span>
+                <span class="fundraiser-title">СБОР НА ПРОЕКТ</span>
+                <span class="fundraiser-target">15 000 ₽</span>
+            </div>
+            <div class="fundraiser-progress-wrap">
+                <div class="fundraiser-progress-bar">
+                    <div class="fundraiser-progress-fill" id="fundraiserProgressFill" style="width: 0.75%;"></div>
+                </div>
+                <div class="fundraiser-stats">
+                    <span class="fundraiser-current" id="fundraiserCurrent">150</span>
+                    <span class="fundraiser-separator">/</span>
+                    <span class="fundraiser-total">20 000 ₽</span>
+                    <span class="fundraiser-percent" id="fundraiserPercent">0.75%</span>
+                </div>
+            </div>
+            <div class="fundraiser-footer">
+                <span>❤️ Поддержи развитие проекта!</span>
+                <button class="fundraiser-donate-btn" id="fundraiserDonateBtn">ПОМОЧЬ</button>
+            </div>
         </div>
 
         <div class="side-menu" id="sideMenu">
@@ -1712,54 +1917,6 @@
                         <input type="checkbox" id="particlesToggleCheckbox">
                         <span class="slider"></span>
                     </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- ИНФОРМАЦИЯ / ПОМОЩЬ -->
-        <div class="tab-panel" id="infoPanel">
-            <div class="game-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">📚 ИНФОРМАЦИЯ</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Что за что отвечает</div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">⛏️ ШАХТА</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Кирка</strong> — улучшается за алмазы, увеличивает добычу руды за удар<br>
-                            • <strong>Уровень</strong> — повышается за алмазы, увеличивает лимит ударов в день<br>
-                            • <strong>Бонус +5💎</strong> — ежедневный бесплатный бонус<br>
-                            • <strong>Обмен</strong> — 100 руды = 1 алмаз<br>
-                            • <strong>x2 событие</strong> — по выходным (сб-вс) добыча руды удваивается
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">🎴 КАРТЫ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Ранги (от слабого к сильному):</strong> E → D → C → B → G → P → A<br>
-                            • <strong>Сезонные ранги:</strong> V(весна), L(лето), H(хеллоуин), N(зима) — сила 12<br>
-                            • <strong>Обмен 3:1</strong> — три карты одного ранга = одна карта выше рангом<br>
-                            • <strong>Получение карт:</strong> через Telegram @minebuff 
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • Заходи каждый день и получай награды!<br>
-                            • Доступен с 5 уровня<br>
-                            • На 14 день — карта D, на 30 день — карта C
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    📢 По всем вопросам: <a href="https://t.me/b_loody" target="_blank" style="color: #ffcc66;">@b_loody</a>
                 </div>
             </div>
         </div>
@@ -2108,6 +2265,9 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
+            const FUNDRAISER_TARGET = 15000; // Цель в рублях
+            let fundraiserCurrent = 150; // Текущая сумма (можно менять)
+
             let _nextGiftTime = null;      // время следующего подарка
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
@@ -2161,6 +2321,41 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            function updateFundraiserUI() {
+                const percent = Math.min((fundraiserCurrent / FUNDRAISER_TARGET) * 100, 100);
+                
+                const fill = document.getElementById('fundraiserProgressFill');
+                const currentSpan = document.getElementById('fundraiserCurrent');
+                const percentSpan = document.getElementById('fundraiserPercent');
+                
+                if (fill) fill.style.width = percent + '%';
+                if (currentSpan) currentSpan.textContent = fundraiserCurrent.toLocaleString('ru-RU');
+                if (percentSpan) percentSpan.textContent = percent.toFixed(2) + '%';
+            }
+
+            // Кнопка "ПОМОЧЬ" — открывает донат
+            document.getElementById('fundraiserDonateBtn')?.addEventListener('click', () => {
+                window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
+                showToast('❤️ Спасибо за поддержку проекта!', '#ffcc66');
+            });
+
+            // Функция для обновления суммы (вызывайте, когда нужно увеличить сбор)
+            function addFundraiserAmount(amount) {
+                fundraiserCurrent += amount;
+                updateFundraiserUI();
+                // Сохраняем в localStorage
+                localStorage.setItem('fundraiser_current', fundraiserCurrent.toString());
+            }
+
+            // Загружаем сохранённую сумму
+            function loadFundraiserData() {
+                const saved = localStorage.getItem('fundraiser_current');
+                if (saved) {
+                    fundraiserCurrent = parseFloat(saved) || 150;
+                }
+                updateFundraiserUI();
             }
 
             // ========== СИСТЕМА ПОДДЕРЖКИ (раз в сутки) ==========
@@ -4778,9 +4973,11 @@
             initTopListClickHandler();
             checkDailyLogin();
             updateCalendarUI();
+            loadFundraiserData();
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
+            window.addFundraiserAmount = addFundraiserAmount;
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
