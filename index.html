@@ -1020,6 +1020,591 @@
             20% { transform: translate(-50%, -60px) scale(1.5); }
             100% { opacity: 0; transform: translate(-50%, -180px) scale(2); }
         }
+
+            /* Модальное окно */
+    .ad-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(16px);
+        z-index: 500;
+        justify-content: center;
+        align-items: center;
+        animation: adFadeIn 0.3s ease;
+    }
+    .ad-modal.show { display: flex; }
+    @keyframes adFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .ad-content {
+        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+        border-radius: 48px;
+        width: 92%;
+        max-width: 420px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 204, 102, 0.2);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Шапка */
+    .ad-header {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .ad-header-title {
+        font-weight: 800;
+        font-size: 16px;
+        color: #1a1a2e;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .ad-close-btn {
+        background: rgba(0, 0, 0, 0.2);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 18px;
+        color: #1a1a2e;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ad-close-btn:hover { background: rgba(0, 0, 0, 0.4); }
+
+    /* Тело */
+    .ad-body {
+        padding: 24px 20px 16px;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Плейсхолдер "рекламы" */
+    .ad-video-placeholder {
+        width: 100%;
+        background: linear-gradient(135deg, #2a1a2a, #1a0a1a);
+        border-radius: 32px;
+        padding: 30px 20px;
+        text-align: center;
+        border: 2px dashed rgba(255, 204, 102, 0.3);
+        position: relative;
+    }
+    .ad-sponsor-logo {
+        font-size: 64px;
+        margin-bottom: 8px;
+        animation: adPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes adPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    .ad-sponsor-name {
+        font-size: 24px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .ad-sponsor-text {
+        font-size: 14px;
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+
+    /* Круговой таймер */
+    .ad-progress-ring {
+        width: 80px;
+        height: 80px;
+        margin: 16px auto 8px;
+        position: relative;
+    }
+    .ad-progress-svg {
+        transform: rotate(-90deg);
+        width: 80px;
+        height: 80px;
+    }
+    .ad-progress-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.1);
+        stroke-width: 3;
+    }
+    .ad-progress-fill {
+        fill: none;
+        stroke: #ffcc66;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        transition: stroke-dashoffset 0.1s linear;
+    }
+    .ad-progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        font-weight: 800;
+        font-size: 20px;
+        color: #ffcc66;
+    }
+    .ad-tip {
+        font-size: 12px;
+        opacity: 0.6;
+        margin-top: 8px;
+    }
+
+    /* Блок награды */
+    .ad-reward-block {
+        text-align: center;
+        padding: 20px 0;
+        animation: adRewardPop 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    @keyframes adRewardPop {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .ad-reward-icon {
+        font-size: 64px;
+        margin-bottom: 8px;
+    }
+    .ad-reward-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #44ff44;
+        margin-bottom: 4px;
+    }
+    .ad-reward-desc {
+        font-size: 18px;
+        color: #ffcc66;
+        margin-bottom: 16px;
+    }
+    .ad-reward-btn {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        border: none;
+        padding: 14px 40px;
+        border-radius: 60px;
+        font-weight: 800;
+        font-size: 18px;
+        color: #1a1a2e;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 20px rgba(255, 170, 51, 0.3);
+    }
+    .ad-reward-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 30px rgba(255, 170, 51, 0.5);
+    }
+
+    /* Подвал */
+    .ad-footer {
+        padding: 12px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: center;
+        font-size: 11px;
+        opacity: 0.5;
+    }
+
+    /* Кнопка запуска */
+    .ad-start-btn {
+        background: linear-gradient(135deg, #3a6b58, #1e3e31);
+        border: none;
+        padding: 16px 24px;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 18px;
+        color: white;
+        cursor: pointer;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+        display: block;
+        transition: 0.2s;
+        border: 1px solid rgba(255, 204, 102, 0.2);
+    }
+    .ad-start-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(58, 107, 88, 0.4);
+    }
+    .ad-start-btn small {
+        font-size: 11px;
+        opacity: 0.7;
+        display: block;
+        font-weight: 400;
+    }
+
+    /* Toast уведомление */
+    .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a2a2fe6;
+        backdrop-filter: blur(10px);
+        color: #ffdd99;
+        padding: 10px 20px;
+        border-radius: 60px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 1000;
+        animation: toastFade 2.5s ease forwards;
+        text-align: center;
+        max-width: 90vw;
+    }
+    @keyframes toastFade {
+        0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    }
+
+    /* Контейнер для картинки */
+    .ad-image-container {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 12px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 2px solid rgba(255, 204, 102, 0.3);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Сама картинка */
+    .ad-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .ad-image:hover {
+        transform: scale(1.02);
+    }
+
+    .ad-reward-btn, .ad-link-btn {
+        flex: 1;
+        min-width: 120px;
+        max-width: 200px;
+        padding: 14px 20px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        text-align: center;
+    }
+
+    .ad-reward-btn {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        color: #1a1a2e;
+        box-shadow: 0 4px 20px rgba(255, 170, 51, 0.3);
+    }
+
+    .ad-link-btn {
+        background: linear-gradient(135deg, #3a6b58, #1e3e31);
+        color: white;
+    }
+
+    @media (max-width: 400px) {
+        .ad-reward-btn, .ad-link-btn {
+            min-width: 100%;
+            max-width: 100%;
+        }
+    }
+
+    /* Модальное окно поддержки */
+    .support-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        animation: adFadeIn 0.3s ease;
+    }
+    .support-modal.show { display: flex; }
+
+    .support-content {
+        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+        border-radius: 48px;
+        width: 92%;
+        max-width: 400px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 204, 102, 0.3);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+        animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    .support-header {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        padding: 24px 20px;
+        text-align: center;
+    }
+    .support-header .support-icon {
+        font-size: 56px;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .support-header .support-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a1a2e;
+    }
+
+    .support-body {
+        padding: 24px 20px;
+        text-align: center;
+    }
+    .support-body p {
+        font-size: 15px;
+        line-height: 1.6;
+        opacity: 0.9;
+        margin-bottom: 16px;
+    }
+    .support-body .highlight {
+        color: #ffcc66;
+        font-weight: bold;
+    }
+
+    .support-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .support-btn {
+        padding: 14px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: 0.15s;
+    }
+    .support-btn.primary {
+        background: linear-gradient(135deg, #ffcc66, #ffaa33);
+        color: #1a1a2e;
+        box-shadow: 0 4px 15px rgba(255, 170, 51, 0.3);
+    }
+    .support-btn.primary:hover {
+        transform: scale(1.02);
+    }
+    .support-btn.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .support-btn.secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .support-footer {
+        padding: 12px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: center;
+        font-size: 11px;
+        opacity: 0.5;
+    }
+
+    /* ===== БЛОК СБОРА СРЕДСТВ ===== */
+    .fundraiser-block {
+        background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+        border-radius: 24px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        border: 1px solid rgba(255, 204, 102, 0.25);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .fundraiser-block::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 50%, rgba(255, 204, 102, 0.05), transparent 70%);
+        pointer-events: none;
+    }
+
+    .fundraiser-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .fundraiser-icon {
+        font-size: 22px;
+    }
+
+    .fundraiser-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: #ffcc66;
+        flex: 1;
+    }
+
+    .fundraiser-target {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        background: rgba(255, 204, 102, 0.15);
+        padding: 2px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 204, 102, 0.2);
+    }
+
+    .fundraiser-progress-wrap {
+        margin: 6px 0 8px;
+    }
+
+    .fundraiser-progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .fundraiser-progress-fill {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #ffaa33, #ffcc66, #ffaa33);
+        background-size: 200% 100%;
+        animation: shimmer 2s ease-in-out infinite;
+        transition: width 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+        width: 0%;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .fundraiser-stats {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .fundraiser-current {
+        font-weight: 800;
+        color: #ffcc66;
+        font-size: 16px;
+    }
+
+    .fundraiser-separator {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .fundraiser-total {
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+    }
+
+    .fundraiser-percent {
+        margin-left: auto;
+        font-weight: 700;
+        color: #88ddbb;
+        font-size: 13px;
+        background: rgba(136, 221, 187, 0.1);
+        padding: 0 10px;
+        border-radius: 20px;
+    }
+
+    .fundraiser-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        gap: 12px;
+    }
+
+    .fundraiser-footer span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .fundraiser-donate-btn {
+        background: linear-gradient(135deg, #ffaa33, #ff6600);
+        border: none;
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 12px;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 2px 12px rgba(255, 102, 0, 0.3);
+        white-space: nowrap;
+    }
+
+    .fundraiser-donate-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(255, 102, 0, 0.5);
+    }
+
+    .fundraiser-donate-btn:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 480px) {
+        .fundraiser-block {
+            padding: 12px 14px;
+        }
+        .fundraiser-title {
+            font-size: 13px;
+        }
+        .fundraiser-target {
+            font-size: 11px;
+            padding: 1px 10px;
+        }
+        .fundraiser-current {
+            font-size: 14px;
+        }
+        .fundraiser-stats {
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+        .fundraiser-footer {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .fundraiser-footer span {
+            font-size: 11px;
+        }
+        .fundraiser-donate-btn {
+            font-size: 11px;
+            padding: 5px 14px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -1035,6 +1620,30 @@
         <div id="dbErrorBanner" style="display: none; background: linear-gradient(135deg, #ff4444, #990000); color: white; text-align: center; padding: 10px; margin-bottom: 12px; border-radius: 20px; font-size: 12px; animation: pulse 1s infinite;">
             ⚠️ СЕРВЕР ВРЕМЕННО НЕДОСТУПЕН ⚠️<br>
             <span style="font-size: 10px; opacity: 0.8;">Данные сохраняются локально. Скоро всё заработает!</span>
+        </div>
+
+        <!-- БЛОК СБОРА СРЕДСТВ -->
+        <div class="fundraiser-block" id="fundraiserBlock">
+            <div class="fundraiser-header">
+                <span class="fundraiser-icon">🎯</span>
+                <span class="fundraiser-title">СБОР НА ПРОЕКТ</span>
+                <span class="fundraiser-target">15 000 ₽</span>
+            </div>
+            <div class="fundraiser-progress-wrap">
+                <div class="fundraiser-progress-bar">
+                    <div class="fundraiser-progress-fill" id="fundraiserProgressFill" style="width: 0.75%;"></div>
+                </div>
+                <div class="fundraiser-stats">
+                    <span class="fundraiser-current" id="fundraiserCurrent">150</span>
+                    <span class="fundraiser-separator">/</span>
+                    <span class="fundraiser-total">15 000 ₽</span>
+                    <span class="fundraiser-percent" id="fundraiserPercent">0.75%</span>
+                </div>
+            </div>
+            <div class="fundraiser-footer">
+                <span>❤️ Поддержи развитие проекта!</span>
+                <button class="fundraiser-donate-btn" id="fundraiserDonateBtn">ПОМОЧЬ</button>
+            </div>
         </div>
 
         <div class="side-menu" id="sideMenu">
@@ -1101,6 +1710,10 @@
 
                 <button class="level-up-btn" id="levelUpBtn">📈 ПОВЫСИТЬ УРОВЕНЬ</button>
                 <button class="claim-card-btn" id="claimCardBtn">📸 ПОЛУЧИТЬ КАРТУ</button>
+                <button class="ad-start-btn" id="adStartBtn">
+                    📺 СМОТРЕТЬ РЕКЛАМУ<br>
+                    <small>Осталось: <span id="adRemaining">3</span>/3</small>
+                </button>
 
                 <div class="history">
                     <div class="history-title">📜 ИСТОРИЯ КАРТ</div>
@@ -1308,54 +1921,6 @@
             </div>
         </div>
 
-        <!-- ИНФОРМАЦИЯ / ПОМОЩЬ -->
-        <div class="tab-panel" id="infoPanel">
-            <div class="game-panel">
-                <div style="font-weight: bold; font-size: 18px; text-align: center;">📚 ИНФОРМАЦИЯ</div>
-                <div style="font-size: 11px; text-align: center; opacity: 0.7; margin-bottom: 12px;">Что за что отвечает</div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">⛏️ ШАХТА</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Кирка</strong> — улучшается за алмазы, увеличивает добычу руды за удар<br>
-                            • <strong>Уровень</strong> — повышается за алмазы, увеличивает лимит ударов в день<br>
-                            • <strong>Бонус +5💎</strong> — ежедневный бесплатный бонус<br>
-                            • <strong>Обмен</strong> — 100 руды = 1 алмаз<br>
-                            • <strong>x2 событие</strong> — по выходным (сб-вс) добыча руды удваивается
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">🎴 КАРТЫ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • <strong>Ранги (от слабого к сильному):</strong> E → D → C → B → G → P → A<br>
-                            • <strong>Сезонные ранги:</strong> V(весна), L(лето), H(хеллоуин), N(зима) — сила 12<br>
-                            • <strong>Обмен 3:1</strong> — три карты одного ранга = одна карта выше рангом<br>
-                            • <strong>Получение карт:</strong> через Telegram @minebuff 
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dropdown-section">
-                    <div class="dropdown-header"><div class="dropdown-title">📅 КАЛЕНДАРЬ</div><div class="dropdown-arrow">▼</div></div>
-                    <div class="dropdown-content">
-                        <div style="padding: 8px; font-size: 13px; line-height: 1.6;">
-                            • Заходи каждый день и получай награды!<br>
-                            • Доступен с 5 уровня<br>
-                            • На 14 день — карта D, на 30 день — карта C
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="background: #071217cc; border-radius: 30px; padding: 8px; margin-top: 12px; text-align: center; font-size: 11px;">
-                    📢 По всем вопросам: <a href="https://t.me/b_loody" target="_blank" style="color: #ffcc66;">@b_loody</a>
-                </div>
-            </div>
-        </div>
-
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
             <div style="margin-top: 8px;">
@@ -1499,6 +2064,87 @@
         </div>
     </div>
 
+    <!-- Модальное окно поддержки -->
+    <div class="support-modal" id="supportModal">
+        <div class="support-content">
+            <div class="support-header">
+                <span class="support-icon">❤️</span>
+                <div class="support-title">ПОДДЕРЖАТЬ ПРОЕКТ</div>
+            </div>
+            <div class="support-body">
+                <p>
+                    Если вам нравится <span class="highlight">MINEBUFF</span> и вы хотите помочь проекту развиваться, 
+                    вы можете поддержать нас материально!
+                </p>
+                <p style="font-size: 13px; opacity: 0.7;">
+                    💎 <span class="highlight">1 ₽ = 5 алмазов</span> + бонус!
+                </p>
+                <div class="support-buttons">
+                    <button class="support-btn primary" id="supportDonateBtn">❤️ ПОДДЕРЖАТЬ</button>
+                    <button class="support-btn secondary" id="supportCloseBtn">ЗАКРЫТЬ</button>
+                </div>
+<!--                 <div style="margin-top: 12px; font-size: 11px; opacity: 0.5;">
+                    Модальное окно показывается раз в сутки
+                </div> -->
+            </div>
+            <div class="support-footer">
+                Спасибо, что играете в MineBuff! ⛏️
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-modal" id="adModal">
+        <div class="ad-content">
+            <!-- Шапка -->
+            <div class="ad-header">
+                <div class="ad-header-title">
+                    <span id="adTitle">📺 РЕКЛАМА</span>
+                </div>
+                <button class="ad-close-btn" id="adCloseBtn">✕</button>
+            </div>
+
+            <!-- Тело рекламы -->
+            <div class="ad-body" id="adBody">
+                <div class="ad-video-placeholder" id="adVideoPlaceholder">
+                    <div class="ad-image-container">
+                        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Реклама" class="ad-image" id="adImage">
+                    </div>
+                    
+                    <div class="ad-sponsor-logo" id="adSponsorLogo">🎮</div>
+                    <div class="ad-sponsor-name" id="adSponsorName">MINEBUFF</div>
+                    <div class="ad-sponsor-text" id="adSponsorText">ЛУЧШАЯ ШАХТА В МИРЕ!</div>
+                    
+                    <div class="ad-progress-ring">
+                        <svg viewBox="0 0 36 36" class="ad-progress-svg">
+                            <path class="ad-progress-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="ad-progress-fill" id="adProgressFill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        </svg>
+                        <div class="ad-progress-text">
+                            <span id="adTimerDisplay">20</span>
+                            <span style="font-size: 10px;">сек</span>
+                        </div>
+                    </div>
+                    <div class="ad-tip">⏳ Досмотрите до конца, чтобы получить награду!</div>
+                </div>
+
+                <div class="ad-reward-block" id="adRewardBlock" style="display: none;">
+                    <div class="ad-reward-icon">🎁</div>
+                    <div class="ad-reward-title">НАГРАДА ПОЛУЧЕНА!</div>
+                    <div class="ad-reward-desc" id="adRewardDesc">+50 руды</div>
+                    
+                    <!-- Контейнер для кнопок - одинаковые размеры -->
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; max-width: 100%;">
+                        <button class="ad-reward-btn" id="adRewardBtn" style="flex: 1; min-width: 120px; max-width: 200px;">ЗАБРАТЬ</button>
+                        <button class="ad-link-btn" id="adLinkBtn" style="display: none; flex: 1; min-width: 120px; max-width: 200px; background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 14px 20px; border-radius: 60px; font-weight: 700; font-size: 16px; color: white; cursor: pointer;">ПЕРЕЙТИ</button>
+                    </div>
+                </div>
+
+            <div class="ad-footer">
+                <span>⚠️ Закрытие до окончания = отказ от награды</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Плавающий подарок -->
     <div id="floatingGift" style="position: fixed; bottom: 20px; left: 20px; z-index: 1000; cursor: pointer; animation: bounce 1s infinite; display: none;">
         <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #fff;">
@@ -1597,6 +2243,19 @@
             let dbErrorCount = 0;
             let dbErrorBanner = null;
 
+            let adTimer = 20;              // секунд просмотра
+            let adTimerInterval = null;
+            let adIsWatched = false;      // досмотрел до конца?
+            let adIsActive = false;       // идёт просмотр?
+            let adRewardClaimed = false;  // награда уже получена?
+
+            // Ограничение рекламы
+            let adWatchedToday = 0;        // сколько реклам посмотрели сегодня
+            let adLastWatchDate = null;    // дата последнего просмотра
+            const MAX_AD_PER_DAY = 3;      // максимум реклам в день
+            const AD_REWARD_DIAMONDS = 7;  // награда за рекламу
+            let adStats = {};
+
             // ========== КАЛЕНДАРЬ ==========
             let _dailyStreak = 0;
             let _lastLoginDate = null;
@@ -1606,9 +2265,34 @@
             let notificationInterval = null;
             let lastNotificationCheck = null;
 
+            const FUNDRAISER_TARGET = 15000; // Цель в рублях
+            let fundraiserCurrent = 750; // Текущая сумма (можно менять)
+
             let _nextGiftTime = null;      // время следующего подарка
             let _giftAvailable = false;    // доступен ли подарок
             let _giftTimer = null;         // таймер для проверки
+
+            const adModal = document.getElementById('adModal');
+            const adStartBtn = document.getElementById('adStartBtn');
+            const adCloseBtn = document.getElementById('adCloseBtn');
+            const adTimerDisplay = document.getElementById('adTimerDisplay');
+            const adProgressFill = document.getElementById('adProgressFill');
+            const adVideoPlaceholder = document.getElementById('adVideoPlaceholder');
+            const adRewardBlock = document.getElementById('adRewardBlock');
+            const adRewardDesc = document.getElementById('adRewardDesc');
+            const adRewardBtn = document.getElementById('adRewardBtn');
+
+            // ========== РЕКЛАМНЫЕ ОБЪЯВЛЕНИЯ ==========
+            const adList = [
+                {
+                    id: 1,
+                    title: '📺 РЕКЛАМА',
+                    text: 'Стань легендой шахты!',
+                    image: 'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+                    link: 'https://t.me/minebuff',
+                    sponsor: 'MINEBUFF'
+                }
+            ];
 
             // Блокировка разделов по уровню
             const sectionLevelRequirements = {
@@ -1638,6 +2322,432 @@
                 }
                 updateSettingsUI();
             }
+
+            function updateFundraiserUI() {
+                const percent = Math.min((fundraiserCurrent / FUNDRAISER_TARGET) * 100, 100);
+                
+                const fill = document.getElementById('fundraiserProgressFill');
+                const currentSpan = document.getElementById('fundraiserCurrent');
+                const percentSpan = document.getElementById('fundraiserPercent');
+                
+                if (fill) fill.style.width = percent + '%';
+                if (currentSpan) currentSpan.textContent = fundraiserCurrent.toLocaleString('ru-RU');
+                if (percentSpan) percentSpan.textContent = percent.toFixed(2) + '%';
+            }
+
+            // Кнопка "ПОМОЧЬ" — открывает донат
+            document.getElementById('fundraiserDonateBtn')?.addEventListener('click', () => {
+                window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
+                showToast('❤️ Спасибо за поддержку проекта!', '#ffcc66');
+            });
+
+            // Функция для обновления суммы (вызывайте, когда нужно увеличить сбор)
+            function addFundraiserAmount(amount) {
+                fundraiserCurrent += amount;
+                updateFundraiserUI();
+                // Сохраняем в localStorage
+                localStorage.setItem('fundraiser_current', fundraiserCurrent.toString());
+            }
+
+            // Загружаем сохранённую сумму
+            function loadFundraiserData() {
+                const saved = localStorage.getItem('fundraiser_current');
+                if (saved) {
+                    fundraiserCurrent = parseFloat(saved) || 150;
+                }
+                updateFundraiserUI();
+            }
+
+            // ========== СИСТЕМА ПОДДЕРЖКИ (раз в сутки) ==========
+            
+            // Показать модальное окно поддержки
+            function showSupportModal() {
+                const modal = document.getElementById('supportModal');
+                if (modal) {
+                    modal.classList.add('show');
+                }
+            }
+
+            // Закрыть модальное окно поддержки
+            function closeSupportModal() {
+                const modal = document.getElementById('supportModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
+            }
+
+            // Проверить, нужно ли показывать поддержку
+            function checkSupportModal() {
+                const today = new Date().toDateString();
+                const lastSupportShow = localStorage.getItem('minebuff_last_support_show');
+
+                // Если сегодня ещё не показывали
+                if (lastSupportShow !== today) {
+                    showSupportModal();
+                    // Сохраняем, что показали сегодня
+                    localStorage.setItem('minebuff_last_support_show', today);
+                }
+            }
+
+            // Инициализация обработчиков поддержки
+            function initSupportHandlers() {
+                const donateBtn = document.getElementById('supportDonateBtn');
+                const closeBtn = document.getElementById('supportCloseBtn');
+                const modal = document.getElementById('supportModal');
+
+                if (donateBtn) {
+                    donateBtn.onclick = () => {
+                        // Открываем ссылку на поддержку
+                        window.open('https://yoomoney.ru/to/4100119003253255', '_blank');
+                        closeSupportModal();
+                    };
+                }
+
+                if (closeBtn) {
+                    closeBtn.onclick = closeSupportModal;
+                }
+
+                if (modal) {
+                    modal.onclick = (e) => {
+                        if (e.target === modal) {
+                            closeSupportModal();
+                        }
+                    };
+                }
+            }
+
+            // Загрузить статистику
+            function loadAdStats() {
+                const saved = localStorage.getItem('ad_stats');
+                if (saved) {
+                    try {
+                        adStats = JSON.parse(saved);
+                    } catch(e) {}
+                }
+            }
+            
+            // Сохранить статистику
+            function saveAdStats() {
+                localStorage.setItem('ad_stats', JSON.stringify(adStats));
+            }
+            
+            // Увеличить счётчик показов для рекламы
+            function trackAdView(adId) {
+                if (!adStats[adId]) {
+                    adStats[adId] = { views: 0, clicks: 0 };
+                }
+                adStats[adId].views++;
+                saveAdStats();
+            }
+            
+            // Увеличить счётчик кликов
+            function trackAdClick(adId) {
+                if (adStats[adId]) {
+                    adStats[adId].clicks++;
+                    saveAdStats();
+                }
+            }
+
+            // Получить случайную рекламу
+            function getRandomAd() {
+                const randomIndex = Math.floor(Math.random() * adList.length);
+                return adList[randomIndex];
+            }
+            
+            // Получить рекламу по ID (для тестирования)
+            function getAdById(id) {
+                return adList.find(ad => ad.id === id);
+            }
+
+            function updateAdButton() {
+                const remaining = getRemainingAds();
+                const span = document.getElementById('adRemaining');
+                if (span) span.textContent = remaining;
+            }
+
+            // Проверка лимита рекламы
+            function canWatchAd() {
+                const today = new Date().toDateString();
+                
+                // Если дата изменилась - сбрасываем счётчик
+                if (adLastWatchDate !== today) {
+                    adWatchedToday = 0;
+                    adLastWatchDate = today;
+                    saveGame();
+                }
+                
+                return adWatchedToday < MAX_AD_PER_DAY;
+            }
+
+            // Получить остаток реклам на сегодня
+            function getRemainingAds() {
+                const today = new Date().toDateString();
+                if (adLastWatchDate !== today) {
+                    return MAX_AD_PER_DAY;
+                }
+                return MAX_AD_PER_DAY - adWatchedToday;
+            }
+
+            function showToast(message, color = '#ffcc66') {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = message;
+                toast.style.borderLeft = `4px solid ${color}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+            }
+
+            function updateUI() {
+                // Обновите ваши UI элементы
+                document.getElementById('oreValue').textContent = _ore;
+                document.getElementById('diamondValue').textContent = _diamonds;
+            }
+
+            // ==========================================
+            // ОСНОВНАЯ ЛОГИКА РЕКЛАМЫ
+            // ==========================================
+
+            // Открыть рекламу
+            function openAd() {
+                if (adIsActive) return;
+                
+                // Проверяем лимит
+                if (!canWatchAd()) {
+                    showToast(`⛔ Вы уже посмотрели ${MAX_AD_PER_DAY} реклам сегодня! Завтра будет новый лимит.`, '#ff8888');
+                    return;
+                }
+                
+                // Выбираем случайную рекламу
+                const currentAd = getRandomAd();
+                
+                adIsActive = true;
+                adIsWatched = false;
+                adRewardClaimed = false;
+                adTimer = 20;
+
+                // Обновляем контент рекламы
+                const adImage = document.querySelector('.ad-image');
+                const adSponsorName = document.querySelector('.ad-sponsor-name');
+                const adSponsorText = document.querySelector('.ad-sponsor-text');
+                const adTitle = document.querySelector('.ad-header-title span');
+                
+                if (adImage) adImage.src = currentAd.image;
+                if (adSponsorName) adSponsorName.textContent = currentAd.sponsor;
+                if (adSponsorText) adSponsorText.textContent = currentAd.text;
+                if (adTitle) adTitle.textContent = currentAd.title;
+
+                // Сбрасываем UI
+                adVideoPlaceholder.style.display = 'block';
+                adRewardBlock.style.display = 'none';
+                adTimerDisplay.textContent = adTimer;
+                adProgressFill.style.strokeDashoffset = 100;
+                adCloseBtn.style.opacity = '1';
+                adCloseBtn.style.pointerEvents = 'auto';
+
+                // Показываем модалку
+                adModal.classList.add('show');
+
+                // Запускаем таймер
+                adTimerInterval = setInterval(() => {
+                    adTimer--;
+                    adTimerDisplay.textContent = adTimer;
+
+                    const progress = (adTimer / 20) * 100;
+                    adProgressFill.style.strokeDashoffset = progress;
+
+                    if (adTimer <= 0) {
+                        clearInterval(adTimerInterval);
+                        adTimerInterval = null;
+                        adIsWatched = true;
+                        onAdComplete();
+                    }
+                }, 1000);
+            }
+
+            function onAdComplete() {
+                adIsActive = false;
+                
+                // Показываем блок с наградой
+                adVideoPlaceholder.style.display = 'none';
+                adRewardBlock.style.display = 'block';
+                
+                // Награда - 7 алмазов
+                const reward = { 
+                    type: 'diamonds', 
+                    amount: AD_REWARD_DIAMONDS, 
+                    text: `💎 +${AD_REWARD_DIAMONDS} алмазов`,
+                    color: '#aaffdd'
+                };
+                
+                adRewardDesc.textContent = reward.text;
+                adRewardDesc.style.color = reward.color || '#ffcc66';
+                
+                // Показываем кнопку "Перейти" с ссылкой на рекламу
+                const linkBtn = document.getElementById('adLinkBtn');
+                const currentAd = getRandomAd(); // или сохраните текущую рекламу в переменную
+                if (linkBtn && currentAd.link) {
+                    linkBtn.style.display = 'inline-block';
+                    linkBtn.onclick = () => {
+                        trackAdClick(currentAd.id);
+                        window.open(currentAd.link, '_blank');
+                    };
+                }
+                
+                // Кнопка "забрать"
+                adRewardBtn.onclick = function() {
+                    if (adRewardClaimed) return;
+                    adRewardClaimed = true;
+                    
+                    adWatchedToday++;
+                    adLastWatchDate = new Date().toDateString();
+                    
+                    applyReward(reward);
+                    
+                    closeAd();
+                    
+                    const remaining = getRemainingAds();
+                    showToast(`🎁 ${reward.text}! Осталось реклам: ${remaining}`, '#44ff44');
+                    updateUI();
+                };
+
+                adCloseBtn.style.opacity = '0.5';
+                adCloseBtn.style.pointerEvents = 'none';
+            }
+
+            // Закрыть рекламу (с проверкой)
+            function closeAd() {
+                if (adTimerInterval) {
+                    clearInterval(adTimerInterval);
+                    adTimerInterval = null;
+                }
+
+                // Если не досмотрели и не получили награду
+                if (!adIsWatched && !adRewardClaimed) {
+                    // Показываем модальное окно вместо confirm
+                    showAdCloseWarningModal();
+                    return;
+                }
+
+                // Если награда получена — просто закрываем
+                adIsActive = false;
+                adModal.classList.remove('show');
+            }
+
+            // Модальное окно предупреждения при закрытии рекламы
+            function showAdCloseWarningModal() {
+                // Создаём модальное окно
+                const modalHtml = `
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 600; display: flex; justify-content: center; align-items: center; animation: adFadeIn 0.3s ease;">
+                        <div style="background: linear-gradient(145deg, #1e2e2f, #0f1a1f); border-radius: 48px; width: 92%; max-width: 380px; overflow: hidden; border: 1px solid rgba(255, 204, 102, 0.2); box-shadow: 0 30px 60px rgba(0,0,0,0.8);">
+                            <div style="background: linear-gradient(135deg, #ff4444, #cc0000); padding: 20px; text-align: center;">
+                                <div style="font-size: 48px;">⚠️</div>
+                                <div style="font-size: 20px; font-weight: 800; color: white;">ВНИМАНИЕ!</div>
+                            </div>
+                            <div style="padding: 24px 20px; text-align: center;">
+                                <div style="font-size: 16px; margin-bottom: 8px; color: #fff;">Вы не досмотрели рекламу до конца!</div>
+                                <div style="font-size: 14px; opacity: 0.7; margin-bottom: 16px; color: #ffcc66;">Награда НЕ БУДЕТ ЗАЧИСЛЕНА</div>
+                                <div style="display: flex; gap: 12px;">
+                                    <button id="adWarningCancelBtn" style="flex: 1; padding: 14px; border-radius: 60px; font-weight: 700; font-size: 16px; cursor: pointer; border: none; background: linear-gradient(135deg, #3a6b58, #1e3e31); color: white;">ВЕРНУТЬСЯ</button>
+                                    <button id="adWarningConfirmBtn" style="flex: 1; padding: 14px; border-radius: 60px; font-weight: 700; font-size: 16px; cursor: pointer; border: none; background: linear-gradient(135deg, #ff4444, #cc0000); color: white;">ОТКАЗАТЬСЯ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Добавляем модалку в body
+                const modalDiv = document.createElement('div');
+                modalDiv.id = 'adWarningModal';
+                modalDiv.innerHTML = modalHtml;
+                document.body.appendChild(modalDiv);
+
+                // Обработчики
+                document.getElementById('adWarningCancelBtn').onclick = () => {
+                    modalDiv.remove();
+                    // Возвращаемся к просмотру — запускаем таймер заново
+                    resumeAd();
+                };
+
+                document.getElementById('adWarningConfirmBtn').onclick = () => {
+                    modalDiv.remove();
+                    // Отказ от награды
+                    adIsActive = false;
+                    adModal.classList.remove('show');
+                    showToast('⏹️ Просмотр прерван, награда не получена', '#ff8888');
+                };
+
+                // Закрытие по клику на фон (только кнопка "Вернуться")
+                modalDiv.onclick = (e) => {
+                    if (e.target === modalDiv) {
+                        modalDiv.remove();
+                        resumeAd();
+                    }
+                };
+            }
+
+            // Возобновить просмотр рекламы
+            function resumeAd() {
+                if (!adIsWatched && !adRewardClaimed) {
+                    // Перезапускаем таймер с текущего значения
+                    if (adTimer <= 0) adTimer = 1;
+                    
+                    adTimerInterval = setInterval(() => {
+                        adTimer--;
+                        adTimerDisplay.textContent = adTimer;
+
+                        const progress = (adTimer / 20) * 100;
+                        adProgressFill.style.strokeDashoffset = progress;
+
+                        if (adTimer <= 0) {
+                            clearInterval(adTimerInterval);
+                            adTimerInterval = null;
+                            adIsWatched = true;
+                            onAdComplete();
+                        }
+                    }, 1000);
+                }
+            }
+
+            // ==========================================
+            // СИСТЕМА НАГРАД
+            // ==========================================
+            function getRandomReward() {
+                const rewards = [
+                    { type: 'ore', amount: 50, text: '⛏️ +50 руды', color: '#ffdd99' },
+                    { type: 'ore', amount: 100, text: '⛏️ +100 руды', color: '#ffdd99' },
+                    { type: 'diamonds', amount: 2, text: '💎 +2 алмаза', color: '#aaffdd' },
+                    { type: 'diamonds', amount: 5, text: '💎 +5 алмазов', color: '#aaffdd' },
+                    { type: 'card', rank: 'D', text: '🎴 Карта D', color: '#ffd966' },
+                    { type: 'card', rank: 'C', text: '🎴 Карта C', color: '#ffd966' },
+                ];
+                return rewards[Math.floor(Math.random() * rewards.length)];
+            }
+
+            function applyReward(reward) {
+                switch(reward.type) {
+                    case 'ore':
+                        _ore += reward.amount;
+                        break;
+                    case 'diamonds':
+                        _diamonds += reward.amount;
+                        break;
+                    case 'card':
+                        // Добавляем карту в историю
+                        _cardHistory.unshift({ 
+                            id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
+                            text: `🎴 Карта ранга ${reward.rank}`, 
+                            rank: reward.rank 
+                        });
+                        if (_cardHistory.length > 30) _cardHistory.pop();
+                        showToast(`🎴 Получена карта ${reward.rank}!`, '#ffd966');
+                        checkAchievements();
+                        updateQuestProgress('daily_card', 1);
+                        break;
+                }
+                saveGame();
+                updateUI();
+            }
+
 
             // Функция проверки ежедневного входа
             function checkDailyLogin() {
@@ -2191,7 +3301,6 @@
             }
 
             function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
-            function showToast(m, c) { const t = document.createElement('div'); t.className = 'toast-notification'; t.textContent = m; t.style.borderLeftColor = c || '#ffcc66'; document.body.appendChild(t); setTimeout(() => t.remove(), 2000); }
             
             function getRandomCardRank() {
                 const season = getCurrentTheme();
@@ -3173,6 +4282,7 @@
                 updateMiningInProfile();
                 updateRankUI(); 
                 updateEventChestUI();
+                updateAdButton();
             }
             
             function saveGame() {
@@ -3189,7 +4299,9 @@
                     lastLoginDate: _lastLoginDate,
                     calendarClaimed: _calendarClaimed,
                     luckBoostEndTime: _luckBoostEndTime,
-                    eventCurrency: _eventCurrency 
+                    eventCurrency: _eventCurrency,
+                    adWatchedToday: adWatchedToday,
+                    adLastWatchDate: adLastWatchDate,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -3221,6 +4333,17 @@
                         _luckBoostEndTime = d.luckBoostEndTime || null;
                         
                         _eventCurrency = d.eventCurrency || 0; 
+
+                        // Загружаем данные рекламы
+                        adWatchedToday = d.adWatchedToday || 0;
+                        adLastWatchDate = d.adLastWatchDate || null;
+                        
+                        // Проверяем сброс дня
+                        const today = new Date().toDateString();
+                        if (adLastWatchDate !== today) {
+                            adWatchedToday = 0;
+                            adLastWatchDate = today;
+                        }
 
                         // Восстанавливаем таймер, если есть запланированное время
                         if (_nextGiftTime && !_giftAvailable) {
@@ -3346,6 +4469,8 @@
                         })
                         .catch(e => console.warn(e));
                 }
+                initSupportHandlers();
+                setTimeout(() => checkSupportModal(), 2000);
             }     
 
             function checkRankUpgrade() {
@@ -3809,15 +4934,50 @@
                 }
             });
 
+            // ОБРАБОТЧИКИ СОБЫТИЙ
+            // ==========================================
+
+            // Запуск рекламы
+            adStartBtn.addEventListener('click', () => {
+                if (adIsActive) {
+                    showToast('⏳ Сначала завершите просмотр!', '#ffaa88');
+                    return;
+                }
+                
+                // Показываем сколько осталось реклам
+                const remaining = getRemainingAds();
+                if (remaining > 0) {
+                    openAd();
+                } else {
+                    showToast(`⛔ Вы уже посмотрели ${MAX_AD_PER_DAY} реклам сегодня! Завтра будет новый лимит.`, '#ff8888');
+                }
+            });
+
+            // Крестик (закрытие)
+            adCloseBtn.addEventListener('click', closeAd);
+
+            // Закрытие по клику на фон
+            adModal.addEventListener('click', (e) => {
+                if (e.target === adModal && adRewardClaimed) {
+                    closeAd();
+                } else if (e.target === adModal && !adRewardClaimed && adIsWatched) {
+                    showToast('🎁 Сначала заберите награду!', '#ffaa88');
+                } else if (e.target === adModal && !adIsWatched) {
+                    showToast('⏳ Досмотрите рекламу до конца!', '#ffaa88');
+                }
+            });
+
             initDropdowns();
             loadGame();
             initSupabase();
             initTopListClickHandler();
             checkDailyLogin();
             updateCalendarUI();
+            loadFundraiserData();
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
+            window.addFundraiserAmount = addFundraiserAmount;
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
