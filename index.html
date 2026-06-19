@@ -2682,13 +2682,13 @@
 
                 // ===== ОБРАБОТЧИК ДЛЯ ВСЕХ КАРТОЧЕК =====
                 container.querySelectorAll('.skill-card').forEach(card => {
-                    card.addEventListener('click', function(e) {
-                        e.stopPropagation();
+                    card.addEventListener('click', function() {
                         const skillId = this.dataset.skillId;
                         if (!skillId) return;
                         
                         // Проверяем, заблокирована ли карточка
                         if (this.classList.contains('locked')) {
+                            // Показываем причину блокировки
                             const reason = this.querySelector('.skill-requirements');
                             if (reason) {
                                 showToast(`🔒 ${reason.textContent}`, '#ffaa88');
@@ -2698,18 +2698,13 @@
                             return;
                         }
                         
-                        // Если достигнут максимум
-                        if (this.classList.contains('unlocked')) {
-                            showToast('✅ Навык уже максимального уровня!', '#44ff44');
-                            return;
-                        }
-                        
-                        // Если доступен - учим
-                        if (this.classList.contains('available')) {
-                            learnSkill(skillId);
-                        }
+                        // Если не заблокирована - учим навык
+                        learnSkill(skillId);
                     });
                 });
+
+                updateSkillBonusesUI();
+            }
 
             // Инициализация навыков
             function initSkills() {
@@ -3214,7 +3209,7 @@
                     }
                 }
             }
-            
+
             function addEventCurrency(amount) {
                 _eventCurrency += amount;
                 showToast(`✨ +${amount} ивентовой валюты!`, "#ffd966");
@@ -3228,16 +3223,10 @@
                         if (table && typeof table.upsert === 'function') {
                             table.upsert({
                                 player_id: _playerId,
-                                event_currency: _eventCurrency,
-                                ore: _ore,  // ← ДОБАВЛЕНО: сохраняем руду
-                                diamonds: _diamonds,  // ← ДОБАВЛЕНО: сохраняем алмазы
-                                level: _level,  // ← ДОБАВЛЕНО: сохраняем уровень
-                                username: _playerName,  // ← ДОБАВЛЕНО: сохраняем имя
-                                updated_at: new Date().toISOString()  // ← ДОБАВЛЕНО: время обновления
+                                event_currency: _eventCurrency
                             }, { onConflict: 'player_id' })
                             .then(() => {
                                 // Успешно обновлено
-                                console.log('✅ Данные сохранены в Supabase');
                             })
                             .catch(e => console.warn('Supabase upsert error:', e));
                         } else {
@@ -4422,7 +4411,7 @@
                 updatePickaxeVisual();
                 return wasReset;
             }
-                        
+            
             async function syncToSupabase() {
                 if (!supabaseClient || !_playerId || !_playerName) return;
                 try {
@@ -4432,17 +4421,15 @@
                         date: card.id || Date.now()
                     }));
                     
-                    // ДОБАВЛЯЕМ ore В СПИСОК ПОЛЕЙ!
                     await supabaseClient.from('leaderboard').upsert({
                         player_id: _playerId,
                         username: _playerName,
                         level: _level,
                         diamonds: _diamonds,
-                        ore: _ore,  // ← ДОБАВИТЬ ЭТУ СТРОЧКУ
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
-                        event_currency: _eventCurrency,
+                        event_currency: _eventCurrency, // ← ДОБАВИТЬ
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'player_id' });
                     
