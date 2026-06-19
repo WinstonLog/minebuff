@@ -2537,6 +2537,18 @@
                 }
             }
 
+            function applyReward(reward) {
+                // Проверяем, что награда - это алмазы
+                if (reward && reward.type === 'diamonds' && typeof reward.amount === 'number') {
+                    _diamonds += reward.amount;
+                    saveGame();
+                    updateUI();
+                    // Можно добавить уведомление
+                    showToast(`💎 +${reward.amount} алмазов!`, '#aaffdd');
+                }
+                // Все остальные награды игнорируем
+            }
+
             function updateFundraiserUI() {
                 const percent = Math.min((fundraiserCurrent / FUNDRAISER_TARGET) * 100, 100);
                 
