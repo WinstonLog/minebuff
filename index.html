@@ -1507,6 +1507,138 @@
                 max-width: 100%;
             }
         }
+
+        /* ===== ДРЕВО НАВЫКОВ ===== */
+        .skill-card {
+            background: linear-gradient(145deg, #1a2a2f, #0f1a1f);
+            border-radius: 20px;
+            padding: 14px 12px;
+            text-align: center;
+            border: 2px solid rgba(255, 204, 102, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 204, 102, 0.4);
+        }
+
+        .skill-card.unlocked {
+            border-color: #44ff44;
+            background: linear-gradient(145deg, #1a3a2a, #0f2a1a);
+            box-shadow: 0 0 20px rgba(68, 255, 68, 0.1);
+        }
+
+        .skill-card.locked {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+            cursor: not-allowed;
+        }
+
+        .skill-card.available {
+            border-color: #ffcc66;
+            animation: skillPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skillPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 204, 102, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 204, 102, 0.3); }
+        }
+
+        .skill-icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+
+        .skill-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .skill-desc {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .skill-level {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ffcc66;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-top: 4px;
+        }
+
+        .skill-bonus {
+            font-size: 12px;
+            color: #44ff44;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .skill-cost {
+            font-size: 10px;
+            color: #ffaa66;
+            margin-top: 4px;
+        }
+
+        .skill-card.locked .skill-cost {
+            color: #ff6666;
+        }
+
+        .skill-requirements {
+            font-size: 9px;
+            opacity: 0.5;
+            margin-top: 4px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 8px;
+        }
+
+        .category-label {
+            grid-column: 1 / -1;
+            margin-top: 8px;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .skill-bonuses-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            text-align: center;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        .skill-bonuses-display div {
+            font-size: 11px;
+        }
+
+        .skill-bonuses-display .value {
+            font-weight: bold;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -1648,6 +1780,21 @@
                 </div>
                 <div class="cards-stats" id="cardsStats"></div>
                 
+                <!-- Древо навыков -->
+                <div class="dropdown-section">
+                    <div class="dropdown-header" id="skillsDropdown">
+                        <div class="dropdown-title">🌳 ДРЕВО НАВЫКОВ <span id="skillPointsDisplay">(0 очков)</span></div>
+                        <div class="dropdown-arrow">▼</div>
+                    </div>
+                    <div class="dropdown-content" id="skillsContent">
+                        <div style="padding: 8px; text-align: center; margin-bottom: 12px;">
+                            <span style="font-size: 14px; opacity: 0.8;">💡 Очки навыков — за каждый 5-й уровень</span>
+                        </div>
+                        <div id="skillBonusesDisplay" class="skill-bonuses-display"></div>
+                        <div id="skillsTree" class="skills-grid"></div>
+                    </div>
+                </div>
+
                 <!-- Ежедневный календарь -->
                 <div class="dropdown-section">
                     <div class="dropdown-header">
@@ -2204,6 +2351,131 @@
             const adRewardDesc = document.getElementById('adRewardDesc');
             const adRewardBtn = document.getElementById('adRewardBtn');
 
+            // ========== ДЕРЕВО НАВЫКОВ ==========
+            const SKILLS_DATA = [
+                // ----- ВЕТКА ДОБЫЧИ -----
+                {
+                    id: 'miner_1',
+                    name: 'Шахтёр I',
+                    icon: '⛏️',
+                    desc: '+10% руды за удар',
+                    maxLevel: 5,
+                    costPerLevel: 1,
+                    bonusPerLevel: 0.10,
+                    category: 'mining',
+                    requirements: { level: 3 }
+                },
+                {
+                    id: 'miner_2',
+                    name: 'Шахтёр II',
+                    icon: '🪨',
+                    desc: '+15% руды за удар',
+                    maxLevel: 5,
+                    costPerLevel: 2,
+                    bonusPerLevel: 0.15,
+                    category: 'mining',
+                    requirements: { level: 10, skill: 'miner_1', skillLevel: 3 }
+                },
+                {
+                    id: 'miner_3',
+                    name: 'Шахтёр III',
+                    icon: '💎',
+                    desc: '+25% руды за удар',
+                    maxLevel: 3,
+                    costPerLevel: 3,
+                    bonusPerLevel: 0.25,
+                    category: 'mining',
+                    requirements: { level: 25, skill: 'miner_2', skillLevel: 3 }
+                },
+                
+                // ----- ВЕТКА ЭКОНОМИКИ -----
+                {
+                    id: 'jeweler_1',
+                    name: 'Ювелир I',
+                    icon: '💍',
+                    desc: '+1 алмаз за обмен',
+                    maxLevel: 3,
+                    costPerLevel: 1,
+                    bonusPerLevel: 1,
+                    category: 'economy',
+                    requirements: { level: 5 }
+                },
+                {
+                    id: 'jeweler_2',
+                    name: 'Ювелир II',
+                    icon: '🔮',
+                    desc: '+2 алмаза за обмен',
+                    maxLevel: 3,
+                    costPerLevel: 2,
+                    bonusPerLevel: 2,
+                    category: 'economy',
+                    requirements: { level: 15, skill: 'jeweler_1', skillLevel: 2 }
+                },
+                
+                // ----- ВЕТКА УДАЧИ -----
+                {
+                    id: 'lucky_1',
+                    name: 'Удача I',
+                    icon: '🍀',
+                    desc: 'Шанс сундука +2%',
+                    maxLevel: 5,
+                    costPerLevel: 1,
+                    bonusPerLevel: 2,
+                    category: 'luck',
+                    requirements: { level: 8 }
+                },
+                {
+                    id: 'lucky_2',
+                    name: 'Удача II',
+                    icon: '🎴',
+                    desc: 'Шанс сундука +5%',
+                    maxLevel: 3,
+                    costPerLevel: 2,
+                    bonusPerLevel: 5,
+                    category: 'luck',
+                    requirements: { level: 20, skill: 'lucky_1', skillLevel: 3 }
+                },
+                
+                // ----- ВЕТКА ВЫНОСЛИВОСТИ -----
+                {
+                    id: 'stamina_1',
+                    name: 'Выносливость I',
+                    icon: '💪',
+                    desc: '+10 ударов в день',
+                    maxLevel: 5,
+                    costPerLevel: 1,
+                    bonusPerLevel: 10,
+                    category: 'stamina',
+                    requirements: { level: 6 }
+                },
+                {
+                    id: 'stamina_2',
+                    name: 'Выносливость II',
+                    icon: '⚡',
+                    desc: '+20 ударов в день',
+                    maxLevel: 3,
+                    costPerLevel: 2,
+                    bonusPerLevel: 20,
+                    category: 'stamina',
+                    requirements: { level: 15, skill: 'stamina_1', skillLevel: 3 }
+                }
+            ];
+
+            const SKILL_CATEGORIES = {
+                mining: { name: '⛏️ Добыча', color: '#ffaa33' },
+                economy: { name: '💰 Экономика', color: '#44ff44' },
+                luck: { name: '🍀 Удача', color: '#ff69b4' },
+                stamina: { name: '💪 Выносливость', color: '#5bc0ff' }
+            };
+
+            // Глобальные бонусы навыков
+            let _skillBonuses = {
+                oreMultiplier: 1,
+                diamondBonus: 0,
+                cardChanceBonus: 0,
+                strikesBonus: 0
+            };
+
             // ========== РЕКЛАМНЫЕ ОБЪЯВЛЕНИЯ ==========
             const adList = [
                 {
@@ -2243,6 +2515,208 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
+            }
+
+            // Загрузка навыков игрока
+            function loadPlayerSkills() {
+                const saved = localStorage.getItem('minebuff_skills');
+                if (saved) {
+                    try {
+                        return JSON.parse(saved);
+                    } catch(e) {}
+                }
+                
+                // Инициализация навыков
+                const skills = {};
+                for (const skill of SKILLS_DATA) {
+                    skills[skill.id] = { level: 0 };
+                }
+                return skills;
+            }
+
+            // Сохранение навыков
+            function savePlayerSkills(skills) {
+                localStorage.setItem('minebuff_skills', JSON.stringify(skills));
+            }
+
+            // Получение очков навыков (1 очко за каждый 5-й уровень)
+            function getSkillPoints() {
+                return Math.floor(_level / 5);
+            }
+
+            // Использованные очки
+            function getUsedSkillPoints(skills) {
+                let used = 0;
+                for (const skillId in skills) {
+                    used += skills[skillId].level;
+                }
+                return used;
+            }
+
+            // Проверка возможности изучения навыка
+            function canLearnSkill(skillId, skills) {
+                const skill = SKILLS_DATA.find(s => s.id === skillId);
+                if (!skill) return { can: false, reason: 'Навык не найден' };
+                
+                const current = skills[skillId];
+                if (!current) return { can: false, reason: 'Ошибка данных' };
+                
+                // Проверка максимального уровня
+                if (current.level >= skill.maxLevel) {
+                    return { can: false, reason: 'Максимальный уровень' };
+                }
+                
+                // Проверка уровня игрока
+                if (_level < skill.requirements.level) {
+                    return { can: false, reason: `Требуется ${skill.requirements.level} уровень` };
+                }
+                
+                // Проверка требований к другим навыкам
+                if (skill.requirements.skill) {
+                    const reqSkill = skills[skill.requirements.skill];
+                    if (!reqSkill || reqSkill.level < skill.requirements.skillLevel) {
+                        return { can: false, reason: `Требуется ${skill.requirements.skill} ${skill.requirements.skillLevel} ур.` };
+                    }
+                }
+                
+                // Проверка очков навыков
+                const available = getSkillPoints() - getUsedSkillPoints(skills);
+                if (available < skill.costPerLevel) {
+                    return { can: false, reason: `Нужно ${skill.costPerLevel} очков навыков` };
+                }
+                
+                return { can: true };
+            }
+
+            // Изучить навык
+            function learnSkill(skillId) {
+                const skills = loadPlayerSkills();
+                const result = canLearnSkill(skillId, skills);
+                
+                if (!result.can) {
+                    showToast(`❌ ${result.reason}`, '#ff8888');
+                    return;
+                }
+                
+                const skill = SKILLS_DATA.find(s => s.id === skillId);
+                skills[skillId].level++;
+                savePlayerSkills(skills);
+                
+                showToast(`✅ ${skill.icon} ${skill.name} улучшен до ${skills[skillId].level} уровня!`, '#44ff44');
+                updateSkillsUI();
+                applySkillBonuses();
+                saveGame();
+            }
+
+            // Применить бонусы от навыков
+            function applySkillBonuses() {
+                const skills = loadPlayerSkills();
+                let bonuses = {
+                    oreMultiplier: 1,
+                    diamondBonus: 0,
+                    cardChanceBonus: 0,
+                    strikesBonus: 0
+                };
+                
+                for (const skillId in skills) {
+                    const level = skills[skillId].level;
+                    if (level === 0) continue;
+                    
+                    const skillData = SKILLS_DATA.find(s => s.id === skillId);
+                    if (!skillData) continue;
+                    
+                    if (skillId.startsWith('miner')) {
+                        bonuses.oreMultiplier += skillData.bonusPerLevel * level;
+                    } else if (skillId.startsWith('jeweler')) {
+                        bonuses.diamondBonus += skillData.bonusPerLevel * level;
+                    } else if (skillId.startsWith('lucky')) {
+                        bonuses.cardChanceBonus += skillData.bonusPerLevel * level;
+                    } else if (skillId.startsWith('stamina')) {
+                        bonuses.strikesBonus += skillData.bonusPerLevel * level;
+                    }
+                }
+                
+                _skillBonuses = bonuses;
+                
+                // Применяем бонус к лимиту ударов
+                const baseLimit = 100 + Math.floor(_level / 10);
+                _strikesLimit = Math.min(baseLimit + bonuses.strikesBonus, 300);
+                if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
+                
+                updateUI();
+                updateSkillBonusesUI();
+            }
+
+            // Обновление UI бонусов
+            function updateSkillBonusesUI() {
+                const container = document.getElementById('skillBonusesDisplay');
+                if (!container) return;
+                
+                const b = _skillBonuses;
+                container.innerHTML = `
+                    <div><div style="opacity:0.6;">⛏️ Руда</div><div class="value" style="color:#ffaa33;">+${Math.round((b.oreMultiplier - 1) * 100)}%</div></div>
+                    <div><div style="opacity:0.6;">💎 Алмазы</div><div class="value" style="color:#44ff44;">+${b.diamondBonus}</div></div>
+                    <div><div style="opacity:0.6;">🍀 Сундук</div><div class="value" style="color:#ff69b4;">+${b.cardChanceBonus}%</div></div>
+                    <div><div style="opacity:0.6;">💪 Удары</div><div class="value" style="color:#5bc0ff;">+${b.strikesBonus}</div></div>
+                `;
+            }
+
+            // Обновить UI древа навыков
+            function updateSkillsUI() {
+                const container = document.getElementById('skillsTree');
+                if (!container) return;
+                
+                const skills = loadPlayerSkills();
+                const usedPoints = getUsedSkillPoints(skills);
+                const totalPoints = getSkillPoints();
+                const available = totalPoints - usedPoints;
+                
+                const pointsDisplay = document.getElementById('skillPointsDisplay');
+                if (pointsDisplay) pointsDisplay.textContent = `(${available} очков)`;
+                
+                let html = '';
+                let currentCategory = '';
+                
+                for (const skill of SKILLS_DATA) {
+                    const current = skills[skill.id];
+                    const level = current ? current.level : 0;
+                    const isMaxLevel = level >= skill.maxLevel;
+                    const canLearn = canLearnSkill(skill.id, skills);
+                    const isAvailable = canLearn.can;
+                    const isLocked = !isAvailable && !isMaxLevel;
+                    
+                    // Показываем категорию
+                    if (currentCategory !== skill.category) {
+                        currentCategory = skill.category;
+                        const catInfo = SKILL_CATEGORIES[skill.category];
+                        html += `<div class="category-label" style="color:${catInfo.color};">${catInfo.name}</div>`;
+                    }
+                    
+                    const statusClass = isMaxLevel ? 'unlocked' : (isAvailable ? 'available' : 'locked');
+                    
+                    html += `
+                        <div class="skill-card ${statusClass}" onclick="learnSkill('${skill.id}')" style="${isLocked ? 'cursor: not-allowed;' : ''}">
+                            <div class="skill-icon">${skill.icon}</div>
+                            <div class="skill-name">${skill.name}</div>
+                            <div class="skill-desc">${skill.desc}</div>
+                            <div class="skill-level">${level}/${skill.maxLevel}</div>
+                            ${level > 0 ? `<div class="skill-bonus">+${Math.round(skill.bonusPerLevel * level * 100)}%</div>` : ''}
+                            ${!isMaxLevel ? `<div class="skill-cost">💰 ${skill.costPerLevel} очк.</div>` : '<div style="color:#44ff44;font-size:12px;">✅ MAX</div>'}
+                            ${isLocked ? `<div class="skill-requirements">🔒 ${canLearn.reason || 'Требования не выполнены'}</div>` : ''}
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+                updateSkillBonusesUI();
+            }
+
+            // Инициализация навыков
+            function initSkills() {
+                const skills = loadPlayerSkills();
+                savePlayerSkills(skills);
+                applySkillBonuses();
+                updateSkillsUI();
             }
 
             // Загрузить статистику
@@ -3309,6 +3783,11 @@
                 const streakBonus = 1 + (Math.floor(_dailyStreak / 7) * 0.05);
                 oreGain = Math.floor(oreGain * streakBonus);
 
+                // ===== НОВОЕ: Бонус от навыков =====
+                if (_skillBonuses && _skillBonuses.oreMultiplier > 1) {
+                    oreGain = Math.floor(oreGain * _skillBonuses.oreMultiplier);
+                }
+
                 if (oreGain < 1) oreGain = 1;
                 return oreGain;
             }
@@ -3886,8 +4365,11 @@
                 const today = new Date().toDateString();
                 const lastReset = localStorage.getItem('minebuff_last_reset');
                 const baseLimit = 100 + Math.floor(_level / 10);
-                const maxLimit = 200;
-                const finalBaseLimit = Math.min(baseLimit, maxLimit);
+                const maxLimit = 300;
+
+                // ===== НОВОЕ: Бонус от навыков =====
+                const skillStrikesBonus = _skillBonuses ? _skillBonuses.strikesBonus : 0;
+                let finalBaseLimit = Math.min(baseLimit + skillStrikesBonus, maxLimit);
                 
                 const boostKey = `strikes_boost_${today}`;
                 const hasBoostToday = localStorage.getItem(boostKey) === 'true';
@@ -4156,6 +4638,7 @@
                     eventCurrency: _eventCurrency,
                     adWatchedToday: adWatchedToday,
                     adLastWatchDate: adLastWatchDate,
+                    skillBonuses: _skillBonuses,
                 };
                 localStorage.setItem('minebuff_save', JSON.stringify(saveData));
                 if (supabaseClient && _playerId && _playerName) { syncToSupabase(); }
@@ -4308,6 +4791,7 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
+                initSkills();
 
                 if (supabaseClient && _playerId) {
                     supabaseClient
@@ -4534,6 +5018,10 @@
                     showToast(`⭐ УРОВЕНЬ ${_level}!`, "#ffcc66");
                     if (supabaseClient) syncToSupabase();
                     checkAchievements();
+                    
+                    // ===== НОВОЕ: Обновляем навыки =====
+                    applySkillBonuses();
+                    updateSkillsUI();
                 } else showToast(`❗ Нужно ${cost} алмазов`, "#ffb37c");
                 document.getElementById('levelModal').classList.remove('show');
             };
@@ -4610,6 +5098,23 @@
             document.getElementById('particlesToggleCheckbox').onchange = () => toggleParticles();
             document.getElementById('exchangeSlider').oninput = (e) => { document.getElementById('exchangeAmount').innerText = e.target.value; };
             document.getElementById('openEventChestBtn')?.addEventListener('click', () => openEventChest());
+
+            // Дропдаун навыков
+            const skillsDropdown = document.getElementById('skillsDropdown');
+            const skillsContent = document.getElementById('skillsContent');
+            const skillsArrow = skillsDropdown ? skillsDropdown.querySelector('.dropdown-arrow') : null;
+
+            if (skillsDropdown) {
+                skillsDropdown.onclick = () => {
+                    if (skillsContent) {
+                        skillsContent.classList.toggle('open');
+                        if (skillsArrow) skillsArrow.classList.toggle('open');
+                        if (skillsContent.classList.contains('open')) {
+                            updateSkillsUI();
+                        }
+                    }
+                };
+            }
 
 /*            // Магазин - сундук с картой (S, X и A ранги)
             document.getElementById('openCardChestBtn')?.addEventListener('click', () => {
