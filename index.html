@@ -2680,13 +2680,26 @@
                 
                 container.innerHTML = html;
 
-                // ===== НОВЫЙ ОБРАБОТЧИК =====
-                container.querySelectorAll('.skill-card:not(.locked)').forEach(card => {
+                // ===== ОБРАБОТЧИК ДЛЯ ВСЕХ КАРТОЧЕК =====
+                container.querySelectorAll('.skill-card').forEach(card => {
                     card.addEventListener('click', function() {
                         const skillId = this.dataset.skillId;
-                        if (skillId) {
-                            learnSkill(skillId);
+                        if (!skillId) return;
+                        
+                        // Проверяем, заблокирована ли карточка
+                        if (this.classList.contains('locked')) {
+                            // Показываем причину блокировки
+                            const reason = this.querySelector('.skill-requirements');
+                            if (reason) {
+                                showToast(`🔒 ${reason.textContent}`, '#ffaa88');
+                            } else {
+                                showToast('🔒 Навык недоступен', '#ffaa88');
+                            }
+                            return;
                         }
+                        
+                        // Если не заблокирована - учим навык
+                        learnSkill(skillId);
                     });
                 });
 
@@ -4904,7 +4917,23 @@
                 });
             }
             
-            function initDropdowns() { document.querySelectorAll('.dropdown-section').forEach(d => { const h = d.querySelector('.dropdown-header'), c = d.querySelector('.dropdown-content'), a = h.querySelector('.dropdown-arrow'); h.onclick = () => { c.classList.toggle('open'); a.classList.toggle('open'); }; }); }
+            // Инициализация дропдаунов (кроме skillsDropdown - у него свой обработчик)
+            function initDropdowns() { 
+                document.querySelectorAll('.dropdown-section').forEach(d => { 
+                    // Пропускаем древо навыков
+                    if (d.id === 'skillsDropdown' || d.querySelector('#skillsDropdown')) return;
+                    
+                    const h = d.querySelector('.dropdown-header'), 
+                          c = d.querySelector('.dropdown-content'), 
+                          a = h?.querySelector('.dropdown-arrow'); 
+                    if (h) {
+                        h.onclick = () => { 
+                            if (c) c.classList.toggle('open'); 
+                            if (a) a.classList.toggle('open'); 
+                        };
+                    }
+                }); 
+            }
 
             window.mineOre = function() {
                 updateLastActive(); 
@@ -4970,9 +4999,39 @@
                 updateLastActive(); 
                 let amt = parseInt(document.getElementById('exchangeSlider').value);
                 if (amt <= 0) { showToast("Выберите количество", "#ffaa88"); return; }
-                const gain = Math.floor(amt / 100);
-                if (gain && _ore >= gain * 100) { _ore -= gain * 100; _diamonds += gain; showToast(`💎 +${gain} алмаз(а)`, "#aaffdd"); document.getElementById('exchangeSlider').value = 0; document.getElementById('exchangeAmount').innerText = 0; saveGame(); updateUI(); checkAchievements(); }
-                else showToast("Нужно минимум 100 руды", "#ffaa88");
+                
+                // Базовое количество алмазов
+                let baseGain = Math.floor(amt / 100);
+                if (baseGain <= 0) { showToast("Нужно минимум 100 руды", "#ffaa88"); return; }
+                
+                // Проверяем, хватает ли руды
+                if (_ore < baseGain * 100) { 
+                    showToast("Недостаточно руды!", "#ffaa88"); 
+                    return; 
+                }
+                
+                // ===== НОВОЕ: Добавляем бонус от навыка "Ювелир" =====
+                const diamondBonus = _skillBonuses ? _skillBonuses.diamondBonus : 0;
+                const totalGain = baseGain + diamondBonus;
+                
+                // Списываем руду
+                _ore -= baseGain * 100;
+                
+                // Добавляем алмазы с бонусом
+                _diamonds += totalGain;
+                
+                // Показываем уведомление с бонусом
+                if (diamondBonus > 0) {
+                    showToast(`💎 +${totalGain} алмаз(а) (${baseGain} + ${diamondBonus} бонус)`, "#aaffdd");
+                } else {
+                    showToast(`💎 +${totalGain} алмаз(а)`, "#aaffdd");
+                }
+                
+                document.getElementById('exchangeSlider').value = 0;
+                document.getElementById('exchangeAmount').innerText = 0;
+                saveGame();
+                updateUI();
+                checkAchievements();
             };
             
             window.showLevelUpModal = function() {
