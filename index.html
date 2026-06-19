@@ -2412,30 +2412,6 @@
                     requirements: { level: 15, skill: 'jeweler_1', skillLevel: 2 }
                 },
                 
-                // ----- ВЕТКА УДАЧИ -----
-                {
-                    id: 'lucky_1',
-                    name: 'Удача I',
-                    icon: '🍀',
-                    desc: 'Шанс сундука +2%',
-                    maxLevel: 5,
-                    costPerLevel: 1,
-                    bonusPerLevel: 2,
-                    category: 'luck',
-                    requirements: { level: 8 }
-                },
-                {
-                    id: 'lucky_2',
-                    name: 'Удача II',
-                    icon: '🎴',
-                    desc: 'Шанс сундука +5%',
-                    maxLevel: 3,
-                    costPerLevel: 2,
-                    bonusPerLevel: 5,
-                    category: 'luck',
-                    requirements: { level: 20, skill: 'lucky_1', skillLevel: 3 }
-                },
-                
                 // ----- ВЕТКА ВЫНОСЛИВОСТИ -----
                 {
                     id: 'stamina_1',
@@ -2464,7 +2440,6 @@
             const SKILL_CATEGORIES = {
                 mining: { name: '⛏️ Добыча', color: '#ffaa33' },
                 economy: { name: '💰 Экономика', color: '#44ff44' },
-                luck: { name: '🍀 Удача', color: '#ff69b4' },
                 stamina: { name: '💪 Выносливость', color: '#5bc0ff' }
             };
 
@@ -2472,7 +2447,6 @@
             let _skillBonuses = {
                 oreMultiplier: 1,
                 diamondBonus: 0,
-                cardChanceBonus: 0,
                 strikesBonus: 0
             };
 
@@ -2587,6 +2561,7 @@
                 
                 return { can: true };
             }
+            window.learnSkill = learnSkill;
 
             // Изучить навык
             function learnSkill(skillId) {
@@ -2614,7 +2589,6 @@
                 let bonuses = {
                     oreMultiplier: 1,
                     diamondBonus: 0,
-                    cardChanceBonus: 0,
                     strikesBonus: 0
                 };
                 
@@ -2629,8 +2603,6 @@
                         bonuses.oreMultiplier += skillData.bonusPerLevel * level;
                     } else if (skillId.startsWith('jeweler')) {
                         bonuses.diamondBonus += skillData.bonusPerLevel * level;
-                    } else if (skillId.startsWith('lucky')) {
-                        bonuses.cardChanceBonus += skillData.bonusPerLevel * level;
                     } else if (skillId.startsWith('stamina')) {
                         bonuses.strikesBonus += skillData.bonusPerLevel * level;
                     }
@@ -2656,7 +2628,6 @@
                 container.innerHTML = `
                     <div><div style="opacity:0.6;">⛏️ Руда</div><div class="value" style="color:#ffaa33;">+${Math.round((b.oreMultiplier - 1) * 100)}%</div></div>
                     <div><div style="opacity:0.6;">💎 Алмазы</div><div class="value" style="color:#44ff44;">+${b.diamondBonus}</div></div>
-                    <div><div style="opacity:0.6;">🍀 Сундук</div><div class="value" style="color:#ff69b4;">+${b.cardChanceBonus}%</div></div>
                     <div><div style="opacity:0.6;">💪 Удары</div><div class="value" style="color:#5bc0ff;">+${b.strikesBonus}</div></div>
                 `;
             }
@@ -2695,7 +2666,7 @@
                     const statusClass = isMaxLevel ? 'unlocked' : (isAvailable ? 'available' : 'locked');
                     
                     html += `
-                        <div class="skill-card ${statusClass}" onclick="learnSkill('${skill.id}')" style="${isLocked ? 'cursor: not-allowed;' : ''}">
+                        <div class="skill-card ${statusClass}" data-skill-id="${skill.id}" style="${isLocked ? 'cursor: not-allowed;' : ''}">
                             <div class="skill-icon">${skill.icon}</div>
                             <div class="skill-name">${skill.name}</div>
                             <div class="skill-desc">${skill.desc}</div>
@@ -2708,6 +2679,17 @@
                 }
                 
                 container.innerHTML = html;
+
+                // ===== НОВЫЙ ОБРАБОТЧИК =====
+                container.querySelectorAll('.skill-card:not(.locked)').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const skillId = this.dataset.skillId;
+                        if (skillId) {
+                            learnSkill(skillId);
+                        }
+                    });
+                });
+
                 updateSkillBonusesUI();
             }
 
