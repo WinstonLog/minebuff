@@ -4998,11 +4998,17 @@
             window.exchangeOreToDiamonds = function() {
                 updateLastActive(); 
                 let amt = parseInt(document.getElementById('exchangeSlider').value);
-                if (amt <= 0) { showToast("Выберите количество", "#ffaa88"); return; }
+                if (amt <= 0) { 
+                    showToast("Выберите количество", "#ffaa88"); 
+                    return; 
+                }
                 
-                // Базовое количество алмазов
+                // Базовое количество алмазов (1 алмаз за 100 руды)
                 let baseGain = Math.floor(amt / 100);
-                if (baseGain <= 0) { showToast("Нужно минимум 100 руды", "#ffaa88"); return; }
+                if (baseGain <= 0) { 
+                    showToast("Нужно минимум 100 руды", "#ffaa88"); 
+                    return; 
+                }
                 
                 // Проверяем, хватает ли руды
                 if (_ore < baseGain * 100) { 
@@ -5010,19 +5016,19 @@
                     return; 
                 }
                 
-                // ===== НОВОЕ: Добавляем бонус от навыка "Ювелир" =====
+                // ===== БОНУС ОТ НАВЫКА "ЮВЕЛИР" =====
                 const diamondBonus = _skillBonuses ? _skillBonuses.diamondBonus : 0;
                 const totalGain = baseGain + diamondBonus;
                 
-                // Списываем руду
+                // Списываем руду (только базовую часть)
                 _ore -= baseGain * 100;
                 
                 // Добавляем алмазы с бонусом
                 _diamonds += totalGain;
                 
-                // Показываем уведомление с бонусом
+                // Уведомление
                 if (diamondBonus > 0) {
-                    showToast(`💎 +${totalGain} алмаз(а) (${baseGain} + ${diamondBonus} бонус)`, "#aaffdd");
+                    showToast(`💎 +${totalGain} алмаз(а)`, "#aaffdd");
                 } else {
                     showToast(`💎 +${totalGain} алмаз(а)`, "#aaffdd");
                 }
@@ -5032,6 +5038,9 @@
                 saveGame();
                 updateUI();
                 checkAchievements();
+                
+                // ===== ДОБАВЬТЕ ЭТУ СТРОКУ =====
+                updateSkillsUI();  // ← обновляем дерево навыков
             };
             
             window.showLevelUpModal = function() {
