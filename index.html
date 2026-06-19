@@ -4775,6 +4775,7 @@
                     }
                 }
                 
+                initSkills();
                 checkDailyReset();
                 updateUI();
                 checkAchievements();
@@ -4786,8 +4787,7 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
-                initSkills();
-
+                
                 if (supabaseClient && _playerId) {
                     supabaseClient
                         .from('leaderboard')
