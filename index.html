@@ -2447,6 +2447,136 @@
                 updateSettingsUI();
             }
 
+
+            // ============================================
+            // АВТОМАТИЧЕСКИЙ ФИКС ДАННЫХ
+            // ============================================
+
+            function fixPlayerData() {
+                console.log('🔧 Проверка данных игрока...');
+                let fixed = false;
+                
+                // 1. Проверяем сохранение
+                const saved = localStorage.getItem('minebuff_save');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        
+                        // Проверяем критические поля
+                        if (data.strikesDone === undefined || isNaN(data.strikesDone)) {
+                            data.strikesDone = 0;
+                            fixed = true;
+                            console.log('🔧 Исправлено strikesDone');
+                        }
+                        
+                        if (data.strikesLimit === undefined || isNaN(data.strikesLimit) || data.strikesLimit < 50) {
+                            data.strikesLimit = 100;
+                            fixed = true;
+                            console.log('🔧 Исправлено strikesLimit');
+                        }
+                        
+                        if (data.level === undefined || isNaN(data.level) || data.level < 1) {
+                            data.level = 1;
+                            fixed = true;
+                            console.log('🔧 Исправлено level');
+                        }
+                        
+                        // Гарантируем, что strikesDone не больше strikesLimit
+                        if (data.strikesDone > data.strikesLimit) {
+                            data.strikesDone = data.strikesLimit;
+                            fixed = true;
+                            console.log('🔧 Исправлено: strikesDone > strikesLimit');
+                        }
+                        
+                        if (fixed) {
+                            localStorage.setItem('minebuff_save', JSON.stringify(data));
+                            console.log('✅ Данные восстановлены!');
+                        }
+                    } catch(e) {
+                        console.warn('❌ Повреждённое сохранение, создаём новое');
+                        localStorage.removeItem('minebuff_save');
+                        fixed = true;
+                    }
+                }
+                
+                // 2. Проверяем навыки
+                const skills = localStorage.getItem('minebuff_skills');
+                if (skills) {
+                    try {
+                        JSON.parse(skills);
+                    } catch(e) {
+                        console.warn('❌ Повреждённые навыки, создаём новые');
+                        localStorage.removeItem('minebuff_skills');
+                        fixed = true;
+                    }
+                }
+                
+                // 3. Проверяем сброс дня
+                const today = new Date().toDateString();
+                const lastReset = localStorage.getItem('minebuff_last_reset');
+                if (!lastReset || lastReset !== today) {
+                    // Если сегодня ещё не было сброса, но удары не обнулились
+                    // Принудительно сбрасываем
+                    localStorage.setItem('minebuff_last_reset', today);
+                    console.log('🔧 Принудительный сброс дня');
+                    fixed = true;
+                }
+                
+                if (fixed) {
+                    showToast('🔧 Данные восстановлены автоматически', '#ffcc66');
+                    // Перезагружаем игру
+                    setTimeout(() => location.reload(), 1000);
+                }
+                
+                return fixed;
+            }
+
+            // ============================================
+            // ПРИНУДИТЕЛЬНАЯ СИНХРОНИЗАЦИЯ УДАРОВ
+            // ============================================
+
+            function forceSyncStrikes() {
+                const today = new Date().toDateString();
+                const lastReset = localStorage.getItem('minebuff_last_reset');
+                
+                // Загружаем сохранение
+                let saveData = null;
+                try {
+                    const saved = localStorage.getItem('minebuff_save');
+                    if (saved) saveData = JSON.parse(saved);
+                } catch(e) {}
+                
+                if (!saveData) return;
+                
+                // Проверяем, нужно ли сбросить удары
+                if (lastReset !== today) {
+                    // Новый день — сбрасываем
+                    saveData.strikesDone = 0;
+                    
+                    // Пересчитываем лимит
+                    const baseLimit = 100 + Math.floor((saveData.level || 1) / 10);
+                    const bonusStrikes = window._skillBonuses?.strikesBonus || 0;
+                    saveData.strikesLimit = Math.min(baseLimit + bonusStrikes, 300);
+                    
+                    // Сохраняем
+                    localStorage.setItem('minebuff_save', JSON.stringify(saveData));
+                    localStorage.setItem('minebuff_last_reset', today);
+                    
+                    console.log('✅ Удары принудительно синхронизированы!');
+                    return true;
+                }
+                
+                // Проверяем, что strikesDone не больше strikesLimit
+                if (saveData.strikesDone > saveData.strikesLimit) {
+                    saveData.strikesDone = saveData.strikesLimit;
+                    localStorage.setItem('minebuff_save', JSON.stringify(saveData));
+                    console.log('✅ Исправлено: strikesDone > strikesLimit');
+                    return true;
+                }
+                
+                return false;
+            }
+
             // Загрузка навыков игрока
             function loadPlayerSkills() {
                 const saved = localStorage.getItem('minebuff_skills');
@@ -4382,6 +4512,7 @@
                         username: _playerName,
                         level: _level,
                         diamonds: _diamonds,
+                        ore: _ore, 
                         mb_link: _mbProfileLink || null,
                         cards_json: cardsForDb,
                         last_active: _lastActive || new Date().toISOString(),
@@ -4731,6 +4862,8 @@
                     }
                 }
                 
+                fixPlayerData();
+                forceSyncStrikes();
                 initSkills();
                 checkDailyReset();
                 updateUI();
