@@ -985,10 +985,7 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-        #floatingGift:hover {
-            animation: none;
-            transform: scale(1.05);
-        }
+
         /* Анимация вылетающих цифр */
         .floating-number {
             position: fixed;
@@ -1806,89 +1803,92 @@
             }
         }
 
-        /* ===== УВЕДОМЛЕНИЕ О ПОДАРКЕ ===== */
-        .gift-notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
+        /* Хранитель карт */
+        .keeper-card {
             background: linear-gradient(145deg, #1a2a2f, #0f1a1f);
-            border-radius: 24px;
-            padding: 24px 28px;
+            border-radius: 16px;
+            padding: 12px 8px;
             text-align: center;
-            z-index: 2001;
-            border: 2px solid #ffcc66;
-            box-shadow: 0 0 60px rgba(255, 204, 102, 0.2);
-            animation: giftPop 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
-            max-width: 340px;
-            width: 90%;
-            pointer-events: auto;
+            border: 2px solid rgba(255, 204, 102, 0.15);
+            transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
         }
 
-        .gift-notification .icon {
-            font-size: 48px;
-            margin-bottom: 6px;
-            animation: iconBounce 0.6s ease 0.3s;
+        .keeper-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 204, 102, 0.4);
         }
 
-        .gift-notification .title {
-            font-size: 17px;
+        .keeper-card .rank {
+            font-size: 28px;
             font-weight: 800;
-            color: #ffcc66;
-            margin-bottom: 2px;
+            display: block;
         }
 
-        .gift-notification .subtitle {
-            font-size: 13px;
-            opacity: 0.8;
+        .keeper-card .count {
+            font-size: 12px;
+            opacity: 0.7;
+            margin: 4px 0;
         }
 
-        .gift-notification .timer {
-            font-size: 26px;
-            font-weight: 800;
+        .keeper-card .reward {
+            font-size: 11px;
             color: #44ff44;
-            margin: 6px 0;
+            font-weight: bold;
         }
 
-        .gift-notification .close-hint {
+        .keeper-card .exchange-btn {
+            background: linear-gradient(135deg, #3a6b58, #1e3e31);
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        .keeper-card .exchange-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .keeper-card .exchange-btn:active {
+            transform: scale(0.95);
+        }
+
+        .keeper-card .exchange-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .keeper-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .keeper-card .no-cards {
             font-size: 10px;
             opacity: 0.4;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
-        @keyframes giftPop {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(-5deg); opacity: 0; }
-            60% { transform: translate(-50%, -50%) scale(1.05) rotate(1deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
-        }
-
-        .gift-notification.hide {
-            animation: giftHide 0.4s ease forwards;
-        }
-
-        @keyframes giftHide {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-        }
-
-        /* Адаптация для маленьких экранов */
-        @media (max-width: 400px) {
-            .gift-notification {
-                padding: 18px 20px;
-                max-width: 300px;
-                border-radius: 20px;
-            }
-            .gift-notification .icon {
-                font-size: 38px;
-            }
-            .gift-notification .title {
-                font-size: 15px;
-            }
-            .gift-notification .timer {
-                font-size: 22px;
-            }
-        }
+        /* Стили для рангов в хранителе */
+        .keeper-card.rank-E { border-color: #a17654; }
+        .keeper-card.rank-D { border-color: #6e8f9e; }
+        .keeper-card.rank-C { border-color: #b8a35c; }
+        .keeper-card.rank-B { border-color: #3a1e52; }
+        .keeper-card.rank-G { border-color: #1c4620; }
+        .keeper-card.rank-P { border-color: #102b4e; }
+        .keeper-card.rank-A { border-color: #5a1a1a; }
+        .keeper-card.rank-V { border-color: #4a8a4a; }
+        .keeper-card.rank-L { border-color: #f4d03f; }
+        .keeper-card.rank-H { border-color: #ff6600; }
+        .keeper-card.rank-N { border-color: #2a6a8a; }
+        .keeper-card.rank-F { border-color: #8B7355; }
 
         #fundraiserBlock {
             display: none !important;
@@ -2075,7 +2075,7 @@
                 <!-- Ежедневный календарь -->
                 <div class="dropdown-section">
                     <div class="dropdown-header">
-                        <div class="dropdown-title">📅 ЕЖЕДНЕВНЫЙ КАЛЕНДАРЬ <span id="calendarStreak">(День 1)</span></div>
+                        <div class="dropdown-title">📅 КАЛЕНДАРЬ <span id="calendarStreak">(День 1)</span></div>
                         <div class="dropdown-arrow">▼</div>
                     </div>
                     <div class="dropdown-content" id="calendarContent">
@@ -2095,6 +2095,22 @@
                 <div class="dropdown-section">
                     <div class="dropdown-header"><div class="dropdown-title">📋 ЕЖЕДНЕВНЫЕ ЗАДАНИЯ <span id="questsProgress">(0/4)</span></div><div class="dropdown-arrow">▼</div></div>
                     <div class="dropdown-content" id="questsContent"></div>
+                </div>
+
+                <!-- Хранитель карт  -->
+                <div class="dropdown-section">
+                    <div class="dropdown-header" id="cardKeeperDropdown">
+                        <div class="dropdown-title">🏛️ ХРАНИТЕЛЬ КАРТ <span id="cardKeeperCount">(0 карт)</span></div>
+                        <div class="dropdown-arrow">▼</div>
+                    </div>
+                    <div class="dropdown-content" id="cardKeeperContent">
+                        <div style="padding: 8px; text-align: center; margin-bottom: 12px;">
+                            <span style="font-size: 13px; opacity: 0.8;">💎 Обменивайте карты на алмазы</span>
+                            <span style="font-size: 11px; opacity: 0.5; display: block;">S и X ранги нельзя обменять</span>
+                        </div>
+                        <div id="cardKeeperGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; padding: 4px;">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="profile-link-section" id="profileLinkSection">
@@ -2155,6 +2171,7 @@
                            🍉 Ивентовая валюта: <span id="eventCurrencyDisplay">0</span>
                         </div>
                     </div> -->
+                </div>
                 
                 <!-- ПОПОЛНЕНИЕ (ДОНАТ) -->
                 <div id="shopDonateContent" style="display: none;">
@@ -2438,13 +2455,6 @@
         </div>
     </div>
 
-    <!-- Плавающий подарок -->
-    <div id="floatingGift" style="position: fixed; bottom: 20px; left: 20px; z-index: 1000; cursor: pointer; animation: bounce 1s infinite; display: none;">
-        <div style="background: linear-gradient(135deg, #ffcc66, #ffaa33); border-radius: 60px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #fff;">
-            <div style="font-size: 32px;">🎁</div>
-        </div>
-    </div>
-
     <!-- Контейнер для уведомлений -->
     <div id="notificationContainer" style="position: fixed; top: 70px; right: 10px; left: 10px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; pointer-events: block;">
     </div>
@@ -2498,6 +2508,25 @@
                 { id: 'daily_strikes', name: 'Активность', desc: '40 ударов', target: 40, reward: 2 },
                 { id: 'daily_card', name: 'Удача', desc: 'Получить карту', target: 1, reward: 4 }
             ];
+
+            // Настройки обмена (ранг -> алмазы)
+            const CARD_EXCHANGE_RATES = {
+                'E': 1,
+                'D': 2,
+                'C': 4,
+                'B': 5,
+                'G': 7,
+                'P': 9,
+                'A': 10,
+                // Ивентовые ранги
+                'V': 40,
+                'L': 40,
+                'H': 40,
+                'N': 40,
+                'F': 0, // F — эксклюзивный, не обменивается
+                'S': 0, // S — нельзя обменять
+                'X': 0  // X — нельзя обменять
+            };
 
             // ========== СИСТЕМА РАНГОВ/ЗВАНИЙ ==========
             const rankTitles = [
@@ -2558,10 +2587,6 @@
 
             const FUNDRAISER_TARGET = 15000; // Цель в рублях
             let fundraiserCurrent = 750; // Текущая сумма (можно менять)
-
-            let _nextGiftTime = null;      // время следующего подарка
-            let _giftAvailable = false;    // доступен ли подарок
-            let _giftTimer = null;         // таймер для проверки
 
             let _carouselIndex = 0;
             let _carouselInterval = null;
@@ -2675,73 +2700,73 @@
                 updateSettingsUI();
             }
 
-            // ============================================
-            // УВЕДОМЛЕНИЕ О ПОДАРКЕ ПРИ ВХОДЕ
-            // ============================================
-
-            // Показать уведомление о подарке
-            function showGiftNotification(minutes) {
-                // Не показываем, если подарок уже доступен
-                if (_giftAvailable) return;
+            // Обновить UI Хранителя карт
+            function updateCardKeeperUI() {
+                const container = document.getElementById('cardKeeperGrid');
+                if (!container) return;
                 
-                // Удаляем старое уведомление, если есть
-                const old = document.querySelector('.gift-notification');
-                if (old) old.remove();
+                const counts = getCardCounts();
+                const totalCards = _cardHistory.length;
                 
-                const toast = document.createElement('div');
-                toast.className = 'gift-notification';
-                toast.innerHTML = `
-                    <div class="icon">🎁</div>
-                    <div class="title">ПОДАРОК СКОРО!</div>
-                    <div class="subtitle">Следующий подарок появится через</div>
-                    <div class="timer">${minutes} мин</div>
-                    <div class="close-hint">👆 Нажмите, чтобы закрыть</div>
-                `;
-                document.body.appendChild(toast);
+                // Обновляем счётчик
+                const countSpan = document.getElementById('cardKeeperCount');
+                if (countSpan) countSpan.textContent = `(${totalCards} карт)`;
                 
-                // Автоматически скрыть через 4 секунды
-                const hideTimeout = setTimeout(() => {
-                    toast.classList.add('hide');
-                    setTimeout(() => {
-                        if (toast.parentNode) toast.remove();
-                    }, 400);
-                }, 4000);
+                // Ранги для отображения (все, кроме S и X)
+                const displayRanks = ['E', 'D', 'C', 'B', 'G', 'P', 'A', 'V', 'L', 'H', 'N', 'F'];
                 
-                // Закрытие по клику
-                toast.onclick = () => {
-                    clearTimeout(hideTimeout);
-                    toast.classList.add('hide');
-                    setTimeout(() => {
-                        if (toast.parentNode) toast.remove();
-                    }, 400);
-                };
-            }
-
-            // Проверить и показать уведомление о подарке при входе
-            function checkGiftOnEntry() {
-                // Не показываем, если подарок уже доступен
-                if (_giftAvailable) return;
+                let html = '';
                 
-                // Не показываем, если нет запланированного времени
-                if (!_nextGiftTime) return;
-                
-                const now = Date.now();
-                const remaining = _nextGiftTime - now;
-                
-                // Если осталось меньше минуты — показываем подарок
-                if (remaining < 60000) {
-                    if (!_giftAvailable) {
-                        showGift();
-                    }
-                    return;
+                for (const rank of displayRanks) {
+                    const count = counts[rank] || 0;
+                    const rate = CARD_EXCHANGE_RATES[rank] || 0;
+                    const canExchange = rate > 0 && count > 0;
+                    const isLocked = rate === 0;
+                    
+                    // Цвета для рангов
+                    const rankColors = {
+                        'E': '#a17654', 'D': '#6e8f9e', 'C': '#b8a35c', 'B': '#3a1e52',
+                        'G': '#1c4620', 'P': '#102b4e', 'A': '#5a1a1a',
+                        'V': '#4a8a4a', 'L': '#f4d03f', 'H': '#ff6600', 'N': '#2a6a8a',
+                        'F': '#8B7355'
+                    };
+                    
+                    const bgColor = rankColors[rank] || '#3a3a3a';
+                    
+                    html += `
+                        <div class="keeper-card rank-${rank} ${isLocked ? 'locked' : ''}" style="border-color: ${bgColor};">
+                            <span class="rank" style="color: ${bgColor};">${rank}</span>
+                            <div class="count">${count} шт.</div>
+                            ${rate > 0 ? `<div class="reward">💎 ${rate} алмазов</div>` : '<div class="reward" style="color:#ff6666;">❌ Нельзя обменять</div>'}
+                            ${count > 0 && rate > 0 ? 
+                                `<button class="exchange-btn" onclick="exchangeCard('${rank}')">ОБМЕНЯТЬ</button>` : 
+                                count === 0 && rate > 0 ? 
+                                `<div class="no-cards">Нет карт</div>` : ''
+                            }
+                            ${isLocked ? `<div class="no-cards">🔒 Недоступен</div>` : ''}
+                        </div>
+                    `;
                 }
                 
-                // Переводим в минуты
-                const minutes = Math.ceil(remaining / 60000);
+                container.innerHTML = html;
+            }
+
+            // Инициализация дропдауна для Хранителя карт
+            function initCardKeeper() {
+                const dropdown = document.getElementById('cardKeeperDropdown');
+                const content = document.getElementById('cardKeeperContent');
+                const arrow = dropdown?.querySelector('.dropdown-arrow');
                 
-                // Показываем уведомление только если осталось от 1 до 30 минут
-                if (minutes > 0 && minutes <= 30) {
-                    showGiftNotification(minutes);
+                if (dropdown) {
+                    dropdown.onclick = () => {
+                        if (content) {
+                            content.classList.toggle('open');
+                            if (arrow) arrow.classList.toggle('open');
+                            if (content.classList.contains('open')) {
+                                updateCardKeeperUI();
+                            }
+                        }
+                    };
                 }
             }
 
@@ -4352,129 +4377,6 @@
                 return 'E';                     // 69.5% (самый частый)
             }
 
-            function getRandomGiftCard() {
-                const rand = Math.random() * 100;
-                
-                // 50% - руда
-                if (rand < 50) {
-                    const amount = Math.floor(Math.random() * 100) + 50;
-                    return { type: 'ore', amount: amount, text: `⛏️ ${amount} руды` };
-                }
-                // 30% - алмазы
-                else if (rand < 80) {
-                    const amount = Math.floor(Math.random() * 3) + 1;
-                    return { type: 'diamonds', amount: amount, text: `💎 ${amount} алмаза` };
-                }
-                // 20% - карта (F - САМЫЙ РЕДКИЙ)
-                else {
-                    const cardRand = Math.random() * 100;
-                    let rank = 'E';  // по умолчанию E
-                    if (cardRand < 0.1) rank = 'F';      // 0.1%
-                    else if (cardRand < 1.5) rank = 'A'; // 1%
-                    else if (cardRand < 3) rank = 'P';   // 1.5%
-                    else if (cardRand < 5) rank = 'G';   // 2%
-                    else if (cardRand < 10) rank = 'B';  // 5%
-                    else if (cardRand < 17) rank = 'C';  // 7%
-                    else if (cardRand < 30) rank = 'D';  // 13%
-                    else rank = 'E';                     // 70%
-                    return { type: 'card', rank: rank, text: `🎴 Карта ранга ${rank}` };
-                }
-            }
-
-            function scheduleNextGift() {
-                // Интервал 10-30 минут (не слишком часто, но и не редко)
-                const minDelay = 10 * 60 * 1000;   // 10 минут
-                const maxDelay = 30 * 60 * 1000;  // 30 минут
-                const delay = minDelay + Math.random() * (maxDelay - minDelay);
-                
-                _nextGiftTime = Date.now() + delay;
-                _giftAvailable = false;
-                
-                const giftDiv = document.getElementById('floatingGift');
-                if (giftDiv) giftDiv.style.display = 'none';
-                
-                saveGame();
-                
-                const minutes = Math.round(delay / 60000);
-                console.log(`🎁 Следующий подарок через ${minutes} минут`);
-                
-                // Очищаем старый таймер
-                if (_giftTimer) {
-                    clearTimeout(_giftTimer);
-                    _giftTimer = null;
-                }
-                
-                // Запускаем новый таймер
-                _giftTimer = setTimeout(() => {
-                    console.log('🎁 Подарок появился!');
-                    showGift();
-                }, delay);
-            }
-                        
-            // Показать подарок
-            function showGift() {
-                if (_giftAvailable) return;
-                
-                _giftAvailable = true;
-                const giftDiv = document.getElementById('floatingGift');
-                if (giftDiv) {
-                    giftDiv.style.display = 'block';
-                    
-                    // Добавляем эффект "пульсации" для привлечения внимания
-                    giftDiv.style.animation = 'bounce 0.5s ease-in-out 3';
-                    setTimeout(() => {
-                        if (giftDiv) giftDiv.style.animation = 'bounce 1s infinite';
-                    }, 1500);
-                }
-                
-                // ===== НОВОЕ: Уведомление о подарке =====
-                showNotification('🎁 ПОДАРОК!', 'Нажмите на иконку 🎁 внизу слева, чтобы забрать!', '🎁', 'success');
-                
-                saveGame();
-            }
-
-            // Забрать подарок
-            function claimGift() {
-                if (!_giftAvailable) {
-                    showToast("❌ Подарок ещё не появился!", "#ffaa88");
-                    return;
-                }
-                
-                const reward = getRandomGiftCard();
-                
-                // Эффект конфетти при получении подарка
-                if (typeof launchConfetti === 'function') {
-                    launchConfetti();
-                }
-
-                if (reward.type === 'ore') {
-                    _ore += reward.amount;
-                    showToast(`✨ ${reward.text}! ✨`, "#ffdd99");
-                } else if (reward.type === 'diamonds') {
-                    _diamonds += reward.amount;
-                    showToast(`✨ ${reward.text}! ✨`, "#aaffdd");
-                } else if (reward.type === 'card') {
-                    _cardHistory.unshift({ 
-                        id: Date.now() + '_' + Math.random().toString(36).substr(2, 6), 
-                        text: reward.text, 
-                        rank: reward.rank 
-                    });
-                    if (_cardHistory.length > 30) _cardHistory.pop();
-                    showToast(`✨ ${reward.text}! ✨`, "#ffd966");
-                    checkAchievements();
-                    updateQuestProgress('daily_card', 1);
-                }
-                
-                _giftAvailable = false;
-                document.getElementById('floatingGift').style.display = 'none';
-                
-                // ВАЖНО: Сразу планируем следующий подарок
-                scheduleNextGift();
-                
-                saveGame();
-                updateUI();
-            }
-
             function isEventActive() {
                 const now = new Date();
                 const day = now.getDay();
@@ -5337,7 +5239,13 @@
                 if (slider) { slider.max = maxS; if (slider.value > maxS) slider.value = maxS; document.getElementById('exchangeAmount').innerText = slider.value; }
                 const today = new Date().toDateString();
                 const bonusBlock = document.getElementById('bonusBlock');
-                if (bonusBlock) { if (_lastBonusDate && _lastBonusDate.toDateString() === today) bonusBlock.classList.add('hidden'); else bonusBlock.classList.remove('hidden'); }
+                if (bonusBlock) { 
+                    if (_lastBonusDate && _lastBonusDate.toDateString() === today) {
+                        bonusBlock.classList.add('hidden');
+                    } else {
+                        bonusBlock.classList.remove('hidden');
+                    }
+                }
                 const historyContainer = document.getElementById('historyContainer');
                 if (historyContainer) {
                     if (!_cardHistory.length) historyContainer.innerHTML = '<span style="opacity:0.6;">— нет карт —</span>';
@@ -5351,6 +5259,7 @@
                 updateRankUI(); 
                 // updateEventChestUI();
                 updateAdButton();
+                updateCardKeeperUI();
             }
             
             function saveGame() {
@@ -5362,11 +5271,9 @@
                     pickaxeLevel: _pickaxeLevel,
                     lastChestTime: _lastChestTime, totalStrikesEver: _totalStrikesEver, lastRank: _lastRank, last_active: _lastActive,
                     mbProfileLink: _mbProfileLink,
-                    nextGiftTime: _nextGiftTime, giftAvailable: _giftAvailable,
                     dailyStreak: _dailyStreak,
                     lastLoginDate: _lastLoginDate,
                     calendarClaimed: _calendarClaimed,
-                    luckBoostEndTime: _luckBoostEndTime,
                     eventCurrency: _eventCurrency,
                     adWatchedToday: adWatchedToday,
                     adLastWatchDate: adLastWatchDate,
@@ -5399,7 +5306,6 @@
                         _dailyStreak = d.dailyStreak || 1;
                         _lastLoginDate = d.lastLoginDate || null;
                         _calendarClaimed = d.calendarClaimed || {};
-                        _luckBoostEndTime = d.luckBoostEndTime || null;
                         
                         _eventCurrency = d.eventCurrency || 0; 
 
@@ -5412,28 +5318,6 @@
                         if (adLastWatchDate !== today) {
                             adWatchedToday = 0;
                             adLastWatchDate = today;
-                        }
-
-                        // Восстанавливаем таймер, если есть запланированное время
-                        if (_nextGiftTime && !_giftAvailable) {
-                            const now = Date.now();
-                            if (_nextGiftTime > now) {
-                                const delay = _nextGiftTime - now;
-                                if (delay > 0) {
-                                    _giftTimer = setTimeout(() => showGift(), delay);
-                                } else {
-                                    showGift();
-                                }
-                            } else if (_nextGiftTime <= now) {
-                                showGift();
-                            }
-                        } else if (_giftAvailable) {
-                            showGift(); // показываем, если был активен
-                        }
-
-                        // Если нет запланированного времени — создаём
-                        if (!_nextGiftTime && !_giftAvailable) {
-                            scheduleNextGift();
                         }
 
                     } catch(e) {
@@ -5456,38 +5340,6 @@
                 else {
                     document.getElementById('playerName').innerText = _playerName;
                     document.getElementById('playerId').innerText = _playerId.slice(-12);
-                }
-
-                // Восстанавливаем таймер подарка
-                if (_nextGiftTime) {
-                    const now = Date.now();
-                    const remaining = _nextGiftTime - now;
-                    
-                    if (remaining > 0 && !_giftAvailable) {
-                        // Таймер ещё не сработал — запускаем его заново
-                        console.log(`⏳ Восстанавливаем таймер подарка: ${Math.round(remaining / 60000)} минут`);
-                        if (_giftTimer) clearTimeout(_giftTimer);
-                        _giftTimer = setTimeout(() => {
-                            console.log('🎁 Подарок появился!');
-                            showGift();
-                        }, remaining);
-                    } else if (remaining <= 0 && !_giftAvailable) {
-                        // Таймер уже должен был сработать — показываем подарок
-                        console.log('🎁 Подарок уже должен быть доступен!');
-                        showGift();
-                    } else if (_giftAvailable) {
-                        // Подарок уже доступен
-                        showGift();
-                    }
-                } else if (!_giftAvailable) {
-                    // Нет запланированного времени — создаём новое
-                    console.log('🎁 Создаём новый таймер подарка');
-                    scheduleNextGift();
-                }
-
-                // Если подарок доступен, но не отображается — показываем
-                if (_giftAvailable) {
-                    showGift();
                 }
                 
                 // === ПРОВЕРКА КАЛЕНДАРЯ ПРИ ЗАГРУЗКЕ ===
@@ -5584,11 +5436,6 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
-
-                // ===== ПРОВЕРКА ПОДАРКА ПРИ ВХОДЕ =====
-                setTimeout(() => {
-                    checkGiftOnEntry();
-                }, 3000); 
             }     
 
             function checkRankUpgrade() {
@@ -5742,6 +5589,35 @@
                 
                 base = Math.floor(base * multiplier);
                 return Math.max(base, 1);
+            };
+
+            // Обменять карту
+            window.exchangeCard = function(rank) {
+                const rate = CARD_EXCHANGE_RATES[rank];
+                if (!rate || rate === 0) {
+                    showToast(`❌ Ранг ${rank} нельзя обменять`, '#ff8888');
+                    return;
+                }
+                
+                // Проверяем, есть ли карта в истории
+                const index = _cardHistory.findIndex(card => card.rank === rank);
+                if (index === -1) {
+                    showToast(`❌ У вас нет карты ранга ${rank}`, '#ff8888');
+                    return;
+                }
+                
+                // Удаляем карту
+                _cardHistory.splice(index, 1);
+                
+                // Добавляем алмазы
+                _diamonds += rate;
+                
+                showToast(`💎 Карта ${rank} обменяна на ${rate} алмазов!`, '#44ff44');
+                
+                saveGame();
+                updateUI();
+                updateCardKeeperUI();
+                checkAchievements();
             };
 
             window.mineOre = function() {
@@ -6110,11 +5986,6 @@
                 }
             });
 
-            // Обработчик для подарка
-            document.getElementById('floatingGift')?.addEventListener('click', () => {
-                claimGift();
-            });
-
             // Периодическое обновление статуса (каждую минуту)
             setInterval(() => {
                 if (!document.hidden) { // обновляем только если вкладка активна
@@ -6167,6 +6038,7 @@
             updateCalendarUI();
             loadFundraiserData();
             initSound();
+            initCardKeeper();
 
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
@@ -6180,9 +6052,8 @@
             // Экспортируем
             window.updateEventNotification = updateEventNotification;
             window.nextEvent = nextEvent;
-
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
 </body>
-    </html>
+</html>
