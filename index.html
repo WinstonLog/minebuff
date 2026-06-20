@@ -1968,28 +1968,22 @@
                     </label>
                 </div>
 
-                <!-- ===== НОВАЯ КНОПКА СБРОСА ===== -->
-                <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
-                    <div style="font-size: 12px; opacity: 0.5; text-align: center; margin-bottom: 12px;">
-                        ⚠️ ОПАСНАЯ ЗОНА — ДЕЙСТВИЕ НЕОБРАТИМО
-                    </div>
-                    <button id="resetAccountBtn" style="
+                <div style="margin-top: 12px;">
+                    <button id="fixStrikesBtn" style="
                         width: 100%;
-                        padding: 14px;
+                        padding: 12px;
                         border-radius: 40px;
-                        background: linear-gradient(135deg, #ff4444, #cc0000);
+                        background: linear-gradient(135deg, #ffaa33, #ff6600);
                         border: none;
                         color: white;
                         font-weight: bold;
-                        font-size: 16px;
+                        font-size: 14px;
                         cursor: pointer;
-                        transition: 0.2s;
-                        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
                     ">
-                        🗑️ ПОЛНОСТЬЮ СБРОСИТЬ АККАУНТ
+                        🔧 ВОССТАНОВИТЬ УДАРЫ (ИСПРАВИТЬ БАГ)
                     </button>
-                    <div style="font-size: 10px; opacity: 0.4; text-align: center; margin-top: 8px;">
-                        Удалятся: руда, алмазы, уровень, удары, карты, достижения, навыки, настройки
+                    <div style="font-size: 10px; opacity: 0.4; text-align: center; margin-top: 6px;">
+                        Пересчитает лимит ударов с учётом ваших навыков
                     </div>
                 </div>
             </div>
@@ -5372,140 +5366,45 @@
             window.addFundraiserAmount = addFundraiserAmount;
 
             // ============================================
-            // ПОЛНЫЙ СБРОС АККАУНТА (ВНУТРИ IIFE)
+            // АВАРИЙНОЕ ВОССТАНОВЛЕНИЕ УДАРОВ
             // ============================================
 
-            // Находим кнопку и добавляем обработчик
-            const resetBtn = document.getElementById('resetAccountBtn');
-            if (resetBtn) {
-                console.log('✅ Кнопка сброса найдена, добавляем обработчик...');
-                
-                resetBtn.addEventListener('click', function() {
-                    // === ПЕРВОЕ ПОДТВЕРЖДЕНИЕ ===
-                    if (!confirm('⚠️ ВНИМАНИЕ! Это действие НЕОБРАТИМО!\n\nВы действительно хотите полностью сбросить аккаунт?\n\nБудут удалены:\n• Вся руда\n• Все алмазы\n• Весь прогресс (уровень)\n• Все карты\n• Все достижения\n• Все навыки\n• Все настройки')) {
-                        return;
-                    }
+            document.getElementById('fixStrikesBtn')?.addEventListener('click', function() {
+                if (!confirm('🔄 Пересчитать лимит ударов с учётом ваших навыков?\n\nЭто исправит баг с ударами.')) {
+                    return;
+                }
 
-                    // === ВТОРОЕ ПОДТВЕРЖДЕНИЕ (с вводом текста) ===
-                    const confirmation = prompt(
-                        '🔴 Для подтверждения введите слово "СБРОС" (латиницей или кириллицей):'
-                    );
+                try {
+                    // 1. Загружаем навыки
+                    const skills = loadPlayerSkills();
+                    const staminaLevel = skills.stamina_1 ? skills.stamina_1.level : 0;
+                    const bonusStrikes = staminaLevel * 10;
                     
-                    if (!confirmation || confirmation.toUpperCase() !== 'СБРОС') {
-                        showToast('❌ Сброс отменён — неверное подтверждение', '#ff8888');
-                        return;
+                    // 2. Пересчитываем лимит
+                    const baseLimit = 100 + Math.floor(_level / 10);
+                    const maxLimit = 300;
+                    const newLimit = Math.min(baseLimit + bonusStrikes, maxLimit);
+                    
+                    // 3. Применяем
+                    _strikesLimit = newLimit;
+                    if (_strikesDone > _strikesLimit) {
+                        _strikesDone = _strikesLimit;
                     }
-
-                    // === ТРЕТЬЕ ПОДТВЕРЖДЕНИЕ (финальное) ===
-                    if (!confirm('🔥 ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ!\n\nВсе данные будут удалены безвозвратно.\n\nПродолжить?')) {
-                        showToast('❌ Сброс отменён', '#ff8888');
-                        return;
-                    }
-
-                    // === ВЫПОЛНЯЕМ СБРОС ===
-                    try {
-                        // 1. Удаляем все ключи localStorage
-                        const keysToRemove = [
-                            'minebuff_save',
-                            'minebuff_skills',
-                            'minebuff_settings',
-                            'minebuff_last_reset',
-                            'minebuff_last_visit',
-                            'minebuff_skill_bonuses',
-                            'minebuff_fundraiser',
-                            'minebuff_ads',
-                            'minebuff_admin',
-                            'minebuff_gift_time',
-                            'minebuff_gift_available',
-                            'minebuff_strikes_boost',
-                            'minebuff_boosters',
-                            'minebuff_notifications',
-                            'minebuff_achievements',
-                            'minebuff_quests',
-                            'minebuff_calendar',
-                            'minebuff_chest',
-                            'minebuff_pickaxe',
-                            'minebuff_rank',
-                            'minebuff_last_active',
-                            'minebuff_mb_link',
-                            'minebuff_event_currency',
-                            'minebuff_luck_boost'
-                        ];
-
-                        let deletedCount = 0;
-                        for (const key of keysToRemove) {
-                            if (localStorage.getItem(key) !== null) {
-                                localStorage.removeItem(key);
-                                deletedCount++;
-                            }
-                        }
-
-                        // 2. Сбрасываем все глобальные переменные
-                        _ore = 0;
-                        _diamonds = 0;
-                        _level = 1;
-                        _strikesDone = 0;
-                        _strikesLimit = 100;
-                        _pickaxeLevel = 1;
-                        _totalStrikesEver = 0;
-                        _cardHistory = [];
-                        _achievements = {};
-                        _quests = {};
-                        _eventCurrency = 0;
-                        _dailyStreak = 1;
-                        _calendarClaimed = {};
-                        _lastBonusDate = null;
-                        _lastChestTime = null;
-                        _lastRank = null;
-                        _lastActive = null;
-                        _mbProfileLink = null;
-                        _giftAvailable = false;
-                        _nextGiftTime = null;
-                        _skillBonuses = { oreMultiplier: 1, diamondBonus: 0, strikesBonus: 0 };
-                        
-                        // Сбрасываем навыки
-                        const skills = {};
-                        for (const skill of SKILLS_DATA) {
-                            skills[skill.id] = { level: 0 };
-                        }
-                        savePlayerSkills(skills);
-                        
-                        // Сбрасываем рекламу
-                        adWatchedToday = 0;
-                        adLastWatchDate = null;
-
-                        // 3. Сохраняем пустое сохранение
-                        saveGame();
-
-                        // 4. Обновляем UI
-                        updateUI();
-                        updateSkillsUI();
-                        applySkillBonuses();
-                        updateProfileLinkUI();
-                        updateRankUI();
-                        updateEventChestUI();
-                        updateAdButton();
-                        updateSectionLocks();
-
-                        // 5. Показываем уведомление
-                        showToast('🗑️ Аккаунт полностью сброшен! Начните заново.', '#ffcc66');
-
-                        // 6. Перезагружаем страницу через 2 секунды
-                        setTimeout(() => {
-                            location.reload();
-                        }, 2000);
-
-                        console.log(`✅ Сброс выполнен: удалено ${deletedCount} записей`);
-
-                    } catch(e) {
-                        console.error('Ошибка при сбросе:', e);
-                        showToast('❌ Ошибка при сбросе аккаунта', '#ff8888');
-                    }
-                });
-            } else {
-                console.error('❌ Кнопка сброса НЕ найдена!');
-            }
-                        
+                    
+                    // 4. Сохраняем
+                    saveGame();
+                    updateUI();
+                    
+                    // 5. Уведомление
+                    showToast(`✅ Лимит ударов восстановлен: ${_strikesLimit}`, '#44ff44');
+                    console.log(`✅ Лимит ударов: ${_strikesLimit} (базовый ${baseLimit} + бонус ${bonusStrikes})`);
+                    
+                } catch(e) {
+                    console.error('Ошибка:', e);
+                    showToast('❌ Ошибка восстановления', '#ff8888');
+                }
+            });
+            
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
