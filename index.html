@@ -4751,6 +4751,34 @@
                     }
                 }
                 
+                if (supabaseClient && _playerId) {
+                    // Загружаем ивентовую валюту и навыки
+                    supabaseClient
+                        .from('leaderboard')
+                        .select('event_currency, skills_json')
+                        .eq('player_id', _playerId)
+                        .single()
+                        .then(({ data }) => {
+                            if (data) {
+                                // Ивентовая валюта
+                                if (data.event_currency !== undefined) {
+                                    _eventCurrency = data.event_currency;
+                                    updateEventChestUI();
+                                }
+                                
+                                // ===== НОВОЕ: НАВЫКИ =====
+                                if (data.skills_json) {
+                                    const hasSkills = Object.keys(data.skills_json).length > 0;
+                                    if (hasSkills) {
+                                        localStorage.setItem('minebuff_skills', JSON.stringify(data.skills_json));
+                                        console.log('✅ Навыки загружены из Supabase');
+                                    }
+                                }
+                            }
+                        })
+                        .catch(e => console.warn('Ошибка загрузки данных:', e));
+                }
+                
                 initSkills();
                 checkDailyReset();
                 updateUI();
@@ -4764,20 +4792,6 @@
                 checkRankUpgrade();
                 startNotificationChecker();
                 
-                if (supabaseClient && _playerId) {
-                    supabaseClient
-                        .from('leaderboard')
-                        .select('event_currency')
-                        .eq('player_id', _playerId)
-                        .single()
-                        .then(({ data }) => {
-                            if (data && data.event_currency !== undefined) {
-                                _eventCurrency = data.event_currency;
-                                updateEventChestUI();
-                            }
-                        })
-                        .catch(e => console.warn(e));
-                }
             }     
 
             function checkRankUpgrade() {
@@ -5404,7 +5418,7 @@
                     showToast('❌ Ошибка восстановления', '#ff8888');
                 }
             });
-            
+
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
