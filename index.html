@@ -1967,6 +1967,31 @@
                         <span class="slider"></span>
                     </label>
                 </div>
+
+                <!-- ===== НОВАЯ КНОПКА СБРОСА ===== -->
+                <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
+                    <div style="font-size: 12px; opacity: 0.5; text-align: center; margin-bottom: 12px;">
+                        ⚠️ ОПАСНАЯ ЗОНА — ДЕЙСТВИЕ НЕОБРАТИМО
+                    </div>
+                    <button id="resetAccountBtn" style="
+                        width: 100%;
+                        padding: 14px;
+                        border-radius: 40px;
+                        background: linear-gradient(135deg, #ff4444, #cc0000);
+                        border: none;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 16px;
+                        cursor: pointer;
+                        transition: 0.2s;
+                        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
+                    ">
+                        🗑️ ПОЛНОСТЬЮ СБРОСИТЬ АККАУНТ
+                    </button>
+                    <div style="font-size: 10px; opacity: 0.4; text-align: center; margin-top: 8px;">
+                        Удалятся: руда, алмазы, уровень, удары, карты, достижения, навыки, настройки
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2445,136 +2470,6 @@
                     } catch(e) {}
                 }
                 updateSettingsUI();
-            }
-
-
-            // ============================================
-            // АВТОМАТИЧЕСКИЙ ФИКС ДАННЫХ
-            // ============================================
-
-            function fixPlayerData() {
-                console.log('🔧 Проверка данных игрока...');
-                let fixed = false;
-                
-                // 1. Проверяем сохранение
-                const saved = localStorage.getItem('minebuff_save');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        
-                        // Проверяем критические поля
-                        if (data.strikesDone === undefined || isNaN(data.strikesDone)) {
-                            data.strikesDone = 0;
-                            fixed = true;
-                            console.log('🔧 Исправлено strikesDone');
-                        }
-                        
-                        if (data.strikesLimit === undefined || isNaN(data.strikesLimit) || data.strikesLimit < 50) {
-                            data.strikesLimit = 100;
-                            fixed = true;
-                            console.log('🔧 Исправлено strikesLimit');
-                        }
-                        
-                        if (data.level === undefined || isNaN(data.level) || data.level < 1) {
-                            data.level = 1;
-                            fixed = true;
-                            console.log('🔧 Исправлено level');
-                        }
-                        
-                        // Гарантируем, что strikesDone не больше strikesLimit
-                        if (data.strikesDone > data.strikesLimit) {
-                            data.strikesDone = data.strikesLimit;
-                            fixed = true;
-                            console.log('🔧 Исправлено: strikesDone > strikesLimit');
-                        }
-                        
-                        if (fixed) {
-                            localStorage.setItem('minebuff_save', JSON.stringify(data));
-                            console.log('✅ Данные восстановлены!');
-                        }
-                    } catch(e) {
-                        console.warn('❌ Повреждённое сохранение, создаём новое');
-                        localStorage.removeItem('minebuff_save');
-                        fixed = true;
-                    }
-                }
-                
-                // 2. Проверяем навыки
-                const skills = localStorage.getItem('minebuff_skills');
-                if (skills) {
-                    try {
-                        JSON.parse(skills);
-                    } catch(e) {
-                        console.warn('❌ Повреждённые навыки, создаём новые');
-                        localStorage.removeItem('minebuff_skills');
-                        fixed = true;
-                    }
-                }
-                
-                // 3. Проверяем сброс дня
-                const today = new Date().toDateString();
-                const lastReset = localStorage.getItem('minebuff_last_reset');
-                if (!lastReset || lastReset !== today) {
-                    // Если сегодня ещё не было сброса, но удары не обнулились
-                    // Принудительно сбрасываем
-                    localStorage.setItem('minebuff_last_reset', today);
-                    console.log('🔧 Принудительный сброс дня');
-                    fixed = true;
-                }
-                
-                if (fixed) {
-                    showToast('🔧 Данные восстановлены автоматически', '#ffcc66');
-                    // Перезагружаем игру
-                    setTimeout(() => location.reload(), 1000);
-                }
-                
-                return fixed;
-            }
-
-            // ============================================
-            // ПРИНУДИТЕЛЬНАЯ СИНХРОНИЗАЦИЯ УДАРОВ
-            // ============================================
-
-            function forceSyncStrikes() {
-                const today = new Date().toDateString();
-                const lastReset = localStorage.getItem('minebuff_last_reset');
-                
-                // Загружаем сохранение
-                let saveData = null;
-                try {
-                    const saved = localStorage.getItem('minebuff_save');
-                    if (saved) saveData = JSON.parse(saved);
-                } catch(e) {}
-                
-                if (!saveData) return;
-                
-                // Проверяем, нужно ли сбросить удары
-                if (lastReset !== today) {
-                    // Новый день — сбрасываем
-                    saveData.strikesDone = 0;
-                    
-                    // Пересчитываем лимит
-                    const baseLimit = 100 + Math.floor((saveData.level || 1) / 10);
-                    const bonusStrikes = window._skillBonuses?.strikesBonus || 0;
-                    saveData.strikesLimit = Math.min(baseLimit + bonusStrikes, 300);
-                    
-                    // Сохраняем
-                    localStorage.setItem('minebuff_save', JSON.stringify(saveData));
-                    localStorage.setItem('minebuff_last_reset', today);
-                    
-                    console.log('✅ Удары принудительно синхронизированы!');
-                    return true;
-                }
-                
-                // Проверяем, что strikesDone не больше strikesLimit
-                if (saveData.strikesDone > saveData.strikesLimit) {
-                    saveData.strikesDone = saveData.strikesLimit;
-                    localStorage.setItem('minebuff_save', JSON.stringify(saveData));
-                    console.log('✅ Исправлено: strikesDone > strikesLimit');
-                    return true;
-                }
-                
-                return false;
             }
 
             // Загрузка навыков игрока
@@ -4862,8 +4757,6 @@
                     }
                 }
                 
-                fixPlayerData();
-                forceSyncStrikes();
                 initSkills();
                 checkDailyReset();
                 updateUI();
@@ -5477,6 +5370,142 @@
             window.updateLastActive = updateLastActive;
             window.getOnlineStatus = getOnlineStatus;
             window.addFundraiserAmount = addFundraiserAmount;
+
+            // ============================================
+            // ПОЛНЫЙ СБРОС АККАУНТА (ВНУТРИ IIFE)
+            // ============================================
+
+            // Находим кнопку и добавляем обработчик
+            const resetBtn = document.getElementById('resetAccountBtn');
+            if (resetBtn) {
+                console.log('✅ Кнопка сброса найдена, добавляем обработчик...');
+                
+                resetBtn.addEventListener('click', function() {
+                    // === ПЕРВОЕ ПОДТВЕРЖДЕНИЕ ===
+                    if (!confirm('⚠️ ВНИМАНИЕ! Это действие НЕОБРАТИМО!\n\nВы действительно хотите полностью сбросить аккаунт?\n\nБудут удалены:\n• Вся руда\n• Все алмазы\n• Весь прогресс (уровень)\n• Все карты\n• Все достижения\n• Все навыки\n• Все настройки')) {
+                        return;
+                    }
+
+                    // === ВТОРОЕ ПОДТВЕРЖДЕНИЕ (с вводом текста) ===
+                    const confirmation = prompt(
+                        '🔴 Для подтверждения введите слово "СБРОС" (латиницей или кириллицей):'
+                    );
+                    
+                    if (!confirmation || confirmation.toUpperCase() !== 'СБРОС') {
+                        showToast('❌ Сброс отменён — неверное подтверждение', '#ff8888');
+                        return;
+                    }
+
+                    // === ТРЕТЬЕ ПОДТВЕРЖДЕНИЕ (финальное) ===
+                    if (!confirm('🔥 ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ!\n\nВсе данные будут удалены безвозвратно.\n\nПродолжить?')) {
+                        showToast('❌ Сброс отменён', '#ff8888');
+                        return;
+                    }
+
+                    // === ВЫПОЛНЯЕМ СБРОС ===
+                    try {
+                        // 1. Удаляем все ключи localStorage
+                        const keysToRemove = [
+                            'minebuff_save',
+                            'minebuff_skills',
+                            'minebuff_settings',
+                            'minebuff_last_reset',
+                            'minebuff_last_visit',
+                            'minebuff_skill_bonuses',
+                            'minebuff_fundraiser',
+                            'minebuff_ads',
+                            'minebuff_admin',
+                            'minebuff_gift_time',
+                            'minebuff_gift_available',
+                            'minebuff_strikes_boost',
+                            'minebuff_boosters',
+                            'minebuff_notifications',
+                            'minebuff_achievements',
+                            'minebuff_quests',
+                            'minebuff_calendar',
+                            'minebuff_chest',
+                            'minebuff_pickaxe',
+                            'minebuff_rank',
+                            'minebuff_last_active',
+                            'minebuff_mb_link',
+                            'minebuff_event_currency',
+                            'minebuff_luck_boost'
+                        ];
+
+                        let deletedCount = 0;
+                        for (const key of keysToRemove) {
+                            if (localStorage.getItem(key) !== null) {
+                                localStorage.removeItem(key);
+                                deletedCount++;
+                            }
+                        }
+
+                        // 2. Сбрасываем все глобальные переменные
+                        _ore = 0;
+                        _diamonds = 0;
+                        _level = 1;
+                        _strikesDone = 0;
+                        _strikesLimit = 100;
+                        _pickaxeLevel = 1;
+                        _totalStrikesEver = 0;
+                        _cardHistory = [];
+                        _achievements = {};
+                        _quests = {};
+                        _eventCurrency = 0;
+                        _dailyStreak = 1;
+                        _calendarClaimed = {};
+                        _lastBonusDate = null;
+                        _lastChestTime = null;
+                        _lastRank = null;
+                        _lastActive = null;
+                        _mbProfileLink = null;
+                        _giftAvailable = false;
+                        _nextGiftTime = null;
+                        _skillBonuses = { oreMultiplier: 1, diamondBonus: 0, strikesBonus: 0 };
+                        
+                        // Сбрасываем навыки
+                        const skills = {};
+                        for (const skill of SKILLS_DATA) {
+                            skills[skill.id] = { level: 0 };
+                        }
+                        savePlayerSkills(skills);
+                        
+                        // Сбрасываем рекламу
+                        adWatchedToday = 0;
+                        adLastWatchDate = null;
+
+                        // 3. Сохраняем пустое сохранение
+                        saveGame();
+
+                        // 4. Обновляем UI
+                        updateUI();
+                        updateSkillsUI();
+                        applySkillBonuses();
+                        updateProfileLinkUI();
+                        updateRankUI();
+                        updateEventChestUI();
+                        updateAdButton();
+                        updateSectionLocks();
+
+                        // 5. Показываем уведомление
+                        showToast('🗑️ Аккаунт полностью сброшен! Начните заново.', '#ffcc66');
+
+                        // 6. Перезагружаем страницу через 2 секунды
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+
+                        console.log(`✅ Сброс выполнен: удалено ${deletedCount} записей`);
+
+                    } catch(e) {
+                        console.error('Ошибка при сбросе:', e);
+                        showToast('❌ Ошибка при сбросе аккаунта', '#ff8888');
+                    }
+                });
+            } else {
+                console.error('❌ Кнопка сброса НЕ найдена!');
+            }
+                        
         })();
     </script>
     <!-- <script src="admin.js"></script> -->
