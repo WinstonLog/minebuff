@@ -2245,7 +2245,7 @@
                                 <div style="font-weight: bold; font-size: 16px;">ЭНЕРГИЯ ШАХТЫ</div>
                                 <div style="font-size: 12px; opacity: 0.7;">+20 ударов сверх лимита сегодня!</div>
                             </div>
-                            <button id="buyStrikesBoostBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">30💎 КУПИТЬ</button>
+                            <button id="buyStrikesBoostBtn" style="background: linear-gradient(135deg, #3a6b58, #1e3e31); border: none; padding: 12px 20px; border-radius: 40px; font-weight: bold; color: white; font-size: 14px; cursor: pointer;">Недоступно</button>    <!-- 30💎 КУПИТЬ -->
                         </div>
                     </div>
                 </div>
@@ -2337,7 +2337,7 @@
 
 
 
-                <div style="margin-top: 12px;">
+<!--                 <div style="margin-top: 12px;">
                     <button id="fixStrikesBtn" style="
                         width: 100%;
                         padding: 12px;
@@ -2354,7 +2354,7 @@
                     <div style="font-size: 10px; opacity: 0.4; text-align: center; margin-top: 6px;">
                         Пересчитает лимит ударов с учётом ваших навыков
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -3622,12 +3622,6 @@
                 toast.style.borderLeft = `4px solid ${color}`;
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2500);
-            }
-
-            function updateUI() {
-                // Обновите ваши UI элементы
-                document.getElementById('oreValue').textContent = _ore;
-                document.getElementById('diamondValue').textContent = _diamonds;
             }
 
             // ==========================================
@@ -5232,13 +5226,21 @@
                 const baseLimit = 100 + Math.floor(_level / 10);
                 const maxLimit = 300;
 
-                // ===== НОВОЕ: Бонус от навыков =====
+                // Бонус от навыков
                 const skillStrikesBonus = _skillBonuses ? _skillBonuses.strikesBonus : 0;
                 let finalBaseLimit = Math.min(baseLimit + skillStrikesBonus, maxLimit);
                 
                 const boostKey = `strikes_boost_${today}`;
                 const hasBoostToday = localStorage.getItem(boostKey) === 'true';
                 let wasReset = false;
+                
+                // ===== ВАЖНО: ВОССТАНАВЛИВАЕМ БУСТЕР ПРИ ЗАГРУЗКЕ =====
+                if (lastReset === today && hasBoostToday) {
+                    // Сегодня уже был сброс и бустер куплен — добавляем +20
+                    if (!_strikesLimit || _strikesLimit < finalBaseLimit + 20) {
+                        _strikesLimit = finalBaseLimit + 20;
+                    }
+                }
                 
                 if (lastReset !== today) {
                     // НОВЫЙ ДЕНЬ - сбрасываем всё
@@ -5276,7 +5278,7 @@
                 }
                 
                 if (wasReset) {
-                    updateUI(); // Обновляем UI, если был сброс
+                    updateUI();
                 }
                 updatePickaxeVisual();
                 return wasReset;
@@ -5466,6 +5468,8 @@
                 document.getElementById('profileLevel').innerText = _level;
                 document.getElementById('profileDiamonds').innerText = Math.floor(_diamonds);
                 document.getElementById('profileCards').innerText = _cardHistory.length;
+                document.getElementById('oreValue').textContent = _ore;
+                document.getElementById('diamondValue').textContent = _diamonds;
                 const maxS = Math.min(_ore, 10000);
                 const slider = document.getElementById('exchangeSlider');
                 if (slider) { slider.max = maxS; if (slider.value > maxS) slider.value = maxS; document.getElementById('exchangeAmount').innerText = slider.value; }
@@ -5485,6 +5489,22 @@
                 updateRankUI(); 
                 updateEventChestUI();
                 updateAdButton();
+
+                // ===== СТАТУС БУСТЕРА =====
+                const boostKey = `strikes_boost_${new Date().toDateString()}`;
+                const hasBoostToday = localStorage.getItem(boostKey) === 'true';
+                const boostBtn = document.getElementById('buyStrikesBoostBtn');
+                if (boostBtn) {
+                    if (hasBoostToday) {
+                        boostBtn.textContent = '✅ КУПЛЕНО';
+                        boostBtn.style.opacity = '0.5';
+                        boostBtn.style.pointerEvents = 'none';
+                    } else {
+                        boostBtn.textContent = '30💎 КУПИТЬ';
+                        boostBtn.style.opacity = '1';
+                        boostBtn.style.pointerEvents = 'auto';
+                    }
+                }
             }
             
             function saveGame() {
@@ -6170,14 +6190,14 @@
                 }
             });*/
 
-            // Бустер на +20 ударов
-            document.getElementById('buyStrikesBoostBtn')?.addEventListener('click', () => {
+/*            // Бустер на +20 ударов
+            document.getElementById('buyStrikesBoostBtn')?.addEventListener('click', function() {
                 const cost = 30;
                 const today = new Date().toDateString();
                 const boostKey = `strikes_boost_${today}`;
                 const alreadyBoosted = localStorage.getItem(boostKey);
                 
-                if (alreadyBoosted) {
+                if (alreadyBoosted === 'true') {
                     showToast("⏰ Сегодня вы уже покупали бустер ударов!", "#ffaa88");
                     return;
                 }
@@ -6188,16 +6208,27 @@
                     // Сохраняем флаг, что бустер куплен сегодня
                     localStorage.setItem(boostKey, 'true');
                     
-                    // Добавляем +20 к текущему лимиту
-                    _strikesLimit += 20;
+                    // Добавляем +20 к текущему лимиту (СРАЗУ СОХРАНЯЕМ)
+                    const baseLimit = 100 + Math.floor(_level / 10) + (_skillBonuses ? _skillBonuses.strikesBonus : 0);
+                    const maxLimit = 300;
+                    _strikesLimit = Math.min(baseLimit + 20, maxLimit);
+                    if (_strikesDone > _strikesLimit) _strikesDone = _strikesLimit;
                     
-                    showToast(`⚡ +20 ударов на сегодня! Лимит: ${_strikesLimit}`, "#aaffdd");
+                    // ===== ВАЖНО: СОХРАНЯЕМ ИГРУ =====
                     saveGame();
                     updateUI();
+                    
+                    showToast(`⚡ +20 ударов на сегодня! Лимит: ${_strikesLimit}`, "#aaffdd");
+                    
+                    // Обновляем кнопку
+                    this.textContent = '✅ КУПЛЕНО';
+                    this.style.opacity = '0.5';
+                    this.style.pointerEvents = 'none';
+                    
                 } else {
                     showToast(`❌ Нужно 30 алмазов!`, "#ff8888");
                 }
-            });
+            });*/
 
             // Переключение вкладок в магазине
             const shopGoodsTab = document.getElementById('shopGoodsTab');
