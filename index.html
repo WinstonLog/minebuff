@@ -1893,6 +1893,101 @@
         #fundraiserBlock {
             display: none !important;
         }
+
+        /* Модальное окно для пожертвования */
+        .donation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(16px);
+            z-index: 5000;
+            justify-content: center;
+            align-items: center;
+            animation: adFadeIn 0.4s ease;
+        }
+        .donation-modal.show {
+            display: flex;
+        }
+
+        .donation-content {
+            background: linear-gradient(145deg, #1e2e2f, #0f1a1f);
+            border-radius: 48px;
+            width: 92%;
+            max-width: 400px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 204, 102, 0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+
+        .donation-header {
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .donation-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .donation-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a1a2e;
+            letter-spacing: 1px;
+        }
+
+        .donation-body {
+            padding: 24px 20px 20px;
+        }
+
+        .donation-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .donation-btn.donate {
+            background: linear-gradient(135deg, #ffaa33, #ff6600);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 102, 0, 0.3);
+            flex: 2;
+        }
+        .donation-btn.donate:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 102, 0, 0.5);
+        }
+        .donation-btn.donate:active {
+            transform: scale(0.95);
+        }
+        .donation-btn.close {
+            background: linear-gradient(135deg, #3a6b58, #1e3e31);
+            color: white;
+            flex: 1;
+        }
+        .donation-btn.close:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 400px) {
+            .donation-btn {
+                min-width: 100%;
+                flex: 1 1 100% !important;
+            }
+            .donation-body {
+                padding: 16px 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2260,6 +2355,7 @@
             </div>
         </div>
 
+
         <div class="footer">
             <div>📢 Telegram: <a href="https://t.me/b_loody" target="_blank">@b_loody</a></div>
             <div style="margin-top: 8px;">
@@ -2268,6 +2364,45 @@
             <div style="margin-top: 12px; font-size: 10px; opacity: 0.6; border-top: 1px solid #3a6b58; padding-top: 10px;">
                 ⚠️ Данный проект является фанатским и не связан с mangabuff.ru<br>
                 Все карты выдаются от лица @b_loody
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для пожертвования -->
+    <div class="donation-modal" id="donationModal">
+        <div class="donation-content">
+            <div class="donation-header">
+                <div class="donation-icon">❤️</div>
+                <div class="donation-title">ПОДДЕРЖИТЕ РАЗРАБОТЧИКА</div>
+            </div>
+            <div class="donation-body">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 48px; margin-bottom: 8px;">⛏️</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #ffcc66;">
+                        Пожертвуйте 1 рубль!
+                    </div>
+                    <div style="font-size: 14px; opacity: 0.8; margin-top: 8px; line-height: 1.6;">
+                        Ваша поддержка помогает развивать проект<br>
+                        и создавать новые функции для всех игроков!
+                    </div>
+                </div>
+                
+                <div class="stat-row" style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 12px; margin: 12px 0;">
+                    <span style="font-size: 13px; opacity: 0.7;">💡 Это займёт всего 1 минуту</span>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+                    <button class="donation-btn donate" id="donateNowBtn">
+                        💰 ПОЖЕРТВОВАТЬ 1 ₽
+                    </button>
+                    <button class="donation-btn close" id="donationCloseBtn">
+                        ✕ ЗАКРЫТЬ
+                    </button>
+                </div>
+                
+                <div style="font-size: 11px; opacity: 0.5; text-align: center; margin-top: 12px;">
+                    Уведомление появится при следующем входе, если вы не пожертвуете
+                </div>
             </div>
         </div>
     </div>
@@ -2769,6 +2904,73 @@
                     };
                 }
             }
+
+            // ========== УВЕДОМЛЕНИЕ О ПОЖЕРТВОВАНИИ ==========
+            let donationShown = false;
+
+            function checkAndShowDonation() {
+                // Проверяем, показывали ли уже сегодня
+                const today = new Date().toDateString();
+                const lastDonationShow = localStorage.getItem('minebuff_donation_show');
+                const donationDone = localStorage.getItem('minebuff_donation_done');
+                
+                // Если уже пожертвовали — больше не показываем
+                if (donationDone === 'true') {
+                    return;
+                }
+                
+                // Если показывали сегодня — пропускаем
+                if (lastDonationShow === today) {
+                    return;
+                }
+                
+                // Показываем модальное окно
+                showDonationModal();
+            }
+
+            function showDonationModal() {
+                const modal = document.getElementById('donationModal');
+                if (!modal) return;
+                
+                modal.classList.add('show');
+                donationShown = true;
+                
+                // Сохраняем, что показали сегодня
+                const today = new Date().toDateString();
+                localStorage.setItem('minebuff_donation_show', today);
+            }
+
+            function closeDonationModal() {
+                const modal = document.getElementById('donationModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
+            }
+
+            // Обработчики кнопок
+            document.getElementById('donateNowBtn')?.addEventListener('click', function() {
+                // Открываем страницу доната
+                window.open('https://yoomoney.ru/to/4100119003253255/1', '_blank');
+                
+                // Сохраняем, что пользователь перешёл по ссылке
+                localStorage.setItem('minebuff_donation_done', 'true');
+                
+                showToast('❤️ Спасибо за поддержку!', '#44ff44');
+                closeDonationModal();
+            });
+
+            document.getElementById('donationCloseBtn')?.addEventListener('click', function() {
+                closeDonationModal();
+                showToast('💡 Вы можете пожертвовать позже через кнопку "ПОДДЕРЖАТЬ" внизу', '#ffaa88');
+            });
+
+            // Закрытие по клику на фон
+            document.getElementById('donationModal')?.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDonationModal();
+                    showToast('💡 Вы можете пожертвовать позже через кнопку "ПОДДЕРЖАТЬ" внизу', '#ffaa88');
+                }
+            });
 
             // ============================================
             // УВЕДОМЛЕНИЕ О ДОСТИЖЕНИИ С КОНФЕТТИ
@@ -5436,6 +5638,9 @@
                 updateSectionLocks();
                 checkRankUpgrade();
                 startNotificationChecker();
+                setTimeout(() => {
+                    checkAndShowDonation();
+                }, 1500);
             }     
 
             function checkRankUpgrade() {
