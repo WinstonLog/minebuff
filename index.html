@@ -2030,12 +2030,308 @@
             .profile-link-section .link-status { flex-direction: column; text-align: center; }
             .set-grid { grid-template-columns: 1fr; }
         }
+
+        /* ===== ГАМБУРГЕР-КНОПКА ===== */
+        .hamburger-btn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 44px;
+            height: 44px;
+            background: rgba(18, 22, 36, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            z-index: 200;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+            padding: 0;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background: #e4e6f0;
+            border-radius: 4px;
+            transition: 0.3s;
+            transform-origin: center;
+        }
+
+        .hamburger-btn:hover {
+            background: rgba(30, 34, 50, 0.95);
+            border-color: rgba(179, 136, 255, 0.2);
+        }
+
+        .hamburger-btn:active {
+            transform: scale(0.92);
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ===== ОВЕРЛЕЙ ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 260px;
+                height: 100vh;
+                background: rgba(18, 22, 36, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-right: 1px solid rgba(255, 255, 255, 0.06);
+                padding: 20px 0;
+                transition: left 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+                z-index: 100;
+                overflow-y: auto;
+                box-shadow: 4px 0 40px rgba(0, 0, 0, 0.3);
+            }
+
+            .sidebar::-webkit-scrollbar {
+                width: 3px;
+            }
+
+            .sidebar::-webkit-scrollbar-thumb {
+                background: rgba(179, 136, 255, 0.3);
+                border-radius: 10px;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar .logo {
+                writing-mode: horizontal-tb;
+                font-size: 24px;
+                margin-bottom: 24px;
+                padding-left: 20px;
+                width: 100%;
+                text-align: left;
+            }
+
+            .sidebar .logo span {
+                font-size: 14px;
+            }
+
+            .nav-item {
+                width: 100%;
+                height: 50px;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 0 20px;
+                border-radius: 0;
+                gap: 14px;
+                font-size: 14px;
+                margin-bottom: 2px;
+                text-align: left;
+            }
+
+            .nav-item i {
+                font-size: 18px;
+                width: 24px;
+                text-align: center;
+            }
+
+            .nav-item .badge {
+                margin-left: auto;
+                font-size: 9px;
+                padding: 2px 10px;
+            }
+
+            .nav-item.active {
+                background: rgba(123, 77, 255, 0.12);
+                border-left: 3px solid #b388ff;
+                box-shadow: none;
+            }
+
+            .nav-item:hover {
+                background: rgba(255, 255, 255, 0.03);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px 30px;
+            }
+
+            .main-content .section-header {
+                padding-left: 52px;
+            }
+
+            .main-content .section-header h1 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-btn {
+                top: 12px;
+                left: 12px;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+            }
+
+            .hamburger-btn span {
+                width: 20px;
+                height: 2px;
+            }
+
+            .sidebar {
+                width: 220px;
+                left: -240px;
+            }
+
+            .nav-item {
+                height: 44px;
+                font-size: 13px;
+                padding: 0 16px;
+                gap: 12px;
+            }
+
+            .nav-item i {
+                font-size: 16px;
+                width: 20px;
+            }
+
+            .main-content .section-header {
+                padding-left: 44px;
+            }
+
+            .main-content .section-header h1 {
+                font-size: 17px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .hamburger-btn {
+                display: none !important;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                width: 80px;
+                background: rgba(18, 22, 36, 0.92);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-right: 1px solid rgba(255, 255, 255, 0.06);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 28px 0;
+                z-index: 100;
+                overflow-y: auto;
+                box-shadow: none;
+                transform: none;
+                transition: none;
+            }
+
+            .sidebar .logo {
+                writing-mode: vertical-lr;
+                text-orientation: mixed;
+                font-size: 28px;
+                margin-bottom: 30px;
+                padding-left: 0;
+                text-align: center;
+            }
+
+            .nav-item {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 70px;
+                padding: 0;
+                border-radius: 16px;
+                gap: 2px;
+                font-size: 10px;
+                margin-bottom: 6px;
+                text-align: center;
+            }
+
+            .nav-item i {
+                font-size: 20px;
+                width: auto;
+            }
+
+            .nav-item .badge {
+                margin-left: 0;
+            }
+
+            .main-content {
+                margin-left: 90px;
+                padding: 24px 32px 40px;
+            }
+
+            .main-content .section-header {
+                padding-left: 0;
+            }
+        }
     </style>
 </head>
 <body>
 
+<!-- ===== ГАМБУРГЕР ДЛЯ МОБИЛЬНЫХ ===== -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- ===== ОВЕРЛЕЙ (ЗАТЕМНЕНИЕ) ===== -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <!-- ===== САЙДБАР ===== -->
-<nav class="sidebar">
+<nav class="sidebar" id="sidebar">
     <div class="logo">A<span>N</span></div>
 
     <button class="nav-item active" data-section="mine">
@@ -2814,6 +3110,77 @@
         }
     }
     window.copyPlayerId = copyPlayerId;
+
+    // МЕХАНИКА МЕНЮ
+    (function() {
+        const hamburger = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (!hamburger || !sidebar || !overlay) {
+            console.error('❌ Гамбургер не найден!');
+            return;
+        }
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('show');
+            hamburger.classList.add('active');
+            document.body.classList.add('sidebar-open');
+            document.body.style.overflow = 'hidden';
+            console.log('✅ Меню открыто');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+            hamburger.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+            document.body.style.overflow = '';
+            console.log('✅ Меню закрыто');
+        }
+
+        // Клик по гамбургеру
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('🔄 Клик по гамбургеру');
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        // Клик по оверлею
+        overlay.addEventListener('click', closeSidebar);
+
+        // Клик по пункту меню
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+
+        // Изменение размера окна
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Для отладки
+        console.log('✅ Гамбургер инициализирован');
+        console.log('📱 Ширина экрана:', window.innerWidth);
+    })();
 
     // МЕХАНИКА ЧАТА
 
