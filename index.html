@@ -2480,7 +2480,10 @@
             </div>
 
             <div class="chat-input-area" style="border-top: 1px solid rgba(255,255,255,0.04); padding: 10px 14px; background: rgba(0,0,0,0.15); display: flex; gap: 8px;">
-                <input type="text" class="chat-input" id="chatInputSection" placeholder="Напишите сообщение..." maxlength="200" style="flex: 1; padding: 8px 14px; border-radius: 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); color: #e4e6f0; font-size: 13px; outline: none; transition: 0.3s;">
+                <input type="text" class="chat-input" id="chatInputSection" placeholder="Напишите сообщение..."
+                maxlength="200" 
+                minlength="4"
+                style="flex: 1; padding: 8px 14px; border-radius: 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); color: #e4e6f0; font-size: 13px; outline: none; transition: 0.3s;">
                 <button class="chat-send-btn" id="chatSendBtnSection" style="width: 38px; height: 38px; border-radius: 50%; border: none; background: linear-gradient(135deg, #b388ff, #7c4dff); color: #fff; font-size: 18px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;">➤</button>
             </div>
         </div>
@@ -3149,12 +3152,23 @@
         const input = document.getElementById('chatInputSection');
         const text = input.value.trim();
         
+        // Проверка на минимальную длину
+        if (text.length < 4) {
+            showToast('❌ Сообщение должно содержать минимум 4 символа!', '#ff6b6b');
+            return;
+        }
+        
+        // Проверка на максимальную длину
+        if (text.length > 200) {
+            showToast('❌ Сообщение не может быть длиннее 200 символов!', '#ff6b6b');
+            return;
+        }
+        
         if (chatCooldown) {
             showToast('⏳ Подождите 3 секунды перед следующим сообщением!', '#ffaa88');
             return;
         }
         
-        if (!text) return;
         if (!_playerName) {
             showToast('❌ Сначала введите имя в профиле!', '#ff6b6b');
             return;
@@ -3210,7 +3224,6 @@
                 console.log('✅ Сообщение отправлено:', data);
                 chatInput.value = '';
                 
-                // Увеличиваем счётчик ТОЛЬКО если ещё не достигли лимита
                 if (hasReward) {
                     chatMessagesToday++;
                     chatLastMessageDate = new Date().toDateString();
