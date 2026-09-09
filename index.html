@@ -3101,24 +3101,28 @@
         const totalEl = document.getElementById('chatTotalMessages');
         if (totalEl) totalEl.textContent = totalMessages;
         
+        // Показываем только до 10
+        const displayCount = Math.min(chatMessagesToday, CHAT_DAILY_LIMIT);
         const soulsToday = document.getElementById('chatSoulsToday');
-        if (soulsToday) soulsToday.textContent = `${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
+        if (soulsToday) soulsToday.textContent = `${displayCount}/${CHAT_DAILY_LIMIT}`;
         
-        const progress = (chatMessagesToday / CHAT_DAILY_LIMIT) * 100;
+        // Прогресс всегда 100% после 10
+        const progress = Math.min((chatMessagesToday / CHAT_DAILY_LIMIT) * 100, 100);
         const progressFill = document.getElementById('chatProgressFill');
-        if (progressFill) progressFill.style.width = Math.min(progress, 100) + '%';
+        if (progressFill) progressFill.style.width = progress + '%';
         
+        // Осталось сообщений — 0 после лимита
         const untilReward = document.getElementById('chatMessagesUntilReward');
         if (untilReward) {
-            const remaining = CHAT_DAILY_LIMIT - chatMessagesToday;
-            untilReward.textContent = Math.max(remaining, 0);
+            const remaining = Math.max(CHAT_DAILY_LIMIT - chatMessagesToday, 0);
+            untilReward.textContent = remaining;
         }
         
         const cooldownDisplay = document.getElementById('chatCooldownDisplay');
         if (cooldownDisplay) {
             if (chatMessagesToday >= CHAT_DAILY_LIMIT) {
-                cooldownDisplay.textContent = '⛔ Лимит исчерпан';
-                cooldownDisplay.style.color = '#ff4444';
+                cooldownDisplay.textContent = '✅ Лимит исчерпан';
+                cooldownDisplay.style.color = '#44ff44';
             } else {
                 cooldownDisplay.textContent = `${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
                 cooldownDisplay.style.color = '#44ff44';
@@ -3160,7 +3164,6 @@
             return;
         }
 
-        // Проверка на лимит ДО отправки
         checkChatDailyReset();
         const hasReward = chatMessagesToday < CHAT_DAILY_LIMIT;
 
@@ -3207,14 +3210,14 @@
                 console.log('✅ Сообщение отправлено:', data);
                 chatInput.value = '';
                 
-                chatMessagesToday++;
-                chatLastMessageDate = new Date().toDateString();
-                
+                // Увеличиваем счётчик ТОЛЬКО если ещё не достигли лимита
                 if (hasReward) {
+                    chatMessagesToday++;
+                    chatLastMessageDate = new Date().toDateString();
                     _essence += CHAT_REWARD_PER_MESSAGE;
-                    showToast(`💠 +${CHAT_REWARD_PER_MESSAGE} Эссенции за сообщение! (${chatMessagesToday}/${CHAT_DAILY_LIMIT})`, '#44ff44');
+                    showToast(`💠 +${CHAT_REWARD_PER_MESSAGE} Эссенции! (${chatMessagesToday}/${CHAT_DAILY_LIMIT})`, '#44ff44');
                 } else {
-                    showToast(`💬 Сообщение отправлено (${chatMessagesToday}/${CHAT_DAILY_LIMIT})`, '#6b7084');
+                    showToast(`💬 Сообщение отправлено`, '#6b7084');
                 }
                 
                 addChatMessageToSection({
