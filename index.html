@@ -2426,14 +2426,12 @@
             <div class="card-grid" id="eventCardsGrid"></div>
         </div>
     </section>
-
     <!-- ===== ЧАТ ===== -->
     <section id="section-chat" class="section">
         <div class="section-header">
             <h1><i class="fas fa-comment-dots"></i> Общий чат</h1>
             <div class="balance-info">
                 <span><i class="fas fa-gem" style="color:#b388ff;"></i> <strong class="essence-color" id="essenceDisplayChat">0</strong></span>
-                <span><i class="fas fa-skull" style="color:#ff6b6b;"></i> <strong class="soul-color" id="soulDisplayChat" style="color:#ff6b6b;">0</strong></span>
             </div>
         </div>
 
@@ -2444,8 +2442,8 @@
                 <div class="value" id="chatTotalMessages" style="color: #b388ff;">0</div>
             </div>
             <div class="stat-box" style="background: rgba(0,0,0,0.2);">
-                <div class="label">🪙 Душ сегодня</div>
-                <div class="value" id="chatSoulsToday" style="color: #ff6b6b;">0</div>
+                <div class="label">📊 Сегодня</div>
+                <div class="value" id="chatSoulsToday" style="color: #ff6b6b;">0/10</div>
             </div>
             <div class="stat-box" style="background: rgba(0,0,0,0.2);">
                 <div class="label">🏆 Рейтинг</div>
@@ -2453,18 +2451,18 @@
             </div>
         </div>
 
-        <!-- Прогресс до награды -->
+        <!-- Прогресс до лимита -->
         <div style="background: rgba(0,0,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <span style="font-size: 13px; color: #6b7084;">
-                    🪙 До следующей награды: <strong id="chatMessagesUntilReward" style="color: #ff6b6b;">10</strong> сообщений
+                    📊 Осталось сообщений: <strong id="chatMessagesUntilReward" style="color: #ff6b6b;">10</strong>
                 </span>
                 <span style="font-size: 12px; color: #6b7084;">
-                    ⏳ <span id="chatCooldownDisplay">Готово</span>
+                    💠 <span id="chatCooldownDisplay">0/10</span>
                 </span>
             </div>
             <div style="height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 8px; overflow: hidden;">
-                <div id="chatProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff6b6b, #b388ff); border-radius: 4px; transition: width 0.3s ease;"></div>
+                <div id="chatProgressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #b388ff, #7c4dff); border-radius: 4px; transition: width 0.3s ease;"></div>
             </div>
         </div>
 
@@ -2477,7 +2475,7 @@
 
             <div class="chat-messages-section" id="chatMessagesSection" style="height: 350px; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; scroll-behavior: smooth;">
                 <div class="chat-message system">
-                    <span class="msg-text">💬 Добро пожаловать в общий чат! Пишите сообщения и зарабатывайте 🪙 Эссенцию!</span>
+                    <span class="msg-text">💬 Добро пожаловать в общий чат! Пишите сообщения и получайте 💠 Эссенцию! (10 сообщений в день)</span>
                 </div>
             </div>
 
@@ -3051,6 +3049,7 @@
             chatMessagesToday = 0;
             chatLastMessageDate = today;
             updateChatStats();
+            saveChatData();
             console.log('🔄 Сброс лимита чата на сегодня');
         }
     }
@@ -3101,7 +3100,7 @@
         
         // Обновляем количество сообщений сегодня
         const soulsToday = document.getElementById('chatSoulsToday');
-        if (soulsToday) soulsToday.textContent = chatMessagesToday;
+        if (soulsToday) soulsToday.textContent = `${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
         
         // Обновляем прогресс до лимита
         const progress = (chatMessagesToday / CHAT_DAILY_LIMIT) * 100;
@@ -3122,9 +3121,15 @@
                 cooldownDisplay.textContent = '⛔ Лимит исчерпан';
                 cooldownDisplay.style.color = '#ff4444';
             } else {
-                cooldownDisplay.textContent = `✅ ${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
+                cooldownDisplay.textContent = `${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
                 cooldownDisplay.style.color = '#44ff44';
             }
+        }
+        
+        // Обновляем рейтинг (количество сообщений * 10)
+        const ratingEl = document.getElementById('chatRating');
+        if (ratingEl) {
+            ratingEl.textContent = totalMessages * 10;
         }
     }
 
@@ -3219,15 +3224,9 @@
                 
                 // Обновляем статистику
                 updateChatStats();
+                saveChatData();
                 saveGame();
                 updateUI();
-                
-                // Обновляем рейтинг
-                const ratingEl = document.getElementById('chatRating');
-                if (ratingEl) {
-                    const current = parseInt(ratingEl.textContent) || 0;
-                    ratingEl.textContent = current + 1;
-                }
             }
         } catch(e) {
             console.error('Ошибка:', e);
@@ -3422,6 +3421,15 @@
         pollChat();
     }
 
+    // ---- СОХРАНЕНИЕ ДАННЫХ ЧАТА ----
+    function saveChatData() {
+        const data = {
+            chatMessagesToday: chatMessagesToday,
+            chatLastMessageDate: chatLastMessageDate
+        };
+        localStorage.setItem('arcana_chat_data', JSON.stringify(data));
+    }
+
     // ---- ИНИЦИАЛИЗАЦИЯ ----
     document.addEventListener('DOMContentLoaded', function() {
         // Загружаем данные чата из сохранения
@@ -3461,18 +3469,6 @@
         // Обновляем онлайн каждые 30 секунд
         setInterval(updateChatOnlineCount, 30000);
     });
-
-    // Сохраняем данные чата
-    function saveChatData() {
-        const data = {
-            chatMessagesToday: chatMessagesToday,
-            chatLastMessageDate: chatLastMessageDate
-        };
-        localStorage.setItem('arcana_chat_data', JSON.stringify(data));
-    }
-
-    // Периодическое сохранение
-    setInterval(saveChatData, 10000);
 
     // Обновляем чат при загрузке страницы
     window.addEventListener('load', function() {
