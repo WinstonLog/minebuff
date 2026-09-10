@@ -2504,111 +2504,184 @@
         while (container.children.length > 100) container.removeChild(container.firstChild);
     }
 
+    // ---- ПРОВЕРКА СБРОСА ЛИМИТА ----
     function checkChatDailyReset() {
         const today = new Date().toDateString();
-        if (chatLastMessageDate !== today) {
-            chatMessagesToday = 0;
-            chatLastMessageDate = today;
-            updateChatStats();
-            saveChatData();
+        
+        // Если дата уже сегодня — ничего не делаем
+        if (chatLastMessageDate === today) {
+            return;
         }
+        
+        // Сброс только при смене дня
+        chatMessagesToday = 0;
+        chatLastMessageDate = today;
+        saveChatData();
+        console.log('🔄 Лимит чата сброшен на новый день');
     }
 
+    // ---- ОБНОВЛЕНИЕ СТАТИСТИКИ ЧАТА ----
     function updateChatStats() {
         checkChatDailyReset();
+        
         const container = document.getElementById('chatMessagesSection');
         if (!container) return;
+        
         const messages = container.querySelectorAll('.chat-message:not(.system)');
+        const totalMessages = messages.length;
+        
         const totalEl = document.getElementById('chatTotalMessages');
-        if (totalEl) totalEl.textContent = messages.length;
+        if (totalEl) totalEl.textContent = totalMessages;
+        
+        // Показываем только до 10
         const displayCount = Math.min(chatMessagesToday, CHAT_DAILY_LIMIT);
         const soulsToday = document.getElementById('chatSoulsToday');
         if (soulsToday) soulsToday.textContent = `${displayCount}/${CHAT_DAILY_LIMIT}`;
+        
+        // Прогресс всегда 100% после 10
         const progress = Math.min((chatMessagesToday / CHAT_DAILY_LIMIT) * 100, 100);
         const progressFill = document.getElementById('chatProgressFill');
         if (progressFill) progressFill.style.width = progress + '%';
+        
+        // Осталось сообщений — 0 после лимита
         const untilReward = document.getElementById('chatMessagesUntilReward');
         if (untilReward) {
             const remaining = Math.max(CHAT_DAILY_LIMIT - chatMessagesToday, 0);
             untilReward.textContent = remaining;
         }
+        
+        const cooldownDisplay = document.getElementById('chatCooldownDisplay');
+        if (cooldownDisplay) {
+            if (chatMessagesToday >= CHAT_DAILY_LIMIT) {
+                cooldownDisplay.textContent = '✅ Лимит исчерпан';
+                cooldownDisplay.style.color = '#44ff44';
+            } else {
+                cooldownDisplay.textContent = `${chatMessagesToday}/${CHAT_DAILY_LIMIT}`;
+                cooldownDisplay.style.color = '#44ff44';
+            }
+        }
+        
         const ratingEl = document.getElementById('chatRating');
-        if (ratingEl) ratingEl.textContent = messages.length * 10;
+        if (ratingEl) {
+            ratingEl.textContent = totalMessages * 10;
+        }
     }
 
     function saveChatData() {
-        localStorage.setItem('arcana_chat_data', JSON.stringify({ chatMessagesToday, chatLastMessageDate }));
+        const data = {
+            chatMessagesToday: chatMessagesToday,
+            chatLastMessageDate: chatLastMessageDate
+        };
+        localStorage.setItem('arcana_chat_data', JSON.stringify(data));
     }
 
+    // ---- ОТПРАВКА СООБЩЕНИЯ ----
     async function sendChatMessageSection() {
         const input = document.getElementById('chatInputSection');
         const text = input.value.trim();
-        if (text.length < 4) { showToast('❌ Минимум 4 символа!', '#ff6b6b'); return; }
-        if (text.length > 200) { showToast('❌ Максимум 200 символов!', '#ff6b6b'); return; }
-        if (chatCooldown) { showToast('⏳ Подождите 3 секунды!', '#ffaa88'); return; }
-        if (!_playerName) { showToast('❌ Сначала введите имя!', '#ff6b6b'); return; }
-        if (!supabaseClient) { showToast('⚠️ Подключение...', '#ffaa88'); return; }
+        
+        if (text.length < 4) {
+            showToast('❌ Сообщение должно содержать минимум 4 символа!', '#ff6b6b');
+            return;
+        }
+        
+        if (text.length > 200) {
+            showToast('❌ Сообщение не может быть длиннее 200 символов!', '#ff6b6b');
+            return;
+        }
+        
+        if (chatCooldown) {
+            showToast('⏳ Подождите 3 секунды перед следующим сообщением!', '#ffaa88');
+            return;
+        }
+        
+        if (!_playerName) {
+            showToast('❌ Сначала введите имя в профиле!', '#ff6b6b');
+            return;
+        }
+        if (!supabaseClient) {
+            showToast('⚠️ Подключение к серверу...', '#ffaa88');
+            return;
+        }
 
         checkChatDailyReset();
         const hasReward = chatMessagesToday < CHAT_DAILY_LIMIT;
+
         chatCooldown = true;
         const sendBtn = document.getElementById('chatSendBtnSection');
+        const chatInput = document.getElementById('chatInputSection');
+        
         sendBtn.disabled = true;
         sendBtn.textContent = '3';
-        input.disabled = true;
+        sendBtn.style.opacity = '0.6';
+        chatInput.disabled = true;
+        
         let remaining = 3;
         const cooldownInterval = setInterval(() => {
             remaining--;
-            if (remaining > 0) sendBtn.textContent = `${remaining}`;
-            else clearInterval(cooldownInterval);
+            if (remaining > 0) {
+                sendBtn.textContent = `${remaining}`;
+            } else {
+                clearInterval(cooldownInterval);
+            }
         }, 1000);
 
         const now = new Date();
         const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-        const message = { sender: _playerName, text, player_id: _playerId, created_at: now.toISOString() };
+        
+        const message = {
+            sender: _playerName,
+            text: text,
+            player_id: _playerId,
+            created_at: now.toISOString()
+        };
 
         try {
-            const { error } = await supabaseClient.from('chat_messages').insert(message).select();
+            const { data, error } = await supabaseClient
+                .from('chat_messages')
+                .insert(message)
+                .select();
+
             if (error) {
-                showToast('❌ Ошибка отправки', '#ff6b6b');
-                input.value = text;
+                console.error('Ошибка отправки:', error);
+                showToast('❌ Ошибка отправки сообщения', '#ff6b6b');
+                chatInput.value = text;
             } else {
-                input.value = '';
+                console.log('✅ Сообщение отправлено:', data);
+                chatInput.value = '';
+                
                 if (hasReward) {
                     chatMessagesToday++;
                     chatLastMessageDate = new Date().toDateString();
-                    _essence += CHAT_REWARD_PER_MESSAGE;
-                    showToast(`💠 +${CHAT_REWARD_PER_MESSAGE} Эссенции! (${chatMessagesToday}/${CHAT_DAILY_LIMIT})`, '#44ff44');
+                    _essence += CHAT_REWARD_ESSENCE;      // ← ИСПРАВЛЕНО
+                    addXP(CHAT_REWARD_XP);                // ← XP тоже
+                    showToast(`💠 +${CHAT_REWARD_ESSENCE} · ✨ +${CHAT_REWARD_XP} XP (${chatMessagesToday}/${CHAT_DAILY_LIMIT})`, '#44ff44');
                 } else {
                     showToast(`💬 Сообщение отправлено (лимит награды исчерпан)`, '#6b7084');
                 }
-
-                // ===== СОХРАНЯЕМ СЧЁТЧИК В SUPABASE =====
-                if (supabaseClient && _playerId) {
-                    supabaseClient.from('leaderboard')
-                        .update({ 
-                            chat_messages_today: chatMessagesToday,
-                            chat_last_date: chatLastMessageDate
-                        })
-                        .eq('player_id', _playerId)
-                        .then(() => console.log('✅ Счётчик чата сохранён'))
-                        .catch(e => console.warn('Ошибка сохранения счётчика:', e));
-                }
-                addChatMessageToSection({ sender: _playerName, text, time: timeStr }, true);
+                
+                addChatMessageToSection({
+                    sender: _playerName,
+                    text: text,
+                    time: timeStr
+                }, true);
+                
                 updateChatStats();
                 saveChatData();
                 saveGame();
                 updateUI();
             }
         } catch(e) {
+            console.error('Ошибка:', e);
             showToast('❌ Ошибка отправки', '#ff6b6b');
         } finally {
             setTimeout(() => {
                 chatCooldown = false;
                 sendBtn.disabled = false;
                 sendBtn.textContent = '➤';
-                input.disabled = false;
-                input.focus();
+                sendBtn.style.opacity = '1';
+                chatInput.disabled = false;
+                chatInput.focus();
                 clearInterval(cooldownInterval);
             }, 3000);
         }
@@ -3730,22 +3803,32 @@
         document.head.appendChild(script);
     }
 
-    function syncToSupabase() {
+    async function syncToSupabase() {
         if (!supabaseClient || !_playerId || !_playerName) return;
+
         const cardsForDb = _cardHistory.map(card => ({
             cardId: card.cardId || card.id,
             rank: card.rank,
             text: card.text || `🎴 ${card.rank}`,
             uniqueId: card.uniqueId || Date.now()
         }));
+
         try {
-            supabaseClient.from('leaderboard').upsert({
-                player_id: _playerId, username: _playerName,
-                level: _level, diamonds: _essence, ore: _ore,
-                cards_json: cardsForDb, mb_link: _mbProfileLink || null,
-                last_active: new Date().toISOString(), updated_at: new Date().toISOString()
-            }, { onConflict: 'player_id' }).then(() => {}).catch(() => {});
-        } catch(e) {}
+            await supabaseClient.from('leaderboard')
+                .upsert({
+                    player_id: _playerId,
+                    username: _playerName,
+                    level: _level,
+                    diamonds: _essence,
+                    ore: _ore,
+                    cards_json: cardsForDb,
+                    mb_link: _mbProfileLink || null,
+                    last_active: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'player_id' });
+        } catch(e) {
+            console.warn('Supabase sync error:', e);
+        }
     }
 
     function loadFromSupabase() {
@@ -3762,14 +3845,6 @@
                     _level = data.level || _level;
                     _mbProfileLink = data.mb_link || _mbProfileLink;
                     
-                    // ===== ЗАГРУЗКА СЧЁТЧИКА ЧАТА =====
-                    if (data.chat_messages_today !== undefined) {
-                        chatMessagesToday = data.chat_messages_today || 0;
-                    }
-                    if (data.chat_last_date) {
-                        chatLastMessageDate = data.chat_last_date;
-                    }
-                    
                     if (data.cards_json) {
                         _cardHistory = data.cards_json.map(c => ({
                             cardId: c.cardId || c.id,
@@ -3778,11 +3853,7 @@
                             uniqueId: c.uniqueId || c.date || Date.now()
                         }));
                     }
-                    
-                    // Проверяем смену дня
-                    checkChatDailyReset();
-                    updateChatStats();
-                    
+                                        
                     saveGame();
                     updateUI();
                     renderCollection();
@@ -5336,6 +5407,37 @@
     document.addEventListener('DOMContentLoaded', function() {
         initSupabase();
         loadGame();
+
+        // ===== ЧАТ — ТОЛЬКО LOCALSTORAGE =====
+        const savedChat = localStorage.getItem('arcana_chat_data');
+        if (savedChat) {
+            try {
+                const data = JSON.parse(savedChat);
+                const today = new Date().toDateString();
+                
+                if (data.chatLastMessageDate === today) {
+                    // Тот же день — восстанавливаем
+                    chatMessagesToday = data.chatMessagesToday || 0;
+                    chatLastMessageDate = data.chatLastMessageDate;
+                    console.log('📊 Восстановлен лимит чата:', chatMessagesToday, '/', CHAT_DAILY_LIMIT);
+                } else {
+                    // Новый день — сбрасываем
+                    chatMessagesToday = 0;
+                    chatLastMessageDate = today;
+                    saveChatData();
+                    console.log('🔄 Новый день — лимит чата сброшен');
+                }
+            } catch(e) {
+                chatMessagesToday = 0;
+                chatLastMessageDate = new Date().toDateString();
+            }
+        } else {
+            chatMessagesToday = 0;
+            chatLastMessageDate = new Date().toDateString();
+            saveChatData();
+        }
+        
+        updateChatStats();
 
         document.getElementById('openEventPackBtn').addEventListener('click', openEventPack);
         setInterval(() => {
