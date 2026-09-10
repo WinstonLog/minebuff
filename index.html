@@ -3807,13 +3807,17 @@
             const cardsInTrade = await getCardsInActiveTradesForPlayer(receiverId);
             
             receiverCardsData = data.cards_json
-                .map(c => ({
-                    id: c.id || c.date || 'unknown_' + Math.random().toString(36).substr(2, 6),
-                    rank: c.rank,
-                    text: c.text || `🎴 ${c.rank}`,
-                    inTrade: cardsInTrade.has(c.id || c.date)
-                }))
-                .filter(c => !c.inTrade);
+                .map(c => {
+                    const cardId = c.cardId || c.id || c.date;
+                    return {
+                        id: cardId,
+                        cardId: cardId,
+                        rank: c.rank,
+                        text: c.text || `🎴 ${c.rank}`,
+                        inTrade: cardsInTrade.has(cardId)
+                    };
+                })
+                .filter(c => !c.inTrade && c.cardId);
 
             if (receiverCardsData.length === 0) {
                 showToast('❌ У игрока нет доступных карт для обмена', '#ffaa88');
@@ -3998,7 +4002,7 @@
         if (selectedReceiverCards.length === 0) { showToast('❌ Выберите хотя бы 1 карту получателя!', '#ff6b6b'); return; }
 
         for (const cardId of selectedSenderCards) {
-            const hasCard = _cardHistory.some(c => c.id === cardId);
+            const hasCard = _cardHistory.some(c => (c.cardId || c.id) === cardId);
             if (!hasCard) { showToast(`❌ У вас нет карты с ID ${cardId}!`, '#ff6b6b'); return; }
         }
 
@@ -4009,7 +4013,7 @@
             .single();
         
         if (freshReceiverData && freshReceiverData.cards_json) {
-            const receiverCardIds = freshReceiverData.cards_json.map(c => c.id);
+            const receiverCardIds = freshReceiverData.cards_json.map(c => c.cardId || c.id);
             for (const cardId of selectedReceiverCards) {
                 if (!receiverCardIds.includes(cardId)) {
                     const card = getCardById(cardId);
@@ -4325,7 +4329,7 @@
 
             // Проверки
             for (const cardId of senderCardIds) {
-                if (!senderCards.some(c => c.id === cardId)) {
+                if (!senderCards.some(c => (c.cardId || c.id) === cardId)) {
                     showToast('❌ У отправителя нет одной из карт!', '#ff6b6b');
                     await supabaseClient.from('trade_offers').update({ status: 'expired' }).eq('id', offerId);
                     loadTrades();
@@ -4333,7 +4337,7 @@
                 }
             }
             for (const cardId of receiverCardIds) {
-                if (!receiverCards.some(c => c.id === cardId)) {
+                if (!receiverCards.some(c => (c.cardId || c.id) === cardId)) {
                     showToast('❌ У вас нет одной из карт!', '#ff6b6b');
                     return;
                 }
@@ -4346,27 +4350,27 @@
             }
             // Удаляем у получателя
             for (const cardId of receiverCardIds) {
-                const idx = receiverCards.findIndex(c => c.id === cardId);
+                const idx = receiverCards.findIndex(c => (c.cardId || c.id) === cardId);
                 if (idx !== -1) receiverCards.splice(idx, 1);
             }
             // Добавляем получателю
             for (const cardId of senderCardIds) {
                 const cardData = getCardById(cardId);
                 receiverCards.push({
-                    id: cardId,
+                    cardId: cardId,
                     rank: cardData ? cardData.rank : '?',
                     text: `🎴 ${cardData ? cardData.rank : '?'}`,
-                    date: Date.now()
+                    uniqueId: Date.now()
                 });
             }
             // Добавляем отправителю
             for (const cardId of receiverCardIds) {
                 const cardData = getCardById(cardId);
                 senderCards.push({
-                    id: cardId,
+                    cardId: cardId,
                     rank: cardData ? cardData.rank : '?',
                     text: `🎴 ${cardData ? cardData.rank : '?'}`,
-                    date: Date.now()
+                    uniqueId: Date.now()
                 });
             }
 
