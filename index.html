@@ -1058,6 +1058,208 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        /* ===== ОБМЕН КАРТАМИ ===== */
+        .trade-card-select {
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            min-height: 80px;
+            padding: 8px 4px;
+            border-radius: 12px;
+        }
+        .trade-card-select:hover {
+            transform: translateY(-2px);
+            border-color: rgba(179, 136, 255, 0.3);
+        }
+        .trade-card-select.selected {
+            border-color: #b388ff !important;
+            box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
+        }
+        .trade-card-select.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -6px; right: -6px;
+            background: #b388ff;
+            color: #fff;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .trade-card-select.in-trade {
+            opacity: 0.4 !important;
+            filter: grayscale(1) !important;
+            border-color: #444 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+        .trade-card-select.in-trade::after {
+            content: '🔒';
+            position: absolute;
+            top: -6px; right: -6px;
+            font-size: 14px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 50%;
+            padding: 2px 4px;
+        }
+
+        .trade-offer-item {
+            background: rgba(0,0,0,0.2);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: 0.3s;
+        }
+        .trade-offer-item:hover {
+            border-color: rgba(179, 136, 255, 0.1);
+        }
+        .trade-offer-item .offer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .trade-offer-item .offer-player {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .trade-offer-item .offer-card {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            min-width: 44px;
+        }
+        .trade-offer-item .offer-card .card-rank {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .trade-offer-item .offer-card .card-img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+        .trade-offer-item .offer-card .card-name {
+            font-size: 8px;
+            opacity: 0.7;
+            text-align: center;
+            max-width: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .trade-offer-item .offer-cards {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 4px 0;
+        }
+        .trade-offer-item .offer-cards-label {
+            font-size: 11px;
+            opacity: 0.4;
+            margin-right: 4px;
+        }
+        .trade-offer-item .offer-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .trade-offer-item .offer-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+        .trade-offer-item .offer-status.pending { background: rgba(255,204,102,0.15); color: #ffcc66; }
+        .trade-offer-item .offer-status.accepted { background: rgba(68,255,68,0.15); color: #44ff44; }
+        .trade-offer-item .offer-status.rejected { background: rgba(255,68,68,0.15); color: #ff6b6b; }
+        .trade-offer-item .offer-status.cancelled { background: rgba(255,255,255,0.05); color: #6b7084; }
+        .trade-offer-item .offer-status.expired { background: rgba(255,255,255,0.05); color: #6b7084; }
+        .trade-offer-item .offer-time {
+            font-size: 10px;
+            opacity: 0.3;
+        }
+
+        .trade-btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .trade-btn:active { transform: scale(0.95); }
+        .trade-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+        .trade-btn.primary {
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(123, 77, 255, 0.3);
+        }
+        .trade-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(123, 77, 255, 0.4); }
+        .trade-btn.secondary {
+            background: rgba(123, 77, 255, 0.1);
+            color: #b388ff;
+            border: 1px solid rgba(123, 77, 255, 0.2);
+        }
+        .trade-btn.secondary:hover { background: rgba(123, 77, 255, 0.2); transform: translateY(-2px); }
+        .trade-btn.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff;
+        }
+        .trade-btn.danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: #fff;
+        }
+        .trade-btn.warning {
+            background: linear-gradient(135deg, #f5b342, #e8960a);
+            color: #1a1a2e;
+        }
+        .trade-btn-sm {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .trade-btn-sm.danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: #fff;
+        }
+        .trade-btn-sm.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff;
+        }
+        .trade-btn-sm.warning {
+            background: rgba(245, 179, 66, 0.15);
+            color: #f5b342;
+            border: 1px solid rgba(245, 179, 66, 0.2);
+        }
+        .trade-btn-sm:hover { transform: translateY(-2px); }
+
         /* ===== ТОП ===== */
         .top-wrapper { max-width: 560px; margin: 0 auto; }
         .top-list {
@@ -2177,6 +2379,11 @@
         <span>Чат</span>
         <span class="badge" id="chatBadge" style="background:#7c4dff;">0</span>
     </button>
+    <button class="nav-item" data-section="trade">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Обмен</span>
+        <span class="badge" id="tradeBadge" style="background:#ff6600;">0</span>
+    </button>
     <button class="nav-item" data-section="top">
         <i class="fas fa-trophy"></i>
         <span>Топ</span>
@@ -2488,7 +2695,98 @@
             </div>
         </div>
     </section>
+    <!-- ===== ОБМЕН КАРТАМИ ===== -->
+    <section id="section-trade" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-exchange-alt"></i> Обмен картами</h1>
+            <div class="balance-info">
+                <span><i class="fas fa-gem" style="color:#b388ff;"></i> <strong class="essence-color" id="essenceDisplayTrade">0</strong></span>
+                <span><i class="fas fa-layer-group"></i> <strong id="tradeCardsCount">0</strong></span>
+            </div>
+        </div>
 
+        <!-- Создать предложение -->
+        <div class="game-panel" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <span style="font-weight:700;font-size:16px;color:#b388ff;">📤 Создать предложение</span>
+                <span style="font-size:12px;color:#6b7084;">Выберите до 9 своих карт</span>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                <input type="text" id="tradeReceiverId" placeholder="ID получателя..." style="flex:1;min-width:150px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);color:#e4e6f0;font-size:14px;outline:none;">
+                <button class="trade-btn warning" id="loadReceiverCardsBtn">📥 Загрузить карты</button>
+            </div>
+
+            <!-- Карты отправителя (мои) -->
+            <div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+                    <span style="font-size:13px;color:#6b7084;">🎴 Мои карты (выберите до 9):</span>
+                    <span style="font-size:12px;color:#b388ff;" id="senderSelectedCount">0/9</span>
+                    <span style="font-size:11px;color:#ffcc66;" id="senderSelectedInfo"></span>
+                </div>
+                <div class="card-grid" id="senderCardsGrid" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:200px;overflow-y:auto;padding:4px;"></div>
+            </div>
+
+            <!-- Карты получателя -->
+            <div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+                    <span style="font-size:13px;color:#6b7084;" id="receiverLabel">🎴 Карты получателя (выберите от 1 до 9):</span>
+                    <span style="font-size:12px;color:#b388ff;" id="receiverSelectedCount">0/9</span>
+                </div>
+                <div class="card-grid" id="receiverCardsGrid" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:200px;overflow-y:auto;padding:4px;"></div>
+                <div id="receiverEmptyState" style="text-align:center;padding:20px;color:#6b7084;font-size:13px;">
+                    <span>👤 Введите ID получателя и нажмите "Загрузить карты"</span>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                <button class="trade-btn primary" id="createTradeBtn" style="flex:1;min-width:120px;">📤 Отправить предложение</button>
+                <button class="trade-btn secondary" id="clearTradeSelectionBtn" style="flex:0.5;min-width:80px;">🔄 Очистить</button>
+            </div>
+        </div>
+
+        <!-- Входящие предложения -->
+        <div class="game-panel" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <span style="font-weight:700;font-size:16px;color:#b388ff;">📥 Входящие предложения</span>
+                <span style="font-size:12px;color:#6b7084;" id="incomingTradesCount">0</span>
+            </div>
+            <div id="incomingTradesList">
+                <div class="empty-state" style="padding:20px;">
+                    <span class="icon">📭</span>
+                    <div class="title" style="font-size:14px;">Нет входящих предложений</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мои предложения -->
+        <div class="game-panel" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <span style="font-weight:700;font-size:16px;color:#b388ff;">📤 Мои предложения</span>
+                <span style="font-size:12px;color:#6b7084;" id="myTradesCount">0</span>
+            </div>
+            <div id="myTradesList">
+                <div class="empty-state" style="padding:20px;">
+                    <span class="icon">📤</span>
+                    <div class="title" style="font-size:14px;">Нет отправленных предложений</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История -->
+        <div class="game-panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <span style="font-weight:700;font-size:16px;color:#b388ff;">📜 История обменов</span>
+                <button class="trade-btn-sm danger" id="clearTradeHistoryBtn">🗑️ Очистить</button>
+            </div>
+            <div id="tradeHistoryList">
+                <div class="empty-state" style="padding:20px;">
+                    <span class="icon">📜</span>
+                    <div class="title" style="font-size:14px;">История пуста</div>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- ===== ТОП ===== -->
     <section id="section-top" class="section">
         <div class="section-header">
@@ -2641,7 +2939,7 @@
         <div class="progress-bar"><div class="progress-fill" id="levelProgressFill" style="width:0%;"></div></div>
         <div class="stat-row"><span class="label">Следующий уровень</span><span class="value highlight" id="modalNextLevel">2</span></div>
         <div class="stat-row"><span class="label">💠 Нужно Эссенции</span><span class="value" id="modalCost">35</span></div>
-        <div class="stat-row"><span class="label">💠 У вас</span><span class="value" id="modalessence">0</span></div>
+        <div class="stat-row"><span class="label">💠 У вас</span><span class="value" id="modalEssence">0</span></div>
         <div class="reward-preview">
             <span>✨ При повышении каждого 10 уровня:<br>💥 +1 к добыче руды</span>
         </div>
@@ -3470,6 +3768,690 @@
         updateChatStats();
     });
 
+    // МЕХАНИКА ОБМЕНА
+
+    let tradeChannel = null;
+    let selectedSenderCards = [];
+    let selectedReceiverCards = [];
+    let receiverCardsData = [];
+
+    // ---- ЗАГРУЗКА КАРТ ПОЛУЧАТЕЛЯ ----
+    async function loadReceiverCards() {
+        const receiverId = document.getElementById('tradeReceiverId').value.trim();
+        if (!receiverId) {
+            showToast('❌ Введите ID получателя!', '#ff6b6b');
+            return;
+        }
+        if (receiverId === _playerId) {
+            showToast('❌ Нельзя обмениваться с самим собой!', '#ff6b6b');
+            return;
+        }
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('leaderboard')
+                .select('cards_json, username')
+                .eq('player_id', receiverId)
+                .single();
+
+            if (error) {
+                showToast('❌ Игрок не найден!', '#ff6b6b');
+                return;
+            }
+
+            if (!data || !data.cards_json || data.cards_json.length === 0) {
+                showToast('❌ У игрока нет карт для обмена', '#ffaa88');
+                return;
+            }
+
+            const cardsInTrade = await getCardsInActiveTradesForPlayer(receiverId);
+            
+            receiverCardsData = data.cards_json
+                .map(c => ({
+                    id: c.id || c.date || 'unknown_' + Math.random().toString(36).substr(2, 6),
+                    rank: c.rank,
+                    text: c.text || `🎴 ${c.rank}`,
+                    inTrade: cardsInTrade.has(c.id || c.date)
+                }))
+                .filter(c => !c.inTrade);
+
+            if (receiverCardsData.length === 0) {
+                showToast('❌ У игрока нет доступных карт для обмена', '#ffaa88');
+                return;
+            }
+
+            document.getElementById('receiverLabel').innerHTML = `🎴 Карты получателя (${data.username || receiverId}):`;
+            document.getElementById('receiverEmptyState').style.display = 'none';
+            renderReceiverCards();
+            showToast(`✅ Загружено ${receiverCardsData.length} карт игрока ${data.username || receiverId}`, '#44ff44');
+        } catch(e) {
+            showToast('❌ Ошибка загрузки карт', '#ff6b6b');
+            console.error(e);
+        }
+    }
+
+    // ---- ПОЛУЧЕНИЕ КАРТ В АКТИВНЫХ ТРЕЙДАХ ----
+    async function getCardsInActiveTradesForPlayer(playerId) {
+        if (!supabaseClient || !playerId) return new Set();
+        const cardIdsInTrade = new Set();
+        try {
+            const { data: trades } = await supabaseClient
+                .from('trade_offers')
+                .select('sender_cards, receiver_cards, sender_id, receiver_id, status')
+                .eq('status', 'pending')
+                .or(`sender_id.eq.${playerId},receiver_id.eq.${playerId}`);
+            
+            if (trades) {
+                for (const trade of trades) {
+                    if (trade.sender_id === playerId && trade.sender_cards) {
+                        for (const cardId of trade.sender_cards) cardIdsInTrade.add(cardId);
+                    }
+                    if (trade.receiver_id === playerId && trade.receiver_cards) {
+                        for (const cardId of trade.receiver_cards) cardIdsInTrade.add(cardId);
+                    }
+                }
+            }
+        } catch(e) {
+            console.warn('Ошибка получения активных трейдов:', e);
+        }
+        return cardIdsInTrade;
+    }
+
+    async function getCardsInActiveTrades() {
+        return await getCardsInActiveTradesForPlayer(_playerId);
+    }
+
+    // ---- РЕНДЕР КАРТ ОТПРАВИТЕЛЯ ----
+    async function renderSenderCards() {
+        const grid = document.getElementById('senderCardsGrid');
+        if (!grid) return;
+        
+        if (_cardHistory.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#6b7084;font-size:13px;">🎴 У вас нет карт</div>';
+            return;
+        }
+
+        try {
+            const cardsInTrade = await getCardsInActiveTrades();
+                        
+            grid.innerHTML = _cardHistory.map(card => {
+                const cardId = card.cardId || card.id;        // ← берём правильный ID
+                const cardData = getCardById(cardId);
+                const isSelected = selectedSenderCards.includes(cardId);
+                const isInTrade = cardsInTrade.has(cardId);
+                const color = cardData ? cardData.color : '#6b7084';
+                const name = cardData ? cardData.name : (card.rank || '?');
+                const isDisabled = isInTrade && !isSelected;
+                
+                return `
+                    <div class="card-item trade-card-select rank-${card.rank} ${isSelected ? 'selected' : ''} ${isDisabled ? 'in-trade' : ''}" 
+                         onclick="${isDisabled ? '' : `toggleSenderCard('${cardId}')`}" 
+                         style="min-height:70px;padding:8px 4px;cursor:${isDisabled ? 'not-allowed' : 'pointer'};">
+                        <div class="card-rank" style="font-size:20px;color:${isDisabled ? '#666' : color};">${card.rank}</div>
+                        <div class="card-name" style="font-size:10px;">${name}</div>
+                        ${isSelected ? '<div style="font-size:10px;color:#44ff44;margin-top:2px;">✅ Выбрана</div>' : ''}
+                        ${isDisabled ? '<div style="font-size:9px;color:#ff6b6b;margin-top:2px;">⏳ В обмене</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+        } catch(e) {
+            console.warn('Ошибка рендеринга карт:', e);
+        }
+    }
+
+    // ---- РЕНДЕР КАРТ ПОЛУЧАТЕЛЯ ----
+    function renderReceiverCards() {
+        const grid = document.getElementById('receiverCardsGrid');
+        if (!grid) return;
+        
+        if (!receiverCardsData || receiverCardsData.length === 0) {
+            grid.innerHTML = '';
+            document.getElementById('receiverEmptyState').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('receiverEmptyState').style.display = 'none';
+
+        grid.innerHTML = receiverCardsData.map(card => {
+            const cardData = getCardById(card.id);
+            const isSelected = selectedReceiverCards.includes(card.id);
+            const color = cardData ? cardData.color : '#6b7084';
+            const name = cardData ? cardData.name : card.rank;
+            
+            return `
+                <div class="card-item trade-card-select rank-${card.rank} ${isSelected ? 'selected' : ''}" 
+                     onclick="toggleReceiverCard('${card.id}')" 
+                     style="min-height:70px;padding:8px 4px;cursor:pointer;">
+                    <div class="card-rank" style="font-size:20px;color:${color};">${card.rank}</div>
+                    <div class="card-name" style="font-size:10px;">${name}</div>
+                    ${isSelected ? '<div style="font-size:10px;color:#44ff44;margin-top:2px;">✅ Выбрана</div>' : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ---- ВЫБОР КАРТ ОТПРАВИТЕЛЯ ----
+    async function toggleSenderCard(cardId) {
+        const cardsInTrade = await getCardsInActiveTrades();
+        if (cardsInTrade.has(cardId)) {
+            showToast('⏳ Эта карта уже участвует в обмене!', '#ffaa88');
+            return;
+        }
+        
+        const index = selectedSenderCards.indexOf(cardId);
+        if (index !== -1) {
+            selectedSenderCards.splice(index, 1);
+        } else {
+            if (selectedSenderCards.length >= 9) {
+                showToast('❌ Нельзя выбрать больше 9 карт!', '#ffaa88');
+                return;
+            }
+            const hasCard = _cardHistory.some(c => (c.cardId || c.id) === cardId);
+            if (!hasCard) {
+                showToast('❌ У вас нет этой карты!', '#ff6b6b');
+                return;
+            }
+            selectedSenderCards.push(cardId);
+        }
+        document.getElementById('senderSelectedCount').textContent = `${selectedSenderCards.length}/9`;
+        
+        const infoEl = document.getElementById('senderSelectedInfo');
+        if (infoEl) {
+            const ranks = selectedSenderCards.map(id => {
+                const card = getCardById(id);
+                return card ? card.rank : '?';
+            });
+            infoEl.textContent = ranks.length ? `Выбрано: ${ranks.join(', ')}` : '';
+        }
+        
+        renderSenderCards();
+    }
+
+    // ---- ВЫБОР КАРТ ПОЛУЧАТЕЛЯ ----
+    function toggleReceiverCard(cardId) {
+        const index = selectedReceiverCards.indexOf(cardId);
+        if (index !== -1) {
+            selectedReceiverCards.splice(index, 1);
+        } else {
+            if (selectedReceiverCards.length >= 9) {
+                showToast('❌ Нельзя выбрать больше 9 карт!', '#ffaa88');
+                return;
+            }
+            const hasCard = receiverCardsData.some(c => c.id === cardId);
+            if (!hasCard) {
+                showToast('❌ У получателя нет этой карты!', '#ff6b6b');
+                return;
+            }
+            selectedReceiverCards.push(cardId);
+        }
+        document.getElementById('receiverSelectedCount').textContent = `${selectedReceiverCards.length}/9`;
+        renderReceiverCards();
+    }
+
+    // ---- СОЗДАНИЕ ПРЕДЛОЖЕНИЯ ----
+    async function createTradeOffer() {
+        const receiverId = document.getElementById('tradeReceiverId').value.trim();
+        
+        if (!receiverId) { showToast('❌ Введите ID получателя!', '#ff6b6b'); return; }
+        if (receiverId === _playerId) { showToast('❌ Нельзя обмениваться с самим собой!', '#ff6b6b'); return; }
+        if (selectedSenderCards.length === 0) { showToast('❌ Выберите хотя бы 1 свою карту!', '#ff6b6b'); return; }
+        if (selectedReceiverCards.length === 0) { showToast('❌ Выберите хотя бы 1 карту получателя!', '#ff6b6b'); return; }
+
+        for (const cardId of selectedSenderCards) {
+            const hasCard = _cardHistory.some(c => c.id === cardId);
+            if (!hasCard) { showToast(`❌ У вас нет карты с ID ${cardId}!`, '#ff6b6b'); return; }
+        }
+
+        const { data: freshReceiverData } = await supabaseClient
+            .from('leaderboard')
+            .select('cards_json')
+            .eq('player_id', receiverId)
+            .single();
+        
+        if (freshReceiverData && freshReceiverData.cards_json) {
+            const receiverCardIds = freshReceiverData.cards_json.map(c => c.id);
+            for (const cardId of selectedReceiverCards) {
+                if (!receiverCardIds.includes(cardId)) {
+                    const card = getCardById(cardId);
+                    showToast(`❌ У получателя больше нет карты ${card ? card.rank : cardId}!`, '#ff6b6b');
+                    return;
+                }
+            }
+        }
+
+        try {
+            const { data: existing } = await supabaseClient
+                .from('trade_offers')
+                .select('id')
+                .eq('sender_id', _playerId)
+                .eq('receiver_id', receiverId)
+                .eq('status', 'pending')
+                .maybeSingle();
+
+            if (existing) {
+                showToast('❌ У вас уже есть активное предложение этому игроку!', '#ffaa88');
+                return;
+            }
+        } catch(e) {
+            console.warn('Ошибка проверки предложений:', e);
+        }
+
+        try {
+            const { error } = await supabaseClient
+                .from('trade_offers')
+                .insert({
+                    sender_id: _playerId,
+                    receiver_id: receiverId,
+                    sender_cards: selectedSenderCards,
+                    receiver_cards: selectedReceiverCards,
+                    expires_at: new Date(Date.now() + 3600000).toISOString()
+                });
+
+            if (error) {
+                showToast('❌ Ошибка создания: ' + error.message, '#ff6b6b');
+                return;
+            }
+
+            showToast(`✅ Предложение отправлено! (${selectedSenderCards.length} → ${selectedReceiverCards.length})`, '#44ff44');
+            
+            selectedSenderCards = [];
+            selectedReceiverCards = [];
+            receiverCardsData = [];
+            document.getElementById('senderSelectedCount').textContent = '0/9';
+            document.getElementById('receiverSelectedCount').textContent = '0/9';
+            document.getElementById('receiverEmptyState').style.display = 'block';
+            document.getElementById('receiverLabel').innerHTML = '🎴 Карты получателя (выберите от 1 до 9):';
+            document.getElementById('tradeReceiverId').value = '';
+            
+            renderSenderCards();
+            renderReceiverCards();
+            await loadTrades();
+            
+        } catch(e) {
+            showToast('❌ Ошибка создания предложения', '#ff6b6b');
+            console.error(e);
+        }
+    }
+
+    // ---- ЗАГРУЗКА ВСЕХ ТРЕЙДОВ ----
+    async function loadTrades() {
+        if (!supabaseClient || !_playerId) return;
+
+        try {
+            const { data: incoming } = await supabaseClient
+                .from('trade_offers')
+                .select('*')
+                .eq('receiver_id', _playerId)
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false });
+
+            const { data: myTrades } = await supabaseClient
+                .from('trade_offers')
+                .select('*')
+                .eq('sender_id', _playerId)
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            const { data: history } = await supabaseClient
+                .from('trade_offers')
+                .select('*')
+                .or(`sender_id.eq.${_playerId},receiver_id.eq.${_playerId}`)
+                .in('status', ['accepted', 'rejected', 'cancelled', 'expired'])
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            renderIncomingTrades(incoming || []);
+            renderMyTrades(myTrades || []);
+            renderTradeHistory(history || []);
+
+            const badge = document.getElementById('tradeBadge');
+            if (badge) {
+                const count = (incoming || []).length;
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+
+            document.getElementById('incomingTradesCount').textContent = `${incoming?.length || 0} активных`;
+            document.getElementById('myTradesCount').textContent = `${myTrades?.length || 0} всего`;
+
+        } catch(e) {
+            console.error('Ошибка загрузки предложений:', e);
+        }
+    }
+
+    // ---- ОТРИСОВКА ВХОДЯЩИХ ----
+    function renderIncomingTrades(trades) {
+        const container = document.getElementById('incomingTradesList');
+        if (!container) return;
+        if (!trades.length) {
+            container.innerHTML = `<div class="empty-state" style="padding:20px;">
+                <span class="icon">📭</span>
+                <div class="title" style="font-size:14px;">Нет входящих предложений</div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = trades.map(t => {
+            const isExpired = new Date(t.expires_at) < new Date();
+            const statusClass = isExpired ? 'expired' : 'pending';
+            const statusText = isExpired ? '⏰ Истёк' : '⏳ Ожидает';
+            const senderCards = (t.sender_cards || []).map(id => getCardById(id)).filter(Boolean);
+            const receiverCards = (t.receiver_cards || []).map(id => getCardById(id)).filter(Boolean);
+
+            return `
+                <div class="trade-offer-item">
+                    <div class="offer-header">
+                        <span class="offer-player">📥 От: <strong>${t.sender_id}</strong></span>
+                        <span class="offer-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;">
+                        <span class="offer-cards-label">Отдаёт (${senderCards.length}):</span>
+                        <div class="offer-cards">
+                            ${senderCards.length ? senderCards.map(card => `
+                                <div class="offer-card">
+                                    ${card.image ? `<img src="${card.image}" alt="${card.rank}" class="card-img" onerror="this.style.display='none'">` : ''}
+                                    <span class="card-rank" style="color:${card.color};">${card.rank}</span>
+                                    <span class="card-name">${card.name}</span>
+                                </div>
+                            `).join('') : '<span style="font-size:11px;opacity:0.3;">—</span>'}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;">
+                        <span class="offer-cards-label">Просит (${receiverCards.length}):</span>
+                        <div class="offer-cards">
+                            ${receiverCards.length ? receiverCards.map(card => `
+                                <div class="offer-card">
+                                    ${card.image ? `<img src="${card.image}" alt="${card.rank}" class="card-img" onerror="this.style.display='none'">` : ''}
+                                    <span class="card-rank" style="color:${card.color};">${card.rank}</span>
+                                    <span class="card-name">${card.name}</span>
+                                </div>
+                            `).join('') : '<span style="font-size:11px;opacity:0.3;">—</span>'}
+                        </div>
+                    </div>
+                    <div class="offer-actions">
+                        ${!isExpired ? `
+                            <button class="trade-btn-sm success" onclick="acceptTrade(${t.id})">✅ Принять</button>
+                            <button class="trade-btn-sm danger" onclick="rejectTrade(${t.id})">❌ Отклонить</button>
+                        ` : ''}
+                        <span class="offer-time">${new Date(t.created_at).toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ---- ОТРИСОВКА МОИХ ----
+    function renderMyTrades(trades) {
+        const container = document.getElementById('myTradesList');
+        if (!container) return;
+        if (!trades.length) {
+            container.innerHTML = `<div class="empty-state" style="padding:20px;">
+                <span class="icon">📤</span>
+                <div class="title" style="font-size:14px;">Нет отправленных предложений</div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = trades.map(t => {
+            const isExpired = new Date(t.expires_at) < new Date();
+            const statusText = {
+                pending: isExpired ? '⏰ Истёк' : '⏳ Ожидает',
+                accepted: '✅ Принят',
+                rejected: '❌ Отклонён',
+                cancelled: '🚫 Отменён',
+                expired: '⏰ Истёк'
+            }[t.status] || t.status;
+
+            const statusClass = t.status === 'pending' ? (isExpired ? 'expired' : 'pending') : t.status;
+            const senderCards = (t.sender_cards || []).map(id => getCardById(id)).filter(Boolean);
+            const receiverCards = (t.receiver_cards || []).map(id => getCardById(id)).filter(Boolean);
+
+            return `
+                <div class="trade-offer-item">
+                    <div class="offer-header">
+                        <span class="offer-player">📤 Кому: <strong>${t.receiver_id}</strong></span>
+                        <span class="offer-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;">
+                        <span class="offer-cards-label">Отдаю (${senderCards.length}):</span>
+                        <div class="offer-cards">
+                            ${senderCards.length ? senderCards.map(card => `
+                                <div class="offer-card">
+                                    ${card.image ? `<img src="${card.image}" alt="${card.rank}" class="card-img" onerror="this.style.display='none'">` : ''}
+                                    <span class="card-rank" style="color:${card.color};">${card.rank}</span>
+                                    <span class="card-name">${card.name}</span>
+                                </div>
+                            `).join('') : '<span style="font-size:11px;opacity:0.3;">—</span>'}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;">
+                        <span class="offer-cards-label">Прошу (${receiverCards.length}):</span>
+                        <div class="offer-cards">
+                            ${receiverCards.length ? receiverCards.map(card => `
+                                <div class="offer-card">
+                                    ${card.image ? `<img src="${card.image}" alt="${card.rank}" class="card-img" onerror="this.style.display='none'">` : ''}
+                                    <span class="card-rank" style="color:${card.color};">${card.rank}</span>
+                                    <span class="card-name">${card.name}</span>
+                                </div>
+                            `).join('') : '<span style="font-size:11px;opacity:0.3;">—</span>'}
+                        </div>
+                    </div>
+                    <div class="offer-actions">
+                        ${t.status === 'pending' && !isExpired ? `
+                            <button class="trade-btn-sm danger" onclick="cancelTrade(${t.id})">🚫 Отменить</button>
+                        ` : ''}
+                        <span class="offer-time">${new Date(t.created_at).toLocaleString()}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ---- ОТРИСОВКА ИСТОРИИ ----
+    function renderTradeHistory(trades) {
+        const container = document.getElementById('tradeHistoryList');
+        if (!container) return;
+        if (!trades.length) {
+            container.innerHTML = `<div class="empty-state" style="padding:20px;">
+                <span class="icon">📜</span>
+                <div class="title" style="font-size:14px;">История пуста</div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = trades.map(t => {
+            const statusText = {
+                accepted: '✅ Принят',
+                rejected: '❌ Отклонён',
+                cancelled: '🚫 Отменён',
+                expired: '⏰ Истёк'
+            }[t.status] || t.status;
+
+            const isMine = t.sender_id === _playerId;
+            const senderCards = (t.sender_cards || []).map(id => getCardById(id)).filter(Boolean);
+            const receiverCards = (t.receiver_cards || []).map(id => getCardById(id)).filter(Boolean);
+
+            return `
+                <div class="trade-offer-item" style="opacity:0.7;">
+                    <div class="offer-header">
+                        <span class="offer-player">${isMine ? '📤' : '📥'} ${isMine ? 'Кому' : 'От'}: <strong>${isMine ? t.receiver_id : t.sender_id}</strong></span>
+                        <span class="offer-status ${t.status}">${statusText}</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0;">
+                        <span class="offer-cards-label">${isMine ? 'Отдал' : 'Получил'}:</span>
+                        <div class="offer-cards">
+                            ${senderCards.length ? senderCards.map(card => `
+                                <div class="offer-card">
+                                    ${card.image ? `<img src="${card.image}" alt="${card.rank}" class="card-img" onerror="this.style.display='none'">` : ''}
+                                    <span class="card-rank" style="color:${card.color};">${card.rank}</span>
+                                </div>
+                            `).join('') : '<span style="font-size:11px;opacity:0.3;">—</span>'}
+                        </div>
+                    </div>
+                    <span class="offer-time">${new Date(t.created_at).toLocaleString()}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ---- ПРИНЯТЬ ----
+    async function acceptTrade(offerId) {
+        if (!confirm('Вы уверены, что хотите принять это предложение?')) return;
+
+        try {
+            const { data: offer, error: offerError } = await supabaseClient
+                .from('trade_offers').select('*').eq('id', offerId).single();
+
+            if (offerError || !offer) { showToast('❌ Предложение не найдено', '#ff6b6b'); return; }
+            if (offer.status !== 'pending') { showToast('❌ Предложение уже обработано', '#ffaa88'); return; }
+            if (new Date(offer.expires_at) < new Date()) {
+                showToast('⏰ Предложение истекло!', '#ffaa88');
+                await supabaseClient.from('trade_offers').update({ status: 'expired' }).eq('id', offerId);
+                loadTrades();
+                return;
+            }
+
+            const senderCardIds = offer.sender_cards || [];
+            const receiverCardIds = offer.receiver_cards || [];
+
+            const { data: senderData } = await supabaseClient
+                .from('leaderboard').select('cards_json').eq('player_id', offer.sender_id).single();
+
+            const { data: receiverData } = await supabaseClient
+                .from('leaderboard').select('cards_json').eq('player_id', _playerId).single();
+
+            let senderCards = senderData?.cards_json || [];
+            let receiverCards = receiverData?.cards_json || [];
+
+            // Проверки
+            for (const cardId of senderCardIds) {
+                if (!senderCards.some(c => c.id === cardId)) {
+                    showToast('❌ У отправителя нет одной из карт!', '#ff6b6b');
+                    await supabaseClient.from('trade_offers').update({ status: 'expired' }).eq('id', offerId);
+                    loadTrades();
+                    return;
+                }
+            }
+            for (const cardId of receiverCardIds) {
+                if (!receiverCards.some(c => c.id === cardId)) {
+                    showToast('❌ У вас нет одной из карт!', '#ff6b6b');
+                    return;
+                }
+            }
+
+            // Удаляем у отправителя
+            for (const cardId of senderCardIds) {
+                const idx = senderCards.findIndex(c => (c.cardId || c.id) === cardId);
+                if (idx !== -1) senderCards.splice(idx, 1);
+            }
+            // Удаляем у получателя
+            for (const cardId of receiverCardIds) {
+                const idx = receiverCards.findIndex(c => c.id === cardId);
+                if (idx !== -1) receiverCards.splice(idx, 1);
+            }
+            // Добавляем получателю
+            for (const cardId of senderCardIds) {
+                const cardData = getCardById(cardId);
+                receiverCards.push({
+                    id: cardId,
+                    rank: cardData ? cardData.rank : '?',
+                    text: `🎴 ${cardData ? cardData.rank : '?'}`,
+                    date: Date.now()
+                });
+            }
+            // Добавляем отправителю
+            for (const cardId of receiverCardIds) {
+                const cardData = getCardById(cardId);
+                senderCards.push({
+                    id: cardId,
+                    rank: cardData ? cardData.rank : '?',
+                    text: `🎴 ${cardData ? cardData.rank : '?'}`,
+                    date: Date.now()
+                });
+            }
+
+            // Сохраняем
+            await supabaseClient.from('leaderboard').update({ cards_json: senderCards }).eq('player_id', offer.sender_id);
+            await supabaseClient.from('leaderboard').update({ cards_json: receiverCards }).eq('player_id', _playerId);
+            await supabaseClient.from('trade_offers').update({ status: 'accepted' }).eq('id', offerId);
+
+            _cardHistory = receiverCards;
+            saveGame();
+            updateUI();
+            showToast('✅ Обмен совершён!', '#44ff44');
+
+            setTimeout(async () => {
+                await loadTrades();
+                renderSenderCards();
+                renderReceiverCards();
+            }, 500);
+        } catch(e) {
+            console.error('❌ Ошибка:', e);
+            showToast('❌ Ошибка при обмене', '#ff6b6b');
+        }
+    }
+
+    // ---- ОТКЛОНИТЬ ----
+    async function rejectTrade(offerId) {
+        if (!confirm('Отклонить предложение?')) return;
+        try {
+            await supabaseClient.from('trade_offers').update({ status: 'rejected' }).eq('id', offerId);
+            showToast('❌ Предложение отклонено', '#ff6b6b');
+            loadTrades();
+        } catch(e) { showToast('❌ Ошибка', '#ff6b6b'); }
+    }
+
+    // ---- ОТМЕНИТЬ ----
+    async function cancelTrade(offerId) {
+        if (!confirm('Отменить предложение?')) return;
+        try {
+            await supabaseClient.from('trade_offers').update({ status: 'cancelled' }).eq('id', offerId);
+            showToast('🚫 Предложение отменено', '#ffaa88');
+            loadTrades();
+            renderSenderCards();
+            renderReceiverCards();
+        } catch(e) { showToast('❌ Ошибка', '#ff6b6b'); }
+    }
+
+    // ---- ОЧИСТКА ВЫБОРА ----
+    function clearTradeSelection() {
+        selectedSenderCards = [];
+        selectedReceiverCards = [];
+        receiverCardsData = [];
+        document.getElementById('senderSelectedCount').textContent = '0/9';
+        document.getElementById('receiverSelectedCount').textContent = '0/9';
+        document.getElementById('receiverEmptyState').style.display = 'block';
+        document.getElementById('receiverLabel').innerHTML = '🎴 Карты получателя (выберите от 1 до 9):';
+        document.getElementById('tradeReceiverId').value = '';
+        renderSenderCards();
+        renderReceiverCards();
+    }
+
+    // ---- ПОДПИСКА НА ТРЕЙДЫ ----
+    function subscribeToTrades() {
+        if (!supabaseClient || !_playerId) return;
+        if (tradeChannel) {
+            try { supabaseClient.removeChannel(tradeChannel); } catch(e) {}
+            tradeChannel = null;
+        }
+
+        tradeChannel = supabaseClient
+            .channel('trade-channel')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trade_offers' }, (payload) => {
+                const offer = payload.new;
+                if (offer.receiver_id === _playerId) {
+                    showToast(`📩 Новое предложение обмена!`, '#b388ff');
+                    loadTrades();
+                    if (navigator.vibrate) navigator.vibrate(100);
+                }
+            })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'trade_offers' }, (payload) => {
+                const offer = payload.new;
+                if (offer.receiver_id === _playerId || offer.sender_id === _playerId) loadTrades();
+            })
+            .subscribe();
+    }
+
     // ---- МЕХАНИКА КАЛЕНДАРЯ ----
     let _dailyStreak = 1;
     let _lastLoginDate = null;
@@ -4137,6 +5119,31 @@
                 _lastLoginDate = d.lastLoginDate || null;
                 _calendarClaimed = d.calendarClaimed || {};
                 _eventCurrency = d.eventCurrency || 0;
+
+                // ===== МИГРАЦИЯ СТАРЫХ КАРТ =====
+                // Карты без cardId получают cardId, найденный по рангу
+                let migrated = 0;
+                _cardHistory = _cardHistory.map(item => {
+                    // Если уже есть cardId — оставляем как есть
+                    if (item.cardId) return item;
+                    
+                    // Иначе ищем карту по рангу (первую попавшуюся в ALL_CARDS)
+                    const cardByRank = ALL_CARDS.find(c => c.rank === item.rank);
+                    if (cardByRank) migrated++;
+                    
+                    return {
+                        cardId: cardByRank ? cardByRank.id : null,
+                        rank: item.rank,
+                        text: item.text,
+                        uniqueId: item.id || Date.now()
+                    };
+                }).filter(item => item.cardId !== null); // удаляем битые записи
+                
+                if (migrated > 0) {
+                    console.log(`✅ Мигрировано карт: ${migrated}`);
+                    saveGame(); // сохраняем с новыми cardId
+                }
+
             } catch(e) { console.warn('Ошибка загрузки:', e); }
         } else {
             _playerId = generatePlayerId();
@@ -4188,7 +5195,6 @@
             syncToSupabase();
         }
     }
-
     function saveGame() {
         const saveData = {
             ore: _ore,
@@ -4294,9 +5300,10 @@
         if (!supabaseClient || !_playerId || !_playerName) return;
 
         const cardsForDb = _cardHistory.map(card => ({
+            cardId: card.cardId || card.id,    
             rank: card.rank,
-            text: card.text,
-            date: card.id || Date.now()
+            text: card.text || `🎴 ${card.rank}`,
+            uniqueId: card.uniqueId || Date.now()
         }));
 
         try {
@@ -4334,9 +5341,10 @@
                     _mbProfileLink = data.mb_link || _mbProfileLink;
                     if (data.cards_json) {
                         _cardHistory = data.cards_json.map(c => ({
-                            id: c.date || Date.now(),
+                            cardId: c.cardId || c.id,       // ← сохраняем в cardId
                             rank: c.rank,
-                            text: c.text || `🎴 ${c.rank}`
+                            text: c.text || `🎴 ${c.rank}`,
+                            uniqueId: c.uniqueId || c.date || Date.now()
                         }));
                     }
                     saveGame();
@@ -4358,11 +5366,9 @@
             return;
         }
 
+        // Получаем всех игроков для расчёта рейтинга
         supabaseClient.from('leaderboard')
             .select('username, level, player_id, ore, diamonds, mb_link, cards_json, last_active')
-            .order('level', { ascending: false })
-            .order('ore', { ascending: false })
-            .limit(20)
             .then(({ data }) => {
                 const container = document.getElementById('topList');
                 const rankBlock = document.getElementById('playerRankBlock');
@@ -4376,6 +5382,18 @@
                     return;
                 }
 
+                // === РАСЧЁТ РЕЙТИНГА ===
+                const playersWithRating = data.map(p => ({
+                    ...p,
+                    rating: (p.level || 0) * 10 + (p.diamonds || 0)
+                }));
+
+                // Сортируем по рейтингу (по убыванию)
+                playersWithRating.sort((a, b) => b.rating - a.rating);
+
+                // === ОГРАНИЧИВАЕМ ТОП ДО 10 ===
+                const topPlayers = playersWithRating.slice(0, 10);
+
                 // Общее количество
                 supabaseClient.from('leaderboard')
                     .select('*', { count: 'exact', head: true })
@@ -4386,82 +5404,116 @@
                         if (totalSpan) totalSpan.textContent = `👥 Всего: ${data.length}+`;
                     });
 
-                container.innerHTML = data.map((p, i) => {
+                // === ОТОБРАЖЕНИЕ ТОП-10 ===
+                container.innerHTML = topPlayers.map((p, i) => {
                     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.';
                     const isCurrent = p.player_id === _playerId;
                     const status = getOnlineStatus(p.last_active);
+                    const rating = p.rating || 0;
+                    
                     return `<li class="${isCurrent ? 'current-player' : ''}" 
                                 data-player-id="${p.player_id}"
                                 data-player-name="${p.username || 'Игрок'}"
-                                data-player-level="${p.level}"
-                                data-player-essence="${p.essence || 0}"
+                                data-player-level="${p.level || 0}"
+                                data-player-essence="${p.diamonds || 0}"
+                                data-player-rating="${rating}"
                                 data-player-cards='${JSON.stringify(p.cards_json || [])}'
                                 data-mb-link="${p.mb_link || ''}">
-                        <span class="top-player-name">
-                            <span class="medal">${medal}</span>
-                            <span class="name">${p.username || 'Игрок'}</span>
-                            <span style="font-size:9px;color:${status.color};margin-left:4px;">${status.text}</span>
-                        </span>
-                        <span class="top-player-stats">
-                            <span>⭐ ${p.level}</span>
-                            <span>💠 ${p.diamonds  || 0}</span>
-                        </span>
-                    </li>`;
+                            <span class="top-player-name">
+                                <span class="medal">${medal}</span>
+                                <span class="name">${p.username || 'Игрок'}</span>
+                                <span style="font-size:9px;color:${status.color};margin-left:4px;">${status.text}</span>
+                            </span>
+                            <span class="top-player-stats">
+                                <span>⭐ ${p.level || 0}</span>
+                                <span>💠 ${p.diamonds || 0}</span>
+                                <span style="color:#ffcc66;font-weight:700;">🏆 ${rating}</span>
+                            </span>
+                        </li>`;
                 }).join('');
 
-                // Место игрока
-                supabaseClient.from('leaderboard')
-                    .select('player_id, level', { count: 'exact', head: false })
-                    .order('level', { ascending: false })
-                    .then(({ data: allData }) => {
-                        if (allData) {
-                            const playerIndex = allData.findIndex(p => p.player_id === _playerId);
-                            if (playerIndex !== -1) {
-                                rankSpan.textContent = `${playerIndex + 1} место из ${allData.length}`;
-                                rankBlock.style.display = 'block';
-                            } else {
-                                rankBlock.style.display = 'none';
-                            }
-                        }
-                    })
-                    .catch(() => {
-                        const inTop = data.some(p => p.player_id === _playerId);
-                        if (inTop) {
-                            const idx = data.findIndex(p => p.player_id === _playerId);
-                            rankSpan.textContent = `${idx + 1} место в топе`;
-                            rankBlock.style.display = 'block';
-                        } else {
-                            rankBlock.style.display = 'none';
-                        }
-                    });
+                // === ЕСЛИ ИГРОК НЕ В ТОП-10, ПОКАЗЫВАЕМ ЕГО МЕСТО ===
+                const playerIndex = playersWithRating.findIndex(p => p.player_id === _playerId);
+                if (playerIndex !== -1) {
+                    if (playerIndex < 10) {
+                        rankSpan.textContent = `${playerIndex + 1} место из ${playersWithRating.length}`;
+                        rankBlock.style.display = 'block';
+                    } else {
+                        // Игрок вне топа — показываем его место отдельно
+                        const playerData = playersWithRating[playerIndex];
+                        const playerRating = playerData.rating || 0;
+                        
+                        // Добавляем строку с игроком внизу списка
+                        const playerRow = document.createElement('li');
+                        playerRow.className = 'current-player';
+                        playerRow.style.borderTop = '2px solid rgba(123, 77, 255, 0.2)';
+                        playerRow.style.marginTop = '8px';
+                        playerRow.style.paddingTop = '12px';
+                        playerRow.innerHTML = `
+                            <span class="top-player-name">
+                                <span class="medal">${playerIndex + 1}.</span>
+                                <span class="name">${playerData.username || 'Игрок'}</span>
+                                <span style="font-size:9px;color:#44ff44;margin-left:4px;">🟢 Вы</span>
+                            </span>
+                            <span class="top-player-stats">
+                                <span>⭐ ${playerData.level || 0}</span>
+                                <span>💠 ${playerData.diamonds || 0}</span>
+                                <span style="color:#ffcc66;font-weight:700;">🏆 ${playerRating}</span>
+                            </span>
+                        `;
+                        container.appendChild(playerRow);
+                        
+                        rankSpan.textContent = `${playerIndex + 1} место из ${playersWithRating.length}`;
+                        rankBlock.style.display = 'block';
+                    }
+                } else {
+                    rankBlock.style.display = 'none';
+                }
 
-                // Клик по игроку
+                // === КЛИК ПО ИГРОКУ ===
                 container.querySelectorAll('li[data-player-id]').forEach(el => {
                     el.addEventListener('click', function() {
                         const playerId = this.dataset.playerId;
                         const playerName = this.dataset.playerName;
-                        const playerLevel = parseInt(this.dataset.playerLevel);
-                        const playeressence = parseInt(this.dataset.playerEssence);
+                        const playerLevel = parseInt(this.dataset.playerLevel) || 0;
+                        const playerEssence = parseInt(this.dataset.playerEssence) || 0;
+                        const playerRating = parseInt(this.dataset.playerRating) || 0;
                         const mbLink = this.dataset.mbLink || '';
                         let cardsJson = [];
                         try {
                             cardsJson = JSON.parse(this.dataset.playerCards || '[]');
                         } catch(e) {}
-                        showPlayerProfile(playerId, playerName, playerLevel, playeressence, cardsJson, mbLink);
+                        showPlayerProfile(playerId, playerName, playerLevel, playerEssence, playerRating, cardsJson, mbLink);
                     });
                 });
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error('Ошибка загрузки топа:', error);
                 document.getElementById('topList').innerHTML = '<li style="justify-content:center; opacity:0.4;">⚠️ Ошибка загрузки</li>';
             });
     }
 
     // ---- ПРОФИЛЬ ИГРОКА ----
-    function showPlayerProfile(playerId, playerName, level, essence, cardsJson, mbLink) {
+    function showPlayerProfile(playerId, playerName, level, essence, rating, cardsJson, mbLink) {
         const modal = document.getElementById('playerProfileModal');
         document.getElementById('playerProfileName').textContent = playerName || 'Игрок';
         document.getElementById('playerProfileLevel').textContent = level || 1;
         document.getElementById('playerprofileEssence').textContent = essence || 0;
+
+        // Добавляем отображение рейтинга в модалку
+        const ratingEl = document.createElement('div');
+        ratingEl.className = 'stat-row';
+        ratingEl.innerHTML = `
+            <span class="label">🏆 Рейтинг</span>
+            <span class="value" style="color: #ffcc66;">${rating || 0}</span>
+        `;
+        
+        // Вставляем после эссенции
+        const essenceRow = document.querySelector('#playerProfileModal .stat-row:nth-child(2)');
+        if (essenceRow && !document.querySelector('#playerProfileModal .stat-row.rating-row')) {
+            ratingEl.classList.add('rating-row');
+            essenceRow.after(ratingEl);
+        }
 
         const avatarEl = document.getElementById('playerProfileAvatar');
         if (level >= 100) avatarEl.textContent = '🏆';
@@ -4707,16 +5759,37 @@
     }
 
     function showLevelUpModal() {
-        const cost = getLevelUpCost(_level);
-        document.getElementById('modalCurrentLevel').textContent = _level;
-        document.getElementById('modalNextLevel').textContent = _level + 1;
-        document.getElementById('modalCost').textContent = cost;
-        document.getElementById('modalEssence').textContent = _essence;
-
-        const progress = (_level / 100) * 100;
-        document.getElementById('levelProgressFill').style.width = Math.min(progress, 100) + '%';
-
-        document.getElementById('levelModal').classList.add('show');
+        try {
+            const cost = getLevelUpCost(_level);
+            
+            const el = (id) => document.getElementById(id);
+            
+            const currentEl = el('modalCurrentLevel');
+            const nextEl = el('modalNextLevel');
+            const costEl = el('modalCost');
+            const essenceEl = el('modalEssence') || el('modalessence'); // ← на случай если HTML не исправлен
+            const progressEl = el('levelProgressFill');
+            const modal = el('levelModal');
+            
+            if (currentEl) currentEl.textContent = _level;
+            if (nextEl) nextEl.textContent = _level + 1;
+            if (costEl) costEl.textContent = cost;
+            if (essenceEl) essenceEl.textContent = _essence;
+            if (progressEl) {
+                const progress = (_level / 100) * 100;
+                progressEl.style.width = Math.min(progress, 100) + '%';
+            }
+            
+            if (modal) {
+                modal.classList.add('show');
+            } else {
+                console.error('❌ Модалка levelModal не найдена!');
+                showToast('❌ Ошибка: модалка не найдена', '#ff6b6b');
+            }
+        } catch(e) {
+            console.error('❌ Ошибка в showLevelUpModal:', e);
+            showToast('❌ Ошибка при открытии окна', '#ff6b6b');
+        }
     }
 
     function performLevelUp() {
@@ -4979,58 +6052,74 @@
     function getCollectionMap() {
         const map = new Map();
         for (const item of _cardHistory) {
-            map.set(item.id, true);
+            const cardId = item.cardId || item.id;
+            map.set(cardId, true);
         }
         return map;
     }
 
     function renderCollection() {
         const grid = document.getElementById('collectionGrid');
+        if (!grid) return;
 
-        let cards = [];
+        // Считаем количество каждой карты по cardId
+        const countsById = {};
         for (const item of _cardHistory) {
-            const card = getCardById(item.id);
-            if (card) cards.push({ ...card, count: 1 });
+            const cardId = item.cardId || item.id;
+            countsById[cardId] = (countsById[cardId] || 0) + 1;
         }
 
-        const counts = {};
-        for (const c of cards) {
-            counts[c.rank] = (counts[c.rank] || 0) + 1;
-        }
-
+        // Уникальные карты
         const uniqueCards = [];
         const seen = new Set();
-        for (const c of cards) {
-            if (!seen.has(c.rank)) {
-                seen.add(c.rank);
-                uniqueCards.push(c);
+        for (const item of _cardHistory) {
+            const cardId = item.cardId || item.id;
+            if (!seen.has(cardId)) {
+                seen.add(cardId);
+                const cardData = getCardById(cardId);
+                if (cardData) {
+                    uniqueCards.push({ ...cardData });
+                }
             }
         }
 
+        // Фильтры
         let filtered = [...uniqueCards];
         if (collectionFilter !== 'all') {
             filtered = filtered.filter(c => c.rank === collectionFilter);
         }
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase().trim();
-            filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || c.rank.toLowerCase().includes(q));
+            filtered = filtered.filter(c => 
+                c.name.toLowerCase().includes(q) || 
+                c.rank.toLowerCase().includes(q)
+            );
         }
 
+        // Сортировка по рангам
         const rankOrder = ['M', 'T', 'K', 'Y', 'U', 'Q', 'R', 'Z', 'O', 'H', 'N', 'V', 'L'];
         filtered.sort((a, b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
 
-        document.getElementById('totalCards').textContent = cards.length;
-        document.getElementById('totalRanks').textContent = Object.keys(counts).length;
-        document.getElementById('rareCards').textContent = cards.filter(c => ['M', 'K', 'T', 'Y'].includes(c.rank)).length;
-        document.getElementById('collectionTotal').textContent = cards.length + ' карт';
+        // Обновляем статистику
+        document.getElementById('totalCards').textContent = _cardHistory.length;
+        document.getElementById('totalRanks').textContent = uniqueCards.length;
+        document.getElementById('rareCards').textContent = _cardHistory.filter(item => {
+            const cardId = item.cardId || item.id;
+            const card = getCardById(cardId);
+            return card && ['M', 'K', 'T', 'Y'].includes(card.rank);
+        }).length;
+        document.getElementById('collectionTotal').textContent = _cardHistory.length + ' карт';
 
+        // Пустое состояние
         if (filtered.length === 0) {
             grid.innerHTML = `<div class="empty-state"><div class="icon">🎴</div><div class="title">Коллекция пуста</div><div class="desc">Открывайте паки, чтобы получить карты!</div></div>`;
             return;
         }
 
+        // Рендер
         grid.innerHTML = filtered.map(card => {
             const imgPath = getCardImage(card);
+            const count = countsById[card.id] || 1;
             return `
                 <div class="card-item rank-${card.rank}" onclick="openCardModal('${card.id}')">
                     <div class="shine"></div>
@@ -5041,7 +6130,7 @@
                     <div class="card-rank" style="color:${card.color};">${card.rank}</div>
                     <div class="card-name">${card.name}</div>
                     <div class="card-rarity">${card.set || 'Коллекция'}</div>
-                    <div class="card-count">${counts[card.rank] || 1} шт.</div>
+                    <div class="card-count">${count} шт.</div>
                 </div>
             `;
         }).join('');
@@ -5323,15 +6412,17 @@
     }
 
     function addCardToCollection(card) {
-        const existing = _cardHistory.find(item => item.rank === card.rank);
+        // Проверяем дубликат ПО ID КАРТЫ (card.id — это ID из ALL_CARDS)
+        const existing = _cardHistory.find(item => item.cardId === card.id);
         if (existing) {
             _essence += 7;
             showToast(`🔄 Дубликат! +7 💠 за "${card.name}"`, '#f5b342');
         } else {
             _cardHistory.push({ 
-                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                cardId: card.id,                            
                 rank: card.rank, 
-                text: `🎴 ${card.rank} — ${card.name}` 
+                text: `🎴 ${card.rank} — ${card.name}`,
+                uniqueId: Date.now() + '_' + Math.random().toString(36).substr(2, 6)
             });
             showToast(`✨ Новая карта! "${card.name}" добавлена в коллекцию ✨`, '#b388ff');
         }
@@ -5468,7 +6559,8 @@
             'sets': 'section-sets',
             'packs': 'section-packs',
             'event': 'section-event',
-            'chat': 'section-chat', 
+            'chat': 'section-chat',
+            'trade': 'section-trade',
             'top': 'section-top',
             'profile': 'section-profile',
             'settings': 'section-settings'
@@ -5486,6 +6578,13 @@
         if (section === 'event') { updateEventUI(); }
         if (section === 'profile') { updateProfileUI(); updateProfileLinkUI(); }
         if (section === 'top') loadTopFromSupabase();
+        if (section === 'trade') {
+            setTimeout(async () => {
+                await loadTrades();
+                await renderSenderCards();
+                renderReceiverCards();
+            }, 100);
+        }
     }
 
     // ---- ОБРАБОТЧИКИ ----
@@ -5675,6 +6774,40 @@
             if (_soundEnabled) playClickSound();
         });
 
+        // ===== ОБМЕН КАРТАМИ =====
+        document.getElementById('loadReceiverCardsBtn')?.addEventListener('click', loadReceiverCards);
+        document.getElementById('createTradeBtn')?.addEventListener('click', createTradeOffer);
+        document.getElementById('clearTradeSelectionBtn')?.addEventListener('click', clearTradeSelection);
+        document.getElementById('clearTradeHistoryBtn')?.addEventListener('click', async () => {
+            if (confirm('Очистить историю обменов?')) {
+                await supabaseClient.from('trade_offers')
+                    .delete()
+                    .or(`sender_id.eq.${_playerId},receiver_id.eq.${_playerId}`)
+                    .in('status', ['accepted', 'rejected', 'cancelled', 'expired']);
+                showToast('✅ История очищена', '#44ff44');
+                loadTrades();
+            }
+        });
+
+        // Предзагрузка данных обмена (чтобы при первом открытии всё было готово)
+        setTimeout(async () => {
+            if (typeof loadTrades === 'function') {
+                await loadTrades();
+            }
+            if (typeof renderSenderCards === 'function') {
+                await renderSenderCards();
+            }
+        }, 1500);
+
+        // Подписка на трейды
+        setTimeout(() => {
+            subscribeToTrades();
+            loadTrades();
+        }, 3000);
+
+        // Периодическое обновление
+        setInterval(loadTrades, 30000);
+
         setInterval(() => {
             checkDailyReset();
             updateUI();
@@ -5704,6 +6837,14 @@
     window.closeAd = closeAd;
     window.claimAdReward = claimAdReward;
     window.showSetCards = showSetCards;
+    // Экспорт для onclick
+    window.loadReceiverCards = loadReceiverCards;
+    window.toggleSenderCard = toggleSenderCard;
+    window.toggleReceiverCard = toggleReceiverCard;
+    window.createTradeOffer = createTradeOffer;
+    window.acceptTrade = acceptTrade;
+    window.rejectTrade = rejectTrade;
+    window.cancelTrade = cancelTrade;
 
     console.log('⚡ Arcana Nexus — Все разделы загружены!');
     console.log(`🆔 Ваш ID: ${_playerId}`);
