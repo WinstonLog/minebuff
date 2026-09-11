@@ -4772,26 +4772,49 @@
     }
 
     // Проверка и показ модалки компенсации
-    function checkCompensation() {
-        // Уже получал — выходим
+    async function checkCompensation() {
+        // 1. Сначала читаем флаг из БД (если есть подключение)
+        if (supabaseClient && _playerId) {
+            try {
+                const { data } = await supabaseClient
+                    .from('leaderboard')
+                    .select('compensation_claimed')
+                    .eq('player_id', _playerId)
+                    .single();
+                
+                if (data && data.compensation_claimed === true) {
+                    // Уже получил на другом устройстве
+                    _compensationClaimed = true;
+                    saveGame();
+                    console.log('✅ Компенсация уже получена (из БД)');
+                    return;
+                }
+            } catch(e) {
+                console.warn('Ошибка проверки компенсации:', e);
+            }
+        }
+        
+        // 2. Проверяем локальный флаг
         if (_compensationClaimed) return;
         
-        // Уровень 1 — ничего не тратил — выходим
+        // 3. Уровень 1 — нечего компенсировать
         if (_level < 2) {
             _compensationClaimed = true;
             saveGame();
+            if (supabaseClient) syncToSupabase();
             return;
         }
         
-        // Считаем сумму
+        // 4. Считаем сумму
         const compensation = calculateLevelCompensation(_level);
         if (compensation <= 0) {
             _compensationClaimed = true;
             saveGame();
+            if (supabaseClient) syncToSupabase();
             return;
         }
         
-        // Показываем модалку
+        // 5. Показываем модалку
         showCompensationModal(compensation);
     }
 
@@ -4827,13 +4850,25 @@
         document.body.appendChild(modal);
         
         // Обработчик
-        document.getElementById('claimCompensationBtn').addEventListener('click', function() {
+        document.getElementById('claimCompensationBtn').addEventListener('click', async function() {
             _essence += amount;
             _compensationClaimed = true;
             saveGame();
+            
+            // 👇 ВАЖНО: сразу отправляем в БД
+            if (supabaseClient && _playerId && _playerName) {
+                try {
+                    await supabaseClient.from('leaderboard')
+                        .update({ compensation_claimed: true })
+                        .eq('player_id', _playerId);
+                    console.log('✅ Флаг компенсации сохранён в БД');
+                } catch(e) {
+                    console.warn('Ошибка сохранения флага:', e);
+                }
+            }
+            
             updateUI();
             
-            // Красивое уведомление
             showToast(`💰 +${amount.toLocaleString('ru-RU')} 💠 компенсация получена!`, '#ffcc66');
             
             // Всплывашка с числом
@@ -5060,6 +5095,7 @@
                     mb_link: _mbProfileLink || null,
                     last_active: new Date().toISOString(),
                     updated_at: new Date().toISOString()
+                    compensation_claimed: _compensationClaimed
                 }, { onConflict: 'player_id' });
         } catch(e) {
             console.warn('Supabase sync error:', e);
@@ -5079,6 +5115,11 @@
                     _essence = data.diamonds || _essence;
                     _level = data.level || _level;
                     _mbProfileLink = data.mb_link || _mbProfileLink;
+                    
+                    if (data.compensation_claimed !== undefined && data.compensation_claimed !== null) {
+                        _compensationClaimed = data.compensation_claimed;
+                        console.log('💰 compensation_claimed из БД:', _compensationClaimed);
+                    }
                     
                     if (data.cards_json) {
                         _cardHistory = data.cards_json.map(c => ({
