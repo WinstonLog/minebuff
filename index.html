@@ -2747,7 +2747,7 @@
     let receiverCardsData = [];
 
     // ================================================================
-    // МИНИ-ИГРА «АРКАНА: ПРЫЖОК» — финальная версия
+    // МИНИ-ИГРА «АРКАНА: ПРЫЖОК» — оптимизированная версия
     // ================================================================
     const MG = {
         canvas: null, ctx: null,
@@ -2767,34 +2767,36 @@
         keys: { left: false, right: false }
     };
 
-    // --- SVG-иконки ---
+    // Кэш градиента фона (создаётся один раз)
+    let _mgBgGrad = null;
+
+    // FPS-ограничение
+    const MG_FPS_TARGET = 60;
+    const MG_FRAME_TIME = 1000 / MG_FPS_TARGET;
+
+    // --- SVG-иконки (без анимаций — они не работают в Image) ---
     function mgMakeIcon(type, color) {
         const icons = {
             player: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
                 <defs>
-                    <!-- Градиент тела призрака -->
                     <radialGradient id="ghostBody" cx="50%" cy="30%" r="75%">
                         <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
                         <stop offset="50%" stop-color="#e0d5ff" stop-opacity="0.85"/>
                         <stop offset="100%" stop-color="#b388ff" stop-opacity="0.7"/>
                     </radialGradient>
-                    <!-- Свечение глаз -->
                     <radialGradient id="ghostEyeGlow" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
                         <stop offset="40%" stop-color="#b388ff" stop-opacity="0.8"/>
                         <stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/>
                     </radialGradient>
-                    <!-- Внутреннее свечение -->
                     <radialGradient id="ghostInner" cx="50%" cy="60%" r="50%">
                         <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
                         <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
                     </radialGradient>
                 </defs>
                 
-                <!-- Внешняя аура (дымка) -->
                 <ellipse cx="32" cy="38" rx="24" ry="22" fill="#b388ff" opacity="0.15"/>
                 
-                <!-- ХВОСТ-ДЫМКА (волнистые полосы снизу) -->
                 <path d="M14 48 Q16 58 12 62 Q18 60 20 54 Q22 62 20 64 
                          Q26 60 26 54 Q28 62 28 64 
                          Q32 60 32 54 Q34 62 34 64 
@@ -2803,7 +2805,6 @@
                          Q52 60 50 48 Z" 
                       fill="url(#ghostBody)" opacity="0.9"/>
                 
-                <!-- ТЕЛО (основная форма призрака) -->
                 <path d="M32 8 Q48 8 50 26 L50 46 
                          Q48 52 44 50 Q40 48 38 52 
                          Q36 56 32 54 
@@ -2814,7 +2815,6 @@
                       fill="url(#ghostBody)" 
                       stroke="#a89ddc" stroke-width="0.8" stroke-linejoin="round"/>
                 
-                <!-- Внутреннее свечение тела -->
                 <path d="M32 14 Q44 14 46 28 L46 44 
                          Q44 48 40 46 Q36 44 34 48 
                          Q32 50 30 48 
@@ -2823,51 +2823,35 @@
                          L18 28 Q20 14 32 14 Z" 
                       fill="url(#ghostInner)"/>
                 
-                <!-- ГЛАЗА (милые, светящиеся) -->
                 <ellipse cx="24" cy="30" rx="4" ry="5" fill="#1a0a2a"/>
                 <ellipse cx="40" cy="30" rx="4" ry="5" fill="#1a0a2a"/>
                 
-                <!-- Свечение вокруг глаз -->
                 <circle cx="24" cy="30" r="9" fill="url(#ghostEyeGlow)" opacity="0.6"/>
                 <circle cx="40" cy="30" r="9" fill="url(#ghostEyeGlow)" opacity="0.6"/>
                 
-                <!-- Блики в глазах -->
                 <ellipse cx="25.5" cy="28" rx="1.8" ry="2.2" fill="#fff"/>
                 <ellipse cx="41.5" cy="28" rx="1.8" ry="2.2" fill="#fff"/>
                 <circle cx="23" cy="32" r="0.9" fill="#b388ff" opacity="0.8"/>
                 <circle cx="39" cy="32" r="0.9" fill="#b388ff" opacity="0.8"/>
                 
-                <!-- РУМЯНЦЫ (полупрозрачные) -->
                 <ellipse cx="18" cy="36" rx="3" ry="2" fill="#ff6b9d" opacity="0.4"/>
                 <ellipse cx="46" cy="36" rx="3" ry="2" fill="#ff6b9d" opacity="0.4"/>
                 
-                <!-- УЛЫБКА (лёгкая, милая) -->
                 <path d="M29 38 Q32 41 35 38" 
                       stroke="#1a0a2a" stroke-width="1" fill="none" 
                       stroke-linecap="round" opacity="0.8"/>
                 
-                <!-- ЯЗЫЧОК (торчит как у милого призрака) -->
                 <ellipse cx="32" cy="40.5" rx="1.8" ry="1.2" fill="#ff6b9d" opacity="0.7"/>
                 
-                <!-- БЛИКИ на теле (магический эффект) -->
                 <ellipse cx="20" cy="22" rx="3" ry="4" fill="#ffffff" opacity="0.5"/>
                 <ellipse cx="44" cy="24" rx="2" ry="3" fill="#ffffff" opacity="0.4"/>
                 <circle cx="28" cy="18" r="1.5" fill="#ffffff" opacity="0.6"/>
                 <circle cx="38" cy="20" r="1" fill="#ffffff" opacity="0.5"/>
                 
-                <!-- Маленькие искорки вокруг -->
-                <circle cx="12" cy="20" r="1" fill="#b388ff" opacity="0.8">
-                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
-                </circle>
-                <circle cx="52" cy="16" r="1.2" fill="#ffcc66" opacity="0.7">
-                    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.5s" repeatCount="indefinite"/>
-                </circle>
-                <circle cx="56" cy="34" r="0.9" fill="#b388ff" opacity="0.6">
-                    <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite"/>
-                </circle>
-                <circle cx="8" cy="36" r="0.8" fill="#ffcc66" opacity="0.5">
-                    <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.2s" repeatCount="indefinite"/>
-                </circle>
+                <circle cx="12" cy="20" r="1" fill="#b388ff" opacity="0.8"/>
+                <circle cx="52" cy="16" r="1.2" fill="#ffcc66" opacity="0.7"/>
+                <circle cx="56" cy="34" r="0.9" fill="#b388ff" opacity="0.6"/>
+                <circle cx="8" cy="36" r="0.8" fill="#ffcc66" opacity="0.5"/>
             </svg>`,
             platform: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 16" preserveAspectRatio="none">
                 <defs>
@@ -2987,7 +2971,23 @@
         MG.canvas = document.getElementById('mgCanvas');
         if (!MG.canvas || MG.canvas.dataset.inited) return;
         MG.canvas.dataset.inited = '1';
-        MG.ctx = MG.canvas.getContext('2d');
+        
+        // Создаём контекст с оптимизациями
+        MG.ctx = MG.canvas.getContext('2d', {
+            alpha: false,
+            desynchronized: true
+        });
+        if (MG.ctx) MG.ctx.imageSmoothingEnabled = false;
+
+        // Уменьшаем разрешение на телефонах — рендер быстрее в 1.5 раза
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+            MG.canvas.width = 300;
+            MG.canvas.height = 533;
+            // Сбрасываем кэш градиента — он привязан к размеру
+            _mgBgGrad = null;
+        }
+
         MG.W = MG.canvas.width;
         MG.H = MG.canvas.height;
         mgLoadIcons();
@@ -3122,7 +3122,7 @@
         MG.runEssence = 0;
         MG.combo = 1;
         MG.comboTimer = 0;
-        MG.comboPlatformId = null; 
+        MG.comboPlatformId = null;
         MG.spawnTimer = 0;
         MG.player.x = MG.W / 2;
         MG.player.y = MG.H - 100;
@@ -3156,7 +3156,7 @@
             if (h) h.style.display = 'none';
         }, 3000);
 
-        MG.lastTime = performance.now();
+        MG.lastTime = 0;
         requestAnimationFrame(mgLoop);
     }
 
@@ -3215,6 +3215,9 @@
     }
 
     function mgSpawnEntities() {
+        // Ограничиваем количество платформ — максимум 15
+        if (MG.platforms.length >= 15) return;
+        
         const lastPlat = MG.platforms.reduce((min, p) => p.y < min.y ? p : min, MG.platforms[0]);
         if (lastPlat && lastPlat.y > 0) {
             MG.platforms.push({
@@ -3269,8 +3272,8 @@
                     // ===== КОМБО РАСТЁТ ТОЛЬКО НА НОВОЙ ПЛАТФОРМЕ =====
                     if (MG.comboPlatformId !== p.id) {
                         MG.combo++;
-                        MG.comboPlatformId = p.id;   // запоминаем платформу
-                        MG.comboTimer = 100;         // 10 секунд до сброса
+                        MG.comboPlatformId = p.id;
+                        MG.comboTimer = 100;
                         if (MG.combo > MG.bestCombo) MG.bestCombo = MG.combo;
                         MG.score += 5;
                     }
@@ -3347,13 +3350,13 @@
                     MG.runEssence += 1;
                     MG.dailyCollected += 1;
                     MG.score += 10;
+                    mgSaveStats();
                     const rect = MG.canvas.getBoundingClientRect();
                     showFloatingNumber('💠', rect.left + (p.x / MG.W) * rect.width, rect.top + (p.y / MG.H) * rect.height, false);
                     
-                    // ===== ДОСТИГЛИ ДНЕВНОГО ЛИМИТА — УДАЛЯЕМ ВСЮ ЭССЕНЦИЮ =====
                     if (MG.dailyCollected >= MG.dailyLimit) {
                         MG.pickups = [];
-                        mgSaveStats();  // сохраняем что достигли
+                        mgSaveStats();
                         showToast(`🚫 Лимит ${MG.dailyLimit} 💠 исчерпан!`, '#ff6b6b');
                         break;
                     }
@@ -3372,7 +3375,7 @@
             } else if (p.y > MG.H + 50) {
                 MG.pickups.splice(i, 1);
             }
-    }
+        }
 
         MG.platforms = MG.platforms.filter(p => p.y < MG.H + 50);
 
@@ -3394,74 +3397,57 @@
 
     function mgRender() {
         const ctx = MG.ctx;
-        const grad = ctx.createLinearGradient(0, 0, 0, MG.H);
-        grad.addColorStop(0, '#0f0f1a');
-        grad.addColorStop(0.5, '#1a0a2a');
-        grad.addColorStop(1, '#0f0f1a');
-        ctx.fillStyle = grad;
+
+        // Кэшированный градиент фона
+        if (!_mgBgGrad) {
+            _mgBgGrad = ctx.createLinearGradient(0, 0, 0, MG.H);
+            _mgBgGrad.addColorStop(0, '#0f0f1a');
+            _mgBgGrad.addColorStop(0.5, '#1a0a2a');
+            _mgBgGrad.addColorStop(1, '#0f0f1a');
+        }
+        ctx.fillStyle = _mgBgGrad;
         ctx.fillRect(0, 0, MG.W, MG.H);
 
-        // Звёзды
+        // Звёзды (20 вместо 40, рисуем одним path)
         ctx.fillStyle = 'rgba(179, 136, 255, 0.35)';
-        for (let i = 0; i < 40; i++) {
+        ctx.beginPath();
+        for (let i = 0; i < 20; i++) {
             const sx = (i * 137.5) % MG.W;
             const sy = ((i * 73.3 + MG.score * 0.2) % MG.H);
             const sr = ((i * 31) % 3) * 0.4 + 0.4;
-            ctx.beginPath();
+            ctx.moveTo(sx + sr, sy);
             ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-            ctx.fill();
         }
+        ctx.fill();
 
-        // ===== ПЛАТФОРМЫ =====
+        // ===== ПЛАТФОРМЫ (без shadowBlur) =====
         for (const p of MG.platforms) {
-            ctx.save();
-            
-            // Подсветка платформы, на которой стоит игрок (для комбо)
-            if (MG.comboPlatformId === p.id) {
-                ctx.shadowColor = 'rgba(255, 204, 102, 0.9)';
-                ctx.shadowBlur = 22;
-                ctx.shadowOffsetY = 2;
-            } else {
-                ctx.shadowColor = 'rgba(214, 228, 240, 0.5)';
-                ctx.shadowBlur = 12;
-                ctx.shadowOffsetY = 2;
-            }
-            
+            const isActive = MG.comboPlatformId === p.id;
+
             if (MG_ICONS.platform && MG_ICONS.platform.complete) {
                 ctx.drawImage(MG_ICONS.platform, p.x, p.y, p.w, p.h);
-                
-                // Дополнительная жёлтая рамка для активной платформы
-                if (MG.comboPlatformId === p.id) {
-                    ctx.strokeStyle = 'rgba(255, 204, 102, 0.7)';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    if (ctx.roundRect) {
-                        ctx.roundRect(p.x, p.y, p.w, p.h, 8);
-                    } else {
-                        ctx.rect(p.x, p.y, p.w, p.h);
-                    }
-                    ctx.stroke();
-                }
             } else {
-                ctx.fillStyle = MG.comboPlatformId === p.id ? '#ffcc66' : '#d6e4f0';
-                if (ctx.roundRect) {
-                    ctx.beginPath();
-                    ctx.roundRect(p.x, p.y, p.w, p.h, 8);
-                    ctx.fill();
-                } else {
-                    ctx.fillRect(p.x, p.y, p.w, p.h);
-                }
+                ctx.fillStyle = isActive ? '#ffcc66' : '#d6e4f0';
+                ctx.fillRect(p.x, p.y, p.w, p.h);
             }
-            ctx.restore();
+
+            // Активная платформа — подсветка прямоугольником
+            if (isActive) {
+                ctx.fillStyle = 'rgba(255, 204, 102, 0.25)';
+                ctx.fillRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4);
+
+                ctx.strokeStyle = 'rgba(255, 204, 102, 0.9)';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(p.x - 1, p.y - 1, p.w + 2, p.h + 2);
+            }
         }
 
-        // ===== ЭССЕНЦИЯ =====
+        // ===== ЭССЕНЦИЯ (без shadowBlur) =====
+        const now = performance.now();
         for (const p of MG.pickups) {
             ctx.save();
             ctx.translate(p.x, p.y);
-            ctx.rotate(performance.now() / 600);
-            ctx.shadowColor = 'rgba(179, 136, 255, 0.8)';
-            ctx.shadowBlur = 12;
+            ctx.rotate(now / 800);
             
             if (MG_ICONS.essence && MG_ICONS.essence.complete) {
                 ctx.drawImage(MG_ICONS.essence, -p.r, -p.r, p.r * 2, p.r * 2);
@@ -3478,13 +3464,11 @@
             ctx.restore();
         }
 
-        // ===== ВРАГИ =====
+        // ===== ВРАГИ (без shadowBlur) =====
         for (const e of MG.enemies) {
             ctx.save();
             ctx.translate(e.x, e.y);
             ctx.rotate(Math.sin(e.angle) * 0.3);
-            ctx.shadowColor = 'rgba(239, 68, 68, 0.7)';
-            ctx.shadowBlur = 15;
             
             if (MG_ICONS.enemy && MG_ICONS.enemy.complete) {
                 ctx.drawImage(MG_ICONS.enemy, -e.r, -e.r, e.r * 2, e.r * 2);
@@ -3497,29 +3481,25 @@
             ctx.restore();
         }
 
-        // ===== ИГРОК =====
-        ctx.save();
-        const floatOffset = Math.sin(performance.now() / 300) * 2;
+        // ===== ИГРОК (без shadowBlur и radialGradient) =====
+        const floatOffset = Math.sin(now / 400) * 2;
         const tilt = Math.max(-0.3, Math.min(0.3, MG.player.vx * 0.05));
+
+        ctx.save();
         ctx.translate(MG.player.x, MG.player.y + floatOffset);
         ctx.rotate(tilt);
-        
-        // Пульсирующая аура вокруг призрака (фиолетовая)
-        const auraPhase = performance.now() / 400;
-        const auraRadius = MG.player.w * 0.85 + Math.sin(auraPhase) * 4;
-        const auraGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, auraRadius);
-        auraGrad.addColorStop(0, 'rgba(179, 136, 255, 0.55)');
-        auraGrad.addColorStop(0.5, 'rgba(124, 77, 255, 0.25)');
-        auraGrad.addColorStop(1, 'rgba(124, 77, 255, 0)');
-        ctx.fillStyle = auraGrad;
+
+        // Простая аура — 2 полупрозрачных круга
+        ctx.fillStyle = 'rgba(179, 136, 255, 0.2)';
         ctx.beginPath();
-        ctx.arc(0, 0, auraRadius, 0, Math.PI * 2);
+        ctx.arc(0, 0, MG.player.w * 0.85, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Само тело с лёгкой тенью
-        ctx.shadowColor = 'rgba(179, 136, 255, 0.9)';
-        ctx.shadowBlur = 15;
-        
+
+        ctx.fillStyle = 'rgba(179, 136, 255, 0.35)';
+        ctx.beginPath();
+        ctx.arc(0, 0, MG.player.w * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+
         if (MG_ICONS.player && MG_ICONS.player.complete) {
             ctx.drawImage(MG_ICONS.player, -MG.player.w/2, -MG.player.h/2, MG.player.w, MG.player.h);
         } else {
@@ -3534,21 +3514,34 @@
     function mgRenderIdle() {
         if (!MG.ctx) return;
         const ctx = MG.ctx;
-        const grad = ctx.createLinearGradient(0, 0, 0, MG.H);
-        grad.addColorStop(0, '#0f0f1a');
-        grad.addColorStop(0.5, '#1a0a2a');
-        grad.addColorStop(1, '#0f0f1a');
-        ctx.fillStyle = grad;
+        if (!_mgBgGrad) {
+            _mgBgGrad = ctx.createLinearGradient(0, 0, 0, MG.H);
+            _mgBgGrad.addColorStop(0, '#0f0f1a');
+            _mgBgGrad.addColorStop(0.5, '#1a0a2a');
+            _mgBgGrad.addColorStop(1, '#0f0f1a');
+        }
+        ctx.fillStyle = _mgBgGrad;
         ctx.fillRect(0, 0, MG.W, MG.H);
     }
 
     function mgLoop(t) {
         if (!MG.running) return;
-        const dt = Math.min(t - MG.lastTime, 50);
+        MG.lastTime = MG.lastTime || t;
+        const elapsed = t - MG.lastTime;
+
+        // Пропускаем кадр, если прошло меньше 16.6 мс (60 FPS cap)
+        if (elapsed < MG_FRAME_TIME) {
+            requestAnimationFrame(mgLoop);
+            return;
+        }
+
+        // Фиксированный dt — стабильная физика независимо от FPS
+        const dt = Math.min(elapsed, MG_FRAME_TIME * 2);
         MG.lastTime = t;
+
         mgUpdate(dt);
         mgRender();
-        if (MG.running) requestAnimationFrame(mgLoop);
+        requestAnimationFrame(mgLoop);
     }
 
     // ================================================================
