@@ -1496,22 +1496,24 @@
         .sidebar-overlay.show { display: block; }
 
         /* ============================================================
-           МИНИ-ИГРА 
+           МИНИ-ИГРА (адаптив под телефон)
            ============================================================ */
         .mg-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             width: 100%;
         }
         .mg-main {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
             max-width: 440px;
         }
+
+        /* ===== ИГРОВОЕ ПОЛЕ ===== */
         .mg-stage {
             position: relative;
             width: 100%;
@@ -1527,6 +1529,42 @@
             user-select: none;
             -webkit-user-select: none;
         }
+
+        /* На телефоне — подгоняем под высоту экрана */
+        @media (max-width: 900px) {
+            .mg-stage {
+                aspect-ratio: auto;
+                height: calc(100svh - 260px);
+                max-height: calc(100svh - 260px);
+                min-height: 280px;
+            }
+        }
+        /* Fallback для старых браузеров */
+        @supports not (height: 100svh) {
+            @media (max-width: 900px) {
+                .mg-stage {
+                    height: calc(100vh - 260px);
+                    max-height: calc(100vh - 260px);
+                }
+            }
+        }
+        /* Совсем узкие телефоны — экономим ещё больше */
+        @media (max-width: 480px) {
+            .mg-stage {
+                height: calc(100svh - 240px);
+                max-height: calc(100svh - 240px);
+                border-radius: 14px;
+            }
+        }
+        @supports not (height: 100svh) {
+            @media (max-width: 480px) {
+                .mg-stage {
+                    height: calc(100vh - 240px);
+                    max-height: calc(100vh - 240px);
+                }
+            }
+        }
+
         #mgCanvas {
             display: block;
             width: 100%;
@@ -1534,13 +1572,13 @@
             touch-action: none;
         }
 
-        /* Подсказка управления */
+        /* ===== ПОДСКАЗКА УПРАВЛЕНИЯ ===== */
         .mg-control-hint {
-            position: absolute; bottom: 14px; left: 50%;
+            position: absolute; bottom: 12px; left: 50%;
             transform: translateX(-50%);
             background: rgba(15, 15, 26, 0.85);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            padding: 6px 16px; border-radius: 20px;
+            padding: 5px 14px; border-radius: 20px;
             border: 1px solid rgba(179, 136, 255, 0.3);
             font-size: 11px; color: #b388ff;
             z-index: 5; pointer-events: none;
@@ -1548,47 +1586,47 @@
             white-space: nowrap;
         }
 
-        /* Оверлеи */
+        /* ===== ОВЕРЛЕИ ===== */
         .mg-overlay {
             position: absolute; inset: 0;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            text-align: center; padding: 20px 16px;
+            text-align: center; padding: 16px 14px;
             background: rgba(15, 15, 26, 0.92);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             z-index: 10;
             animation: fadeUp 0.4s ease;
         }
-        .mg-overlay .mg-hero { font-size: 60px; margin-bottom: 4px; animation: pulse 2.4s infinite; }
-        .mg-overlay .mg-emoji { font-size: 48px; margin-bottom: 4px; }
+        .mg-overlay .mg-hero { font-size: 54px; margin-bottom: 4px; animation: pulse 2.4s infinite; }
+        .mg-overlay .mg-emoji { font-size: 44px; margin-bottom: 4px; }
         .mg-overlay h2 {
-            font-size: 19px; font-weight: 800; color: #b388ff;
+            font-size: 18px; font-weight: 800; color: #b388ff;
             margin-bottom: 6px; letter-spacing: -0.3px;
         }
-        .mg-overlay p { font-size: 12px; color: #8b90a8; line-height: 1.5; margin-bottom: 12px; }
+        .mg-overlay p { font-size: 11px; color: #8b90a8; line-height: 1.5; margin-bottom: 10px; }
         .mg-stats-preview {
-            display: flex; gap: 14px; margin-bottom: 14px;
-            font-size: 12px; color: #8b90a8;
+            display: flex; gap: 12px; margin-bottom: 12px;
+            font-size: 11px; color: #8b90a8;
         }
         .mg-stats-preview b { color: #ffcc66; }
         .mg-play-btn {
-            padding: 13px 32px; border-radius: 50px; border: none;
+            padding: 12px 28px; border-radius: 50px; border: none;
             background: linear-gradient(135deg, #b388ff, #7c4dff);
-            color: #fff; font-weight: 800; font-size: 14px; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 10px;
+            color: #fff; font-weight: 800; font-size: 13px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
             transition: 0.25s; box-shadow: 0 8px 30px rgba(123, 77, 255, 0.35);
             letter-spacing: 0.5px;
         }
         .mg-play-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(123, 77, 255, 0.55); }
         .mg-play-btn:active { transform: scale(0.96); }
         .mg-score-big {
-            font-size: 38px; font-weight: 900; color: #ffcc66;
-            margin: 4px 0 8px; text-shadow: 0 0 30px rgba(255, 204, 102, 0.4);
+            font-size: 34px; font-weight: 900; color: #ffcc66;
+            margin: 4px 0 6px; text-shadow: 0 0 30px rgba(255, 204, 102, 0.4);
             font-variant-numeric: tabular-nums;
         }
         .mg-rewards {
-            display: flex; flex-direction: column; gap: 4px;
-            margin-bottom: 12px; font-size: 12px; min-height: 18px;
+            display: flex; flex-direction: column; gap: 3px;
+            margin-bottom: 10px; font-size: 11px; min-height: 16px;
         }
         .mg-rewards .reward-line {
             animation: fadeUp 0.3s ease backwards;
@@ -1600,49 +1638,49 @@
         .mg-rewards .reward-line:nth-child(3) { animation-delay: 0.3s; }
         .mg-rewards .r-essence { color: #b388ff; }
         .mg-rewards .r-ore { color: #f5b342; }
-        .mg-rewards .r-limit { color: #ff6b6b; font-size: 11px; }
+        .mg-rewards .r-limit { color: #ff6b6b; font-size: 10px; }
 
-        /* Выбор управления */
-        .mg-mobile-controls { display: block; margin-bottom: 12px; width: 100%; }
+        /* ===== ВЫБОР УПРАВЛЕНИЯ ===== */
+        .mg-mobile-controls { display: block; margin-bottom: 10px; width: 100%; }
         .mg-ctrl-choice {
-            display: flex; gap: 8px; justify-content: center;
-            background: rgba(0,0,0,0.3); padding: 4px;
-            border-radius: 14px; border: 1px solid rgba(179, 136, 255, 0.15);
+            display: flex; gap: 6px; justify-content: center;
+            background: rgba(0,0,0,0.3); padding: 3px;
+            border-radius: 12px; border: 1px solid rgba(179, 136, 255, 0.15);
         }
         .mg-ctrl-btn {
-            flex: 1; padding: 10px 12px; border-radius: 10px; border: none;
+            flex: 1; padding: 8px 10px; border-radius: 9px; border: none;
             background: transparent; color: #8b90a8;
-            font-size: 12px; font-weight: 600; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 11px; font-weight: 600; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
             transition: 0.2s;
         }
-        .mg-ctrl-btn i { font-size: 16px; }
+        .mg-ctrl-btn i { font-size: 14px; }
         .mg-ctrl-btn.active {
             background: linear-gradient(135deg, rgba(179,136,255,0.25), rgba(123,77,255,0.15));
             color: #b388ff;
             box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
         }
 
-        /* HUD */
+        /* ===== HUD (сверху на канвасе) ===== */
         .mg-hud {
-            position: absolute; top: 10px; left: 10px; right: 10px;
+            position: absolute; top: 8px; left: 8px; right: 8px;
             display: flex; justify-content: space-between; align-items: flex-start;
             z-index: 5; pointer-events: none; gap: 6px;
         }
         .mg-hud-item {
             background: rgba(15, 15, 26, 0.8);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            padding: 5px 10px; border-radius: 10px;
+            padding: 4px 8px; border-radius: 9px;
             border: 1px solid rgba(179, 136, 255, 0.25);
             display: flex; flex-direction: column; align-items: center;
-            min-width: 52px;
+            min-width: 46px;
         }
         .mg-hud-label {
-            font-size: 8px; color: #8b90a8;
-            text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+            font-size: 7px; color: #8b90a8;
+            text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
         }
         .mg-hud-value {
-            font-size: 14px; font-weight: 800; color: #b388ff;
+            font-size: 12px; font-weight: 800; color: #b388ff;
             line-height: 1.2; font-variant-numeric: tabular-nums;
         }
         .mg-hud-item.mg-combo {
@@ -1651,50 +1689,50 @@
         }
         .mg-hud-item.mg-combo .mg-hud-value { color: #ff6600; }
 
-        /* Рекорды снизу */
+        /* ===== РЕКОРДЫ СНИЗУ (4 в ряд) ===== */
         .mg-bottom-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 6px;
             width: 100%;
         }
         .mg-bottom-card {
             background: rgba(20, 24, 36, 0.6);
-            border-radius: 12px;
-            padding: 10px 6px;
+            border-radius: 10px;
+            padding: 8px 4px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             text-align: center;
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .mg-bottom-icon { font-size: 18px; margin-bottom: 2px; }
+        .mg-bottom-icon { font-size: 15px; margin-bottom: 1px; }
         .mg-bottom-value {
-            font-size: 16px; font-weight: 800; color: #b388ff;
+            font-size: 14px; font-weight: 800; color: #b388ff;
             line-height: 1.1; font-variant-numeric: tabular-nums;
         }
         .mg-bottom-label {
-            font-size: 9px; color: #8b90a8;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            margin-top: 2px;
+            font-size: 8px; color: #8b90a8;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            margin-top: 1px;
         }
 
-        /* Дневной лимит */
+        /* ===== ДНЕВНОЙ ЛИМИТ ===== */
         .mg-daily-bottom {
             background: rgba(20, 24, 36, 0.6);
-            border-radius: 12px;
-            padding: 12px 14px;
+            border-radius: 10px;
+            padding: 10px 12px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
         .mg-daily-header {
             display: flex; justify-content: space-between;
-            font-size: 12px; color: #8b90a8; margin-bottom: 8px;
+            font-size: 11px; color: #8b90a8; margin-bottom: 6px;
         }
         .mg-daily-header b { color: #b388ff; font-weight: 700; }
         .mg-daily-bar {
-            height: 6px; background: rgba(0,0,0,0.4);
+            height: 5px; background: rgba(0,0,0,0.4);
             border-radius: 10px; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.04);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .mg-daily-fill {
             height: 100%;
@@ -1703,27 +1741,53 @@
             box-shadow: 0 0 15px rgba(179, 136, 255, 0.4);
         }
         .mg-daily-reset {
-            font-size: 10px; color: #6b7084;
+            font-size: 9px; color: #6b7084;
             text-align: right;
         }
 
-        /* Адаптив */
-        @media (max-width: 768px) {
-            .mg-stage { max-width: 100%; border-radius: 16px; }
-            .mg-bottom-stats { grid-template-columns: repeat(2, 1fr); }
-            .mg-bottom-card { padding: 8px 6px; }
-            .mg-bottom-value { font-size: 15px; }
-            .mg-hud-item { padding: 4px 8px; min-width: 46px; }
-            .mg-hud-value { font-size: 13px; }
-            .mg-hud-label { font-size: 7px; }
-            .mg-control-hint { font-size: 10px; padding: 5px 12px; }
-        }
-        @media (max-width: 380px) {
-            .mg-overlay h2 { font-size: 17px; }
-            .mg-score-big { font-size: 32px; }
-            .mg-play-btn { padding: 11px 24px; font-size: 13px; }
+        /* ===== АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ===== */
+        @media (max-width: 900px) {
+            .mg-wrapper { gap: 8px; }
+            .mg-main { gap: 6px; }
+            .mg-bottom-card { padding: 6px 3px; }
+            .mg-bottom-icon { font-size: 13px; }
             .mg-bottom-value { font-size: 13px; }
-            .mg-bottom-icon { font-size: 16px; }
+            .mg-bottom-label { font-size: 7px; }
+            .mg-daily-bottom { padding: 8px 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .mg-overlay .mg-hero { font-size: 46px; }
+            .mg-overlay h2 { font-size: 16px; }
+            .mg-overlay p { font-size: 10px; }
+            .mg-score-big { font-size: 30px; }
+            .mg-play-btn { padding: 10px 24px; font-size: 12px; }
+            .mg-stats-preview { font-size: 10px; }
+            .mg-control-hint { font-size: 9px; padding: 4px 10px; bottom: 6px; }
+
+            .mg-hud-item { padding: 3px 6px; min-width: 40px; }
+            .mg-hud-value { font-size: 11px; }
+            .mg-hud-label { font-size: 6px; }
+
+            .mg-bottom-stats { gap: 4px; }
+            .mg-bottom-card { padding: 5px 2px; border-radius: 8px; }
+            .mg-bottom-icon { font-size: 12px; }
+            .mg-bottom-value { font-size: 12px; }
+            .mg-bottom-label { font-size: 7px; }
+
+            .mg-daily-bottom { padding: 6px 8px; border-radius: 8px; }
+            .mg-daily-header { font-size: 10px; margin-bottom: 4px; }
+            .mg-daily-bar { height: 4px; margin-bottom: 3px; }
+            .mg-daily-reset { font-size: 8px; }
+        }
+
+        @media (max-width: 380px) {
+            .mg-overlay h2 { font-size: 15px; }
+            .mg-score-big { font-size: 26px; }
+            .mg-play-btn { padding: 9px 20px; font-size: 11px; }
+            .mg-bottom-icon { font-size: 11px; }
+            .mg-bottom-value { font-size: 11px; }
+            .mg-bottom-label { font-size: 6px; }
         }
 
         /* ============================================================
