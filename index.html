@@ -2488,6 +2488,24 @@
         <div class="reward-preview">
             <span>📊 Добыча: <span id="pickaxeModalMinOre">5</span>-<span id="pickaxeModalMaxOre">9</span> → <span id="pickaxeModalNewMinOre">6</span>-<span id="pickaxeModalNewMaxOre">10</span></span>
         </div>
+
+        <!-- ===== УДАРНАЯ ВОЛНА ===== -->
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid rgba(179, 136, 255, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                <div>
+                    <div style="font-weight: 700; font-size: 14px; color: #ffaa33;">⚡ УДАРНАЯ ВОЛНА</div>
+                    <div style="font-size: 11px; color: #8b90a8;">Каждый клик даёт +25 ударов</div>
+                </div>
+                <div id="shockwaveStatus" style="font-size: 12px; font-weight: 700; color: #ff6b6b;">🔒 НЕ КУПЛЕНО</div>
+            </div>
+            <button id="shockwaveBuyBtn" style="width: 100%; padding: 12px; border-radius: 40px; font-weight: 700; font-size: 14px; cursor: pointer; border: none; transition: 0.3s; background: linear-gradient(135deg, #ffaa33, #ff6600); color: #fff;">
+                🛒 КУПИТЬ (50 000 ⛏️)
+            </button>
+            <div id="shockwaveInfo" style="font-size: 11px; color: #8b90a8; margin-top: 8px; text-align: center; display: none;">
+                ⚡ Улучшение активно! Каждый клик даёт +25 ударов.
+            </div>
+        </div>
+
         <div class="modal-buttons">
             <button class="modal-btn close" id="pickaxeModalCloseBtn">Закрыть</button>
             <button class="modal-btn upgrade" id="pickaxeModalUpgradeBtn">Улучшить</button>
@@ -2628,6 +2646,7 @@
 
     let isMining = false;
     let miningCooldown = 150;
+    let _shockwaveBought = false;
     let _soundEnabled = true;
     let _audioCtx = null;
 
@@ -4841,6 +4860,7 @@
                 _lastLoginDate = d.lastLoginDate || null;
                 _calendarClaimed = d.calendarClaimed || {};
                 _compensationClaimed = d.compensationClaimed || false;  
+                _shockwaveBought = d.shockwaveBought || false;
 
                 let migrated = 0;
                 _cardHistory = _cardHistory.map(item => {
@@ -4898,7 +4918,7 @@
             soundEnabled: _soundEnabled, mbProfileLink: _mbProfileLink,
             adWatchedToday, adLastWatchDate, eventCurrency: _eventCurrency,
             dailyStreak: _dailyStreak, lastLoginDate: _lastLoginDate, calendarClaimed: _calendarClaimed,
-            compensationClaimed: _compensationClaimed
+            compensationClaimed: _compensationClaimed, shockwaveBought: _shockwaveBought
         };
         localStorage.setItem('arcana_save', JSON.stringify(saveData));
         const badge = document.getElementById('collectionBadge');
@@ -5217,28 +5237,62 @@
         isMining = true;
         setTimeout(() => { isMining = false; }, miningCooldown);
         if (_strikesDone >= _strikesLimit) { showToast('⛔ Лимит ударов!', '#ff6b6b'); isMining = false; return; }
-        const gain = getOrePerClick();
-        _ore += gain;
-        _strikesDone++;
-        _totalStrikesEver++;
 
-        // +1 XP за удар
-        addXP(XP_MINE);
-
-        const event = getCurrentEvent();
-        if (event && Math.random() < 0.08) {
-            _eventCurrency++;
-            const pickaxe = document.getElementById('pickaxeBtn');
-            const rect = pickaxe.getBoundingClientRect();
-            showFloatingNumber(`${event.emoji}+1`, rect.left + rect.width / 2 - 20 + (Math.random() - 0.5) * 40, rect.top + rect.height / 2 - 80, false);
+        // ===== РАСЧЁТ КОЛИЧЕСТВА УДАРОВ =====
+        let strikesToAdd = 1;
+        if (_shockwaveBought) {
+            const remaining = _strikesLimit - _strikesDone;
+            strikesToAdd = Math.min(25, remaining);
+            if (strikesToAdd <= 0) strikesToAdd = 1;
         }
+
+        // ===== ДОБЫВАЕМ РУДУ =====
+        let totalOre = 0;
+        let eventCurrencyGained = 0;
+        const event = getCurrentEvent();
+
+        for (let i = 0; i < strikesToAdd; i++) {
+            const gain = getOrePerClick();
+            _ore += gain;
+            totalOre += gain;
+            _strikesDone++;
+            _totalStrikesEver++;
+
+            // Ивентовая валюта (8% шанс)
+            if (event && Math.random() < 0.08) {
+                _eventCurrency++;
+                eventCurrencyGained++;
+            }
+        }
+
+        // +1 XP за удар (умножаем на количество ударов)
+        addXP(XP_MINE * strikesToAdd);
+
+        // ===== ВИЗУАЛЬНЫЕ ЭФФЕКТЫ =====
         const pickaxe = document.getElementById('pickaxeBtn');
         const rect = pickaxe.getBoundingClientRect();
-        showFloatingNumber(gain, rect.left + rect.width / 2, rect.top + rect.height / 2, gain > 15);
+
+        // Показываем сколько ударов сделано
+        if (strikesToAdd > 1) {
+            showFloatingNumber(`⚡+${strikesToAdd}`, rect.left + rect.width / 2, rect.top + rect.height / 2 - 40, true);
+            showToast(`⚡ Ударная волна: +${strikesToAdd} ударов!`, '#ffaa33');
+        }
+
+        // Показываем руду
+        showFloatingNumber(totalOre, rect.left + rect.width / 2, rect.top + rect.height / 2, totalOre > 100);
+
+        // Показываем ивентовую валюту
+        if (eventCurrencyGained > 0) {
+            showFloatingNumber(`${event.emoji}+${eventCurrencyGained}`, rect.left + rect.width / 2 - 20 + (Math.random() - 0.5) * 40, rect.top + rect.height / 2 - 80, false);
+        }
+
+        // Анимация нажатия
         pickaxe.style.transform = 'scale(0.92)';
         setTimeout(() => pickaxe.style.transform = '', 90);
+
         playClickSound();
-        saveGame(); updateUI();
+        saveGame();
+        updateUI();
     }
 
     function claimBonus() {
@@ -5281,6 +5335,52 @@
         const progress = (_pickaxeLevel / 10) * 100;
         document.getElementById('pickaxeProgressFill').style.width = Math.min(progress, 100) + '%';
         document.getElementById('pickaxeModal').classList.add('show');
+        updateShockwaveUI();
+    }
+
+    // ===== УДАРНАЯ ВОЛНА =====
+    function updateShockwaveUI() {
+        const statusEl = document.getElementById('shockwaveStatus');
+        const buyBtn = document.getElementById('shockwaveBuyBtn');
+        const infoEl = document.getElementById('shockwaveInfo');
+        if (!statusEl || !buyBtn) return;
+
+        if (_shockwaveBought) {
+            statusEl.textContent = '✅ КУПЛЕНО';
+            statusEl.style.color = '#44ff44';
+            buyBtn.textContent = '✅ УЖЕ КУПЛЕНО';
+            buyBtn.style.background = 'linear-gradient(135deg, #2a6b4a, #1a4a3a)';
+            buyBtn.style.cursor = 'default';
+            buyBtn.onclick = null;
+            if (infoEl) infoEl.style.display = 'block';
+        } else {
+            statusEl.textContent = '🔒 НЕ КУПЛЕНО';
+            statusEl.style.color = '#ff6b6b';
+            buyBtn.textContent = '🛒 КУПИТЬ (50 000 ⛏️)';
+            buyBtn.style.background = 'linear-gradient(135deg, #ffaa33, #ff6600)';
+            buyBtn.style.cursor = 'pointer';
+            buyBtn.onclick = buyShockwave;
+            if (infoEl) infoEl.style.display = 'none';
+        }
+    }
+
+    function buyShockwave() {
+        const cost = 50000;
+        if (_shockwaveBought) {
+            showToast('✅ Улучшение уже куплено!', '#44ff44');
+            return;
+        }
+        if (_ore < cost) {
+            showToast(`❌ Нужно ${cost.toLocaleString('ru-RU')} руды! У вас ${Math.floor(_ore).toLocaleString('ru-RU')}`, '#ff6b6b');
+            return;
+        }
+        _ore -= cost;
+        _shockwaveBought = true;
+        saveGame();
+        updateUI();
+        updateShockwaveUI();
+        showToast('⚡ УДАРНАЯ ВОЛНА АКТИВИРОВАНА! Каждый клик даёт +25 ударов!', '#44ff44');
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     }
 
     function performPickaxeUpgrade() {
