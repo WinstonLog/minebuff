@@ -1496,6 +1496,237 @@
         .sidebar-overlay.show { display: block; }
 
         /* ============================================================
+           МИНИ-ИГРА 
+           ============================================================ */
+        .mg-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+        }
+        .mg-main {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 440px;
+        }
+        .mg-stage {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            aspect-ratio: 360 / 640;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0f0f1a 0%, #1a0a2a 50%, #0f0f1a 100%);
+            border: 2px solid rgba(179, 136, 255, 0.25);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 0 80px rgba(123, 77, 255, 0.08);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #mgCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        /* Подсказка управления */
+        .mg-control-hint {
+            position: absolute; bottom: 14px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            padding: 6px 16px; border-radius: 20px;
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            font-size: 11px; color: #b388ff;
+            z-index: 5; pointer-events: none;
+            animation: pulse 2s infinite;
+            white-space: nowrap;
+        }
+
+        /* Оверлеи */
+        .mg-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 20px 16px;
+            background: rgba(15, 15, 26, 0.92);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            z-index: 10;
+            animation: fadeUp 0.4s ease;
+        }
+        .mg-overlay .mg-hero { font-size: 60px; margin-bottom: 4px; animation: pulse 2.4s infinite; }
+        .mg-overlay .mg-emoji { font-size: 48px; margin-bottom: 4px; }
+        .mg-overlay h2 {
+            font-size: 19px; font-weight: 800; color: #b388ff;
+            margin-bottom: 6px; letter-spacing: -0.3px;
+        }
+        .mg-overlay p { font-size: 12px; color: #8b90a8; line-height: 1.5; margin-bottom: 12px; }
+        .mg-stats-preview {
+            display: flex; gap: 14px; margin-bottom: 14px;
+            font-size: 12px; color: #8b90a8;
+        }
+        .mg-stats-preview b { color: #ffcc66; }
+        .mg-play-btn {
+            padding: 13px 32px; border-radius: 50px; border: none;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: #fff; font-weight: 800; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: 0.25s; box-shadow: 0 8px 30px rgba(123, 77, 255, 0.35);
+            letter-spacing: 0.5px;
+        }
+        .mg-play-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(123, 77, 255, 0.55); }
+        .mg-play-btn:active { transform: scale(0.96); }
+        .mg-score-big {
+            font-size: 38px; font-weight: 900; color: #ffcc66;
+            margin: 4px 0 8px; text-shadow: 0 0 30px rgba(255, 204, 102, 0.4);
+            font-variant-numeric: tabular-nums;
+        }
+        .mg-rewards {
+            display: flex; flex-direction: column; gap: 4px;
+            margin-bottom: 12px; font-size: 12px; min-height: 18px;
+        }
+        .mg-rewards .reward-line {
+            animation: fadeUp 0.3s ease backwards;
+            padding: 3px 10px; border-radius: 20px;
+            background: rgba(0,0,0,0.2);
+        }
+        .mg-rewards .reward-line:nth-child(1) { animation-delay: 0.1s; }
+        .mg-rewards .reward-line:nth-child(2) { animation-delay: 0.2s; }
+        .mg-rewards .reward-line:nth-child(3) { animation-delay: 0.3s; }
+        .mg-rewards .r-essence { color: #b388ff; }
+        .mg-rewards .r-ore { color: #f5b342; }
+        .mg-rewards .r-limit { color: #ff6b6b; font-size: 11px; }
+
+        /* Выбор управления */
+        .mg-mobile-controls { display: block; margin-bottom: 12px; width: 100%; }
+        .mg-ctrl-choice {
+            display: flex; gap: 8px; justify-content: center;
+            background: rgba(0,0,0,0.3); padding: 4px;
+            border-radius: 14px; border: 1px solid rgba(179, 136, 255, 0.15);
+        }
+        .mg-ctrl-btn {
+            flex: 1; padding: 10px 12px; border-radius: 10px; border: none;
+            background: transparent; color: #8b90a8;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            transition: 0.2s;
+        }
+        .mg-ctrl-btn i { font-size: 16px; }
+        .mg-ctrl-btn.active {
+            background: linear-gradient(135deg, rgba(179,136,255,0.25), rgba(123,77,255,0.15));
+            color: #b388ff;
+            box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
+        }
+
+        /* HUD */
+        .mg-hud {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            z-index: 5; pointer-events: none; gap: 6px;
+        }
+        .mg-hud-item {
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            padding: 5px 10px; border-radius: 10px;
+            border: 1px solid rgba(179, 136, 255, 0.25);
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 52px;
+        }
+        .mg-hud-label {
+            font-size: 8px; color: #8b90a8;
+            text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+        }
+        .mg-hud-value {
+            font-size: 14px; font-weight: 800; color: #b388ff;
+            line-height: 1.2; font-variant-numeric: tabular-nums;
+        }
+        .mg-hud-item.mg-combo {
+            border-color: rgba(255, 102, 0, 0.6);
+            animation: pulse 1s infinite;
+        }
+        .mg-hud-item.mg-combo .mg-hud-value { color: #ff6600; }
+
+        /* Рекорды снизу */
+        .mg-bottom-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+        .mg-bottom-card {
+            background: rgba(20, 24, 36, 0.6);
+            border-radius: 12px;
+            padding: 10px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .mg-bottom-icon { font-size: 18px; margin-bottom: 2px; }
+        .mg-bottom-value {
+            font-size: 16px; font-weight: 800; color: #b388ff;
+            line-height: 1.1; font-variant-numeric: tabular-nums;
+        }
+        .mg-bottom-label {
+            font-size: 9px; color: #8b90a8;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-top: 2px;
+        }
+
+        /* Дневной лимит */
+        .mg-daily-bottom {
+            background: rgba(20, 24, 36, 0.6);
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .mg-daily-header {
+            display: flex; justify-content: space-between;
+            font-size: 12px; color: #8b90a8; margin-bottom: 8px;
+        }
+        .mg-daily-header b { color: #b388ff; font-weight: 700; }
+        .mg-daily-bar {
+            height: 6px; background: rgba(0,0,0,0.4);
+            border-radius: 10px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 6px;
+        }
+        .mg-daily-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b388ff, #7c4dff);
+            border-radius: 10px; transition: width 0.6s ease;
+            box-shadow: 0 0 15px rgba(179, 136, 255, 0.4);
+        }
+        .mg-daily-reset {
+            font-size: 10px; color: #6b7084;
+            text-align: right;
+        }
+
+        /* Адаптив */
+        @media (max-width: 768px) {
+            .mg-stage { max-width: 100%; border-radius: 16px; }
+            .mg-bottom-stats { grid-template-columns: repeat(2, 1fr); }
+            .mg-bottom-card { padding: 8px 6px; }
+            .mg-bottom-value { font-size: 15px; }
+            .mg-hud-item { padding: 4px 8px; min-width: 46px; }
+            .mg-hud-value { font-size: 13px; }
+            .mg-hud-label { font-size: 7px; }
+            .mg-control-hint { font-size: 10px; padding: 5px 12px; }
+        }
+        @media (max-width: 380px) {
+            .mg-overlay h2 { font-size: 17px; }
+            .mg-score-big { font-size: 32px; }
+            .mg-play-btn { padding: 11px 24px; font-size: 13px; }
+            .mg-bottom-value { font-size: 13px; }
+            .mg-bottom-icon { font-size: 16px; }
+        }
+
+        /* ============================================================
            АДАПТИВ
            ============================================================ */
         @media (max-width: 1024px) {
@@ -1661,6 +1892,7 @@
     <button class="nav-item" data-section="event"><i class="fas fa-calendar-alt"></i><span>Ивент</span><span class="badge event" id="eventBadge">🎃</span></button>
     <button class="nav-item" data-section="chat"><i class="fas fa-comment-dots"></i><span>Чат</span><span class="badge" id="chatBadge">0</span></button>
     <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button>
+    <button class="nav-item" data-section="minigame"><i class="fas fa-gamepad"></i><span>Аркана: Прыжок</span><span class="badge" id="minigameBadge">NEW</span></button>
     <button class="nav-item" data-section="top"><i class="fas fa-trophy"></i><span>Топ</span></button>
     <button class="nav-item" data-section="settings"><i class="fas fa-cog"></i><span>Настройки</span></button>
 </nav>
@@ -1969,6 +2201,125 @@
         </div>
     </section>
 
+    <!-- МИНИ-ИГРА -->
+    <section id="section-minigame" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-gamepad"></i> Аркана: Прыжок</h1>
+            <span class="section-info">
+                🏆 Рекорд: <strong id="mgBest">0</strong> м
+                &nbsp;·&nbsp;
+                💠 <strong id="mgTodayEssence2">0</strong>/50
+            </span>
+        </div>
+
+        <div class="mg-wrapper">
+            <div class="mg-main">
+                <!-- ИГРОВОЕ ПОЛЕ -->
+                <div class="mg-stage" id="mgStage">
+                    <canvas id="mgCanvas" width="360" height="640"></canvas>
+
+                    <!-- Оверлей: старт -->
+                    <div class="mg-overlay" id="mgStartOverlay">
+                        <div class="mg-hero">🦊</div>
+                        <h2>Кицунэ</h2>
+                        <p>Прыгай по рунным платформам<br>и собирай <b style="color:#b388ff;">💠 эссенцию</b></p>
+
+                        <!-- Выбор управления -->
+                        <div class="mg-mobile-controls">
+                            <div class="mg-ctrl-choice">
+                                <button class="mg-ctrl-btn active" id="mgCtrlSwipe" data-mode="swipe">
+                                    <i class="fas fa-hand-pointer"></i>
+                                    <span>Свайп</span>
+                                </button>
+                                <button class="mg-ctrl-btn" id="mgCtrlGyro" data-mode="gyro">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <span>Гироскоп</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mg-stats-preview">
+                            <span>🏆 <b id="mgBestPreview">0</b> м</span>
+                            <span>💠 <b id="mgTodayEssence">0</b>/50</span>
+                        </div>
+
+                        <button class="mg-play-btn" id="mgPlayBtn">
+                            <i class="fas fa-play"></i> ИГРАТЬ
+                        </button>
+                    </div>
+
+                    <!-- Оверлей: Game Over -->
+                    <div class="mg-overlay mg-over" id="mgOverOverlay" style="display:none;">
+                        <div class="mg-emoji">💀</div>
+                        <h2>Игра окончена</h2>
+                        <div class="mg-score-big" id="mgFinalScore">0 м</div>
+                        <div class="mg-rewards" id="mgRewards"></div>
+                        <button class="mg-play-btn" id="mgRetryBtn">
+                            <i class="fas fa-redo"></i> ЕЩЁ РАЗ
+                        </button>
+                    </div>
+
+                    <!-- HUD -->
+                    <div class="mg-hud" id="mgHUD" style="display:none;">
+                        <div class="mg-hud-item">
+                            <span class="mg-hud-label">ВЫСОТА</span>
+                            <span class="mg-hud-value" id="mgScore">0 м</span>
+                        </div>
+                        <div class="mg-hud-item mg-hud-essence">
+                            <span class="mg-hud-label">💠</span>
+                            <span class="mg-hud-value" id="mgEssence">0</span>
+                        </div>
+                        <div class="mg-hud-item mg-combo" id="mgComboBox" style="display:none;">
+                            <span class="mg-hud-label">КОМБО</span>
+                            <span class="mg-hud-value" id="mgCombo">×1</span>
+                        </div>
+                    </div>
+
+                    <!-- Подсказка управления -->
+                    <div class="mg-control-hint" id="mgControlHint" style="display:none;">
+                        <span id="mgControlHintText">👆 Свайп влево/вправо</span>
+                    </div>
+                </div>
+
+                <!-- РЕКОРДЫ СНИЗУ -->
+                <div class="mg-bottom-stats">
+                    <div class="mg-bottom-card">
+                        <div class="mg-bottom-icon">🏆</div>
+                        <div class="mg-bottom-value" id="mgBottomBest">0</div>
+                        <div class="mg-bottom-label">Рекорд, м</div>
+                    </div>
+                    <div class="mg-bottom-card">
+                        <div class="mg-bottom-icon">💠</div>
+                        <div class="mg-bottom-value" id="mgBottomEssence">0/50</div>
+                        <div class="mg-bottom-label">Сегодня</div>
+                    </div>
+                    <div class="mg-bottom-card">
+                        <div class="mg-bottom-icon">🎯</div>
+                        <div class="mg-bottom-value" id="mgBottomJumps">0</div>
+                        <div class="mg-bottom-label">Прыжков</div>
+                    </div>
+                    <div class="mg-bottom-card">
+                        <div class="mg-bottom-icon">🔥</div>
+                        <div class="mg-bottom-value" id="mgBottomCombo">×1</div>
+                        <div class="mg-bottom-label">Комбо</div>
+                    </div>
+                </div>
+
+                <!-- Дневной лимит -->
+                <div class="mg-daily-bottom">
+                    <div class="mg-daily-header">
+                        <span>💠 Дневной лимит</span>
+                        <span><b id="mgDailyCollected2">0</b>/50</span>
+                    </div>
+                    <div class="mg-daily-bar">
+                        <div class="mg-daily-fill" id="mgDailyFill2" style="width:0%;"></div>
+                    </div>
+                    <div class="mg-daily-reset" id="mgDailyReset2">⏳ до сброса: —</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ТОП -->
     <section id="section-top" class="section">
         <div class="section-header">
@@ -2257,7 +2608,7 @@
     let _ore = 0;
     let _essence = 0;
     let _level = 1;
-    let _xp = 0;                  // ← НОВОЕ: накопленный опыт
+    let _xp = 0;                 
     let _pickaxeLevel = 1;
     let _strikesDone = 0;
     let _strikesLimit = 100;
@@ -2311,6 +2662,711 @@
     let selectedSenderCards = [];
     let selectedReceiverCards = [];
     let receiverCardsData = [];
+
+    // ================================================================
+    // МИНИ-ИГРА «АРКАНА: ПРЫЖОК» — финальная версия
+    // ================================================================
+    const MG = {
+        canvas: null, ctx: null,
+        running: false, gameOver: false,
+        player: { x: 180, y: 540, vx: 0, vy: 0, w: 34, h: 34 },
+        platforms: [], enemies: [], pickups: [],
+        score: 0, best: 0,
+        jumps: 0, bestCombo: 1, combo: 1, comboTimer: 0,
+        comboPlatformId: null,
+        lastTime: 0, spawnTimer: 0,
+        controlMode: 'swipe',
+        touchX: null, touchActive: false,
+        gyroGamma: 0,
+        dailyCollected: 0, dailyLimit: 50, lastDailyDate: null,
+        W: 360, H: 640,
+        runEssence: 0,
+        keys: { left: false, right: false }
+    };
+
+    // --- SVG-иконки ---
+    function mgMakeIcon(type, color) {
+        const icons = {
+            player: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                <ellipse cx="32" cy="42" rx="16" ry="14" fill="${color}"/>
+                <path d="M14 24 L20 6 L28 24 Z" fill="${color}"/>
+                <path d="M50 24 L44 6 L36 24 Z" fill="${color}"/>
+                <path d="M18 22 L22 11 L26 22 Z" fill="#fff" opacity="0.35"/>
+                <path d="M46 22 L42 11 L38 22 Z" fill="#fff" opacity="0.35"/>
+                <circle cx="25" cy="38" r="3" fill="#0a0a1a"/>
+                <circle cx="39" cy="38" r="3" fill="#0a0a1a"/>
+                <circle cx="25.5" cy="37" r="1" fill="#fff"/>
+                <circle cx="39.5" cy="37" r="1" fill="#fff"/>
+                <ellipse cx="32" cy="48" rx="3" ry="2" fill="#ff6b9d"/>
+                <path d="M52 38 Q64 32 62 44 Q58 50 52 46" fill="${color}" opacity="0.85"/>
+                <path d="M12 38 Q0 32 2 44 Q6 50 12 46" fill="${color}" opacity="0.85"/>
+            </svg>`,
+            platform: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 16" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="platGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                        <stop offset="55%" stop-color="${color}" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="${color}" stop-opacity="0.7"/>
+                    </linearGradient>
+                    <linearGradient id="platGlow" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+                        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="80" height="16" rx="8" fill="url(#platGrad)"/>
+                <rect x="0" y="0" width="80" height="6" rx="3" fill="url(#platGlow)"/>
+                <rect x="0" y="1" width="80" height="1.5" rx="0.75" fill="#ffffff" opacity="0.85"/>
+            </svg>`,
+            essence: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                <polygon points="16,2 30,12 24,30 8,30 2,12" fill="${color}"/>
+                <polygon points="16,2 30,12 16,16" fill="#fff" opacity="0.45"/>
+                <polygon points="16,16 24,30 8,30" fill="#000" opacity="0.25"/>
+                <polygon points="16,6 24,13 16,15" fill="#fff" opacity="0.5"/>
+            </svg>`,
+            enemy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+                <circle cx="20" cy="20" r="14" fill="${color}"/>
+                <circle cx="20" cy="20" r="10" fill="#ffcc00" opacity="0.7"/>
+                <circle cx="20" cy="20" r="6" fill="#fff" opacity="0.85"/>
+                <path d="M14 12 L20 2 L26 12 Z" fill="${color}"/>
+                <path d="M26 12 L32 4 L34 14 Z" fill="${color}"/>
+                <path d="M14 12 L8 4 L6 14 Z" fill="${color}"/>
+                <circle cx="15" cy="20" r="2" fill="#0a0a1a"/>
+                <circle cx="25" cy="20" r="2" fill="#0a0a1a"/>
+                <path d="M14 28 Q20 34 26 28" stroke="#0a0a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>`
+        };
+        return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(icons[type]);
+    }
+
+    const MG_ICONS = {};
+    function mgLoadIcons() {
+        MG_ICONS.player = new Image(); MG_ICONS.player.src = mgMakeIcon('player', '#e8d5a0');
+        MG_ICONS.platform = new Image(); MG_ICONS.platform.src = mgMakeIcon('platform', '#d6e4f0');
+        MG_ICONS.essence = new Image(); MG_ICONS.essence.src = mgMakeIcon('essence', '#b388ff');
+        MG_ICONS.enemy = new Image(); MG_ICONS.enemy.src = mgMakeIcon('enemy', '#ef4444');
+    }
+
+    // --- Дневной лимит ---
+    function mgCheckDailyLimit() {
+        const today = new Date().toDateString();
+        if (MG.lastDailyDate !== today) {
+            MG.dailyCollected = 0;
+            MG.lastDailyDate = today;
+            mgSaveStats();
+        }
+    }
+    function mgCanCollect(amount) {
+        mgCheckDailyLimit();
+        return Math.min(amount, Math.max(0, MG.dailyLimit - MG.dailyCollected));
+    }
+    function mgAddDailyCollected(amount) {
+        mgCheckDailyLimit();
+        MG.dailyCollected = Math.min(MG.dailyCollected + amount, MG.dailyLimit);
+        mgSaveStats();
+        mgUpdateDailyUI();
+    }
+    function mgUpdateDailyUI() {
+        const fill2 = document.getElementById('mgDailyFill2');
+        const col2 = document.getElementById('mgDailyCollected2');
+        const res2 = document.getElementById('mgDailyReset2');
+        const todayEssence = document.getElementById('mgTodayEssence');
+        const todayEssence2 = document.getElementById('mgTodayEssence2');
+        const bottomEssence = document.getElementById('mgBottomEssence');
+
+        const pct = Math.min((MG.dailyCollected / MG.dailyLimit) * 100, 100);
+        if (fill2) fill2.style.width = pct + '%';
+        if (col2) col2.textContent = MG.dailyCollected;
+        if (todayEssence) todayEssence.textContent = MG.dailyCollected;
+        if (todayEssence2) todayEssence2.textContent = MG.dailyCollected;
+        if (bottomEssence) bottomEssence.textContent = MG.dailyCollected + '/50';
+
+        if (res2) {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            const diff = tomorrow - now;
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            res2.textContent = `⏳ до сброса: ${h}ч ${m}м`;
+        }
+    }
+
+    // --- Сохранение ---
+    function mgLoadStats() {
+        try {
+            const s = JSON.parse(localStorage.getItem('arcana_minigame') || '{}');
+            MG.best = s.best || 0;
+            MG.jumps = s.jumps || 0;
+            MG.bestCombo = s.bestCombo || 1;
+            MG.dailyCollected = s.dailyCollected || 0;
+            MG.lastDailyDate = s.lastDailyDate || null;
+            MG.controlMode = s.controlMode || 'swipe';
+            mgCheckDailyLimit();
+        } catch(e) {}
+    }
+    function mgSaveStats() {
+        localStorage.setItem('arcana_minigame', JSON.stringify({
+            best: MG.best,
+            jumps: MG.jumps,
+            bestCombo: MG.bestCombo,
+            dailyCollected: MG.dailyCollected,
+            lastDailyDate: MG.lastDailyDate,
+            controlMode: MG.controlMode
+        }));
+    }
+
+    // --- Инициализация ---
+    function mgInit() {
+        MG.canvas = document.getElementById('mgCanvas');
+        if (!MG.canvas || MG.canvas.dataset.inited) return;
+        MG.canvas.dataset.inited = '1';
+        MG.ctx = MG.canvas.getContext('2d');
+        MG.W = MG.canvas.width;
+        MG.H = MG.canvas.height;
+        mgLoadIcons();
+        mgLoadStats();
+        mgUpdateSideStats();
+        mgUpdateDailyUI();
+        mgUpdateControlUI();
+
+        document.getElementById('mgPlayBtn').addEventListener('click', mgStart);
+        document.getElementById('mgRetryBtn').addEventListener('click', mgStart);
+
+        const btnSwipe = document.getElementById('mgCtrlSwipe');
+        const btnGyro = document.getElementById('mgCtrlGyro');
+        if (btnSwipe) btnSwipe.addEventListener('click', () => mgSetControlMode('swipe'));
+        if (btnGyro) btnGyro.addEventListener('click', () => {
+            mgSetControlMode('gyro');
+            mgEnableGyro();
+        });
+
+        MG.canvas.addEventListener('touchstart', mgTouchStart, { passive: false });
+        MG.canvas.addEventListener('touchmove', mgTouchMove, { passive: false });
+        MG.canvas.addEventListener('touchend', mgTouchEnd);
+        MG.canvas.addEventListener('touchcancel', mgTouchEnd);
+        MG.canvas.addEventListener('mousedown', mgMouseDown);
+        MG.canvas.addEventListener('mousemove', mgMouseMove);
+        MG.canvas.addEventListener('mouseup', mgMouseUp);
+        MG.canvas.addEventListener('mouseleave', mgMouseUp);
+
+        window.addEventListener('keydown', mgKeyDown);
+        window.addEventListener('keyup', mgKeyUp);
+
+        window.addEventListener('deviceorientation', function(e) {
+            if (MG.controlMode === 'gyro' && e.gamma !== null) MG.gyroGamma = e.gamma;
+        });
+
+        setInterval(mgUpdateDailyUI, 60000);
+        mgRenderIdle();
+    }
+
+    function mgSetControlMode(mode) {
+        MG.controlMode = mode;
+        mgSaveStats();
+        mgUpdateControlUI();
+    }
+    function mgUpdateControlUI() {
+        const btnSwipe = document.getElementById('mgCtrlSwipe');
+        const btnGyro = document.getElementById('mgCtrlGyro');
+        const hint = document.getElementById('mgControlHintText');
+        if (btnSwipe) btnSwipe.classList.toggle('active', MG.controlMode === 'swipe');
+        if (btnGyro) btnGyro.classList.toggle('active', MG.controlMode === 'gyro');
+        if (hint) {
+            hint.textContent = MG.controlMode === 'gyro'
+                ? '📱 Наклоняй телефон влево/вправо'
+                : '👆 Свайп влево/вправо';
+        }
+    }
+
+    function mgKeyDown(e) {
+        if (!MG.running) return;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'ф') MG.keys.left = true;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'в') MG.keys.right = true;
+    }
+    function mgKeyUp(e) {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'ф') MG.keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'в') MG.keys.right = false;
+    }
+
+    // --- Свайп / мышь ---
+    let mgTouchOffsetX = 0;
+    let mgTouchStartAbsX = 0;
+    function mgTouchStart(e) {
+        e.preventDefault();
+        if (!MG.running) return;
+        const rect = MG.canvas.getBoundingClientRect();
+        mgTouchStartAbsX = e.touches[0].clientX;
+        MG.touchX = (e.touches[0].clientX - rect.left) * (MG.W / rect.width);
+        MG.touchActive = true;
+        mgTouchOffsetX = 0;
+    }
+    function mgTouchMove(e) {
+        e.preventDefault();
+        if (!MG.running || !MG.touchActive) return;
+        const rect = MG.canvas.getBoundingClientRect();
+        mgTouchOffsetX = (e.touches[0].clientX - mgTouchStartAbsX) * (MG.W / rect.width);
+    }
+    function mgTouchEnd() {
+        MG.touchActive = false;
+        MG.touchX = null;
+        mgTouchOffsetX = 0;
+    }
+    function mgMouseDown(e) {
+        if (!MG.running) return;
+        const rect = MG.canvas.getBoundingClientRect();
+        mgTouchStartAbsX = e.clientX;
+        MG.touchX = (e.clientX - rect.left) * (MG.W / rect.width);
+        MG.touchActive = true;
+        mgTouchOffsetX = 0;
+    }
+    function mgMouseMove(e) {
+        if (!MG.running || !MG.touchActive) return;
+        const rect = MG.canvas.getBoundingClientRect();
+        mgTouchOffsetX = (e.clientX - mgTouchStartAbsX) * (MG.W / rect.width);
+    }
+    function mgMouseUp() {
+        MG.touchActive = false;
+        MG.touchX = null;
+        mgTouchOffsetX = 0;
+    }
+    function mgEnableGyro() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission().then(state => {
+                if (state !== 'granted') {
+                    MG.controlMode = 'swipe';
+                    mgUpdateControlUI();
+                    showToast('❌ Гироскоп недоступен', '#ff6b6b');
+                } else {
+                    showToast('✅ Гироскоп включён', '#44ff44');
+                }
+            }).catch(() => {
+                MG.controlMode = 'swipe';
+                mgUpdateControlUI();
+            });
+        }
+    }
+
+    // --- Игра ---
+    function mgStart() {
+        mgCheckDailyLimit();
+        MG.running = true;
+        MG.gameOver = false;
+        MG.score = 0;
+        MG.runEssence = 0;
+        MG.combo = 1;
+        MG.comboTimer = 0;
+        MG.comboPlatformId = null; 
+        MG.spawnTimer = 0;
+        MG.player.x = MG.W / 2;
+        MG.player.y = MG.H - 100;
+        MG.player.vx = 0;
+        MG.player.vy = 0;
+        MG.platforms = [];
+        MG.enemies = [];
+        MG.pickups = [];
+        MG.touchX = null;
+        MG.touchActive = false;
+        mgTouchOffsetX = 0;
+        MG.keys = { left: false, right: false };
+
+        MG.platforms.push({ id: 'p_start', x: MG.W/2 - 45, y: MG.H - 60, w: 90, h: 14, _essenceChecked: false });
+        let lastY = MG.H - 60;
+        for (let i = 0; i < 10; i++) {
+            lastY -= 55 + Math.random() * 30;
+            MG.platforms.push({
+                id: 'p_' + i + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                x: 20 + Math.random() * (MG.W - 100),
+                y: lastY, w: 60 + Math.random() * 30, h: 14, _essenceChecked: false
+            });
+        }
+
+        document.getElementById('mgStartOverlay').style.display = 'none';
+        document.getElementById('mgOverOverlay').style.display = 'none';
+        document.getElementById('mgHUD').style.display = 'flex';
+        document.getElementById('mgControlHint').style.display = 'block';
+        setTimeout(() => {
+            const h = document.getElementById('mgControlHint');
+            if (h) h.style.display = 'none';
+        }, 3000);
+
+        MG.lastTime = performance.now();
+        requestAnimationFrame(mgLoop);
+    }
+
+    function mgGameOver() {
+        MG.running = false;
+        MG.gameOver = true;
+        MG.jumps += 1;
+
+        const newRecord = MG.score > MG.best;
+        const essenceReward = MG.runEssence;
+        const oreReward = newRecord ? 10 : 0;
+
+        if (essenceReward > 0) {
+            _essence += essenceReward;
+            mgSaveStats();
+        }
+        if (oreReward > 0) _ore += oreReward;
+
+        if (newRecord) MG.best = Math.floor(MG.score);
+        if (MG.bestCombo < MG.combo) MG.bestCombo = MG.combo;
+        mgSaveStats();
+
+        saveGame();
+        updateUI();
+
+        document.getElementById('mgFinalScore').textContent = Math.floor(MG.score) + ' м';
+        let rewardsHtml = '';
+        if (essenceReward > 0) rewardsHtml += `<div class="reward-line r-essence">💠 +${essenceReward} эссенции</div>`;
+        if (oreReward > 0) rewardsHtml += `<div class="reward-line r-ore">⛏️ +${oreReward} руды (рекорд!)</div>`;
+        if (MG.dailyCollected >= MG.dailyLimit) {
+            rewardsHtml += `<div class="reward-line r-limit">🚫 Лимит 50 💠 исчерпан</div>`;
+        } else {
+            const left = MG.dailyLimit - MG.dailyCollected;
+            rewardsHtml += `<div class="reward-line" style="color:#8b90a8;">Осталось сегодня: ${left} 💠</div>`;
+        }
+        if (rewardsHtml === '') rewardsHtml = '<div style="color:#6b7084;font-size:12px;">Пока нечего начислять</div>';
+        document.getElementById('mgRewards').innerHTML = rewardsHtml;
+
+        document.getElementById('mgHUD').style.display = 'none';
+        document.getElementById('mgControlHint').style.display = 'none';
+        document.getElementById('mgOverOverlay').style.display = 'flex';
+
+        mgUpdateSideStats();
+        mgUpdateDailyUI();
+
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+
+    function mgUpdateSideStats() {
+        const setT = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        setT('mgBest', MG.best);
+        setT('mgBestPreview', MG.best);
+        setT('mgBottomBest', MG.best);
+        setT('mgBottomJumps', MG.jumps);
+        setT('mgBottomCombo', '×' + MG.bestCombo);
+    }
+
+    function mgSpawnEntities() {
+        const lastPlat = MG.platforms.reduce((min, p) => p.y < min.y ? p : min, MG.platforms[0]);
+        if (lastPlat && lastPlat.y > 0) {
+            MG.platforms.push({
+                id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                x: 20 + Math.random() * (MG.W - 100),
+                y: lastPlat.y - 55 - Math.random() * 40,
+                w: 55 + Math.random() * 35,
+                h: 14,
+                _essenceChecked: false
+            });
+        }
+    }
+
+    function mgUpdate(dt) {
+        const speed = 5;
+        let targetVx = 0;
+
+        if (MG.controlMode === 'gyro' && MG.gyroGamma !== 0) {
+            targetVx = Math.max(-speed, Math.min(speed, MG.gyroGamma * 0.2));
+        } else if (MG.controlMode === 'swipe' && MG.touchActive) {
+            targetVx = Math.max(-speed, Math.min(speed, mgTouchOffsetX * 0.08));
+        } else {
+            if (MG.keys.left) targetVx -= speed;
+            if (MG.keys.right) targetVx += speed;
+        }
+
+        MG.player.vx += (targetVx - MG.player.vx) * 0.35;
+        MG.player.x += MG.player.vx;
+        MG.player.x = Math.max(18, Math.min(MG.W - 18, MG.player.x));
+
+        const targetY = MG.H * 0.4;
+        if (MG.player.y < targetY) {
+            const dy = targetY - MG.player.y;
+            MG.player.y = targetY;
+            MG.platforms.forEach(p => p.y += dy);
+            MG.enemies.forEach(e => e.y += dy);
+            MG.pickups.forEach(p => p.y += dy);
+            MG.score += dy * 0.5;
+        }
+
+        MG.player.vy += 0.55;
+        MG.player.y += MG.player.vy;
+
+        if (MG.player.vy > 0) {
+            for (const p of MG.platforms) {
+                if (MG.player.x > p.x - 5 && MG.player.x < p.x + p.w + 5 &&
+                    MG.player.y + MG.player.h / 2 > p.y &&
+                    MG.player.y + MG.player.h / 2 < p.y + p.h + 12) {
+                    MG.player.y = p.y - MG.player.h / 2;
+                    MG.player.vy = -11.5;
+                    
+                    // ===== КОМБО РАСТЁТ ТОЛЬКО НА НОВОЙ ПЛАТФОРМЕ =====
+                    if (MG.comboPlatformId !== p.id) {
+                        MG.combo++;
+                        MG.comboPlatformId = p.id;   // запоминаем платформу
+                        MG.comboTimer = 100;         // 10 секунд до сброса
+                        if (MG.combo > MG.bestCombo) MG.bestCombo = MG.combo;
+                        MG.score += 5;
+                    }
+                    
+                    break;
+                }
+            }
+        }
+
+        if (MG.comboTimer > 0) {
+            MG.comboTimer--;
+            if (MG.comboTimer === 0) MG.combo = 1;
+        }
+
+        MG.spawnTimer -= dt;
+        if (MG.spawnTimer <= 0) {
+            mgSpawnEntities();
+            MG.spawnTimer = 500;
+        }
+
+        // ===== ЭССЕНЦИЯ НА ПЛАТФОРМАХ =====
+        mgCheckDailyLimit();
+        const canStillCollect = MG.dailyCollected < MG.dailyLimit;
+        if (canStillCollect) {
+            for (const p of MG.platforms) {
+                if (!p._essenceChecked && p.y > 0 && p.y < MG.H && Math.random() < 0.05) {
+                    p._essenceChecked = true;
+                    if (MG.dailyCollected < MG.dailyLimit && Math.random() < 0.7) {
+                        MG.pickups.push({
+                            x: p.x + p.w / 2, y: p.y - 22,
+                            r: 11, collected: false
+                        });
+                    }
+                }
+            }
+        }
+
+        // ===== ВРАГИ — ТОЛЬКО ВЫШЕ ЭКРАНА =====
+        if (MG.score > 150 && Math.random() < 0.008 && MG.platforms.length > 0) {
+            const offscreenPlatforms = MG.platforms.filter(p => p.y < -30);
+            if (offscreenPlatforms.length > 0) {
+                const p = offscreenPlatforms[Math.floor(Math.random() * offscreenPlatforms.length)];
+                MG.enemies.push({
+                    x: p.x + p.w / 2, y: p.y - 40,
+                    r: 15, angle: 0,
+                    baseX: p.x + p.w / 2, baseY: p.y - 40,
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        for (let i = MG.enemies.length - 1; i >= 0; i--) {
+            const e = MG.enemies[i];
+            e.phase += 0.05;
+            e.x = e.baseX + Math.sin(e.phase) * 35;
+            e.angle += 0.05;
+            const dx = e.x - MG.player.x;
+            const dy = e.y - MG.player.y;
+            if (Math.sqrt(dx*dx + dy*dy) < e.r + MG.player.w/2 - 4) {
+                MG.combo = 1;
+                mgGameOver();
+                return;
+            }
+            if (e.y > MG.H + 50) MG.enemies.splice(i, 1);
+        }
+
+        for (let i = MG.pickups.length - 1; i >= 0; i--) {
+            const p = MG.pickups[i];
+            const dx = p.x - MG.player.x;
+            const dy = p.y - MG.player.y;
+            if (Math.sqrt(dx*dx + dy*dy) < p.r + MG.player.w/2 - 2) {
+                const canCollect = mgCanCollect(1);
+                if (canCollect > 0) {
+                    MG.runEssence += 1;
+                    MG.dailyCollected += 1;
+                    MG.score += 10;
+                    const rect = MG.canvas.getBoundingClientRect();
+                    showFloatingNumber('💠', rect.left + (p.x / MG.W) * rect.width, rect.top + (p.y / MG.H) * rect.height, false);
+                    
+                    // ===== ДОСТИГЛИ ДНЕВНОГО ЛИМИТА — УДАЛЯЕМ ВСЮ ЭССЕНЦИЮ =====
+                    if (MG.dailyCollected >= MG.dailyLimit) {
+                        MG.pickups = [];
+                        mgSaveStats();  // сохраняем что достигли
+                        showToast(`🚫 Лимит ${MG.dailyLimit} 💠 исчерпан!`, '#ff6b6b');
+                        break;
+                    }
+                } else {
+                    const rect = MG.canvas.getBoundingClientRect();
+                    const div = document.createElement('div');
+                    div.className = 'floating-number';
+                    div.textContent = '🚫';
+                    div.style.left = rect.left + (p.x / MG.W) * rect.width + 'px';
+                    div.style.top = rect.top + (p.y / MG.H) * rect.height + 'px';
+                    div.style.fontSize = '20px';
+                    document.body.appendChild(div);
+                    setTimeout(() => div.remove(), 1000);
+                }
+                MG.pickups.splice(i, 1);
+            } else if (p.y > MG.H + 50) {
+                MG.pickups.splice(i, 1);
+            }
+    }
+
+        MG.platforms = MG.platforms.filter(p => p.y < MG.H + 50);
+
+        if (MG.player.y > MG.H + 50) {
+            MG.combo = 1;
+            mgGameOver();
+            return;
+        }
+
+        document.getElementById('mgScore').textContent = Math.floor(MG.score) + ' м';
+        document.getElementById('mgEssence').textContent = MG.runEssence;
+        if (MG.combo > 2) {
+            document.getElementById('mgComboBox').style.display = 'flex';
+            document.getElementById('mgCombo').textContent = '×' + MG.combo;
+        } else {
+            document.getElementById('mgComboBox').style.display = 'none';
+        }
+    }
+
+    function mgRender() {
+        const ctx = MG.ctx;
+        const grad = ctx.createLinearGradient(0, 0, 0, MG.H);
+        grad.addColorStop(0, '#0f0f1a');
+        grad.addColorStop(0.5, '#1a0a2a');
+        grad.addColorStop(1, '#0f0f1a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, MG.W, MG.H);
+
+        // Звёзды
+        ctx.fillStyle = 'rgba(179, 136, 255, 0.35)';
+        for (let i = 0; i < 40; i++) {
+            const sx = (i * 137.5) % MG.W;
+            const sy = ((i * 73.3 + MG.score * 0.2) % MG.H);
+            const sr = ((i * 31) % 3) * 0.4 + 0.4;
+            ctx.beginPath();
+            ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ===== ПЛАТФОРМЫ =====
+        for (const p of MG.platforms) {
+            ctx.save();
+            
+            // Подсветка платформы, на которой стоит игрок (для комбо)
+            if (MG.comboPlatformId === p.id) {
+                ctx.shadowColor = 'rgba(255, 204, 102, 0.9)';
+                ctx.shadowBlur = 22;
+                ctx.shadowOffsetY = 2;
+            } else {
+                ctx.shadowColor = 'rgba(214, 228, 240, 0.5)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetY = 2;
+            }
+            
+            if (MG_ICONS.platform && MG_ICONS.platform.complete) {
+                ctx.drawImage(MG_ICONS.platform, p.x, p.y, p.w, p.h);
+                
+                // Дополнительная жёлтая рамка для активной платформы
+                if (MG.comboPlatformId === p.id) {
+                    ctx.strokeStyle = 'rgba(255, 204, 102, 0.7)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    if (ctx.roundRect) {
+                        ctx.roundRect(p.x, p.y, p.w, p.h, 8);
+                    } else {
+                        ctx.rect(p.x, p.y, p.w, p.h);
+                    }
+                    ctx.stroke();
+                }
+            } else {
+                ctx.fillStyle = MG.comboPlatformId === p.id ? '#ffcc66' : '#d6e4f0';
+                if (ctx.roundRect) {
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 8);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(p.x, p.y, p.w, p.h);
+                }
+            }
+            ctx.restore();
+        }
+
+        // ===== ЭССЕНЦИЯ =====
+        for (const p of MG.pickups) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(performance.now() / 600);
+            ctx.shadowColor = 'rgba(179, 136, 255, 0.8)';
+            ctx.shadowBlur = 12;
+            
+            if (MG_ICONS.essence && MG_ICONS.essence.complete) {
+                ctx.drawImage(MG_ICONS.essence, -p.r, -p.r, p.r * 2, p.r * 2);
+            } else {
+                ctx.fillStyle = '#b388ff';
+                ctx.beginPath();
+                ctx.moveTo(0, -p.r);
+                ctx.lineTo(p.r, 0);
+                ctx.lineTo(0, p.r);
+                ctx.lineTo(-p.r, 0);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        // ===== ВРАГИ =====
+        for (const e of MG.enemies) {
+            ctx.save();
+            ctx.translate(e.x, e.y);
+            ctx.rotate(Math.sin(e.angle) * 0.3);
+            ctx.shadowColor = 'rgba(239, 68, 68, 0.7)';
+            ctx.shadowBlur = 15;
+            
+            if (MG_ICONS.enemy && MG_ICONS.enemy.complete) {
+                ctx.drawImage(MG_ICONS.enemy, -e.r, -e.r, e.r * 2, e.r * 2);
+            } else {
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(0, 0, e.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        // ===== ИГРОК =====
+        ctx.save();
+        ctx.translate(MG.player.x, MG.player.y);
+        const tilt = Math.max(-0.3, Math.min(0.3, MG.player.vx * 0.05));
+        ctx.rotate(tilt);
+        ctx.shadowColor = 'rgba(232, 213, 160, 0.6)';
+        ctx.shadowBlur = 15;
+        
+        if (MG_ICONS.player && MG_ICONS.player.complete) {
+            ctx.drawImage(MG_ICONS.player, -MG.player.w/2, -MG.player.h/2, MG.player.w, MG.player.h);
+        } else {
+            ctx.fillStyle = '#e8d5a0';
+            ctx.beginPath();
+            ctx.arc(0, 0, MG.player.w/2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function mgRenderIdle() {
+        if (!MG.ctx) return;
+        const ctx = MG.ctx;
+        const grad = ctx.createLinearGradient(0, 0, 0, MG.H);
+        grad.addColorStop(0, '#0f0f1a');
+        grad.addColorStop(0.5, '#1a0a2a');
+        grad.addColorStop(1, '#0f0f1a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, MG.W, MG.H);
+    }
+
+    function mgLoop(t) {
+        if (!MG.running) return;
+        const dt = Math.min(t - MG.lastTime, 50);
+        MG.lastTime = t;
+        mgUpdate(dt);
+        mgRender();
+        if (MG.running) requestAnimationFrame(mgLoop);
+    }
 
     // ================================================================
     // СИСТЕМА ОПЫТА
@@ -5382,7 +6438,7 @@
             'packs': 'section-packs', 'event': 'section-event',
             'chat': 'section-chat', 'trade': 'section-trade',
             'top': 'section-top', 'profile': 'section-profile',
-            'settings': 'section-settings'
+            'settings': 'section-settings', 'minigame': 'section-minigame'
         };
         const target = document.getElementById(map[section]);
         if (target) target.classList.add('active');
@@ -5396,6 +6452,14 @@
         if (section === 'event') updateEventUI();
         if (section === 'profile') { updateProfileUI(); updateProfileLinkUI(); }
         if (section === 'top') loadTopFromSupabase();
+        if (section === 'minigame') {
+            setTimeout(() => {
+                mgInit();
+                mgRenderIdle();
+                mgUpdateSideStats();
+                mgUpdateDailyUI();
+            }, 50);
+        }
         if (section === 'trade') {
             setTimeout(async () => { await loadTrades(); await renderSenderCards(); renderReceiverCards(); }, 100);
         }
@@ -5438,6 +6502,11 @@
         }
         
         updateChatStats();
+
+        // Мини-игра — инициализация при первом входе
+        if (document.getElementById('mgCanvas')) {
+            setTimeout(mgInit, 100);
+        }
 
         document.getElementById('openEventPackBtn').addEventListener('click', openEventPack);
         setInterval(() => {
