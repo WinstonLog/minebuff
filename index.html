@@ -1496,7 +1496,7 @@
         .sidebar-overlay.show { display: block; }
 
         /* ============================================================
-           МИНИ-ИГРА (адаптив под телефон)
+           МИНИ-ИГРА (правильные пропорции + адаптив)
            ============================================================ */
         .mg-wrapper {
             display: flex;
@@ -1513,12 +1513,13 @@
             max-width: 440px;
         }
 
-        /* ===== ИГРОВОЕ ПОЛЕ ===== */
+        /* ===== ИГРОВОЕ ПОЛЕ — сохраняем пропорции 9:16 ===== */
         .mg-stage {
             position: relative;
             width: 100%;
             max-width: 440px;
-            aspect-ratio: 360 / 640;
+            aspect-ratio: 9 / 16;              /* ← всегда 9:16 */
+            max-height: calc(100svh - 220px);  /* ← ограничение по высоте */
             margin: 0 auto;
             border-radius: 20px;
             overflow: hidden;
@@ -1530,37 +1531,38 @@
             -webkit-user-select: none;
         }
 
-        /* На телефоне — подгоняем под высоту экрана */
-        @media (max-width: 900px) {
-            .mg-stage {
-                aspect-ratio: auto;
-                height: calc(100svh - 260px);
-                max-height: calc(100svh - 260px);
-                min-height: 280px;
-            }
-        }
-        /* Fallback для старых браузеров */
+        /* Fallback для старых браузеров без svh */
         @supports not (height: 100svh) {
-            @media (max-width: 900px) {
-                .mg-stage {
-                    height: calc(100vh - 260px);
-                    max-height: calc(100vh - 260px);
-                }
+            .mg-stage {
+                max-height: calc(100vh - 220px);
             }
         }
-        /* Совсем узкие телефоны — экономим ещё больше */
+
+        /* На узких телефонах — чуть меньше запас */
         @media (max-width: 480px) {
             .mg-stage {
-                height: calc(100svh - 240px);
-                max-height: calc(100svh - 240px);
+                max-height: calc(100svh - 200px);
                 border-radius: 14px;
             }
         }
         @supports not (height: 100svh) {
             @media (max-width: 480px) {
                 .mg-stage {
-                    height: calc(100vh - 240px);
-                    max-height: calc(100vh - 240px);
+                    max-height: calc(100vh - 200px);
+                }
+            }
+        }
+
+        /* На очень маленьких телефонах (iPhone SE) */
+        @media (max-width: 380px) {
+            .mg-stage {
+                max-height: calc(100svh - 180px);
+            }
+        }
+        @supports not (height: 100svh) {
+            @media (max-width: 380px) {
+                .mg-stage {
+                    max-height: calc(100vh - 180px);
                 }
             }
         }
@@ -1661,7 +1663,7 @@
             box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
         }
 
-        /* ===== HUD (сверху на канвасе) ===== */
+        /* ===== HUD ===== */
         .mg-hud {
             position: absolute; top: 8px; left: 8px; right: 8px;
             display: flex; justify-content: space-between; align-items: flex-start;
@@ -1689,7 +1691,7 @@
         }
         .mg-hud-item.mg-combo .mg-hud-value { color: #ff6600; }
 
-        /* ===== РЕКОРДЫ СНИЗУ (4 в ряд) ===== */
+        /* ===== РЕКОРДЫ СНИЗУ ===== */
         .mg-bottom-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1745,7 +1747,7 @@
             text-align: right;
         }
 
-        /* ===== АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ===== */
+        /* ===== АДАПТИВ ===== */
         @media (max-width: 900px) {
             .mg-wrapper { gap: 8px; }
             .mg-main { gap: 6px; }
