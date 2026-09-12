@@ -6946,9 +6946,8 @@
             if (profile) {
                 _essence = profile.essence || 0;
                 _gems = profile.gems || 0;
-                
-                // Синхронизируем глобальные переменные с БД
-                saveGame();
+
+                saveGame(true);        
                 updateUI();
             }
             
