@@ -22,6 +22,687 @@
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #b388ff, #7c4dff); border-radius: 10px; }
 
+        /* ============================================================
+           РЫНОК
+           ============================================================ */
+        .market-tabs-main {
+            display: flex; gap: 6px; margin-bottom: 16px;
+            background: rgba(20, 24, 36, 0.6);
+            padding: 6px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .market-tab-main {
+            flex: 1; padding: 12px 16px; border-radius: 12px;
+            border: none; background: transparent;
+            color: #8b90a8; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: 0.25s; font-family: inherit;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .market-tab-main:hover { color: #e4e6f0; background: rgba(255,255,255,0.03); }
+        .market-tab-main.active {
+            background: linear-gradient(135deg, rgba(179,136,255,0.25), rgba(123,77,255,0.15));
+            color: #b388ff;
+            box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
+        }
+        .market-tab-main .count {
+            background: #7c4dff; color: #fff;
+            font-size: 10px; padding: 2px 7px;
+            border-radius: 20px; font-weight: 700;
+            min-width: 20px;
+        }
+
+        /* Компактная кнопка "Выставить" в шапке */
+        .market-create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            box-shadow: 0 4px 15px rgba(123, 77, 255, 0.3);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .market-create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(123, 77, 255, 0.5);
+        }
+        .market-create-btn:active { transform: scale(0.96); }
+        .market-create-btn i { font-size: 12px; }
+
+        @media (max-width: 480px) {
+            .market-create-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        .market-sub-tabs {
+            display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+        }
+        .market-sub-tab {
+            padding: 7px 14px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(20, 24, 36, 0.6);
+            color: #8b90a8; font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: 0.25s; font-family: inherit;
+        }
+        .market-sub-tab:hover { color: #e4e6f0; }
+        .market-sub-tab.active {
+            background: rgba(179,136,255,0.15);
+            color: #b388ff;
+            border-color: rgba(179,136,255,0.3);
+        }
+
+        .market-list {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .market-lot {
+            background: rgba(20, 24, 36, 0.7);
+            border-radius: 14px; padding: 12px 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: 0.2s; display: flex; align-items: center;
+            gap: 12px; position: relative; cursor: pointer;
+        }
+        .market-lot:hover {
+            border-color: rgba(179, 136, 255, 0.25);
+            background: rgba(30, 34, 48, 0.8);
+        }
+        .market-lot.mine {
+            border-color: rgba(255, 204, 102, 0.3);
+            background: rgba(30, 26, 18, 0.6);
+        }
+        .market-lot.mine::before {
+            content: '👑 ВАШ';
+            position: absolute; top: -8px; left: 12px;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            color: #1a1a2e; font-size: 9px; font-weight: 900;
+            padding: 2px 8px; border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .market-lot-seller {
+            display: flex; align-items: center; gap: 8px;
+            min-width: 120px; flex-shrink: 0;
+        }
+        .market-lot-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c4dff, #b388ff);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; flex-shrink: 0;
+            border: 2px solid rgba(179, 136, 255, 0.3);
+        }
+        .market-lot-seller-info { min-width: 0; flex: 1; }
+        .market-lot-seller-name {
+            font-size: 12px; font-weight: 700; color: #e4e6f0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .market-lot-seller-time {
+            font-size: 10px; color: #6b7084;
+        }
+
+        .market-lot-card {
+            display: flex; align-items: center; gap: 10px;
+            min-width: 150px; flex-shrink: 0;
+        }
+        .market-lot-card-img {
+            width: 44px; height: 58px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 900;
+            border: 2px solid; background: rgba(0,0,0,0.4);
+            flex-shrink: 0; overflow: hidden;
+            box-shadow: 0 0 15px -5px currentColor;
+        }
+        .market-lot-card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .market-lot-card-name {
+            font-size: 12px; font-weight: 700; color: #e4e6f0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 100px;
+        }
+        .market-lot-card-set {
+            font-size: 10px; color: #6b7084;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 100px;
+        }
+
+        .market-lot-price {
+            display: flex; align-items: center; gap: 8px;
+            margin-left: auto; flex-shrink: 0;
+        }
+        .market-lot-price-label {
+            font-size: 10px; color: #6b7084;
+            text-transform: uppercase; font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .market-lot-price-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .market-price-tag {
+            display: flex; align-items: center; gap: 3px;
+            padding: 5px 10px; border-radius: 10px;
+            font-size: 14px; font-weight: 900;
+            border: 2px solid; background: rgba(0,0,0,0.3);
+            min-width: 52px; justify-content: center;
+        }
+        .market-price-tag .r { font-size: 15px; line-height: 1; }
+        .market-price-tag .c { font-size: 11px; opacity: 0.8; }
+
+        .market-lot-action { flex-shrink: 0; margin-left: 4px; }
+        .market-btn {
+            padding: 10px 16px; border-radius: 12px;
+            border: none; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: 0.25s; font-family: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
+            white-space: nowrap;
+        }
+        .market-btn.buy {
+            background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff;
+        }
+        .market-btn.buy:hover:not(:disabled) { transform: translateY(-2px); }
+        .market-btn.buy:disabled {
+            opacity: 0.35; cursor: not-allowed;
+            background: rgba(255,255,255,0.05); color: #6b7084;
+        }
+        .market-btn.sell {
+            background: linear-gradient(135deg, #ffcc66, #ffaa33); color: #1a1a2e;
+        }
+        .market-btn.sell:hover:not(:disabled) { transform: translateY(-2px); }
+        .market-btn.sell:disabled {
+            opacity: 0.35; cursor: not-allowed;
+            background: rgba(255,255,255,0.05); color: #6b7084;
+        }
+        .market-btn.cancel {
+            background: rgba(255, 107, 107, 0.15); color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .market-empty {
+            text-align: center; padding: 50px 20px; color: #6b7084;
+        }
+        .market-empty .icon { font-size: 56px; margin-bottom: 10px; opacity: 0.5; }
+        .market-empty .title { font-size: 16px; font-weight: 700; color: #8b90a8; margin-bottom: 6px; }
+        .market-empty .desc { font-size: 12px; }
+
+        /* Модалка рынка */
+        .market-preview {
+            display: flex; gap: 16px; align-items: center;
+            padding: 16px; background: rgba(0,0,0,0.3);
+            border-radius: 16px; margin-bottom: 16px;
+        }
+        .market-preview-img {
+            width: 90px; height: 120px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 42px; font-weight: 900; border: 3px solid;
+            background: rgba(0,0,0,0.4); flex-shrink: 0;
+            overflow: hidden;
+        }
+        .market-preview-img img { width: 100%; height: 100%; object-fit: cover; }
+        .market-preview-info { flex: 1; min-width: 0; }
+        .market-preview-info .name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+        .market-preview-info .rank-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; margin-bottom: 6px;
+        }
+        .market-preview-info .set { font-size: 12px; color: #8b90a8; margin-bottom: 6px; }
+
+        .market-check-block {
+            background: rgba(0,0,0,0.2); border-radius: 14px;
+            padding: 14px; margin-bottom: 14px;
+        }
+        .market-check-title {
+            font-size: 11px; color: #6b7084;
+            text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 700; margin-bottom: 10px;
+        }
+        .market-check-row {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 6px 0; font-size: 13px;
+        }
+        .market-check-row .label {
+            display: flex; align-items: center; gap: 8px; color: #8b90a8;
+        }
+        .market-check-row .rank-mini {
+            width: 24px; height: 24px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 12px; border: 1px solid;
+        }
+        .market-check-row .value { font-weight: 700; }
+        .market-check-row .value.ok { color: #44ff44; }
+        .market-check-row .value.fail { color: #ff6b6b; }
+
+        .market-price-big {
+            display: flex; flex-direction: column;
+            align-items: center; padding: 12px 16px;
+            border-radius: 12px; border: 2px solid;
+            background: rgba(0,0,0,0.3); min-width: 70px;
+        }
+        .market-price-big .rank { font-size: 24px; font-weight: 900; line-height: 1; }
+        .market-price-big .count {
+            font-size: 12px; color: #8b90a8;
+            font-weight: 700; margin-top: 2px;
+        }
+
+        .market-rank-picker {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 6px; margin-bottom: 14px;
+        }
+        .market-rank-opt {
+            padding: 10px 8px; border-radius: 10px;
+            border: 2px solid; background: rgba(0,0,0,0.3);
+            cursor: pointer; transition: 0.2s; text-align: center;
+        }
+        .market-rank-opt:hover { transform: translateY(-2px); }
+        .market-rank-opt.selected {
+            box-shadow: 0 0 0 2px #b388ff, 0 0 20px rgba(123,77,255,0.3);
+            background: rgba(179,136,255,0.1);
+        }
+        .market-rank-opt .r { font-size: 20px; font-weight: 900; line-height: 1; }
+        .market-rank-opt .lbl {
+            font-size: 9px; color: #8b90a8;
+            text-transform: uppercase; margin-top: 3px;
+        }
+
+        .market-qty {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.3); border-radius: 12px;
+            padding: 10px 14px; border: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 8px;
+        }
+        .market-qty button {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; background: rgba(179,136,255,0.15);
+            color: #b388ff; font-size: 20px; font-weight: 700;
+            cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit;
+        }
+        .market-qty button:hover { background: rgba(179,136,255,0.25); }
+        .market-qty input {
+            flex: 1; background: transparent; border: none;
+            color: #e4e6f0; font-size: 22px; font-weight: 900;
+            text-align: center; outline: none; font-family: inherit;
+        }
+        .market-qty .remove {
+            background: rgba(255,107,107,0.15);
+            color: #ff6b6b;
+            flex-shrink: 0;
+        }
+
+        .market-card-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+            gap: 8px; max-height: 300px; overflow-y: auto; padding: 4px;
+        }
+        .market-select-card {
+            position: relative;
+            background: linear-gradient(180deg, rgba(30,30,50,0.98), rgba(15,15,25,0.98));
+            border-radius: 10px; padding: 6px 5px 8px;
+            text-align: center; border: 2px solid var(--card-color, #ffcc66);
+            cursor: pointer; transition: 0.25s; min-height: 130px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .market-select-card:hover { transform: translateY(-4px); }
+        .market-select-card .c-img {
+            width: 100%; height: 70px; border-radius: 6px;
+            background: rgba(0,0,0,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 900;
+            color: var(--card-color, #ffcc66);
+            margin-bottom: 4px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .market-select-card .c-img img { width: 100%; height: 100%; object-fit: cover; }
+        .market-select-card .c-rank {
+            position: absolute; top: 4px; left: 4px;
+            font-size: 10px; font-weight: 900;
+            background: rgba(0,0,0,0.85); color: var(--card-color, #ffcc66);
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 5px; border: 2px solid var(--card-color, #ffcc66);
+        }
+        .market-select-card .c-count {
+            position: absolute; top: 4px; right: 4px;
+            font-size: 9px; font-weight: 800;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            color: #1a1a2e; padding: 2px 6px;
+            border-radius: 20px;
+        }
+        .market-select-card .c-name {
+            font-size: 9px; font-weight: 800; color: #f0f2fa;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        /* Бейджи на карточках в каталоге */
+        .market-card-badge {
+            position: absolute; top: 5px; right: 5px;
+            display: flex; gap: 3px; z-index: 5;
+        }
+        .market-card-badge .b-sell {
+            font-size: 9px; font-weight: 800;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff; padding: 3px 7px;
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .market-card-badge .b-buy {
+            font-size: 9px; font-weight: 800;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            color: #1a1a2e; padding: 3px 7px;
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 700px) {
+            .market-lot { flex-direction: column; align-items: stretch; gap: 10px; }
+            .market-lot-seller, .market-lot-card, .market-lot-price { min-width: 0; }
+            .market-lot-price { margin-left: 0; }
+            .market-lot-action { margin-left: 0; }
+            .market-btn { width: 100%; justify-content: center; }
+        }
+
+        /* ============================================================
+           ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ МОДАЛКИ РЫНКА
+           ============================================================ */
+
+        /* Поиск внутри модалки рынка */
+        #marketModal .search-bar {
+            margin-bottom: 12px;
+        }
+        #marketModal .search-input {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 30px;
+            background: rgba(20, 24, 36, 0.6);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #e4e6f0;
+            font-size: 13px;
+            outline: none;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+        #marketModal .search-input:focus {
+            border-color: rgba(179, 136, 255, 0.3);
+            background: rgba(30, 34, 48, 0.8);
+        }
+        #marketModal .search-input::placeholder {
+            color: #6b7084;
+        }
+
+        /* Form-hint внутри модалки */
+        #marketModal .form-hint {
+            background: rgba(255,204,102,0.08);
+            border-left: 3px solid #ffcc66;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #ffcc66;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+        #marketModal .form-hint b { color: #ffaa33; font-weight: 800; }
+
+        /* Sub-tabs внутри модалки (фильтр рангов при покупке) */
+        #marketModal .market-sub-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        #marketModal .market-sub-tab {
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(20, 24, 36, 0.6);
+            color: #8b90a8;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+        #marketModal .market-sub-tab:hover {
+            color: #e4e6f0;
+            border-color: rgba(255,255,255,0.12);
+        }
+        #marketModal .market-sub-tab.active {
+            background: rgba(179,136,255,0.15);
+            color: #b388ff;
+            border-color: rgba(179,136,255,0.3);
+        }
+
+        /* Главные табы в модалке (Продать / Купить) */
+        #marketModal .market-tabs-main {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: rgba(20, 24, 36, 0.6);
+            padding: 6px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        #marketModal .market-tab-main {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #8b90a8;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #marketModal .market-tab-main:hover {
+            color: #e4e6f0;
+            background: rgba(255,255,255,0.03);
+        }
+        #marketModal .market-tab-main.active {
+            background: linear-gradient(135deg, rgba(179,136,255,0.25), rgba(123,77,255,0.15));
+            color: #b388ff;
+            box-shadow: 0 0 20px rgba(123, 77, 255, 0.2);
+        }
+
+        /* Grid карточек в модалке */
+        #marketModal .market-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        #marketModal .market-card-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        #marketModal .market-card-grid::-webkit-scrollbar-thumb {
+            background: rgba(179, 136, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        /* Rank picker */
+        #marketModal .market-rank-picker {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        /* Qty input */
+        #marketModal .market-qty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 8px;
+        }
+
+        /* Пустое состояние в модалке */
+        #marketModal .market-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7084;
+        }
+        #marketModal .market-empty .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+        #marketModal .market-empty .title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #8b90a8;
+            margin-bottom: 6px;
+        }
+        #marketModal .market-empty .desc {
+            font-size: 12px;
+        }
+
+        /* Preview карточки в модалке */
+        #marketModal .market-preview {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 14px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            margin-bottom: 14px;
+        }
+        #marketModal .market-preview-img {
+            width: 80px;
+            height: 105px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 900;
+            border: 3px solid;
+            background: rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        #marketModal .market-preview-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #marketModal .market-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+        #marketModal .market-preview-info .name {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: #e4e6f0;
+        }
+        #marketModal .market-preview-info .rank-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        #marketModal .market-preview-info .set {
+            font-size: 12px;
+            color: #8b90a8;
+            margin-bottom: 6px;
+        }
+
+        /* Кнопки в модалке */
+        #marketModal .modal-actions {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            background: #141824;
+            position: sticky;
+            bottom: 0;
+            border-radius: 0 0 20px 20px;
+        }
+        #marketModal .modal-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+        #marketModal .modal-btn.close {
+            background: rgba(255,255,255,0.05);
+            color: #e4e6f0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        #marketModal .modal-btn.upgrade {
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: #fff;
+        }
+        #marketModal .modal-btn.upgrade:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Check-row */
+        #marketModal .market-check-block {
+            background: rgba(0,0,0,0.2);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        #marketModal .market-check-title {
+            font-size: 11px;
+            color: #6b7084;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        #marketModal .market-check-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+        #marketModal .market-check-row .label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b90a8;
+        }
+        #marketModal .market-check-row .rank-mini {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 12px;
+            border: 1px solid;
+            flex-shrink: 0;
+        }
+        #marketModal .market-check-row .value {
+            font-weight: 700;
+        }
+        #marketModal .market-check-row .value.ok { color: #44ff44; }
+        #marketModal .market-check-row .value.fail { color: #ff6b6b; }
+
         /* ============ ЕЖЕЧАСНЫЙ БОНУС (шапка) ============ */
         .hourly-bonus-btn {
             position: relative;
@@ -3013,6 +3694,7 @@
     <div class="nav-section-title">💬 Социальное</div>
     <button class="nav-item" data-section="chat"><i class="fas fa-comment-dots"></i><span>Чат</span></button>
     <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button>
+    <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge" id="marketBadge">0</span></button>
     <button class="nav-item" data-section="top"><i class="fas fa-trophy"></i><span>Топ</span></button>
     
     <div class="nav-section-title">🎲 Развлечения</div>
@@ -3556,6 +4238,58 @@
         </div>
     </section>
 
+    <!-- РЫНОК -->
+    <section id="section-market" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-store"></i> Рынок карт</h1>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span class="section-info" id="marketStats">Загрузка...</span>
+                <button class="market-create-btn" onclick="openCreateMarketModal()">
+                    <i class="fas fa-plus"></i>
+                    <span>Выставить</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="market-tabs-main">
+            <button class="market-tab-main active" data-mtab="sell">
+                💰 Лоты <span class="count" id="sellCount">0</span>
+            </button>
+            <button class="market-tab-main" data-mtab="buy">
+                🛒 Заявки <span class="count" id="buyCount">0</span>
+            </button>
+            <button class="market-tab-main" data-mtab="mine">
+                👑 Мои <span class="count" id="mineCount">0</span>
+            </button>
+        </div>
+
+        <div id="market-tab-sell">
+            <div class="market-sub-tabs">
+                <button class="market-sub-tab active" data-msub="all">🌐 Все</button>
+                <button class="market-sub-tab" data-msub="affordable">✅ Могу купить</button>
+            </div>
+            <div class="search-bar" style="margin-bottom:14px;">
+                <input type="text" class="search-input" id="marketSellSearch" placeholder="🔍 Поиск по названию карты...">
+            </div>
+            <div class="market-list" id="marketSellList"></div>
+        </div>
+
+        <div id="market-tab-buy" style="display:none;">
+            <div class="market-sub-tabs">
+                <button class="market-sub-tab active" data-msub-buy="all">🌐 Все</button>
+                <button class="market-sub-tab" data-msub-buy="canFulfill">💰 Могу продать</button>
+            </div>
+            <div class="search-bar" style="margin-bottom:14px;">
+                <input type="text" class="search-input" id="marketBuySearch" placeholder="🔍 Поиск по названию карты...">
+            </div>
+            <div class="market-list" id="marketBuyList"></div>
+        </div>
+
+        <div id="market-tab-mine" style="display:none;">
+            <div class="market-list" id="marketMineList"></div>
+        </div>
+    </section>
+
     <!-- ФУТЕР -->
     <footer class="footer">
         <div class="footer-links">
@@ -3738,6 +4472,16 @@
             </div>
         </div>
         <div class="ad-footer">⚠️ Закрытие до окончания = отказ от награды</div>
+    </div>
+</div>
+
+<!-- МОДАЛКА РЫНКА -->
+<div class="modal-overlay" id="marketModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeMarketModal()">&times;</button>
+        <div class="modal-title">Рынок</div>
+        <div class="modal-body"></div>
+        <div class="modal-actions"></div>
     </div>
 </div>
 
@@ -4731,6 +5475,903 @@
             }
         };
     })();
+
+    /* ============================================================
+       РЫНОК КАРТ
+       ============================================================ */
+
+    let marketSellLots = [];
+    let marketBuyOrders = [];
+    let marketMyLots = [];
+    let marketMyOrders = [];
+    let marketCurrentTab = 'sell';
+    let marketSubTab = 'all';
+    let marketBuySubTab = 'all';
+    let marketChannel = null;
+
+    const MARKET_MAX_LOTS = 3;
+
+    // ============================================================
+    // ЗАГРУЗКА
+    // ============================================================
+
+    async function loadMarketData() {
+        if (!supabaseClient) return;
+        try {
+            // Авто-истечение
+            const now = new Date().toISOString();
+            await supabaseClient.from('market_sell_lots').update({ status: 'expired' })
+                .eq('status', 'active').lt('expires_at', now);
+            await supabaseClient.from('market_buy_orders').update({ status: 'expired' })
+                .eq('status', 'active').lt('expires_at', now);
+
+            // Лоты
+            const { data: sellLots } = await supabaseClient
+                .from('market_sell_lots').select('*')
+                .eq('status', 'active').gt('expires_at', now)
+                .order('created_at', { ascending: false }).limit(100);
+
+            // Заявки
+            const { data: buyOrders } = await supabaseClient
+                .from('market_buy_orders').select('*')
+                .eq('status', 'active').gt('expires_at', now)
+                .order('created_at', { ascending: false }).limit(100);
+
+            marketSellLots = sellLots || [];
+            marketBuyOrders = buyOrders || [];
+            marketMyLots = marketSellLots.filter(l => l.seller_id === _playerId);
+            marketMyOrders = marketBuyOrders.filter(o => o.buyer_id === _playerId);
+
+            renderMarketStats();
+            renderMarketContent();
+        } catch(e) {
+            console.warn('loadMarketData error:', e);
+        }
+    }
+
+    // ============================================================
+    // РЕНДЕР
+    // ============================================================
+
+    function renderMarketStats() {
+        const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setEl('sellCount', marketSellLots.length);
+        setEl('buyCount', marketBuyOrders.length);
+        setEl('mineCount', marketMyLots.length + marketMyOrders.length);
+        setEl('marketStats', `🏪 ${marketSellLots.length} лотов · 🛒 ${marketBuyOrders.length} заявок`);
+
+        const badge = document.getElementById('marketBadge');
+        if (badge) {
+            const total = marketSellLots.length;
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'flex' : 'none';
+        }
+    }
+
+    function renderMarketContent() {
+        if (marketCurrentTab === 'sell') renderMarketSellLots();
+        if (marketCurrentTab === 'buy') renderMarketBuyOrders();
+        if (marketCurrentTab === 'mine') renderMarketMine();
+    }
+
+    function renderMarketSellLots() {
+        const container = document.getElementById('marketSellList');
+        if (!container) return;
+        const search = (document.getElementById('marketSellSearch')?.value || '').toLowerCase().trim();
+
+        let lots = [...marketSellLots];
+        if (marketSubTab === 'affordable') {
+            lots = lots.filter(l => l.seller_id !== _playerId && marketCanAfford(l.price));
+        }
+        if (search) {
+            lots = lots.filter(l => {
+                const card = getCardById(l.card_id);
+                return card && card.name.toLowerCase().includes(search);
+            });
+        }
+
+        if (lots.length === 0) {
+            container.innerHTML = `<div class="market-empty">
+                <div class="icon">🏪</div>
+                <div class="title">Лотов нет</div>
+                <div class="desc">${marketSubTab === 'affordable' ? 'У вас не хватает карт' : 'Попробуйте позже'}</div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = lots.map(l => renderMarketSellItem(l)).join('');
+    }
+
+    function renderMarketSellItem(lot) {
+        const card = getCardById(lot.card_id);
+        if (!card) return '';
+        const isMine = lot.seller_id === _playerId;
+        const affordable = !isMine && marketCanAfford(lot.price);
+
+        const priceTags = (lot.price || []).map(p => {
+            const color = getCardColor(p.rank);
+            return `<div class="market-price-tag" style="border-color:${color};color:${color};">
+                <span class="r">${p.rank}</span><span class="c">×${p.count}</span>
+            </div>`;
+        }).join('');
+
+        const imgPath = getCardImage(card);
+        return `
+            <div class="market-lot ${isMine ? 'mine' : ''}" onclick="openSellLotDetail(${lot.id})">
+                <div class="market-lot-seller">
+                    <div class="market-lot-avatar">${lot.seller_avatar || '🧙'}</div>
+                    <div class="market-lot-seller-info">
+                        <div class="market-lot-seller-name">${lot.seller_name}</div>
+                        <div class="market-lot-seller-time">${marketFormatTime(lot.created_at)}</div>
+                    </div>
+                </div>
+                <div class="market-lot-card">
+                    <div class="market-lot-card-img" style="color:${card.color};border-color:${card.color};">
+                        ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
+                    </div>
+                    <div>
+                        <div class="market-lot-card-name">${card.name}</div>
+                        <div class="market-lot-card-set">${card.set}</div>
+                    </div>
+                </div>
+                <div class="market-lot-price">
+                    <span class="market-lot-price-label">Цена</span>
+                    <div class="market-lot-price-tags">${priceTags}</div>
+                </div>
+                <div class="market-lot-action">
+                    ${isMine ? `
+                        <button class="market-btn cancel" onclick="event.stopPropagation(); cancelSellLot(${lot.id})">
+                            🚫 Отменить
+                        </button>
+                    ` : `
+                        <button class="market-btn buy"
+                                onclick="event.stopPropagation(); buySellLot(${lot.id})"
+                                ${!affordable ? 'disabled' : ''}>
+                            ${affordable ? '💳 Купить' : '❌ Не хватает'}
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMarketBuyOrders() {
+        const container = document.getElementById('marketBuyList');
+        if (!container) return;
+        const search = (document.getElementById('marketBuySearch')?.value || '').toLowerCase().trim();
+
+        let orders = [...marketBuyOrders];
+        if (marketBuySubTab === 'canFulfill') {
+            orders = orders.filter(o => o.buyer_id !== _playerId && (_cardHistory.some(c => (c.cardId || c.id) === o.card_id)));
+        }
+        if (search) {
+            orders = orders.filter(o => {
+                const card = getCardById(o.card_id);
+                return card && card.name.toLowerCase().includes(search);
+            });
+        }
+
+        if (orders.length === 0) {
+            container.innerHTML = `<div class="market-empty">
+                <div class="icon">🛒</div>
+                <div class="title">Заявок нет</div>
+                <div class="desc">${marketBuySubTab === 'canFulfill' ? 'У вас нет нужных карт' : 'Никто не покупает'}</div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = orders.map(o => renderMarketBuyItem(o)).join('');
+    }
+
+    function renderMarketBuyItem(order) {
+        const card = getCardById(order.card_id);
+        if (!card) return '';
+        const isMine = order.buyer_id === _playerId;
+        const canSell = !isMine && _cardHistory.some(c => (c.cardId || c.id) === order.card_id);
+
+        const offerTags = (order.offer || []).map(p => {
+            const color = getCardColor(p.rank);
+            return `<div class="market-price-tag" style="border-color:${color};color:${color};">
+                <span class="r">${p.rank}</span><span class="c">×${p.count}</span>
+            </div>`;
+        }).join('');
+
+        const imgPath = getCardImage(card);
+        return `
+            <div class="market-lot ${isMine ? 'mine' : ''}" onclick="openBuyOrderDetail(${order.id})">
+                <div class="market-lot-seller">
+                    <div class="market-lot-avatar">${order.buyer_avatar || '🧙'}</div>
+                    <div class="market-lot-seller-info">
+                        <div class="market-lot-seller-name">${order.buyer_name}</div>
+                        <div class="market-lot-seller-time">${marketFormatTime(order.created_at)}</div>
+                    </div>
+                </div>
+                <div class="market-lot-card">
+                    <div class="market-lot-card-img" style="color:${card.color};border-color:${card.color};">
+                        ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
+                    </div>
+                    <div>
+                        <div class="market-lot-card-name">${card.name}</div>
+                        <div class="market-lot-card-set">${card.set}</div>
+                    </div>
+                </div>
+                <div class="market-lot-price">
+                    <span class="market-lot-price-label">Даёт</span>
+                    <div class="market-lot-price-tags">${offerTags}</div>
+                </div>
+                <div class="market-lot-action">
+                    ${isMine ? `
+                        <button class="market-btn cancel" onclick="event.stopPropagation(); cancelBuyOrder(${order.id})">
+                            🚫 Отменить
+                        </button>
+                    ` : `
+                        <button class="market-btn sell"
+                                onclick="event.stopPropagation(); sellToBuyOrder(${order.id})"
+                                ${!canSell ? 'disabled' : ''}>
+                            ${canSell ? '💰 Продать' : '❌ Нет карты'}
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMarketMine() {
+        const container = document.getElementById('marketMineList');
+        if (!container) return;
+
+        const mySell = marketSellLots.filter(l => l.seller_id === _playerId);
+        const myBuy = marketBuyOrders.filter(o => o.buyer_id === _playerId);
+
+        if (mySell.length === 0 && myBuy.length === 0) {
+            container.innerHTML = `<div class="market-empty">
+                <div class="icon">📭</div>
+                <div class="title">У вас нет активных</div>
+                <div class="desc">Нажмите "➕ Выставить" внизу</div>
+            </div>`;
+            return;
+        }
+
+        let html = '';
+        if (mySell.length > 0) {
+            html += `<div style="font-size:12px;color:#8b90a8;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:8px 0 4px;">💰 Мои лоты (${mySell.length})</div>`;
+            html += mySell.map(l => renderMarketSellItem(l)).join('');
+        }
+        if (myBuy.length > 0) {
+            html += `<div style="font-size:12px;color:#8b90a8;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:16px 0 4px;">🛒 Мои заявки (${myBuy.length})</div>`;
+            html += myBuy.map(o => renderMarketBuyItem(o)).join('');
+        }
+        container.innerHTML = html;
+    }
+
+    // ============================================================
+    // УТИЛИТЫ
+    // ============================================================
+
+    function marketFormatTime(ts) {
+        const diff = Date.now() - new Date(ts).getTime();
+        const min = Math.floor(diff / 60000);
+        if (min < 1) return 'только что';
+        if (min < 60) return `${min} мин назад`;
+        const h = Math.floor(min / 60);
+        if (h < 24) return `${h} ч назад`;
+        return `${Math.floor(h / 24)} дн назад`;
+    }
+
+    function getCardColor(rank) {
+        const c = ALL_CARDS.find(x => x.rank === rank);
+        return c ? c.color : '#888';
+    }
+
+    function marketCountMyCardsByRank(rank) {
+        let total = 0;
+        for (const item of _cardHistory) {
+            const card = getCardById(item.cardId || item.id);
+            if (card && card.rank === rank) total += 1;
+        }
+        return total;
+    }
+
+    function marketHasCard(cardId) {
+        return _cardHistory.some(c => (c.cardId || c.id) === cardId);
+    }
+
+    function marketCanAfford(priceList) {
+        const need = {};
+        (priceList || []).forEach(p => { need[p.rank] = (need[p.rank] || 0) + p.count; });
+        for (const [rank, count] of Object.entries(need)) {
+            if (marketCountMyCardsByRank(rank) < count) return false;
+        }
+        return true;
+    }
+
+    // Списываем карты игрока (по рангам)
+    function marketPayWithCards(priceList) {
+        for (const p of priceList || []) {
+            let remaining = p.count;
+            for (let i = _cardHistory.length - 1; i >= 0 && remaining > 0; i--) {
+                const card = getCardById(_cardHistory[i].cardId || _cardHistory[i].id);
+                if (card && card.rank === p.rank) {
+                    _cardHistory.splice(i, 1);
+                    remaining--;
+                }
+            }
+        }
+    }
+
+    // Удаляем конкретную карту из коллекции
+    function marketRemoveCard(cardId) {
+        const idx = _cardHistory.findIndex(c => (c.cardId || c.id) === cardId);
+        if (idx !== -1) _cardHistory.splice(idx, 1);
+        return idx !== -1;
+    }
+
+    // Добавляем карту
+    function marketAddCard(cardId) {
+        const card = getCardById(cardId);
+        if (!card) return;
+        _cardHistory.push({
+            cardId: card.id,
+            rank: card.rank,
+            text: `🎴 ${card.rank} — ${card.name}`,
+            uniqueId: Date.now() + '_' + Math.random().toString(36).substr(2, 6)
+        });
+    }
+
+    // ============================================================
+    // ДЕЙСТВИЯ
+    // ============================================================
+
+    async function buySellLot(lotId) {
+        const lot = marketSellLots.find(l => l.id === lotId);
+        if (!lot) return;
+        if (!marketCanAfford(lot.price)) { showToast('❌ Не хватает карт', '#ff6b6b'); return; }
+        if (!confirm(`Купить ${getCardById(lot.card_id)?.name}?`)) return;
+
+        // Списываем
+        marketPayWithCards(lot.price);
+        // Добавляем карту
+        marketAddCard(lot.card_id);
+        // Обновляем БД
+        await supabaseClient.from('market_sell_lots').update({
+            status: 'sold', buyer_id: _playerId, buyer_name: _playerName,
+            completed_at: new Date().toISOString()
+        }).eq('id', lotId);
+        // Уведомление продавцу
+        showToast('✅ Куплено!', '#44ff44');
+        saveGame(); updateUI(); renderCollection();
+        await loadMarketData();
+        if (typeof closeModal === 'function') closeModal();
+    }
+
+    async function cancelSellLot(lotId) {
+        const lot = marketSellLots.find(l => l.id === lotId);
+        if (!lot) return;
+        if (!confirm('Отменить лот?')) return;
+        // Возвращаем карту
+        marketAddCard(lot.card_id);
+        await supabaseClient.from('market_sell_lots').update({ status: 'cancelled' }).eq('id', lotId);
+        showToast('🚫 Отменено', '#ffaa88');
+        saveGame(); updateUI(); renderCollection();
+        await loadMarketData();
+        if (typeof closeModal === 'function') closeModal();
+    }
+
+    async function sellToBuyOrder(orderId) {
+        const order = marketBuyOrders.find(o => o.id === orderId);
+        if (!order) return;
+        if (!marketHasCard(order.card_id)) { showToast('❌ Нет карты', '#ff6b6b'); return; }
+        if (!confirm(`Продать ${getCardById(order.card_id)?.name}?`)) return;
+
+        // Списываем карту
+        marketRemoveCard(order.card_id);
+        // Даём награду (карты указанных рангов)
+        for (const p of order.offer || []) {
+            let remaining = p.count;
+            for (let i = 0; i < ALL_CARDS.length && remaining > 0; i++) {
+                if (ALL_CARDS[i].rank === p.rank) {
+                    marketAddCard(ALL_CARDS[i].id);
+                    remaining--;
+                }
+            }
+        }
+        await supabaseClient.from('market_buy_orders').update({
+            status: 'fulfilled', seller_id: _playerId, seller_name: _playerName,
+            completed_at: new Date().toISOString()
+        }).eq('id', orderId);
+        showToast('✅ Продано!', '#44ff44');
+        saveGame(); updateUI(); renderCollection();
+        await loadMarketData();
+        if (typeof closeModal === 'function') closeModal();
+    }
+
+    async function cancelBuyOrder(orderId) {
+        if (!confirm('Отменить заявку?')) return;
+        await supabaseClient.from('market_buy_orders').update({ status: 'cancelled' }).eq('id', orderId);
+        showToast('🚫 Отменено', '#ffaa88');
+        await loadMarketData();
+        if (typeof closeModal === 'function') closeModal();
+    }
+
+    // ============================================================
+    // МОДАЛКА ДЕТАЛЕЙ
+    // ============================================================
+
+    function openSellLotDetail(lotId) {
+        const lot = marketSellLots.find(l => l.id === lotId);
+        if (!lot) return;
+        const card = getCardById(lot.card_id);
+        if (!card) return;
+
+        const isMine = lot.seller_id === _playerId;
+        const affordable = !isMine && marketCanAfford(lot.price);
+
+        const need = {};
+        (lot.price || []).forEach(p => { need[p.rank] = (need[p.rank] || 0) + p.count; });
+
+        const checkHtml = Object.entries(need).map(([rank, count]) => {
+            const have = marketCountMyCardsByRank(rank);
+            const ok = have >= count;
+            const color = getCardColor(rank);
+            return `<div class="market-check-row">
+                <span class="label"><span class="rank-mini" style="color:${color};border-color:${color};">${rank}</span>Нужно ${count} шт</span>
+                <span class="value ${ok ? 'ok' : 'fail'}">${ok ? '✅' : '❌'} у вас ${have}</span>
+            </div>`;
+        }).join('');
+
+        const priceHtml = (lot.price || []).map(p => {
+            const color = getCardColor(p.rank);
+            return `<div class="market-price-big" style="border-color:${color};color:${color};">
+                <div class="rank">${p.rank}</div><div class="count">×${p.count}</div>
+            </div>`;
+        }).join('');
+
+        const imgPath = getCardImage(card);
+        const modal = document.getElementById('marketModal');
+        modal.querySelector('.modal-title').textContent = isMine ? '👑 Ваш лот' : '🏪 Лот';
+        modal.querySelector('.modal-body').innerHTML = `
+            <div class="market-preview">
+                <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
+                    ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
+                </div>
+                <div class="market-preview-info">
+                    <div class="name">${card.name}</div>
+                    <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
+                        ${card.rank} — ${card.rarity || ''}
+                    </div>
+                    <div class="set">📚 ${card.set}</div>
+                    <div style="font-size:12px;color:#8b90a8;">Продавец: <b style="color:#e4e6f0;">${lot.seller_name}</b></div>
+                    <div style="font-size:11px;color:#6b7084;">${marketFormatTime(lot.created_at)}</div>
+                </div>
+            </div>
+            <div class="market-check-block">
+                <div class="market-check-title">💰 Цена</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">${priceHtml}</div>
+            </div>
+            ${!isMine ? `
+                <div class="market-check-block">
+                    <div class="market-check-title">📦 Проверка ваших карт</div>
+                    ${checkHtml}
+                </div>
+            ` : ''}
+        `;
+        modal.querySelector('.modal-actions').innerHTML = `
+            <button class="modal-btn close" onclick="closeMarketModal()">Закрыть</button>
+            ${isMine ? `
+                <button class="modal-btn upgrade" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);" onclick="cancelSellLot(${lot.id})">
+                    🚫 Отменить
+                </button>
+            ` : `
+                <button class="modal-btn upgrade" onclick="buySellLot(${lot.id})" ${!affordable ? 'disabled' : ''}>
+                    ${affordable ? '💳 Купить' : '❌ Не хватает'}
+                </button>
+            `}
+        `;
+        modal.classList.add('show');
+    }
+
+    function openBuyOrderDetail(orderId) {
+        const order = marketBuyOrders.find(o => o.id === orderId);
+        if (!order) return;
+        const card = getCardById(order.card_id);
+        if (!card) return;
+
+        const isMine = order.buyer_id === _playerId;
+        const canSell = !isMine && marketHasCard(order.card_id);
+
+        const offerHtml = (order.offer || []).map(p => {
+            const color = getCardColor(p.rank);
+            return `<div class="market-price-big" style="border-color:${color};color:${color};">
+                <div class="rank">${p.rank}</div><div class="count">×${p.count}</div>
+            </div>`;
+        }).join('');
+
+        const imgPath = getCardImage(card);
+        const modal = document.getElementById('marketModal');
+        modal.querySelector('.modal-title').textContent = isMine ? '👑 Ваша заявка' : '🛒 Заявка';
+        modal.querySelector('.modal-body').innerHTML = `
+            <div class="market-preview">
+                <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
+                    ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
+                </div>
+                <div class="market-preview-info">
+                    <div class="name">${card.name}</div>
+                    <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
+                        ${card.rank} — ${card.rarity || ''}
+                    </div>
+                    <div class="set">📚 ${card.set}</div>
+                    <div style="font-size:12px;color:#8b90a8;">Покупатель: <b style="color:#e4e6f0;">${order.buyer_name}</b></div>
+                    <div style="font-size:11px;color:#6b7084;">${marketFormatTime(order.created_at)}</div>
+                </div>
+            </div>
+            <div class="market-check-block">
+                <div class="market-check-title">💰 Даёт за карту</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">${offerHtml}</div>
+            </div>
+            ${!isMine ? `
+                <div class="market-check-block">
+                    <div class="market-check-title">📦 Проверка</div>
+                    <div class="market-check-row">
+                        <span class="label">Нужна карта ${card.rank}</span>
+                        <span class="value ${canSell ? 'ok' : 'fail'}">${canSell ? '✅ есть' : '❌ нет'}</span>
+                    </div>
+                </div>
+            ` : ''}
+        `;
+        modal.querySelector('.modal-actions').innerHTML = `
+            <button class="modal-btn close" onclick="closeMarketModal()">Закрыть</button>
+            ${isMine ? `
+                <button class="modal-btn upgrade" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);" onclick="cancelBuyOrder(${order.id})">
+                    🚫 Отменить
+                </button>
+            ` : `
+                <button class="modal-btn upgrade" style="background:linear-gradient(135deg,#2ecc71,#27ae60);" onclick="sellToBuyOrder(${order.id})" ${!canSell ? 'disabled' : ''}>
+                    ${canSell ? '💰 Продать' : '❌ Нет карты'}
+                </button>
+            `}
+        `;
+        modal.classList.add('show');
+    }
+
+    function closeMarketModal() {
+        document.getElementById('marketModal').classList.remove('show');
+    }
+
+    // ============================================================
+    // СОЗДАНИЕ
+    // ============================================================
+
+    let marketCreateMode = 'sell';
+    let marketCreateCardId = null;
+    let marketCreatePrices = [];
+
+    function openCreateMarketModal() {
+        const totalActive = marketMyLots.length + marketMyOrders.length;
+        if (totalActive >= MARKET_MAX_LOTS) {
+            showToast(`❌ Лимит ${MARKET_MAX_LOTS} активных!`, '#ff6b6b');
+            return;
+        }
+        marketCreateMode = 'sell';
+        marketCreateCardId = null;
+        marketCreatePrices = [];
+        renderCreateMarketModal();
+        document.getElementById('marketModal').classList.add('show');
+    }
+
+    function renderCreateMarketModal() {
+        const modal = document.getElementById('marketModal');
+        modal.querySelector('.modal-title').textContent = `➕ ${marketCreateMode === 'sell' ? 'Выставить карту' : 'Создать заявку'}`;
+
+        let bodyHtml = `
+            <div class="market-tabs-main" style="margin-bottom:16px;">
+                <button class="market-tab-main ${marketCreateMode === 'sell' ? 'active' : ''}"
+                        onclick="switchMarketCreateMode('sell')">💰 Продать</button>
+                <button class="market-tab-main ${marketCreateMode === 'buy' ? 'active' : ''}"
+                        onclick="switchMarketCreateMode('buy')">🛒 Купить</button>
+            </div>
+        `;
+
+        if (!marketCreateCardId) {
+            // ===== ВЫБОР КАРТЫ =====
+            let uniqueCards = [];
+            
+            if (marketCreateMode === 'buy') {
+                // Купить — показываем ВСЕ карты игры
+                uniqueCards = [...ALL_CARDS];
+            } else {
+                // Продать — только карты из коллекции
+                const seen = new Set();
+                for (const item of _cardHistory) {
+                    const cid = item.cardId || item.id;
+                    if (!seen.has(cid)) {
+                        seen.add(cid);
+                        const card = getCardById(cid);
+                        if (card) uniqueCards.push(card);
+                    }
+                }
+            }
+            
+            const rankOrder = ['M','T','K','Y','U','Q','R','Z','O','H','N','V','L'];
+            uniqueCards.sort((a,b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
+
+            // Заголовок с подсказкой
+            const hintText = marketCreateMode === 'buy'
+                ? `💡 Выберите карту, которую хотите купить (${uniqueCards.length} карт в игре)`
+                : `💡 Выберите карту из коллекции (${uniqueCards.length} карт у вас)`;
+
+            bodyHtml += `<div class="form-hint" style="margin-bottom:12px;">${hintText}</div>`;
+
+            // Если пусто
+            if (uniqueCards.length === 0) {
+                bodyHtml += `<div class="market-empty">
+                    <div class="icon">📭</div>
+                    <div class="title">У вас нет карт</div>
+                    <div class="desc">Откройте паки, чтобы получить карты</div>
+                </div>`;
+            } else {
+                // Поиск (только для buy, чтобы удобнее искать среди всех)
+                if (marketCreateMode === 'buy') {
+                    bodyHtml += `
+                        <div class="search-bar" style="margin-bottom:12px;">
+                            <input type="text" class="search-input" id="marketCreateSearch"
+                                   placeholder="🔍 Поиск по названию или рангу..."
+                                   oninput="filterMarketCreateCards()">
+                        </div>
+                    `;
+                }
+
+                // Фильтр по рангу (только для buy)
+                if (marketCreateMode === 'buy') {
+                    bodyHtml += `
+                        <div class="market-sub-tabs" style="margin-bottom:10px;" id="marketCreateRankFilter">
+                            <button class="market-sub-tab active" data-crank="all" onclick="filterMarketCreateByRank('all', this)">Все</button>
+                            <button class="market-sub-tab" data-crank="M" onclick="filterMarketCreateByRank('M', this)">M</button>
+                            <button class="market-sub-tab" data-crank="T" onclick="filterMarketCreateByRank('T', this)">T</button>
+                            <button class="market-sub-tab" data-crank="K" onclick="filterMarketCreateByRank('K', this)">K</button>
+                            <button class="market-sub-tab" data-crank="Y" onclick="filterMarketCreateByRank('Y', this)">Y</button>
+                            <button class="market-sub-tab" data-crank="U" onclick="filterMarketCreateByRank('U', this)">U</button>
+                            <button class="market-sub-tab" data-crank="Q" onclick="filterMarketCreateByRank('Q', this)">Q</button>
+                            <button class="market-sub-tab" data-crank="R" onclick="filterMarketCreateByRank('R', this)">R</button>
+                            <button class="market-sub-tab" data-crank="Z" onclick="filterMarketCreateByRank('Z', this)">Z</button>
+                            <button class="market-sub-tab" data-crank="O" onclick="filterMarketCreateByRank('O', this)">O</button>
+                        </div>
+                    `;
+                }
+
+                bodyHtml += `<div class="market-card-grid" id="marketCreateCardsGrid">`;
+                bodyHtml += uniqueCards.map(card => {
+                    const img = getCardImage(card);
+                    const count = _cardHistory.filter(c => (c.cardId || c.id) === card.id).length;
+                    const ownedBadge = marketCreateMode === 'buy'
+                        ? (count > 0
+                            ? `<div style="position:absolute;bottom:4px;right:4px;font-size:8px;background:rgba(68,255,68,0.2);color:#44ff44;padding:1px 5px;border-radius:8px;font-weight:700;">✅ есть</div>`
+                            : `<div style="position:absolute;bottom:4px;right:4px;font-size:8px;background:rgba(255,107,107,0.2);color:#ff6b6b;padding:1px 5px;border-radius:8px;font-weight:700;">❌ нет</div>`)
+                        : '';
+                    return `<div class="market-select-card"
+                                 style="--card-color:${card.color};"
+                                 data-card-id="${card.id}"
+                                 data-card-rank="${card.rank}"
+                                 data-card-name="${card.name.toLowerCase()}"
+                                 onclick="selectMarketCreateCard('${card.id}')">
+                        <div class="c-rank">${card.rank}</div>
+                        ${count > 1 ? `<div class="c-count">×${count}</div>` : ''}
+                        ${ownedBadge}
+                        <div class="c-img">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}</div>
+                        <div class="c-name">${card.name}</div>
+                    </div>`;
+                }).join('');
+                bodyHtml += `</div>`;
+            }
+        } else {
+            // ===== НАСТРОЙКА ЦЕНЫ =====
+            const card = getCardById(marketCreateCardId);
+            const imgPath = getCardImage(card);
+            bodyHtml += `
+                <div class="market-preview">
+                    <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
+                        ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
+                    </div>
+                    <div class="market-preview-info">
+                        <div class="name">${card.name}</div>
+                        <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
+                            ${card.rank} — ${card.rarity || ''}
+                        </div>
+                        <div class="set">📚 ${card.set}</div>
+                    </div>
+                </div>
+                <div class="form-hint" style="margin-bottom:12px;">
+                    💡 Выберите ${marketCreateMode === 'sell' ? 'какие карты вы хотите получить' : 'какие карты вы готовы отдать'}.
+                </div>
+                <div class="market-rank-picker">
+                    ${['M','T','K','Y','U','Q','R','Z','O'].map(r => {
+                        const color = getCardColor(r);
+                        const sel = marketCreatePrices.some(p => p.rank === r);
+                        return `<div class="market-rank-opt ${sel ? 'selected' : ''}"
+                                     style="color:${color};border-color:${color};"
+                                     onclick="toggleMarketPriceRank('${r}')">
+                            <div class="r">${r}</div>
+                            <div class="lbl">${RANK_STARS[r] ? r : ''}</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                ${marketCreatePrices.map((p, i) => {
+                    const color = getCardColor(p.rank);
+                    return `<div class="market-qty">
+                        <span style="color:${color};font-weight:900;font-size:18px;width:30px;">${p.rank}</span>
+                        <button onclick="changeMarketPriceCount(${i}, -1)">−</button>
+                        <input type="number" value="${p.count}" min="1" max="99"
+                               onchange="setMarketPriceCount(${i}, this.value)">
+                        <button onclick="changeMarketPriceCount(${i}, 1)">+</button>
+                        <button class="remove" onclick="removeMarketPriceRank(${i})">✕</button>
+                    </div>`;
+                }).join('')}
+            `;
+        }
+
+        modal.querySelector('.modal-body').innerHTML = bodyHtml;
+
+        modal.querySelector('.modal-actions').innerHTML = `
+            <button class="modal-btn close" onclick="closeMarketModal()">Отмена</button>
+            ${marketCreateCardId ? `
+                <button class="modal-btn upgrade" onclick="submitMarketCreate()"
+                        ${marketCreatePrices.length === 0 ? 'disabled' : ''}>
+                    📤 ${marketCreateMode === 'sell' ? 'Выставить' : 'Создать'}
+                </button>
+            ` : ''}
+        `;
+    }
+
+    // Фильтр карт при создании заявки/лота
+    let marketCreateCurrentRank = 'all';
+
+    function filterMarketCreateByRank(rank, btn) {
+        marketCreateCurrentRank = rank;
+        document.querySelectorAll('#marketCreateRankFilter .market-sub-tab').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        filterMarketCreateCards();
+    }
+
+    function filterMarketCreateCards() {
+        const grid = document.getElementById('marketCreateCardsGrid');
+        if (!grid) return;
+
+        const search = (document.getElementById('marketCreateSearch')?.value || '').toLowerCase().trim();
+        const cards = grid.querySelectorAll('.market-select-card');
+
+        cards.forEach(cardEl => {
+            const rank = cardEl.dataset.cardRank;
+            const name = cardEl.dataset.cardName;
+
+            const matchRank = marketCreateCurrentRank === 'all' || rank === marketCreateCurrentRank;
+            const matchSearch = !search || name.includes(search) || rank.toLowerCase().includes(search);
+
+            if (matchRank && matchSearch) {
+                cardEl.style.display = '';
+            } else {
+                cardEl.style.display = 'none';
+            }
+        });
+    }
+
+    function switchMarketCreateMode(mode) {
+        marketCreateMode = mode;
+        marketCreateCardId = null;
+        marketCreatePrices = [];
+        marketCreateCurrentRank = 'all';
+        renderCreateMarketModal();
+    }
+
+    function selectMarketCreateCard(cardId) {
+        marketCreateCardId = cardId;
+        marketCreatePrices = [];
+        renderCreateMarketModal();
+    }
+
+    function toggleMarketPriceRank(rank) {
+        const idx = marketCreatePrices.findIndex(p => p.rank === rank);
+        if (idx !== -1) marketCreatePrices.splice(idx, 1);
+        else {
+            if (marketCreatePrices.length >= 3) { showToast('❌ Максимум 3 ранга', '#ffaa88'); return; }
+            marketCreatePrices.push({ rank, count: 1 });
+        }
+        renderCreateMarketModal();
+    }
+
+    function changeMarketPriceCount(i, d) {
+        if (!marketCreatePrices[i]) return;
+        marketCreatePrices[i].count = Math.max(1, Math.min(99, marketCreatePrices[i].count + d));
+        renderCreateMarketModal();
+    }
+
+    function setMarketPriceCount(i, v) {
+        if (!marketCreatePrices[i]) return;
+        marketCreatePrices[i].count = Math.max(1, Math.min(99, parseInt(v) || 1));
+    }
+
+    function removeMarketPriceRank(i) {
+        marketCreatePrices.splice(i, 1);
+        renderCreateMarketModal();
+    }
+
+    async function submitMarketCreate() {
+        if (!marketCreateCardId || marketCreatePrices.length === 0) return;
+
+        const totalActive = marketMyLots.length + marketMyOrders.length;
+        if (totalActive >= MARKET_MAX_LOTS) { showToast('❌ Лимит активных', '#ff6b6b'); return; }
+
+        if (marketCreateMode === 'sell') {
+            if (!marketHasCard(marketCreateCardId)) { showToast('❌ Нет карты', '#ff6b6b'); return; }
+            marketRemoveCard(marketCreateCardId);
+            const card = getCardById(marketCreateCardId);
+            await supabaseClient.from('market_sell_lots').insert({
+                seller_id: _playerId,
+                seller_name: _playerName,
+                seller_avatar: '🧙',
+                card_id: marketCreateCardId,
+                price: marketCreatePrices
+            });
+            showToast(`✅ Лот создан: ${card.name}`, '#44ff44');
+        } else {
+            await supabaseClient.from('market_buy_orders').insert({
+                buyer_id: _playerId,
+                buyer_name: _playerName,
+                buyer_avatar: '🧙',
+                card_id: marketCreateCardId,
+                offer: marketCreatePrices
+            });
+            showToast('✅ Заявка создана', '#44ff44');
+        }
+
+        saveGame(); updateUI(); renderCollection();
+        closeMarketModal();
+        marketCreateCardId = null;
+        marketCreatePrices = [];
+        await loadMarketData();
+    }
+
+    // ============================================================
+    // ПЕРЕКЛЮЧАТЕЛИ
+    // ============================================================
+
+    document.addEventListener('click', function(e) {
+        const mtab = e.target.closest('.market-tab-main');
+        if (mtab && mtab.dataset.mtab) {
+            document.querySelectorAll('.market-tab-main').forEach(t => t.classList.remove('active'));
+            mtab.classList.add('active');
+            marketCurrentTab = mtab.dataset.mtab;
+            document.getElementById('market-tab-sell').style.display = marketCurrentTab === 'sell' ? 'block' : 'none';
+            document.getElementById('market-tab-buy').style.display = marketCurrentTab === 'buy' ? 'block' : 'none';
+            document.getElementById('market-tab-mine').style.display = marketCurrentTab === 'mine' ? 'block' : 'none';
+            renderMarketContent();
+        }
+        const msub = e.target.closest('.market-sub-tab');
+        if (msub && msub.dataset.msub) {
+            document.querySelectorAll('[data-msub]').forEach(t => t.classList.remove('active'));
+            msub.classList.add('active');
+            marketSubTab = msub.dataset.msub;
+            renderMarketSellLots();
+        }
+        if (msub && msub.dataset.msubBuy) {
+            document.querySelectorAll('[data-msub-buy]').forEach(t => t.classList.remove('active'));
+            msub.classList.add('active');
+            marketBuySubTab = msub.dataset.msubBuy;
+            renderMarketBuyOrders();
+        }
+    });
+
+    document.addEventListener('input', function(e) {
+        if (e.target.id === 'marketSellSearch') renderMarketSellLots();
+        if (e.target.id === 'marketBuySearch') renderMarketBuyOrders();
+    });
+
+    // Realtime
+    function subscribeToMarket() {
+        if (!supabaseClient || marketChannel) return;
+        marketChannel = supabaseClient.channel('market-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'market_sell_lots' }, () => loadMarketData())
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'market_buy_orders' }, () => loadMarketData())
+            .subscribe();
+    }
 
     function showToast(message, color = '#b388ff') {
         const toast = document.createElement('div');
@@ -6066,6 +7707,8 @@
             syncToSupabase();
         }
 
+        setTimeout(loadMarketData, 3000);
+
         if (supabaseClient && _playerId && _playerName) syncToSupabase();
     }
 
@@ -6138,6 +7781,7 @@
             loadTopFromSupabase();
             setTimeout(() => { subscribeToChatSection(); setupChatPollingSection(); }, 2000);
             setTimeout(() => { subscribeToTrades(); loadTrades(); }, 3000);
+            setTimeout(() => { subscribeToMarket(); loadMarketData(); }, 3500);
         };
         document.head.appendChild(script);
     }
@@ -8113,7 +9757,8 @@
             'packs': 'section-packs', 'event': 'section-event',
             'chat': 'section-chat', 'trade': 'section-trade',
             'top': 'section-top', 'profile': 'section-profile',
-            'settings': 'section-settings', 'minigames': 'section-minigames'
+            'settings': 'section-settings', 'minigames': 'section-minigames',
+            'market': 'section-market'
         };
         const target = document.getElementById(map[section]);
         if (target) target.classList.add('active');
@@ -8134,6 +9779,9 @@
                 fgUpdateSideStats();
                 fgUpdateDailyUI();
             }, 50);
+        }
+        if (section === 'market') {
+            setTimeout(() => { loadMarketData(); subscribeToMarket(); }, 100);
         }
         if (section === 'trade') {
             setTimeout(async () => { await loadTrades(); await renderSenderCards(); renderReceiverCards(); }, 100);
@@ -8352,6 +10000,21 @@
     window.loadCardComments = loadCardComments;
     window.chooseCardFromSelect = chooseCardFromSelect;
     window.claimHourlyBonus = claimHourlyBonus;
+    window.openSellLotDetail = openSellLotDetail;
+    window.openBuyOrderDetail = openBuyOrderDetail;
+    window.buySellLot = buySellLot;
+    window.cancelSellLot = cancelSellLot;
+    window.sellToBuyOrder = sellToBuyOrder;
+    window.cancelBuyOrder = cancelBuyOrder;
+    window.openCreateMarketModal = openCreateMarketModal;
+    window.switchMarketCreateMode = switchMarketCreateMode;
+    window.selectMarketCreateCard = selectMarketCreateCard;
+    window.toggleMarketPriceRank = toggleMarketPriceRank;
+    window.changeMarketPriceCount = changeMarketPriceCount;
+    window.setMarketPriceCount = setMarketPriceCount;
+    window.removeMarketPriceRank = removeMarketPriceRank;
+    window.submitMarketCreate = submitMarketCreate;
+    window.closeMarketModal = closeMarketModal;
 
     console.log('⚡ Arcana Nexus — XP Edition загружен!');
 </script>
