@@ -5859,38 +5859,141 @@
 
     async function sellToBuyOrder(orderId) {
         const order = marketBuyOrders.find(o => o.id === orderId);
-        if (!order) return;
-        if (!marketHasCard(order.card_id)) { showToast('❌ Нет карты', '#ff6b6b'); return; }
-        if (!confirm(`Продать ${getCardById(order.card_id)?.name}?`)) return;
+        if (!order) { showToast('❌ Заявка не найдена', '#ff6b6b'); return; }
+        
+        // Проверки
+        if (order.buyer_id === _playerId) { 
+            showToast('❌ Это ваша заявка', '#ff6b6b'); 
+            return; 
+        }
+        if (!marketHasCard(order.card_id)) { 
+            showToast('❌ У вас нет этой карты', '#ff6b6b'); 
+            return; 
+        }
+        
+        // Проверка истечения
+        if (order.expires_at && new Date(order.expires_at) < new Date()) {
+            showToast('❌ Заявка истекла', '#ff6b6b');
+            await supabaseClient.from('market_buy_orders')
+                .update({ status: 'expired' }).eq('id', orderId);
+            await loadMarketData();
+            return;
+        }
+        
+        // Подтверждение
+        const card = getCardById(order.card_id);
+        if (!confirm(`Продать «${card.name}» за ${(order.offer_cards || []).length} карт?`)) return;
 
-        // Списываем карту
-        marketRemoveCard(order.card_id);
-        // Даём награду (карты указанных рангов)
-        for (const p of order.offer || []) {
-            let remaining = p.count;
-            for (let i = 0; i < ALL_CARDS.length && remaining > 0; i++) {
-                if (ALL_CARDS[i].rank === p.rank) {
-                    marketAddCard(ALL_CARDS[i].id);
-                    remaining--;
+        // Показываем загрузку
+        showToast('⏳ Обмен...', '#ffaa88');
+
+        try {
+            // 1. Списываем карту у продавца
+            marketRemoveCard(order.card_id);
+
+            // 2. Забираем залог — конкретные карты из заявки
+            const offerCards = order.offer_cards || [];
+            for (const cardId of offerCards) {
+                marketAddCard(cardId);
+            }
+
+            // 3. Обновляем заявку в БД
+            const { error } = await supabaseClient
+                .from('market_buy_orders')
+                .update({
+                    status: 'fulfilled',
+                    seller_id: _playerId,
+                    seller_name: _playerName,
+                    completed_at: new Date().toISOString()
+                })
+                .eq('id', orderId);
+
+            if (error) throw error;
+
+            // 4. Синхронизация карт с Supabase
+            saveGame();
+            updateUI();
+            renderCollection();
+            if (typeof syncCardOwners === 'function') syncCardOwners();
+
+            // 5. Уведомление покупателю (через отдельную таблицу notifications)
+            if (supabaseClient && order.buyer_id) {
+                try {
+                    await supabaseClient.from('notifications').insert({
+                        player_id: order.buyer_id,
+                        type: 'order_fulfilled',
+                        title: '🎉 Ваша заявка исполнена!',
+                        message: `${_playerName} продал вам «${card.name}»`,
+                        data: { order_id: orderId, card_id: order.card_id },
+                        created_at: new Date().toISOString()
+                    });
+                } catch(e) {
+                    console.warn('Уведомление не отправилось:', e);
                 }
             }
+
+            // 6. Вибрация
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+            // 7. Показываем результат
+            const grouped = {};
+            offerCards.forEach(cid => {
+                const c = getCardById(cid);
+                if (c) grouped[c.rank] = (grouped[c.rank] || 0) + 1;
+            });
+            const receivedStr = Object.entries(grouped)
+                .map(([rank, count]) => `${rank}×${count}`)
+                .join(' + ') || '—';
+
+            showToast(`✅ Продано! Получено: ${receivedStr}`, '#44ff44');
+
+            await loadMarketData();
+            if (typeof closeMarketModal === 'function') closeMarketModal();
+
+        } catch(e) {
+            console.error('sellToBuyOrder error:', e);
+            showToast('❌ Ошибка обмена', '#ff6b6b');
+            // Откатываем локальные изменения
+            await loadMarketData();
+            if (supabaseClient && _playerId && _playerName) {
+                try {
+                    const { data } = await supabaseClient.from('leaderboard')
+                        .select('cards_json').eq('player_id', _playerId).single();
+                    if (data && data.cards_json) {
+                        _cardHistory = data.cards_json.map(c => ({
+                            cardId: c.cardId || c.id,
+                            rank: c.rank,
+                            text: c.text || `🎴 ${c.rank}`,
+                            uniqueId: c.uniqueId || Date.now()
+                        }));
+                        saveGame(); updateUI(); renderCollection();
+                    }
+                } catch(e2) { console.warn('Откат не удался:', e2); }
+            }
         }
-        await supabaseClient.from('market_buy_orders').update({
-            status: 'fulfilled', seller_id: _playerId, seller_name: _playerName,
-            completed_at: new Date().toISOString()
-        }).eq('id', orderId);
-        showToast('✅ Продано!', '#44ff44');
-        saveGame(); updateUI(); renderCollection();
-        await loadMarketData();
-        if (typeof closeModal === 'function') closeModal();
     }
 
     async function cancelBuyOrder(orderId) {
-        if (!confirm('Отменить заявку?')) return;
+        const order = marketBuyOrders.find(o => o.id === orderId);
+        if (!order) return;
+        if (order.buyer_id !== _playerId) {
+            showToast('❌ Не ваша заявка', '#ff6b6b');
+            return;
+        }
+        if (!confirm('Отменить заявку? Карты вернутся в коллекцию.')) return;
+
+        // Возвращаем карты
+        const offerCards = order.offer_cards || [];
+        for (const cardId of offerCards) {
+            marketAddCard(cardId);
+        }
+
         await supabaseClient.from('market_buy_orders').update({ status: 'cancelled' }).eq('id', orderId);
-        showToast('🚫 Отменено', '#ffaa88');
+        showToast(`🚫 Заявка отменена, возвращено ${offerCards.length} карт`, '#ffaa88');
+
+        saveGame(); updateUI(); renderCollection();
         await loadMarketData();
-        if (typeof closeModal === 'function') closeModal();
+        if (typeof closeMarketModal === 'function') closeMarketModal();
     }
 
     // ============================================================
@@ -5979,7 +6082,20 @@
         const isMine = order.buyer_id === _playerId;
         const canSell = !isMine && marketHasCard(order.card_id);
 
-        const offerHtml = (order.offer || []).map(p => {
+        const offerCards = order.offer_cards || [];
+        const offerRanks = order.offer_ranks || [];
+        const grouped = {};
+        if (offerCards.length > 0) {
+            offerCards.forEach(cid => {
+                const c = getCardById(cid);
+                if (c) grouped[c.rank] = (grouped[c.rank] || 0) + 1;
+            });
+        }
+        const offerList = offerCards.length > 0
+            ? Object.entries(grouped).map(([rank, count]) => ({ rank, count }))
+            : offerRanks;
+
+        const offerHtml = offerList.map(p => {
             const color = getCardColor(p.rank);
             return `<div class="market-price-big" style="border-color:${color};color:${color};">
                 <div class="rank">${p.rank}</div><div class="count">×${p.count}</div>
@@ -6044,6 +6160,8 @@
     let marketCreateMode = 'sell';
     let marketCreateCardId = null;
     let marketCreatePrices = [];
+    let marketBuyStep = 1;
+    let marketCreateOfferCards = []; 
 
     function openCreateMarketModal() {
         const totalActive = marketMyLots.length + marketMyOrders.length;
@@ -6071,15 +6189,164 @@
             </div>
         `;
 
-        if (!marketCreateCardId) {
-            // ===== ВЫБОР КАРТЫ =====
-            let uniqueCards = [];
-            
-            if (marketCreateMode === 'buy') {
-                // Купить — показываем ВСЕ карты игры
-                uniqueCards = [...ALL_CARDS];
-            } else {
-                // Продать — только карты из коллекции
+        if (marketCreateMode === 'buy') {
+            // ===== ЗАЯВКА НА ПОКУПКУ =====
+            if (marketBuyStep === 1) {
+                // ШАГ 1: какую карту хотим купить
+                const allCards = [...ALL_CARDS];
+                const rankOrder = ['M','T','K','Y','U','Q','R','Z','O','H','N','V','L'];
+                allCards.sort((a,b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
+
+                bodyHtml += `
+                    <div class="form-hint" style="margin-bottom:12px;">
+                        <b>Шаг 1 из 2.</b> Какую карту вы хотите купить?
+                    </div>
+                    <div class="search-bar" style="margin-bottom:12px;">
+                        <input type="text" class="search-input" id="marketCreateSearch"
+                               placeholder="🔍 Поиск по названию или рангу..."
+                               oninput="filterMarketCreateCards()">
+                    </div>
+                    <div class="market-sub-tabs" style="margin-bottom:10px;" id="marketCreateRankFilter">
+                        <button class="market-sub-tab active" data-crank="all" onclick="filterMarketCreateByRank('all', this)">Все</button>
+                        <button class="market-sub-tab" data-crank="M" onclick="filterMarketCreateByRank('M', this)">M</button>
+                        <button class="market-sub-tab" data-crank="T" onclick="filterMarketCreateByRank('T', this)">T</button>
+                        <button class="market-sub-tab" data-crank="K" onclick="filterMarketCreateByRank('K', this)">K</button>
+                        <button class="market-sub-tab" data-crank="Y" onclick="filterMarketCreateByRank('Y', this)">Y</button>
+                        <button class="market-sub-tab" data-crank="U" onclick="filterMarketCreateByRank('U', this)">U</button>
+                        <button class="market-sub-tab" data-crank="Q" onclick="filterMarketCreateByRank('Q', this)">Q</button>
+                        <button class="market-sub-tab" data-crank="R" onclick="filterMarketCreateByRank('R', this)">R</button>
+                        <button class="market-sub-tab" data-crank="Z" onclick="filterMarketCreateByRank('Z', this)">Z</button>
+                        <button class="market-sub-tab" data-crank="O" onclick="filterMarketCreateByRank('O', this)">O</button>
+                    </div>
+                    <div class="market-card-grid" id="marketCreateCardsGrid">
+                        ${allCards.map(card => {
+                            const img = getCardImage(card);
+                            const count = _cardHistory.filter(c => (c.cardId || c.id) === card.id).length;
+                            return `<div class="market-select-card"
+                                         style="--card-color:${card.color};"
+                                         data-card-id="${card.id}"
+                                         data-card-rank="${card.rank}"
+                                         data-card-name="${card.name.toLowerCase()}"
+                                         onclick="selectMarketCreateCard('${card.id}')">
+                                <div class="c-rank">${card.rank}</div>
+                                ${count > 0 ? `<div class="c-count" style="background:linear-gradient(135deg,#44ff44,#2ecc71);">✅${count}</div>` : ''}
+                                <div class="c-img">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}</div>
+                                <div class="c-name">${card.name}</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
+            } else if (marketBuyStep === 2) {
+                // ШАГ 2: какую карту(ы) отдаём
+                const targetCard = getCardById(marketCreateCardId);
+                const imgPath = getCardImage(targetCard);
+
+                // Свои уникальные карты
+                const uniqueMyCards = [];
+                const seen = new Set();
+                for (const item of _cardHistory) {
+                    const cid = item.cardId || item.id;
+                    if (!seen.has(cid)) {
+                        seen.add(cid);
+                        const card = getCardById(cid);
+                        if (card) uniqueMyCards.push(card);
+                    }
+                }
+                const rankOrder = ['M','T','K','Y','U','Q','R','Z','O','H','N','V','L'];
+                uniqueMyCards.sort((a,b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
+
+                // Выбранная сумма
+                const selectedIds = marketCreateOfferCards;
+                const totalSelected = selectedIds.length;
+
+                bodyHtml += `
+                    <div class="market-preview">
+                        <div class="market-preview-img" style="color:${targetCard.color};border-color:${targetCard.color};">
+                            ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${targetCard.rank}'">` : targetCard.rank}
+                        </div>
+                        <div class="market-preview-info">
+                            <div style="font-size:11px;color:#6b7084;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">Вы хотите купить</div>
+                            <div class="name">${targetCard.name}</div>
+                            <div class="rank-badge" style="background:${targetCard.color}22;color:${targetCard.color};border:1px solid ${targetCard.color}55;">
+                                ${targetCard.rank} — ${targetCard.rarity || ''}
+                            </div>
+                            <div class="set">📚 ${targetCard.set}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-hint" style="margin-bottom:12px;">
+                        <b>Шаг 2 из 2.</b> Выберите карты, которые отдадите за неё.
+                        Они <b>сразу спишутся</b> из коллекции и вернутся, если отмените заявку.
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <span style="font-size:12px;color:#8b90a8;font-weight:700;">
+                            🎴 Ваши карты (${uniqueMyCards.length})
+                        </span>
+                        <span style="font-size:12px;color:#b388ff;font-weight:700;">
+                            Выбрано: ${totalSelected}
+                        </span>
+                    </div>
+                `;
+
+                if (uniqueMyCards.length === 0) {
+                    bodyHtml += `<div class="market-empty">
+                        <div class="icon">📭</div>
+                        <div class="title">У вас нет карт</div>
+                        <div class="desc">Нечего предложить</div>
+                    </div>`;
+                } else {
+                    bodyHtml += `<div class="market-card-grid" id="marketCreateCardsGrid">`;
+                    bodyHtml += uniqueMyCards.map(card => {
+                        const img = getCardImage(card);
+                        const count = _cardHistory.filter(c => (c.cardId || c.id) === card.id).length;
+                        // Сколько уже выбрано
+                        const selectedCount = selectedIds.filter(id => id === card.id).length;
+                        const maxed = selectedCount >= count;
+
+                        return `<div class="market-select-card ${selectedCount > 0 ? 'selected' : ''}"
+                                     style="--card-color:${card.color};${selectedCount > 0 ? 'box-shadow:0 0 0 2px #b388ff, 0 0 20px rgba(123,77,255,0.4);' : ''}"
+                                     data-card-id="${card.id}"
+                                     onclick="${maxed ? '' : `toggleMarketOfferCard('${card.id}')`}"
+                                     title="${maxed ? 'Все копии выбраны' : 'Выбрать'}">
+                            <div class="c-rank">${card.rank}</div>
+                            ${count > 1 ? `<div class="c-count">${selectedCount}/${count}</div>` : (selectedCount > 0 ? `<div class="c-count">✅</div>` : '')}
+                            <div class="c-img">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}</div>
+                            <div class="c-name">${card.name}</div>
+                            ${selectedCount > 0 ? `<div style="position:absolute;bottom:4px;right:4px;font-size:9px;font-weight:900;color:#b388ff;">×${selectedCount}</div>` : ''}
+                        </div>`;
+                    }).join('');
+                    bodyHtml += `</div>`;
+                }
+
+                // Показ того, что уже выбрано
+                if (totalSelected > 0) {
+                    const grouped = {};
+                    selectedIds.forEach(id => {
+                        grouped[id] = (grouped[id] || 0) + 1;
+                    });
+                    const tags = Object.entries(grouped).map(([id, count]) => {
+                        const c = getCardById(id);
+                        if (!c) return '';
+                        return `<div class="market-price-tag" style="border-color:${c.color};color:${c.color};">
+                            <span class="r">${c.rank}</span>
+                            <span class="c">×${count}</span>
+                        </div>`;
+                    }).join('');
+
+                    bodyHtml += `
+                        <div class="market-check-block" style="margin-top:14px;">
+                            <div class="market-check-title">💎 Вы отдаёте (${totalSelected})</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">${tags}</div>
+                        </div>
+                    `;
+                }
+            }
+        } else {
+            // ===== ПРОДАЖА (как было) =====
+            if (!marketCreateCardId) {
+                // Выбор карты из коллекции
+                const uniqueCards = [];
                 const seen = new Set();
                 for (const item of _cardHistory) {
                     const cid = item.cardId || item.id;
@@ -6089,136 +6356,110 @@
                         if (card) uniqueCards.push(card);
                     }
                 }
-            }
-            
-            const rankOrder = ['M','T','K','Y','U','Q','R','Z','O','H','N','V','L'];
-            uniqueCards.sort((a,b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
+                const rankOrder = ['M','T','K','Y','U','Q','R','Z','O','H','N','V','L'];
+                uniqueCards.sort((a,b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
 
-            // Заголовок с подсказкой
-            const hintText = marketCreateMode === 'buy'
-                ? `💡 Выберите карту, которую хотите купить (${uniqueCards.length} карт в игре)`
-                : `💡 Выберите карту из коллекции (${uniqueCards.length} карт у вас)`;
-
-            bodyHtml += `<div class="form-hint" style="margin-bottom:12px;">${hintText}</div>`;
-
-            // Если пусто
-            if (uniqueCards.length === 0) {
-                bodyHtml += `<div class="market-empty">
-                    <div class="icon">📭</div>
-                    <div class="title">У вас нет карт</div>
-                    <div class="desc">Откройте паки, чтобы получить карты</div>
+                bodyHtml += `<div class="form-hint" style="margin-bottom:12px;">
+                    💡 Выберите карту, которую хотите продать (${uniqueCards.length} у вас).
                 </div>`;
-            } else {
-                // Поиск (только для buy, чтобы удобнее искать среди всех)
-                if (marketCreateMode === 'buy') {
-                    bodyHtml += `
-                        <div class="search-bar" style="margin-bottom:12px;">
-                            <input type="text" class="search-input" id="marketCreateSearch"
-                                   placeholder="🔍 Поиск по названию или рангу..."
-                                   oninput="filterMarketCreateCards()">
-                        </div>
-                    `;
-                }
 
-                // Фильтр по рангу (только для buy)
-                if (marketCreateMode === 'buy') {
-                    bodyHtml += `
-                        <div class="market-sub-tabs" style="margin-bottom:10px;" id="marketCreateRankFilter">
-                            <button class="market-sub-tab active" data-crank="all" onclick="filterMarketCreateByRank('all', this)">Все</button>
-                            <button class="market-sub-tab" data-crank="M" onclick="filterMarketCreateByRank('M', this)">M</button>
-                            <button class="market-sub-tab" data-crank="T" onclick="filterMarketCreateByRank('T', this)">T</button>
-                            <button class="market-sub-tab" data-crank="K" onclick="filterMarketCreateByRank('K', this)">K</button>
-                            <button class="market-sub-tab" data-crank="Y" onclick="filterMarketCreateByRank('Y', this)">Y</button>
-                            <button class="market-sub-tab" data-crank="U" onclick="filterMarketCreateByRank('U', this)">U</button>
-                            <button class="market-sub-tab" data-crank="Q" onclick="filterMarketCreateByRank('Q', this)">Q</button>
-                            <button class="market-sub-tab" data-crank="R" onclick="filterMarketCreateByRank('R', this)">R</button>
-                            <button class="market-sub-tab" data-crank="Z" onclick="filterMarketCreateByRank('Z', this)">Z</button>
-                            <button class="market-sub-tab" data-crank="O" onclick="filterMarketCreateByRank('O', this)">O</button>
-                        </div>
-                    `;
-                }
-
-                bodyHtml += `<div class="market-card-grid" id="marketCreateCardsGrid">`;
-                bodyHtml += uniqueCards.map(card => {
-                    const img = getCardImage(card);
-                    const count = _cardHistory.filter(c => (c.cardId || c.id) === card.id).length;
-                    const ownedBadge = marketCreateMode === 'buy'
-                        ? (count > 0
-                            ? `<div style="position:absolute;bottom:4px;right:4px;font-size:8px;background:rgba(68,255,68,0.2);color:#44ff44;padding:1px 5px;border-radius:8px;font-weight:700;">✅ есть</div>`
-                            : `<div style="position:absolute;bottom:4px;right:4px;font-size:8px;background:rgba(255,107,107,0.2);color:#ff6b6b;padding:1px 5px;border-radius:8px;font-weight:700;">❌ нет</div>`)
-                        : '';
-                    return `<div class="market-select-card"
-                                 style="--card-color:${card.color};"
-                                 data-card-id="${card.id}"
-                                 data-card-rank="${card.rank}"
-                                 data-card-name="${card.name.toLowerCase()}"
-                                 onclick="selectMarketCreateCard('${card.id}')">
-                        <div class="c-rank">${card.rank}</div>
-                        ${count > 1 ? `<div class="c-count">×${count}</div>` : ''}
-                        ${ownedBadge}
-                        <div class="c-img">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}</div>
-                        <div class="c-name">${card.name}</div>
+                if (uniqueCards.length === 0) {
+                    bodyHtml += `<div class="market-empty">
+                        <div class="icon">📭</div>
+                        <div class="title">У вас нет карт</div>
                     </div>`;
-                }).join('');
-                bodyHtml += `</div>`;
-            }
-        } else {
-            // ===== НАСТРОЙКА ЦЕНЫ =====
-            const card = getCardById(marketCreateCardId);
-            const imgPath = getCardImage(card);
-            bodyHtml += `
-                <div class="market-preview">
-                    <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
-                        ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
-                    </div>
-                    <div class="market-preview-info">
-                        <div class="name">${card.name}</div>
-                        <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
-                            ${card.rank} — ${card.rarity || ''}
+                } else {
+                    bodyHtml += `<div class="market-card-grid" id="marketCreateCardsGrid">`;
+                    bodyHtml += uniqueCards.map(card => {
+                        const img = getCardImage(card);
+                        const count = _cardHistory.filter(c => (c.cardId || c.id) === card.id).length;
+                        return `<div class="market-select-card"
+                                     style="--card-color:${card.color};"
+                                     onclick="selectMarketCreateCard('${card.id}')">
+                            <div class="c-rank">${card.rank}</div>
+                            ${count > 1 ? `<div class="c-count">×${count}</div>` : ''}
+                            <div class="c-img">${img ? `<img src="${img}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}</div>
+                            <div class="c-name">${card.name}</div>
+                        </div>`;
+                    }).join('');
+                    bodyHtml += `</div>`;
+                }
+            } else {
+                // Настройка цены (какие ранги хотим получить)
+                const card = getCardById(marketCreateCardId);
+                const imgPath = getCardImage(card);
+                bodyHtml += `
+                    <div class="market-preview">
+                        <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
+                            ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
                         </div>
-                        <div class="set">📚 ${card.set}</div>
+                        <div class="market-preview-info">
+                            <div class="name">${card.name}</div>
+                            <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
+                                ${card.rank} — ${card.rarity || ''}
+                            </div>
+                            <div class="set">📚 ${card.set}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-hint" style="margin-bottom:12px;">
-                    💡 Выберите ${marketCreateMode === 'sell' ? 'какие карты вы хотите получить' : 'какие карты вы готовы отдать'}.
-                </div>
-                <div class="market-rank-picker">
-                    ${['M','T','K','Y','U','Q','R','Z','O'].map(r => {
-                        const color = getCardColor(r);
-                        const sel = marketCreatePrices.some(p => p.rank === r);
-                        return `<div class="market-rank-opt ${sel ? 'selected' : ''}"
-                                     style="color:${color};border-color:${color};"
-                                     onclick="toggleMarketPriceRank('${r}')">
-                            <div class="r">${r}</div>
-                            <div class="lbl">${RANK_STARS[r] ? r : ''}</div>
+                    <div class="form-hint" style="margin-bottom:12px;">
+                        💡 Выберите, <b>какие карты вы хотите получить</b> взамен.
+                    </div>
+                    <div class="market-rank-picker">
+                        ${['M','T','K','Y','U','Q','R','Z','O'].map(r => {
+                            const color = getCardColor(r);
+                            const sel = marketCreatePrices.some(p => p.rank === r);
+                            return `<div class="market-rank-opt ${sel ? 'selected' : ''}"
+                                         style="color:${color};border-color:${color};"
+                                         onclick="toggleMarketPriceRank('${r}')">
+                                <div class="r">${r}</div>
+                                <div class="lbl">${r}</div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                    ${marketCreatePrices.map((p, i) => {
+                        const color = getCardColor(p.rank);
+                        return `<div class="market-qty">
+                            <span style="color:${color};font-weight:900;font-size:18px;width:30px;">${p.rank}</span>
+                            <button onclick="changeMarketPriceCount(${i}, -1)">−</button>
+                            <input type="number" value="${p.count}" min="1" max="99"
+                                   onchange="setMarketPriceCount(${i}, this.value)">
+                            <button onclick="changeMarketPriceCount(${i}, 1)">+</button>
+                            <button class="remove" onclick="removeMarketPriceRank(${i})">✕</button>
                         </div>`;
                     }).join('')}
-                </div>
-                ${marketCreatePrices.map((p, i) => {
-                    const color = getCardColor(p.rank);
-                    return `<div class="market-qty">
-                        <span style="color:${color};font-weight:900;font-size:18px;width:30px;">${p.rank}</span>
-                        <button onclick="changeMarketPriceCount(${i}, -1)">−</button>
-                        <input type="number" value="${p.count}" min="1" max="99"
-                               onchange="setMarketPriceCount(${i}, this.value)">
-                        <button onclick="changeMarketPriceCount(${i}, 1)">+</button>
-                        <button class="remove" onclick="removeMarketPriceRank(${i})">✕</button>
-                    </div>`;
-                }).join('')}
-            `;
+                `;
+            }
         }
 
         modal.querySelector('.modal-body').innerHTML = bodyHtml;
 
-        modal.querySelector('.modal-actions').innerHTML = `
-            <button class="modal-btn close" onclick="closeMarketModal()">Отмена</button>
-            ${marketCreateCardId ? `
-                <button class="modal-btn upgrade" onclick="submitMarketCreate()"
-                        ${marketCreatePrices.length === 0 ? 'disabled' : ''}>
-                    📤 ${marketCreateMode === 'sell' ? 'Выставить' : 'Создать'}
-                </button>
-            ` : ''}
-        `;
+        // Кнопки действий
+        let actionsHtml = `<button class="modal-btn close" onclick="closeMarketModal()">Отмена</button>`;
+
+        if (marketCreateMode === 'buy') {
+            if (marketBuyStep === 1 && marketCreateCardId) {
+                actionsHtml += `<button class="modal-btn upgrade" onclick="marketBuyNextStep()">
+                    Далее →
+                </button>`;
+            } else if (marketBuyStep === 2) {
+                actionsHtml = `<button class="modal-btn close" onclick="marketBuyBackStep()">← Назад</button>`;
+                actionsHtml += `<button class="modal-btn upgrade"
+                    onclick="submitMarketCreate()"
+                    ${marketCreateOfferCards.length === 0 ? 'disabled' : ''}>
+                    📤 Создать заявку (${marketCreateOfferCards.length})
+                </button>`;
+            }
+        } else {
+            if (marketCreateCardId) {
+                actionsHtml += `<button class="modal-btn upgrade"
+                    onclick="submitMarketCreate()"
+                    ${marketCreatePrices.length === 0 ? 'disabled' : ''}>
+                    📤 Выставить
+                </button>`;
+            }
+        }
+
+        modal.querySelector('.modal-actions').innerHTML = actionsHtml;
     }
 
     // Фильтр карт при создании заявки/лота
@@ -6257,13 +6498,53 @@
         marketCreateMode = mode;
         marketCreateCardId = null;
         marketCreatePrices = [];
+        marketCreateOfferCards = [];
+        marketBuyStep = 1;
         marketCreateCurrentRank = 'all';
         renderCreateMarketModal();
     }
-
+    
     function selectMarketCreateCard(cardId) {
         marketCreateCardId = cardId;
-        marketCreatePrices = [];
+        if (marketCreateMode === 'buy') {
+            // Для покупки — не переходим дальше, только отмечаем выбранную
+            // Пользователь сам нажмёт "Далее"
+        } else {
+            marketCreatePrices = [];
+        }
+        renderCreateMarketModal();
+    }
+
+    // Переход к шагу 2 (выбор своих карт)
+    function marketBuyNextStep() {
+        if (!marketCreateCardId) {
+            showToast('❌ Выберите карту', '#ffaa88');
+            return;
+        }
+        marketBuyStep = 2;
+        marketCreateOfferCards = [];
+        renderCreateMarketModal();
+    }
+
+    // Назад к шагу 1
+    function marketBuyBackStep() {
+        marketBuyStep = 1;
+        marketCreateOfferCards = [];
+        renderCreateMarketModal();
+    }
+
+    // Переключение карты (взять/убрать)
+    function toggleMarketOfferCard(cardId) {
+        const count = _cardHistory.filter(c => (c.cardId || c.id) === cardId).length;
+        const selectedCount = marketCreateOfferCards.filter(id => id === cardId).length;
+
+        if (selectedCount >= count) {
+            // Уже все выбраны — убираем всё
+            marketCreateOfferCards = marketCreateOfferCards.filter(id => id !== cardId);
+        } else {
+            // Добавляем ещё одну
+            marketCreateOfferCards.push(cardId);
+        }
         renderCreateMarketModal();
     }
 
@@ -6294,15 +6575,17 @@
     }
 
     async function submitMarketCreate() {
-        if (!marketCreateCardId || marketCreatePrices.length === 0) return;
-
-        const totalActive = marketMyLots.length + marketMyOrders.length;
-        if (totalActive >= MARKET_MAX_LOTS) { showToast('❌ Лимит активных', '#ff6b6b'); return; }
-
         if (marketCreateMode === 'sell') {
+            // ===== СОЗДАНИЕ ЛОТА =====
+            if (!marketCreateCardId || marketCreatePrices.length === 0) return;
+
+            const totalActive = marketMyLots.length + marketMyOrders.length;
+            if (totalActive >= MARKET_MAX_LOTS) { showToast('❌ Лимит активных', '#ff6b6b'); return; }
             if (!marketHasCard(marketCreateCardId)) { showToast('❌ Нет карты', '#ff6b6b'); return; }
+
             marketRemoveCard(marketCreateCardId);
             const card = getCardById(marketCreateCardId);
+
             await supabaseClient.from('market_sell_lots').insert({
                 seller_id: _playerId,
                 seller_name: _playerName,
@@ -6312,20 +6595,51 @@
             });
             showToast(`✅ Лот создан: ${card.name}`, '#44ff44');
         } else {
+            // ===== СОЗДАНИЕ ЗАЯВКИ =====
+            if (!marketCreateCardId || marketCreateOfferCards.length === 0) return;
+
+            const totalActive = marketMyLots.length + marketMyOrders.length;
+            if (totalActive >= MARKET_MAX_LOTS) { showToast('❌ Лимит активных', '#ff6b6b'); return; }
+
+            // Проверяем что все карты есть
+            for (const cardId of marketCreateOfferCards) {
+                if (!marketHasCard(cardId)) {
+                    showToast('❌ Нет карты', '#ff6b6b');
+                    return;
+                }
+            }
+
+            // Списываем карты (по одной)
+            for (const cardId of marketCreateOfferCards) {
+                marketRemoveCard(cardId);
+            }
+
+            // Считаем ранги для статистики
+            const rankCount = {};
+            marketCreateOfferCards.forEach(id => {
+                const c = getCardById(id);
+                if (c) rankCount[c.rank] = (rankCount[c.rank] || 0) + 1;
+            });
+            const offerRanks = Object.entries(rankCount).map(([rank, count]) => ({ rank, count }));
+
+            const targetCard = getCardById(marketCreateCardId);
             await supabaseClient.from('market_buy_orders').insert({
                 buyer_id: _playerId,
                 buyer_name: _playerName,
                 buyer_avatar: '🧙',
                 card_id: marketCreateCardId,
-                offer: marketCreatePrices
+                offer_ranks: offerRanks,
+                offer_cards: marketCreateOfferCards
             });
-            showToast('✅ Заявка создана', '#44ff44');
+            showToast(`✅ Заявка создана: хочу ${targetCard.name}`, '#44ff44');
         }
 
         saveGame(); updateUI(); renderCollection();
         closeMarketModal();
         marketCreateCardId = null;
         marketCreatePrices = [];
+        marketCreateOfferCards = [];
+        marketBuyStep = 1;
         await loadMarketData();
     }
 
