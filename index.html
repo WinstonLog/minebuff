@@ -6935,6 +6935,7 @@
     async function loadShopData() {
         if (!supabaseClient || !_playerId) return;
         
+        _syncLock = true;   // ← блокируем
         try {
             const { data: profile } = await supabaseClient
                 .from('leaderboard')
@@ -6943,8 +6944,6 @@
                 .single();
             
             if (profile) {
-                // ✅ Берём из базы ТОЛЬКО если там реально есть значение
-                // (чтобы не затирать локальные данные нулём, если админ ещё не начислил)
                 if (typeof profile.essence === 'number' && profile.essence >= 0) {
                     _essence = profile.essence;
                 }
@@ -6952,11 +6951,10 @@
                     _gems = profile.gems;
                 }
                 
-                saveGame(true);   // не синхронизировать в БД
+                saveGame(true);
                 updateUI();
             }
             
-            // заявки
             const { data: requests } = await supabaseClient
                 .from('donation_requests')
                 .select('*')
@@ -6968,6 +6966,8 @@
             renderShop();
         } catch(e) {
             console.warn('loadShopData error:', e);
+        } finally {
+            _syncLock = false;   // ← разблокируем
         }
     }
 
