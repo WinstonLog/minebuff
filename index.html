@@ -5669,12 +5669,41 @@
         const isMine = order.buyer_id === _playerId;
         const canSell = !isMine && _cardHistory.some(c => (c.cardId || c.id) === order.card_id);
 
-        const offerTags = (order.offer || []).map(p => {
-            const color = getCardColor(p.rank);
-            return `<div class="market-price-tag" style="border-color:${color};color:${color};">
-                <span class="r">${p.rank}</span><span class="c">×${p.count}</span>
-            </div>`;
-        }).join('');
+        // ===== СТРОИМ КОНКРЕТНЫЕ КАРТЫ =====
+        const offerCards = order.offer_cards || [];
+        const offerRanks = order.offer_ranks || [];
+        let offerTags = '';
+
+        if (offerCards.length > 0) {
+            // Группируем по cardId
+            const grouped = {};
+            offerCards.forEach(cid => {
+                grouped[cid] = (grouped[cid] || 0) + 1;
+            });
+
+            // Показываем каждую карту мини-плиткой с рангом и тултипом
+            offerTags = Object.entries(grouped).map(([cardId, count]) => {
+                const c = getCardById(cardId);
+                if (!c) return '';
+                const img = getCardImage(c);
+                return `
+                    <div class="market-price-tag" 
+                         style="border-color:${c.color};color:${c.color};position:relative;padding:4px 8px;min-width:auto;"
+                         title="${c.name} (${c.rank})">
+                        <span class="r" style="font-size:14px;">${c.rank}</span>
+                        ${count > 1 ? `<span class="c" style="font-size:10px;">×${count}</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+        } else if (offerRanks.length > 0) {
+            // Fallback для старых заявок
+            offerTags = offerRanks.map(p => {
+                const color = getCardColor(p.rank);
+                return `<div class="market-price-tag" style="border-color:${color};color:${color};">
+                    <span class="r">${p.rank}</span><span class="c">×${p.count}</span>
+                </div>`;
+            }).join('');
+        }
 
         const imgPath = getCardImage(card);
         return `
@@ -6082,58 +6111,111 @@
         const isMine = order.buyer_id === _playerId;
         const canSell = !isMine && marketHasCard(order.card_id);
 
+        // ===== СТРОИМ КОНКРЕТНЫЕ КАРТЫ =====
         const offerCards = order.offer_cards || [];
         const offerRanks = order.offer_ranks || [];
-        const grouped = {};
-        if (offerCards.length > 0) {
-            offerCards.forEach(cid => {
-                const c = getCardById(cid);
-                if (c) grouped[c.rank] = (grouped[c.rank] || 0) + 1;
-            });
-        }
-        const offerList = offerCards.length > 0
-            ? Object.entries(grouped).map(([rank, count]) => ({ rank, count }))
-            : offerRanks;
+        let offerHtml = '';
 
-        const offerHtml = offerList.map(p => {
-            const color = getCardColor(p.rank);
-            return `<div class="market-price-big" style="border-color:${color};color:${color};">
-                <div class="rank">${p.rank}</div><div class="count">×${p.count}</div>
-            </div>`;
-        }).join('');
+        if (offerCards.length > 0) {
+            // Группируем по cardId чтобы показать «R1 ×2»
+            const grouped = {};
+            offerCards.forEach(cid => {
+                grouped[cid] = (grouped[cid] || 0) + 1;
+            });
+
+            offerHtml = Object.entries(grouped).map(([cardId, count]) => {
+                const c = getCardById(cardId);
+                if (!c) return '';
+                const img = getCardImage(c);
+                return `
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;
+                                padding:8px 6px;border-radius:12px;border:2px solid ${c.color};
+                                background:rgba(0,0,0,0.3);min-width:72px;position:relative;">
+                        <div style="width:52px;height:68px;border-radius:8px;
+                                    display:flex;align-items:center;justify-content:center;
+                                    font-size:22px;font-weight:900;color:${c.color};
+                                    border:2px solid ${c.color};overflow:hidden;
+                                    background:rgba(0,0,0,0.4);
+                                    box-shadow:0 0 15px -5px ${c.color};">
+                            ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='${c.rank}'">` : c.rank}
+                        </div>
+                        <div style="font-size:10px;font-weight:700;color:#e4e6f0;
+                                    max-width:72px;overflow:hidden;text-overflow:ellipsis;
+                                    white-space:nowrap;text-align:center;">
+                            ${c.name}
+                        </div>
+                        <div style="font-size:9px;color:#8b90a8;text-transform:uppercase;">
+                            ${c.rank}
+                        </div>
+                        ${count > 1 ? `
+                            <div style="position:absolute;top:-6px;right:-6px;
+                                background:linear-gradient(135deg,#ffcc66,#ffaa33);
+                                color:#1a1a2e;font-size:10px;font-weight:900;
+                                padding:2px 7px;border-radius:12px;
+                                border:2px solid #0f0f1a;
+                                box-shadow:0 2px 8px rgba(0,0,0,0.5);">×${count}</div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } else if (offerRanks.length > 0) {
+            // Fallback для старых заявок
+            offerHtml = offerRanks.map(p => {
+                const color = getCardColor(p.rank);
+                return `<div class="market-price-big" style="border-color:${color};color:${color};">
+                    <div class="rank">${p.rank}</div><div class="count">×${p.count}</div>
+                </div>`;
+            }).join('');
+        } else {
+            offerHtml = `<div style="color:#6b7084;font-size:12px;padding:10px;">— пусто —</div>`;
+        }
 
         const imgPath = getCardImage(card);
         const modal = document.getElementById('marketModal');
         modal.querySelector('.modal-title').textContent = isMine ? '👑 Ваша заявка' : '🛒 Заявка';
+
         modal.querySelector('.modal-body').innerHTML = `
             <div class="market-preview">
                 <div class="market-preview-img" style="color:${card.color};border-color:${card.color};">
                     ${imgPath ? `<img src="${imgPath}" onerror="this.parentElement.textContent='${card.rank}'">` : card.rank}
                 </div>
                 <div class="market-preview-info">
+                    <div style="font-size:11px;color:#6b7084;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">
+                        ${isMine ? 'Вы хотите купить' : 'Хочет купить'}
+                    </div>
                     <div class="name">${card.name}</div>
                     <div class="rank-badge" style="background:${card.color}22;color:${card.color};border:1px solid ${card.color}55;">
                         ${card.rank} — ${card.rarity || ''}
                     </div>
                     <div class="set">📚 ${card.set}</div>
-                    <div style="font-size:12px;color:#8b90a8;">Покупатель: <b style="color:#e4e6f0;">${order.buyer_name}</b></div>
+                    <div style="font-size:12px;color:#8b90a8;">
+                        Покупатель: <b style="color:#e4e6f0;">${isMine ? 'Вы' : order.buyer_name}</b>
+                    </div>
                     <div style="font-size:11px;color:#6b7084;">${marketFormatTime(order.created_at)}</div>
                 </div>
             </div>
+
             <div class="market-check-block">
-                <div class="market-check-title">💰 Даёт за карту</div>
+                <div class="market-check-title">💰 Даёт за карту (${offerCards.length} шт)</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">${offerHtml}</div>
             </div>
+
             ${!isMine ? `
                 <div class="market-check-block">
                     <div class="market-check-title">📦 Проверка</div>
                     <div class="market-check-row">
-                        <span class="label">Нужна карта ${card.rank}</span>
-                        <span class="value ${canSell ? 'ok' : 'fail'}">${canSell ? '✅ есть' : '❌ нет'}</span>
+                        <span class="label">
+                            <span class="rank-mini" style="color:${card.color};border-color:${card.color};">${card.rank}</span>
+                            Нужна карта «${card.name}»
+                        </span>
+                        <span class="value ${canSell ? 'ok' : 'fail'}">
+                            ${canSell ? '✅ есть' : '❌ нет'}
+                        </span>
                     </div>
                 </div>
             ` : ''}
         `;
+
         modal.querySelector('.modal-actions').innerHTML = `
             <button class="modal-btn close" onclick="closeMarketModal()">Закрыть</button>
             ${isMine ? `
