@@ -6588,12 +6588,16 @@
     
     function selectMarketCreateCard(cardId) {
         marketCreateCardId = cardId;
+        
         if (marketCreateMode === 'buy') {
-            // Для покупки — не переходим дальше, только отмечаем выбранную
-            // Пользователь сам нажмёт "Далее"
+            // Для покупки — сразу переходим на шаг 2 (выбор своих карт)
+            marketBuyStep = 2;
+            marketCreateOfferCards = [];
         } else {
+            // Для продажи — сбрасываем цены (нужно выбрать ранги)
             marketCreatePrices = [];
         }
+        
         renderCreateMarketModal();
     }
 
