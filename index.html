@@ -23,6 +23,427 @@
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #b388ff, #7c4dff); border-radius: 10px; }
 
         /* ============================================================
+           НОВОСТИ / ЧТО НОВОГО
+           ============================================================ */
+        .news-item {
+            background: rgba(20, 24, 36, 0.7);
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.4s ease backwards;
+        }
+        .news-item:hover {
+            border-color: rgba(179, 136, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .news-item.important {
+            border-color: rgba(255, 204, 102, 0.4);
+            background: linear-gradient(135deg, rgba(255, 204, 102, 0.06), rgba(20, 24, 36, 0.7));
+        }
+        .news-item.important::before {
+            content: '📌 ЗАКРЕПЛЕНО';
+            position: absolute;
+            top: 12px; right: 12px;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            color: #1a1a2e;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+        .news-item::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--news-color, #b388ff);
+            box-shadow: 0 0 20px var(--news-color, #b388ff);
+        }
+
+        .news-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .news-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, rgba(179, 136, 255, 0.2), rgba(123, 77, 255, 0.1));
+            border: 2px solid rgba(179, 136, 255, 0.3);
+            flex-shrink: 0;
+        }
+        .news-title-block { flex: 1; min-width: 0; }
+        .news-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #e4e6f0;
+            margin-bottom: 4px;
+        }
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            color: #6b7084;
+            flex-wrap: wrap;
+        }
+        .news-version {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-weight: 700;
+            color: #b388ff;
+        }
+        .news-type {
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 9px;
+        }
+        .news-type.update { background: rgba(68, 255, 68, 0.15); color: #44ff44; }
+        .news-type.event { background: rgba(255, 204, 102, 0.15); color: #ffcc66; }
+        .news-type.hotfix { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; }
+        .news-type.announcement { background: rgba(74, 158, 255, 0.15); color: #4a9eff; }
+
+        .news-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c8cad6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .news-content b, .news-content strong {
+            color: #e4e6f0;
+            font-weight: 700;
+        }
+
+        .news-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7084;
+        }
+        .news-empty .icon { font-size: 64px; margin-bottom: 12px; opacity: 0.5; }
+        .news-empty .title { font-size: 17px; font-weight: 700; color: #8b90a8; margin-bottom: 6px; }
+        .news-empty .desc { font-size: 13px; }
+
+        /* ============================================================
+           ЕЖЕДНЕВНЫЕ КВЕСТЫ
+           ============================================================ */
+        .daily-quests-panel {
+            background: linear-gradient(135deg, rgba(123, 77, 255, 0.08), rgba(123, 77, 255, 0.02));
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(123, 77, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .daily-quests-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -10%;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(179, 136, 255, 0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: questGlow 4s ease-in-out infinite;
+        }
+        @keyframes questGlow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .dq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .dq-header h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #b388ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dq-timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #8b90a8;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .dq-timer strong {
+            color: #ffcc66;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .dq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dq-item {
+            background: rgba(20, 24, 36, 0.7);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: 0.25s;
+        }
+        .dq-item:hover {
+            border-color: rgba(179, 136, 255, 0.25);
+            transform: translateX(4px);
+        }
+        .dq-item.completed {
+            background: linear-gradient(135deg, rgba(68, 255, 68, 0.08), rgba(68, 255, 68, 0.02));
+            border-color: rgba(68, 255, 68, 0.3);
+        }
+        .dq-item.claimed {
+            opacity: 0.5;
+            background: rgba(20, 24, 36, 0.4);
+        }
+        .dq-item.claimed .dq-progress-fill {
+            background: linear-gradient(90deg, #44ff44, #2ecc71);
+        }
+
+        .dq-icon {
+            width: 46px; height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(179, 136, 255, 0.2), rgba(123, 77, 255, 0.1));
+            border: 2px solid rgba(179, 136, 255, 0.2);
+        }
+        .dq-item.completed .dq-icon {
+            border-color: rgba(68, 255, 68, 0.4);
+            background: linear-gradient(135deg, rgba(68, 255, 68, 0.15), rgba(46, 204, 113, 0.05));
+        }
+
+        .dq-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .dq-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e4e6f0;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dq-progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 4px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .dq-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #b388ff, #7c4dff);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+            box-shadow: 0 0 15px rgba(179, 136, 255, 0.4);
+        }
+        .dq-item.completed .dq-progress-fill {
+            background: linear-gradient(90deg, #44ff44, #2ecc71);
+            box-shadow: 0 0 15px rgba(68, 255, 68, 0.4);
+        }
+        .dq-progress-text {
+            font-size: 11px;
+            color: #6b7084;
+            font-weight: 600;
+        }
+
+        .dq-reward {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .dq-reward-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .dq-reward-tag.essence { color: #b388ff; }
+        .dq-reward-tag.ore { color: #f5b342; }
+        .dq-reward-tag.xp { color: #ffcc66; }
+
+        .dq-claim-btn {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            background: linear-gradient(135deg, #44ff44, #2ecc71);
+            color: #1a1a2e;
+            animation: questClaimPulse 1.5s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        @keyframes questClaimPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(68, 255, 68, 0.6); }
+            50% { box-shadow: 0 0 0 8px rgba(68, 255, 68, 0); }
+        }
+        .dq-claim-btn:hover { transform: translateY(-2px) scale(1.05); }
+        .dq-claim-btn:disabled {
+            background: rgba(255,255,255,0.05);
+            color: #6b7084;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        /* Бонус за все 5 квестов */
+        .dq-bonus {
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(255, 204, 102, 0.12), rgba(255, 204, 102, 0.03));
+            border-radius: 14px;
+            border: 1px solid rgba(255, 204, 102, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+        .dq-bonus-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .dq-bonus-icon {
+            font-size: 28px;
+            animation: questBonusFloat 2s ease-in-out infinite;
+        }
+        @keyframes questBonusFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .dq-bonus-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffcc66;
+        }
+        .dq-bonus-desc {
+            font-size: 11px;
+            color: #8b90a8;
+            margin-top: 2px;
+        }
+        .dq-bonus-btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            background: linear-gradient(135deg, #ffcc66, #ffaa33);
+            color: #1a1a2e;
+            white-space: nowrap;
+        }
+        .dq-bonus-btn:hover:not(:disabled) { transform: translateY(-2px) scale(1.05); }
+        .dq-bonus-btn:disabled {
+            background: rgba(255,255,255,0.05);
+            color: #6b7084;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Бейдж на иконке навигации */
+        .nav-item .badge.quest {
+            background: linear-gradient(135deg, #44ff44, #2ecc71);
+            color: #1a1a2e;
+            animation: questBadgePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes questBadgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* Мини-виджет в шапке */
+        .quest-mini-widget {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(68, 255, 68, 0.15), rgba(46, 204, 113, 0.05));
+            border: 1px solid rgba(68, 255, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #44ff44;
+            cursor: pointer;
+            transition: 0.25s;
+            white-space: nowrap;
+        }
+        .quest-mini-widget:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(68, 255, 68, 0.25), rgba(46, 204, 113, 0.1));
+        }
+        .quest-mini-widget i { font-size: 12px; }
+
+        /* Адаптив */
+        @media (max-width: 600px) {
+            .dq-item {
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 10px;
+            }
+            .dq-icon { width: 40px; height: 40px; font-size: 20px; }
+            .dq-title { font-size: 13px; }
+            .dq-claim-btn { padding: 7px 14px; font-size: 11px; }
+            .dq-bonus { padding: 12px; }
+            .dq-bonus-icon { font-size: 22px; }
+            .dq-bonus-title { font-size: 13px; }
+            .dq-bonus-btn { padding: 8px 16px; font-size: 12px; }
+        }
+
+        /* ============================================================
            РЫНОК
            ============================================================ */
         .market-tabs-main {
@@ -3648,6 +4069,10 @@
         <i class="fas fa-search"></i>
         <input type="text" id="globalSearch" placeholder="Поиск...">
     </div>
+    <button class="quest-mini-widget" id="questMiniWidget" onclick="switchSection('quests')" style="display:none;">
+        <i class="fas fa-tasks"></i>
+        <span class="quest-mini-text">0 квест!</span>
+    </button>
     <button class="hourly-bonus-btn" id="hourlyBonusBtn" title="Ежечасный бонус">
         <i class="fas fa-gift bonus-icon"></i>
         <span id="hourlyBonusText" class="hourly-text">Забрать</span>
@@ -3689,18 +4114,28 @@
     <button class="nav-item" data-section="sets"><i class="fas fa-object-group"></i><span>Сеты</span></button>
     
     <div class="nav-section-title">⚡ Активности</div>
+    <button class="nav-item" data-section="quests">
+        <i class="fas fa-tasks"></i>
+        <span>Квесты</span><span class="badge new">NEW</span>
+        <span class="badge quest" id="questBadge">0</span>
+    </button>
     <button class="nav-item" data-section="event"><i class="fas fa-calendar-alt"></i><span>Ивент</span><span class="badge event" id="eventBadge">🎃</span></button>
     
     <div class="nav-section-title">💬 Социальное</div>
     <button class="nav-item" data-section="chat"><i class="fas fa-comment-dots"></i><span>Чат</span></button>
     <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button>
-    <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge" id="marketBadge">0</span></button>
+    <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge new">NEW</span><span class="badge" id="marketBadge">0</span></button>
     <button class="nav-item" data-section="top"><i class="fas fa-trophy"></i><span>Топ</span></button>
     
     <div class="nav-section-title">🎲 Развлечения</div>
-    <button class="nav-item" data-section="minigames"><i class="fas fa-gamepad"></i><span>Игры</span><span class="badge new">NEW</span></button>
+    <button class="nav-item" data-section="minigames"><i class="fas fa-gamepad"></i><span>Игры</span></button>
     
     <div class="nav-section-title">⚙️ Система</div>
+    <button class="nav-item" data-section="news">
+        <i class="fas fa-newspaper"></i>
+        <span>Что нового</span><span class="badge new">NEW</span>
+        <span class="badge new" id="newsBadge" style="display:none;">!</span>
+    </button>
     <button class="nav-item" data-section="settings"><i class="fas fa-cog"></i><span>Настройки</span></button>
 </nav>
 
@@ -3865,6 +4300,38 @@
                     <span class="r-Y">Y</span><span class="r-U">U</span><span class="r-Q">Q</span>
                     <span class="r-R">R</span><span class="r-Z">Z</span><span class="r-O">O</span>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ЕЖЕДНЕВНЫЕ КВЕСТЫ -->
+    <section id="section-quests" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-tasks"></i> Ежедневные квесты</h1>
+            <span class="section-info" id="questDate">Сегодня</span>
+        </div>
+
+        <div class="daily-quests-panel">
+            <div class="dq-header">
+                <h2>🎯 Задания на сегодня</h2>
+                <div class="dq-timer">
+                    ⏰ До сброса: <strong id="questResetTimer">23:59:59</strong>
+                </div>
+            </div>
+
+            <div class="dq-list" id="dqList"></div>
+
+            <div class="dq-bonus" id="dqBonus">
+                <div class="dq-bonus-info">
+                    <div class="dq-bonus-icon">🏆</div>
+                    <div>
+                        <div class="dq-bonus-title">Бонус за все 5 квестов</div>
+                        <div class="dq-bonus-desc" id="dqBonusProgress">Выполнено 0/5</div>
+                    </div>
+                </div>
+                <button class="dq-bonus-btn" id="dqBonusBtn" disabled>
+                    🎁 Забрать бонус
+                </button>
             </div>
         </div>
     </section>
@@ -4288,6 +4755,23 @@
         <div id="market-tab-mine" style="display:none;">
             <div class="market-list" id="marketMineList"></div>
         </div>
+    </section>
+
+    <!-- НОВОСТИ / ЧТО НОВОГО -->
+    <section id="section-news" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-newspaper"></i> Что нового</h1>
+            <span class="section-info" id="newsCount">0 обновлений</span>
+        </div>
+
+        <div class="market-sub-tabs" style="margin-bottom:16px;">
+            <button class="market-sub-tab active" data-news-filter="all">🌐 Все</button>
+            <button class="market-sub-tab" data-news-filter="update">🆕 Обновления</button>
+            <button class="market-sub-tab" data-news-filter="event">🎉 Ивенты</button>
+            <button class="market-sub-tab" data-news-filter="hotfix">🔧 Фиксы</button>
+        </div>
+
+        <div id="newsList" style="display:flex;flex-direction:column;gap:12px;"></div>
     </section>
 
     <!-- ФУТЕР -->
@@ -4865,6 +5349,9 @@
         fgUpdateDailyUI();
 
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        if (FG.score > 0) {
+            addQuestProgress('minigame_play', 1);
+        }
     }
 
     function fgUpdate(dt) {
@@ -5279,6 +5766,482 @@
     }
     function getCardData(rank) { return ALL_CARDS.find(c => c.rank === rank) || null; }
     function getCardById(id) { return ALL_CARDS.find(c => c.id === id) || null; }
+
+    /* ============================================================
+       ЕЖЕДНЕВНЫЕ КВЕСТЫ
+       ============================================================ */
+
+    // ===== ШАБЛОНЫ КВЕСТОВ =====
+    const DAILY_QUESTS_TEMPLATES = [
+        {
+            id: 'mine_strikes',
+            icon: '⛏️',
+            title: 'Сделай 50 ударов',
+            description: 'Добывай руду в шахте',
+            target: 50,
+            event: 'mine',
+            reward: { essence: 10, ore: 0, xp: 25 }
+        },
+        {
+            id: 'open_packs',
+            icon: '🎴',
+            title: 'Открой 2 пака',
+            description: 'Купи и открой паки',
+            target: 2,
+            event: 'pack_open',
+            reward: { essence: 15, ore: 0, xp: 30 }
+        },
+        {
+            id: 'send_messages',
+            icon: '💬',
+            title: 'Напиши 3 сообщения',
+            description: 'Пообщайся в чате',
+            target: 3,
+            event: 'chat_message',
+            reward: { essence: 10, ore: 0, xp: 20 }
+        },
+        {
+            id: 'play_minigame',
+            icon: '🎮',
+            title: 'Победи в мини-игре',
+            description: 'Сыграй в «Аркана: Полёт»',
+            target: 1,
+            event: 'minigame_play',
+            reward: { essence: 15, ore: 0, xp: 30 }
+        },
+        {
+            id: 'market_action',
+            icon: '🏪',
+            title: 'Обменяйся на рынке',
+            description: 'Купи, продай или создай лот',
+            target: 1,
+            event: 'market_action',
+            reward: { essence: 20, ore: 0, xp: 40 }
+        }
+    ];
+
+    // ===== СОСТОЯНИЕ =====
+    let _questProgress = {};        // { questId: { progress, claimed } }
+    let _questBonusClaimed = false;
+    let _questRefreshTimer = null;
+
+    // ===== УТИЛИТЫ =====
+    function questToday() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    function formatTimeLeft() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        const diff = tomorrow - now;
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // ===== ЗАГРУЗКА =====
+    async function loadDailyQuests() {
+        if (!supabaseClient || !_playerId) return;
+        const today = questToday();
+
+        try {
+            // Загружаем прогресс
+            const { data: progress } = await supabaseClient
+                .from('daily_quest_progress')
+                .select('*')
+                .eq('player_id', _playerId)
+                .eq('quest_date', today);
+
+            // Загружаем бонус
+            const { data: bonus } = await supabaseClient
+                .from('daily_quest_bonus')
+                .select('*')
+                .eq('player_id', _playerId)
+                .eq('quest_date', today)
+                .maybeSingle();
+
+            // Инициализируем состояние
+            _questProgress = {};
+            DAILY_QUESTS_TEMPLATES.forEach(t => {
+                const saved = (progress || []).find(p => p.quest_id === t.id);
+                _questProgress[t.id] = {
+                    progress: saved ? saved.progress : 0,
+                    claimed: saved ? saved.claimed : false
+                };
+            });
+
+            _questBonusClaimed = bonus ? bonus.bonus_claimed : false;
+
+            renderDailyQuests();
+            updateQuestBadge();
+        } catch(e) {
+            console.warn('loadDailyQuests error:', e);
+        }
+    }
+
+    // ===== РЕНДЕР =====
+    function renderDailyQuests() {
+        const listEl = document.getElementById('dqList');
+        if (!listEl) return;
+
+        const today = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        const dateEl = document.getElementById('questDate');
+        if (dateEl) dateEl.textContent = today;
+
+        listEl.innerHTML = DAILY_QUESTS_TEMPLATES.map(quest => {
+            const state = _questProgress[quest.id] || { progress: 0, claimed: false };
+            const progress = Math.min(state.progress, quest.target);
+            const isCompleted = progress >= quest.target;
+            const isClaimed = state.claimed;
+            const percent = Math.min((progress / quest.target) * 100, 100);
+
+            const rewardTags = [];
+            if (quest.reward.essence) rewardTags.push(`<span class="dq-reward-tag essence">💠 +${quest.reward.essence}</span>`);
+            if (quest.reward.ore) rewardTags.push(`<span class="dq-reward-tag ore">⛏️ +${quest.reward.ore}</span>`);
+            if (quest.reward.xp) rewardTags.push(`<span class="dq-reward-tag xp">✨ +${quest.reward.xp}</span>`);
+
+            return `
+                <div class="dq-item ${isCompleted ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}">
+                    <div class="dq-icon">${quest.icon}</div>
+                    <div class="dq-content">
+                        <div class="dq-title">${quest.title}</div>
+                        <div class="dq-progress-bar">
+                            <div class="dq-progress-fill" style="width:${percent}%"></div>
+                        </div>
+                        <div class="dq-progress-text">${progress} / ${quest.target}</div>
+                    </div>
+                    <div class="dq-reward">${rewardTags.join('')}</div>
+                    ${isClaimed
+                        ? `<button class="dq-claim-btn" disabled>✅ Получено</button>`
+                        : isCompleted
+                            ? `<button class="dq-claim-btn" onclick="claimQuestReward('${quest.id}')">🎁 Забрать</button>`
+                            : `<button class="dq-claim-btn" disabled>⏳</button>`
+                    }
+                </div>
+            `;
+        }).join('');
+
+        // Бонус
+        const completedCount = DAILY_QUESTS_TEMPLATES.filter(q => {
+            const s = _questProgress[q.id];
+            return s && s.progress >= q.target;
+        }).length;
+        const progressEl = document.getElementById('dqBonusProgress');
+        if (progressEl) progressEl.textContent = `Выполнено ${completedCount}/5`;
+
+        const bonusBtn = document.getElementById('dqBonusBtn');
+        if (bonusBtn) {
+            if (_questBonusClaimed) {
+                bonusBtn.disabled = true;
+                bonusBtn.textContent = '✅ Получено';
+            } else if (completedCount >= 5) {
+                bonusBtn.disabled = false;
+                bonusBtn.textContent = '🎁 Забрать бонус';
+            } else {
+                bonusBtn.disabled = true;
+                bonusBtn.textContent = '🎁 Забрать бонус';
+            }
+        }
+    }
+
+    // ===== ПРОГРЕСС =====
+    async function addQuestProgress(event, amount = 1) {
+        if (!supabaseClient || !_playerId) return;
+
+        // Находим квесты для этого события
+        const quests = DAILY_QUESTS_TEMPLATES.filter(q => q.event === event);
+        if (quests.length === 0) return;
+
+        const today = questToday();
+
+        for (const quest of quests) {
+            const state = _questProgress[quest.id];
+            if (!state || state.claimed) continue;
+            if (state.progress >= quest.target) continue;
+
+            const newProgress = Math.min(state.progress + amount, quest.target);
+            state.progress = newProgress;
+
+            try {
+                // Upsert в БД
+                const { error } = await supabaseClient
+                    .from('daily_quest_progress')
+                    .upsert({
+                        player_id: _playerId,
+                        quest_id: quest.id,
+                        progress: newProgress,
+                        quest_date: today,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'player_id,quest_id,quest_date' });
+
+                if (error) console.warn('quest upsert error:', error);
+            } catch(e) {
+                console.warn('addQuestProgress error:', e);
+            }
+
+            // Показываем уведомление о завершении
+            if (newProgress >= quest.target && state.progress !== quest.target) {
+                showToast(`✅ Квест «${quest.title}» выполнен!`, '#44ff44');
+            }
+        }
+
+        renderDailyQuests();
+        updateQuestBadge();
+    }
+
+    // ===== ПОЛУЧЕНИЕ НАГРАДЫ =====
+    async function claimQuestReward(questId) {
+        const quest = DAILY_QUESTS_TEMPLATES.find(q => q.id === questId);
+        if (!quest) return;
+
+        const state = _questProgress[questId];
+        if (!state || state.claimed) return;
+        if (state.progress < quest.target) return;
+
+        // Начисляем
+        if (quest.reward.essence) _essence += quest.reward.essence;
+        if (quest.reward.ore) _ore += quest.reward.ore;
+        if (quest.reward.xp) addXP(quest.reward.xp);
+
+        state.claimed = true;
+
+        // Сохраняем в БД
+        const today = questToday();
+        try {
+            await supabaseClient
+                .from('daily_quest_progress')
+                .update({ claimed: true, updated_at: new Date().toISOString() })
+                .eq('player_id', _playerId)
+                .eq('quest_id', questId)
+                .eq('quest_date', today);
+        } catch(e) {
+            console.warn('claim quest error:', e);
+        }
+
+        // Показываем всплывашку
+        const rewards = [];
+        if (quest.reward.essence) rewards.push(`💠 +${quest.reward.essence}`);
+        if (quest.reward.ore) rewards.push(`⛏️ +${quest.reward.ore}`);
+        if (quest.reward.xp) rewards.push(`✨ +${quest.reward.xp} XP`);
+        showToast(`🎁 ${rewards.join(' · ')}`, '#ffcc66');
+
+        // Вибрация
+        if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+        saveGame();
+        updateUI();
+        renderDailyQuests();
+        updateQuestBadge();
+    }
+
+    // ===== БОНУС ЗА ВСЕ 5 =====
+    async function claimQuestBonus() {
+        if (_questBonusClaimed) return;
+
+        const completedCount = DAILY_QUESTS_TEMPLATES.filter(q => {
+            const s = _questProgress[q.id];
+            return s && s.progress >= q.target;
+        }).length;
+
+        if (completedCount < 5) {
+            showToast('❌ Выполни все 5 квестов', '#ffaa88');
+            return;
+        }
+
+        // Награда за бонус
+        const bonusEssence = 50;
+        const bonusOre = 500;
+        const bonusXP = 100;
+
+        _essence += bonusEssence;
+        _ore += bonusOre;
+        addXP(bonusXP);
+
+        _questBonusClaimed = true;
+
+        // Сохраняем в БД
+        const today = questToday();
+        try {
+            await supabaseClient
+                .from('daily_quest_bonus')
+                .upsert({
+                    player_id: _playerId,
+                    quest_date: today,
+                    bonus_claimed: true
+                }, { onConflict: 'player_id,quest_date' });
+        } catch(e) {
+            console.warn('bonus claim error:', e);
+        }
+
+        showToast(`🏆 БОНУС: 💠 +${bonusEssence} · ⛏️ +${bonusOre} · ✨ +${bonusXP} XP`, '#ffcc66');
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+
+        saveGame();
+        updateUI();
+        renderDailyQuests();
+        updateQuestBadge();
+    }
+
+    // ===== БЕЙДЖ =====
+    function updateQuestBadge() {
+        const badge = document.getElementById('questBadge');
+        if (!badge) return;
+
+        // Сколько квестов можно забрать
+        const claimable = DAILY_QUESTS_TEMPLATES.filter(q => {
+            const s = _questProgress[q.id];
+            return s && s.progress >= q.target && !s.claimed;
+        }).length;
+
+        if (claimable > 0) {
+            badge.textContent = claimable;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        // Мини-виджет в шапке
+        const widget = document.getElementById('questMiniWidget');
+        if (widget) {
+            if (claimable > 0) {
+                widget.style.display = 'flex';
+                widget.querySelector('.quest-mini-text').textContent = `${claimable} квест!`;
+            } else {
+                widget.style.display = 'none';
+            }
+        }
+    }
+
+    // ===== ТАЙМЕР СБРОСА =====
+    function startQuestTimer() {
+        if (_questRefreshTimer) clearInterval(_questRefreshTimer);
+
+        function update() {
+            const el = document.getElementById('questResetTimer');
+            if (el) el.textContent = formatTimeLeft();
+
+            // Проверка на новый день — каждый час
+            const now = new Date();
+            if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2) {
+                loadDailyQuests();
+            }
+        }
+        update();
+        _questRefreshTimer = setInterval(update, 1000);
+    }
+
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    function initDailyQuests() {
+        startQuestTimer();
+        loadDailyQuests();
+
+        // Кнопка бонуса
+        const bonusBtn = document.getElementById('dqBonusBtn');
+        if (bonusBtn && !bonusBtn.dataset.bound) {
+            bonusBtn.dataset.bound = '1';
+            bonusBtn.addEventListener('click', claimQuestBonus);
+        }
+    }
+
+    /* ============================================================
+       НОВОСТИ / ЧТО НОВОГО
+       ============================================================ */
+
+    let gameNews = [];
+    let newsFilter = 'all';
+
+    async function loadGameNews() {
+        if (!supabaseClient) return;
+
+        try {
+            let query = supabaseClient
+                .from('game_news')
+                .select('*')
+                .order('important', { ascending: false })
+                .order('published_at', { ascending: false })
+                .limit(50);
+
+            if (newsFilter !== 'all') {
+                query = query.eq('type', newsFilter);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+
+            gameNews = data || [];
+            renderNews();
+        } catch(e) {
+            console.warn('loadGameNews error:', e);
+            const listEl = document.getElementById('newsList');
+            if (listEl) {
+                listEl.innerHTML = `<div class="news-empty">
+                    <div class="icon">📰</div>
+                    <div class="title">Ошибка загрузки</div>
+                    <div class="desc">Попробуйте позже</div>
+                </div>`;
+            }
+        }
+    }
+
+    function renderNews() {
+        const listEl = document.getElementById('newsList');
+        if (!listEl) return;
+
+        const countEl = document.getElementById('newsCount');
+        if (countEl) countEl.textContent = `${gameNews.length} обновлений`;
+
+        if (gameNews.length === 0) {
+            listEl.innerHTML = `<div class="news-empty">
+                <div class="icon">📰</div>
+                <div class="title">Новостей пока нет</div>
+                <div class="desc">Скоро появятся обновления!</div>
+            </div>`;
+            return;
+        }
+
+        listEl.innerHTML = gameNews.map((news, i) => {
+            const date = new Date(news.published_at).toLocaleDateString('ru-RU', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+            const time = new Date(news.published_at).toLocaleTimeString('ru-RU', {
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            const typeNames = {
+                update: '🆕 Обновление',
+                event: '🎉 Ивент',
+                hotfix: '🔧 Фикс',
+                announcement: '📢 Анонс'
+            };
+
+            // Парсим простой Markdown
+            const formattedContent = escapeHtml(news.content)
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.+?)`/g, '<code style="background:rgba(179,136,255,0.15);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:12px;color:#b388ff;">$1</code>');
+
+            return `
+                <div class="news-item ${news.important ? 'important' : ''}"
+                     style="--news-color: ${news.color}; animation-delay: ${i * 0.05}s;">
+                    <div class="news-header">
+                        <div class="news-icon">${news.icon}</div>
+                        <div class="news-title-block">
+                            <div class="news-title">${escapeHtml(news.title)}</div>
+                            <div class="news-meta">
+                                <span class="news-version">v${news.version}</span>
+                                <span class="news-type ${news.type}">${typeNames[news.type] || news.type}</span>
+                                <span>📅 ${date}</span>
+                                <span>🕐 ${time}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-content">${formattedContent}</div>
+                </div>
+            `;
+        }).join('');
+    }
 
     // ============================================================
     // ЕЖЕЧАСНЫЙ БОНУС
@@ -5869,6 +6832,7 @@
         // Уведомление продавцу
         showToast('✅ Куплено!', '#44ff44');
         saveGame(); updateUI(); renderCollection();
+        addQuestProgress('market_action', 1);
         await loadMarketData();
         if (typeof closeModal === 'function') closeModal();
     }
@@ -5975,6 +6939,7 @@
                 .join(' + ') || '—';
 
             showToast(`✅ Продано! Получено: ${receivedStr}`, '#44ff44');
+            addQuestProgress('market_action', 1);
 
             await loadMarketData();
             if (typeof closeMarketModal === 'function') closeMarketModal();
@@ -6722,6 +7687,7 @@
 
         saveGame(); updateUI(); renderCollection();
         closeMarketModal();
+        addQuestProgress('market_action', 1);
         marketCreateCardId = null;
         marketCreatePrices = [];
         marketCreateOfferCards = [];
@@ -6993,6 +7959,8 @@
             player_id: _playerId,
             created_at: now.toISOString()
         };
+
+        addQuestProgress('chat_message', 1);
 
         try {
             const { data, error } = await supabaseClient
@@ -8108,6 +9076,7 @@
         }
 
         setTimeout(loadMarketData, 3000);
+        setTimeout(loadDailyQuests, 3500);
 
         if (supabaseClient && _playerId && _playerName) syncToSupabase();
     }
@@ -8182,6 +9151,8 @@
             setTimeout(() => { subscribeToChatSection(); setupChatPollingSection(); }, 2000);
             setTimeout(() => { subscribeToTrades(); loadTrades(); }, 3000);
             setTimeout(() => { subscribeToMarket(); loadMarketData(); }, 3500);
+            setTimeout(() => { initDailyQuests(); }, 4000);
+            setTimeout(() => { loadGameNews(); }, 4500);
         };
         document.head.appendChild(script);
     }
@@ -8480,6 +9451,7 @@
 
         // +1 XP за удар (умножаем на количество ударов)
         addXP(XP_MINE * strikesToAdd);
+        addQuestProgress('mine', strikesToAdd);
 
         // ===== ВИЗУАЛЬНЫЕ ЭФФЕКТЫ =====
         const pickaxe = document.getElementById('pickaxeBtn');
@@ -9606,7 +10578,7 @@
         startPackOpeningAnimation(cards);
         updateUI();
         updatePackButton();
-        addQuestProgress('packsOpened', 1);
+        addQuestProgress('pack_open', 1);
     }
 
     function startPackOpeningAnimation(cards, fromReload = false) {
@@ -9961,6 +10933,7 @@
         saveGame();
         updateUI();
         renderCollection();
+        addQuestProgress('pack_open', 1);
         renderCatalog();
         renderSets();
         updatePackButton();
@@ -10158,7 +11131,8 @@
             'chat': 'section-chat', 'trade': 'section-trade',
             'top': 'section-top', 'profile': 'section-profile',
             'settings': 'section-settings', 'minigames': 'section-minigames',
-            'market': 'section-market'
+            'market': 'section-market', 'quests': 'section-quests', 
+            'news': 'section-news',
         };
         const target = document.getElementById(map[section]);
         if (target) target.classList.add('active');
@@ -10172,6 +11146,9 @@
         if (section === 'event') updateEventUI();
         if (section === 'profile') { updateProfileUI(); updateProfileLinkUI(); }
         if (section === 'top') loadTopFromSupabase();
+        if (section === 'news') {
+            loadGameNews();
+        }
         if (section === 'minigames') {
             setTimeout(() => {
                 fgInit();
@@ -10182,6 +11159,9 @@
         }
         if (section === 'market') {
             setTimeout(() => { loadMarketData(); subscribeToMarket(); }, 100);
+        }
+        if (section === 'quests') {
+            loadDailyQuests();
         }
         if (section === 'trade') {
             setTimeout(async () => { await loadTrades(); await renderSenderCards(); renderReceiverCards(); }, 100);
@@ -10376,6 +11356,15 @@
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) loadGame();
         });
+
+        document.querySelectorAll('[data-news-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-news-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                newsFilter = this.dataset.newsFilter;
+                loadGameNews();
+            });
+        });
     });
 
     window.deleteAllData = deleteAllData;
@@ -10415,6 +11404,10 @@
     window.removeMarketPriceRank = removeMarketPriceRank;
     window.submitMarketCreate = submitMarketCreate;
     window.closeMarketModal = closeMarketModal;
+    window.claimQuestReward = claimQuestReward;
+    window.claimQuestBonus = claimQuestBonus;
+    window.addQuestProgress = addQuestProgress;
+    window.loadGameNews = loadGameNews;
 
     console.log('⚡ Arcana Nexus — XP Edition загружен!');
 </script>
