@@ -2737,6 +2737,77 @@
         /* ============================================================
            ТОП
            ============================================================ */
+        /* Кнопка копирования ID в модалке профиля */
+        .copy-profile-id-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(179, 136, 255, 0.3);
+            background: rgba(179, 136, 255, 0.1);
+            color: #b388ff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            margin-top: 6px;
+        }
+        .copy-profile-id-btn:hover {
+            background: rgba(179, 136, 255, 0.2);
+            border-color: rgba(179, 136, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(179, 136, 255, 0.25);
+        }
+        .copy-profile-id-btn:active {
+            transform: scale(0.96);
+        }
+        .copy-profile-id-btn i {
+            font-size: 11px;
+        } 
+        /* Кнопка копирования ID в ТОПе */
+        .top-copy-id-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 1px solid rgba(179, 136, 255, 0.25);
+            background: rgba(179, 136, 255, 0.1);
+            color: #b388ff;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 11px;
+            padding: 0;
+            margin-left: 6px;
+            flex-shrink: 0;
+        }
+        .top-copy-id-btn:hover {
+            background: rgba(179, 136, 255, 0.25);
+            border-color: rgba(179, 136, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 0 12px rgba(179, 136, 255, 0.3);
+        }
+        .top-copy-id-btn:active {
+            transform: scale(0.9);
+        }
+        .top-copy-id-btn.copied {
+            background: rgba(68, 255, 68, 0.2);
+            border-color: rgba(68, 255, 68, 0.5);
+            color: #44ff44;
+        }
+
+        @media (max-width: 600px) {
+            .top-copy-id-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 10px;
+                margin-left: 4px;
+            }
+        }
+
         .top-wrapper { max-width: 600px; margin: 0 auto; }
         .top-list { list-style: none; margin-top: 10px; }
         .top-list li {
@@ -4893,6 +4964,7 @@
         <button class="modal-close" id="playerProfileClose">&times;</button>
         <div class="modal-title" id="playerProfileName">Игрок</div>
         <div style="text-align:center;font-size:48px;padding:8px 0;" id="playerProfileAvatar">🧙</div>
+        <div id="playerProfileId" style="text-align:center; margin-bottom:12px;"></div>
         <div class="stat-row"><span class="label">⭐ Уровень</span><span class="value" id="playerProfileLevel">1</span></div>
         <div class="stat-row"><span class="label">💠 Эссенция</span><span class="value" id="playerprofileEssence">0</span></div>
         <div class="stat-row"><span class="label">🎴 Всего карт</span><span class="value" id="playerProfileCards">0</span></div>
@@ -7779,6 +7851,51 @@
     }
     window.copyPlayerId = copyPlayerId;
 
+    /* ============================================================
+       КОПИРОВАНИЕ ID ИЗ ТОПа
+       ============================================================ */
+    async function copyPlayerIdFromTop(playerId, playerName) {
+        if (!playerId) {
+            showToast('❌ ID не найден', '#ff6b6b');
+            return;
+        }
+
+        try {
+            // Пробуем современный API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(playerId);
+            } else {
+                // Fallback для старых браузеров
+                const input = document.createElement('input');
+                input.value = playerId;
+                input.style.position = 'fixed';
+                input.style.opacity = '0';
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+            }
+
+            // Показываем красивый тост
+            showToast(`📋 ID ${playerName ? `«${playerName}»` : ''} скопирован!`, '#44ff44');
+
+            // Вибрация
+            if (navigator.vibrate) navigator.vibrate(30);
+
+            // Анимация на кнопке
+            event.target.closest('.top-copy-id-btn')?.classList.add('copied');
+            setTimeout(() => {
+                event.target.closest('.top-copy-id-btn')?.classList.remove('copied');
+            }, 1000);
+
+        } catch(e) {
+            console.warn('copyPlayerIdFromTop error:', e);
+            showToast('❌ Не удалось скопировать', '#ff6b6b');
+        }
+    }
+
+    window.copyPlayerIdFromTop = copyPlayerIdFromTop;
+
     // ---- МЕНЮ ----
     (function() {
         const hamburger = document.getElementById('hamburgerBtn');
@@ -9267,6 +9384,11 @@
                                 <span>⭐ ${p.level || 0}</span>
                                 <span>💠 ${p.diamonds || 0}</span>
                                 <span style="color:#ffcc66;font-weight:700;">🏆 ${rating}</span>
+                                <button class="top-copy-id-btn" 
+                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${p.player_id}', '${(p.username || 'Игрок').replace(/'/g, "\\'")}')"
+                                        title="Скопировать ID">
+                                    <i class="fas fa-copy"></i>
+                                </button>
                             </span>
                         </li>`;
                 }).join('');
@@ -9293,6 +9415,11 @@
                                 <span>⭐ ${playerData.level || 0}</span>
                                 <span>💠 ${playerData.diamonds || 0}</span>
                                 <span style="color:#ffcc66;font-weight:700;">🏆 ${playerRating}</span>
+                                <button class="top-copy-id-btn" 
+                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${playerData.player_id}', '${(playerData.username || 'Игрок').replace(/'/g, "\\'")}')"
+                                        title="Скопировать ID">
+                                    <i class="fas fa-copy"></i>
+                                </button>
                             </span>
                         `;
                         container.appendChild(playerRow);
@@ -9321,6 +9448,21 @@
     function showPlayerProfile(playerId, playerName, level, essence, rating, cardsJson, mbLink) {
         const modal = document.getElementById('playerProfileModal');
         document.getElementById('playerProfileName').textContent = playerName || 'Игрок';
+        // Показываем ID + кнопка копирования
+        const playerIdEl = document.getElementById('playerProfileId');
+        if (playerIdEl) {
+            playerIdEl.innerHTML = `
+                <span style="font-family: monospace; font-size: 11px; color: #6b7084; cursor: pointer; word-break: break-all;"
+                      onclick="copyPlayerIdFromTop('${playerId}', '${(playerName || 'Игрок').replace(/'/g, "\\'")}')"
+                      title="Нажми, чтобы скопировать">
+                    🆔 ${playerId}
+                </span>
+                <button class="copy-profile-id-btn" 
+                        onclick="copyPlayerIdFromTop('${playerId}', '${(playerName || 'Игрок').replace(/'/g, "\\'")}')">
+                    <i class="fas fa-copy"></i> Скопировать ID
+                </button>
+            `;
+        }
         document.getElementById('playerProfileLevel').textContent = level || 1;
         document.getElementById('playerprofileEssence').textContent = essence || 0;
         let ratingEl = modal.querySelector('.rating-row');
