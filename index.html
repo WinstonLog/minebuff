@@ -23,6 +23,365 @@
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #b388ff, #7c4dff); border-radius: 10px; }
 
         /* ============================================================
+           МАГАЗИН ДОНАТА
+           ============================================================ */
+
+        /* Инфо-баннер */
+        .shop-info-banner {
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.12), rgba(123, 77, 255, 0.06));
+            border: 1px solid rgba(74, 158, 255, 0.25);
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .shop-info-icon {
+            font-size: 56px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 20px rgba(74, 158, 255, 0.5));
+        }
+        .shop-info-content { flex: 1; min-width: 200px; }
+        .shop-info-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #4a9eff;
+            margin-bottom: 6px;
+        }
+        .shop-info-desc {
+            font-size: 13px;
+            color: #8b90a8;
+            line-height: 1.6;
+        }
+        .shop-info-desc b { color: #e4e6f0; font-weight: 700; }
+
+        /* Как купить — шаги */
+        .shop-howto {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(20, 24, 36, 0.6);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .shop-howto-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 140px;
+        }
+        .shop-howto-step .step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: #fff;
+            font-weight: 900;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(123, 77, 255, 0.4);
+        }
+        .shop-howto-step .step-text {
+            font-size: 12px;
+            color: #8b90a8;
+            line-height: 1.4;
+        }
+        .shop-howto-step .step-text a {
+            color: #b388ff;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .shop-howto-step .step-text a:hover { text-decoration: underline; }
+        .shop-howto-arrow {
+            color: #b388ff;
+            font-size: 20px;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        /* Пакеты */
+        .shop-packs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) {
+            .shop-packs-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
+        }
+        @media (max-width: 600px) {
+            .shop-packs-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        .shop-pack {
+            position: relative;
+            background: linear-gradient(180deg, rgba(30, 30, 50, 0.98), rgba(15, 15, 25, 0.98));
+            border-radius: 20px;
+            padding: 24px 18px;
+            text-align: center;
+            border: 2px solid var(--pack-color, #4a9eff);
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+        .shop-pack::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top, rgba(74, 158, 255, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+        .shop-pack:hover {
+            transform: translateY(-6px);
+            box-shadow: 
+                0 16px 40px rgba(0,0,0,0.6),
+                0 0 30px -4px var(--pack-color, #4a9eff);
+        }
+        .shop-pack.popular {
+            border-color: #ffcc66;
+            box-shadow: 0 0 30px rgba(255, 204, 102, 0.3);
+        }
+        .shop-pack.popular::after {
+            content: '🔥 ХИТ';
+            position: absolute;
+            top: 12px;
+            right: -30px;
+            background: linear-gradient(135deg, #ff6600, #cc3300);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 4px 40px;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .shop-pack-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            display: block;
+            filter: drop-shadow(0 0 15px var(--pack-color, #4a9eff));
+        }
+        .shop-pack-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #e4e6f0;
+            margin-bottom: 6px;
+        }
+        .shop-pack-gems {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--pack-color, #4a9eff);
+            margin-bottom: 4px;
+            text-shadow: 0 0 20px var(--pack-color, #4a9eff);
+        }
+        .shop-pack-bonus {
+            font-size: 11px;
+            color: #44ff44;
+            font-weight: 700;
+            margin-bottom: 12px;
+            min-height: 16px;
+        }
+        .shop-pack-price {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 14px;
+        }
+        .shop-pack-buy-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(135deg, var(--pack-color, #4a9eff), #2a6aaf);
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+        .shop-pack-buy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.4);
+        }
+        .shop-pack-buy-btn:active { transform: scale(0.97); }
+
+        /* Мои заявки */
+        .shop-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #b388ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .shop-requests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .shop-request-item {
+            background: rgba(20, 24, 36, 0.7);
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .shop-request-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .shop-request-status.pending {
+            background: rgba(255, 204, 102, 0.15);
+            color: #ffcc66;
+        }
+        .shop-request-status.approved {
+            background: rgba(68, 255, 68, 0.15);
+            color: #44ff44;
+        }
+        .shop-request-status.rejected {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff6b6b;
+        }
+
+        /* FAQ */
+        .shop-faq {
+            background: rgba(20, 24, 36, 0.6);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .shop-faq-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #b388ff;
+            margin-bottom: 14px;
+        }
+        .shop-faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding: 10px 0;
+        }
+        .shop-faq-item:last-child { border-bottom: none; }
+        .shop-faq-q {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e4e6f0;
+            margin-bottom: 4px;
+        }
+        .shop-faq-a {
+            font-size: 12px;
+            color: #8b90a8;
+            line-height: 1.5;
+        }
+
+        /* Модалка покупки */
+        #shopBuyContent .shop-buy-preview {
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.1), rgba(123, 77, 255, 0.05));
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            border: 1px solid rgba(74, 158, 255, 0.2);
+        }
+        #shopBuyContent .shop-buy-icon {
+            font-size: 64px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        #shopBuyContent .shop-buy-gems {
+            font-size: 32px;
+            font-weight: 900;
+            color: #4a9eff;
+            margin-bottom: 6px;
+        }
+        #shopBuyContent .shop-buy-price {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        #shopBuyContent .shop-buy-warning {
+            background: rgba(255, 204, 102, 0.08);
+            border-left: 3px solid #ffcc66;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #ffcc66;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+        #shopBuyContent .shop-buy-warning b { color: #ffaa33; }
+
+        #shopBuyContent .shop-buy-id {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        #shopBuyContent .shop-buy-id-label {
+            font-size: 12px;
+            color: #8b90a8;
+        }
+        #shopBuyContent .shop-buy-id-value {
+            font-family: monospace;
+            font-size: 13px;
+            color: #b388ff;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(179, 136, 255, 0.1);
+            border: 1px solid rgba(179, 136, 255, 0.2);
+            transition: 0.25s;
+        }
+        #shopBuyContent .shop-buy-id-value:hover {
+            background: rgba(179, 136, 255, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .shop-packs-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .shop-pack {
+                padding: 16px 12px;
+            }
+            .shop-pack-icon { font-size: 36px; }
+            .shop-pack-gems { font-size: 22px; }
+            .shop-pack-price { font-size: 18px; }
+            .shop-howto-step { min-width: 100%; }
+            .shop-howto-arrow { display: none; }
+        }
+
+        /* ============================================================
            НОВОСТИ / ЧТО НОВОГО
            ============================================================ */
         .news-item {
@@ -2573,7 +2932,9 @@
         /* ============================================================
            ЧАТ
            ============================================================ */
-        .chat-messages-section { scrollbar-width: thin; }
+        .chat-messages-section { 
+            scrollbar-width: thin;
+        }
         .chat-messages-section::-webkit-scrollbar { width: 4px; }
         .chat-messages-section::-webkit-scrollbar-thumb {
             background: rgba(179, 136, 255, 0.3); border-radius: 10px;
@@ -4195,7 +4556,12 @@
     <div class="nav-section-title">💬 Социальное</div>
     <button class="nav-item" data-section="chat"><i class="fas fa-comment-dots"></i><span>Чат</span></button>
     <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button>
-    <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge new">NEW</span><span class="badge" id="marketBadge">0</span></button>
+    <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge new">NEW</span><span class="badge" id="marketBadge">0</span></button>    
+    <button class="nav-item" data-section="shop">
+        <i class="fas fa-gem"></i>
+        <span>Магазин</span>
+        <span class="badge new">💰</span>
+    </button>
     <button class="nav-item" data-section="top"><i class="fas fa-trophy"></i><span>Топ</span></button>
     
     <div class="nav-section-title">🎲 Развлечения</div>
@@ -4476,8 +4842,7 @@
                 <span style="font-weight:700;font-size:14px;color:#b388ff;">💬 Общий чат</span>
                 <span style="font-size:11px;opacity:0.4;" id="chatOnlineCountSection">👤 0</span>
             </div>
-            <div class="chat-messages-section" id="chatMessagesSection" style="height:350px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth;">
-                <div class="chat-message system">
+            <div class="chat-messages-section" id="chatMessagesSection" style="height:350px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth;">                <div class="chat-message system">
                     <span class="msg-text">💬 Добро пожаловать в общий чат! Пишите сообщения и получайте 💠 Эссенцию и ✨ XP! (10 сообщений в день)</span>
                 </div>
             </div>
@@ -4828,6 +5193,82 @@
         </div>
     </section>
 
+    <!-- МАГАЗИН -->
+    <section id="section-shop" class="section">
+        <div class="section-header">
+            <h1><i class="fas fa-gem"></i> Магазин эссенции</h1>
+            <span class="section-info">
+                <i class="fas fa-gem" style="color:#b388ff;"></i>
+                <strong id="shopGemsDisplay">0</strong> эссенции
+            </span>
+        </div>
+
+        <!-- Инфо-баннер -->
+        <div class="shop-info-banner">
+            <div class="shop-info-icon">💠</div>
+            <div class="shop-info-content">
+                <div class="shop-info-title">Эссенция — игровая валюта</div>
+                <div class="shop-info-desc">
+                    Эссенцию можно потратить на <b>паки с картами</b>, <b>улучшение кирки</b> и <b>другие функции</b>.
+                    Покупка через ЮMoney. После оплаты — <b>обязательно</b> отправь чек в Telegram.
+                </div>
+            </div>
+        </div>
+
+        <!-- Как купить -->
+        <div class="shop-howto">
+            <div class="shop-howto-step">
+                <div class="step-num">1</div>
+                <div class="step-text">Выбери пакет</div>
+            </div>
+            <div class="shop-howto-arrow">→</div>
+            <div class="shop-howto-step">
+                <div class="step-num">2</div>
+                <div class="step-text">Оплати через ЮMoney</div>
+            </div>
+            <div class="shop-howto-arrow">→</div>
+            <div class="shop-howto-step">
+                <div class="step-num">3</div>
+                <div class="step-text">Отправь чек + ID в <a href="https://t.me/paytopay" target="_blank">@paytopay</a></div>
+            </div>
+            <div class="shop-howto-arrow">→</div>
+            <div class="shop-howto-step">
+                <div class="step-num">4</div>
+                <div class="step-text">Получи эссенции (до 24ч)</div>
+            </div>
+        </div>
+
+        <!-- Мои заявки -->
+        <div id="myDonationsBlock" style="display:none; margin-bottom:16px;">
+            <div class="shop-section-title">📋 Мои заявки</div>
+            <div id="myDonationsList" class="shop-requests-list"></div>
+        </div>
+
+        <!-- Пакеты -->
+        <div class="shop-packs-grid" id="shopPacksGrid"></div>
+
+        <!-- FAQ -->
+        <div class="shop-faq">
+            <div class="shop-faq-title">❓ Частые вопросы</div>
+            <div class="shop-faq-item">
+                <div class="shop-faq-q">Когда начислят эссенция?</div>
+                <div class="shop-faq-a">После проверки чека админом. Обычно до 24 часов. Если долго — напиши в Telegram.</div>
+            </div>
+            <div class="shop-faq-item">
+                <div class="shop-faq-q">Как найти свой ID?</div>
+                <div class="shop-faq-a">Открой свой профиль — ID показан под ником. Нажми на него — скопируется.</div>
+            </div>
+            <div class="shop-faq-item">
+                <div class="shop-faq-q">Что если я не отправил чек?</div>
+                <div class="shop-faq-a">Эссенция не начислятся. Обязательно отправь чек и ID в @paytopay.</div>
+            </div>
+            <div class="shop-faq-item">
+                <div class="shop-faq-q">Можно вернуть деньги?</div>
+                <div class="shop-faq-a">Цифровые товары возврату не подлежат. Но если что-то не начислилось — напиши, разберёмся.</div>
+            </div>
+        </div>
+    </section>
+
     <!-- НОВОСТИ / ЧТО НОВОГО -->
     <section id="section-news" class="section">
         <div class="section-header">
@@ -5038,6 +5479,23 @@
         <div class="modal-title">Рынок</div>
         <div class="modal-body"></div>
         <div class="modal-actions"></div>
+    </div>
+</div>
+
+<!-- МОДАЛКА ПОКУПКИ -->
+<div class="modal-overlay" id="shopBuyModal">
+    <div class="modal-content" style="max-width: 460px;">
+        <button class="modal-close" onclick="closeShopBuyModal()">&times;</button>
+        <div class="modal-title">💠 Покупка эссенции</div>
+
+        <div id="shopBuyContent"></div>
+
+        <div class="modal-buttons" style="margin-top:16px;">
+            <button class="modal-btn close" onclick="closeShopBuyModal()">Отмена</button>
+            <button class="modal-btn upgrade" id="shopBuyConfirmBtn">
+                💳 Перейти к оплате
+            </button>
+        </div>
     </div>
 </div>
 
@@ -6180,7 +6638,7 @@
         if (widget) {
             if (claimable > 0) {
                 widget.style.display = 'flex';
-                widget.querySelector('.quest-mini-text').textContent = `${claimable} квест!`;
+                widget.querySelector('.quest-mini-text').textContent = `${claimable}`;
             } else {
                 widget.style.display = 'none';
             }
@@ -6313,6 +6771,307 @@
                 </div>
             `;
         }).join('');
+    }
+
+    /* ============================================================
+       МАГАЗИН ДОНАТА
+    ============================================================ */
+
+    const DONATION_PACKAGES = [
+        {
+            id: 'small',
+            icon: '💠',
+            name: 'Малый',
+            essence: 50,
+            price: 49,
+            color: '#4a9eff',
+            popular: false
+        },
+        {
+            id: 'medium',
+            icon: '💠',
+            name: 'Средний',
+            essence: 150,
+            bonusEssence: 15,   // +10% → 165
+            price: 129,
+            color: '#b388ff',
+            popular: true
+        },
+        {
+            id: 'large',
+            icon: '💠',
+            name: 'Большой',
+            essence: 350,
+            bonusEssence: 50,   // +15% → 400
+            price: 249,
+            color: '#ffcc66',
+            popular: false
+        },
+        {
+            id: 'mega',
+            icon: '💠',
+            name: 'Мега',
+            essence: 1000,
+            bonusEssence: 250,  // +25% → 1250
+            price: 599,
+            color: '#ff6600',
+            popular: false
+        }
+    ];
+    const YOOMONEY_WALLET = '4100119003253255'; // Твой кошелёк
+    const TELEGRAM_ADMIN = 'paytopay';           // Твой Telegram без @
+
+    let _gems = 0;
+    let _donationRequests = [];
+
+    // ===== ЗАГРУЗКА =====
+    async function loadShopData() {
+        if (!supabaseClient || !_playerId) return;
+        
+        try {
+            // Загружаем и эссенцию, и алмазы
+            const { data: profile } = await supabaseClient
+                .from('leaderboard')
+                .select('essence, gems')
+                .eq('player_id', _playerId)
+                .single();
+            
+            if (profile) {
+                _essence = profile.essence || 0;
+                _gems = profile.gems || 0;
+                
+                // Синхронизируем глобальные переменные с БД
+                saveGame();
+                updateUI();
+            }
+            
+            // Загружаем заявки игрока
+            const { data: requests } = await supabaseClient
+                .from('donation_requests')
+                .select('*')
+                .eq('player_id', _playerId)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
+            _donationRequests = requests || [];
+            
+            renderShop();
+        } catch(e) {
+            console.warn('loadShopData error:', e);
+        }
+    }
+
+    // ===== РЕНДЕР =====
+    function renderShop() {
+        // Баланс
+        const gemsEl = document.getElementById('shopGemsDisplay');
+        if (gemsEl) gemsEl.textContent = _essence;   // ← показываем эссенцию
+        
+        // Пакеты
+        const grid = document.getElementById('shopPacksGrid');
+        if (grid) {
+            grid.innerHTML = DONATION_PACKAGES.map(pkg => {
+            const totalEssence = pkg.essence + (pkg.bonusEssence || 0);
+            const bonus = pkg.bonusEssence ? `+${pkg.bonusEssence} бонус` : '';
+                return `
+                    <div class="shop-pack ${pkg.popular ? 'popular' : ''}" 
+                         style="--pack-color: ${pkg.color};"
+                         onclick="openShopBuyModal('${pkg.id}')">
+                        <span class="shop-pack-icon">${pkg.icon}</span>
+                        <div class="shop-pack-name">${pkg.name}</div>
+                        <div class="shop-pack-gems">${totalEssence} 💠</div>
+                        <div class="shop-pack-bonus">${bonus}</div>
+                        <div class="shop-pack-price">${pkg.price} ₽</div>
+                        <button class="shop-pack-buy-btn">Купить</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Мои заявки
+        const block = document.getElementById('myDonationsBlock');
+        const list = document.getElementById('myDonationsList');
+        if (block && list) {
+            if (_donationRequests.length === 0) {
+                block.style.display = 'none';
+            } else {
+                block.style.display = 'block';
+                list.innerHTML = _donationRequests.map(req => {
+                    const pkg = DONATION_PACKAGES.find(p => p.id === req.package_id);
+                    const totalGems = req.package_gems;
+                    const statusText = {
+                        pending: '⏳ Ожидает',
+                        approved: '✅ Начислено',
+                        rejected: '❌ Отклонено'
+                    }[req.status] || req.status;
+                    
+                    return `
+                        <div class="shop-request-item">
+                            <div>
+                                <div style="font-weight:700;font-size:13px;">
+                                    ${pkg ? pkg.name : req.package_id} — ${totalGems} 💠
+                                </div>
+                                <div style="font-size:11px;color:#6b7084;">
+                                    ${new Date(req.created_at).toLocaleString('ru-RU')} · ${req.price_rub} ₽
+                                </div>
+                            </div>
+                            <div class="shop-request-status ${req.status}">${statusText}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    }
+
+    // ===== МОДАЛКА ПОКУПКИ =====
+    let _currentPurchase = null;
+
+    function openShopBuyModal(pkgId) {
+        const pkg = DONATION_PACKAGES.find(p => p.id === pkgId);
+        if (!pkg) return;
+        
+        _currentPurchase = pkg;
+        const totalGems = pkg.gems + (pkg.bonusGems || 0);
+        
+        const content = document.getElementById('shopBuyContent');
+        content.innerHTML = `
+            <div class="shop-buy-preview">
+                <span class="shop-buy-icon">${pkg.icon}</span>
+                <div class="shop-buy-gems">${totalGems} 💠</div>
+                <div class="shop-buy-price">${pkg.price} ₽</div>
+            </div>
+            
+            <div class="shop-buy-id">
+                <span class="shop-buy-id-label">🆔 Ваш ID:</span>
+                <span class="shop-buy-id-value" onclick="copyShopPlayerId()">
+                    ${_playerId} 📋
+                </span>
+            </div>
+            
+            <div class="shop-buy-warning">
+                ⚠️ <b>Важно:</b> после оплаты <b>обязательно</b> отправь чек и свой ID в Telegram 
+                <a href="https://t.me/${TELEGRAM_ADMIN}" target="_blank" style="color:#ffaa33;font-weight:900;">@${TELEGRAM_ADMIN}</a>.
+                Без чека алмазы не начислятся!
+            </div>
+        `;
+        
+        document.getElementById('shopBuyModal').classList.add('show');
+    }
+
+    function closeShopBuyModal() {
+        document.getElementById('shopBuyModal').classList.remove('show');
+        _currentPurchase = null;
+    }
+
+    function copyShopPlayerId() {
+        if (!_playerId) return;
+        navigator.clipboard.writeText(_playerId).then(() => {
+            showToast('✅ ID скопирован!', '#44ff44');
+        }).catch(() => {
+            showToast('❌ Не удалось скопировать', '#ff6b6b');
+        });
+    }
+
+    // ===== ПЕРЕХОД К ОПЛАТЕ =====
+    async function confirmShopBuy() {
+        if (!_currentPurchase) return;
+        
+        const pkg = _currentPurchase;
+        const totalEssence = pkg.essence + (pkg.bonusEssence || 0);
+
+        try {
+            if (supabaseClient && _playerId && _playerName) {
+                await supabaseClient.from('donation_requests').insert({
+                    player_id: _playerId,
+                    player_name: _playerName,
+                    package_id: pkg.id,
+                    package_essence: totalEssence,   // ← новое
+                    price_rub: pkg.price,
+                    status: 'pending'
+                });
+            }
+        } catch(e) {
+            console.warn('Ошибка создания заявки:', e);
+        }
+        
+        // 2. Формируем ссылку на ЮMoney с суммой
+        const yoomoneyUrl = `https://yoomoney.ru/to/${YOOMONEY_WALLET}?amount=${pkg.price}&comment=${encodeURIComponent('Эссенция ' + totalEssence + ' для ' + _playerId)}`;
+        
+        // 3. Открываем оплату
+        window.open(yoomoneyUrl, '_blank');
+        
+        // 4. Показываем инструкцию
+        showToast(`✅ Заявка создана! Отправь чек @${TELEGRAM_ADMIN}`, '#44ff44');
+        
+        closeShopBuyModal();
+        
+        // 5. Обновляем список заявок
+        setTimeout(loadShopData, 1000);
+    }
+
+    // ============================================================
+    // АВТООБНОВЛЕНИЕ БАЛАНСА АЛМАЗОВ
+    // ============================================================
+
+    let _shopAutoRefreshTimer = null;
+    let _lastSeenGems = -1;
+
+    async function refreshGemsBalance() {
+        if (!supabaseClient || !_playerId) return;
+        
+        try {
+            const { data, error } = await supabaseClient
+                .from('leaderboard')
+                .select('gems')
+                .eq('player_id', _playerId)
+                .single();
+            
+            if (error) return;
+            
+            const newGems = data?.gems || 0;
+            
+            // Если баланс изменился — показываем уведомление
+            if (_lastSeenGems !== -1 && newGems > _lastSeenGems) {
+                const diff = newGems - _lastSeenGems;
+                showToast(`💠 +${diff} эссенции зачислено!`, '#4a9eff');
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            }
+            
+            _lastSeenGems = newGems;
+            _gems = newGems;
+            
+            // Обновляем UI если мы в магазине
+            const gemsEl = document.getElementById('shopGemsDisplay');
+            if (gemsEl) gemsEl.textContent = _gems;
+            
+            // Обновляем заявки
+            if (typeof loadShopData === 'function' && document.querySelector('#section-shop.active')) {
+                // Тихо обновляем без тостов
+                const { data: requests } = await supabaseClient
+                    .from('donation_requests')
+                    .select('*')
+                    .eq('player_id', _playerId)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                _donationRequests = requests || [];
+                renderShop();
+            }
+        } catch(e) {
+            console.warn('refreshGemsBalance error:', e);
+        }
+    }
+
+    function startShopAutoRefresh() {
+        if (_shopAutoRefreshTimer) clearInterval(_shopAutoRefreshTimer);
+        // Каждые 30 секунд
+        _shopAutoRefreshTimer = setInterval(refreshGemsBalance, 30000);
+    }
+
+    function stopShopAutoRefresh() {
+        if (_shopAutoRefreshTimer) {
+            clearInterval(_shopAutoRefreshTimer);
+            _shopAutoRefreshTimer = null;
+        }
     }
 
     // ============================================================
@@ -7455,7 +8214,7 @@
 
                     bodyHtml += `
                         <div class="market-check-block" style="margin-top:14px;">
-                            <div class="market-check-title">💎 Вы отдаёте (${totalSelected})</div>
+                            <div class="market-check-title">💠 Вы отдаёте (${totalSelected})</div>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;">${tags}</div>
                         </div>
                     `;
@@ -7945,9 +8704,22 @@
         } else {
             msgDiv.innerHTML = `<span class="msg-text">${message.text}</span>`;
         }
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-        while (container.children.length > 100) container.removeChild(container.firstChild);
+        
+        // Проверяем: пользователь у верха? (чтобы не дёргать если он читает старое)
+        const isAtTop = container.scrollTop < 50;
+        
+        // Вставляем В НАЧАЛО (новые сверху)
+        container.insertBefore(msgDiv, container.firstChild);
+        
+        // Удаляем лишние СНИЗУ (старые)
+        while (container.children.length > 100) container.removeChild(container.lastChild);
+        
+        // Скролл наверх — только если пользователь был у верха
+        // (чтобы не мешать, если он читает старые)
+        if (isAtTop || isSystem) {
+            // Плавно наверх
+            container.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     // ---- ПРОВЕРКА СБРОСА ЛИМИТА ----
@@ -8142,10 +8914,12 @@
                 if (error || !data) return;
                 const container = document.getElementById('chatMessagesSection');
                 if (container) {
+                    // Системное сообщение будет внизу (т.к. column-reverse его перевернёт)
                     container.innerHTML = `<div class="chat-message system"><span class="msg-text">💬 Добро пожаловать! Первые 10 сообщений в день дают 💠 и ✨ XP!</span></div>`;
                 }
-                const reversed = data.reverse();
-                for (const msg of reversed) {
+                // Сортируем: старые в начало (они окажутся внизу визуально)
+                const sorted = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                for (const msg of sorted) {
                     addChatMessageToSection({
                         sender: msg.sender || 'Аноним',
                         text: msg.text,
@@ -9929,7 +10703,7 @@
             { emoji: '⭐', unlocked: _level >= 10, tooltip: 'Уровень 10' },
             { emoji: '👑', unlocked: _level >= 25, tooltip: 'Уровень 25' },
             { emoji: '🏆', unlocked: _level >= 50, tooltip: 'Уровень 50' },
-            { emoji: '💎', unlocked: _cardHistory.length >= 50, tooltip: '50 карт' },
+            { emoji: '💠', unlocked: _cardHistory.length >= 50, tooltip: '50 карт' },
             { emoji: '🐉', unlocked: _cardHistory.length >= 100, tooltip: '100 карт' },
             { emoji: '🪙', unlocked: _essence >= 1000, tooltip: '1000 эссенции' }
         ];
@@ -11269,8 +12043,14 @@
 
     // ---- НАВИГАЦИЯ ----
     function switchSection(section) {
+        // Останавливаем авто-обновление магазина если уходим из него
+        if (section !== 'shop') {
+            if (typeof stopShopAutoRefresh === 'function') stopShopAutoRefresh();
+        }
+        
         document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
         const map = {
             'mine': 'section-mine', 'mycards': 'section-mycards',
             'catalog': 'section-catalog', 'sets': 'section-sets',
@@ -11279,13 +12059,16 @@
             'top': 'section-top', 'profile': 'section-profile',
             'settings': 'section-settings', 'minigames': 'section-minigames',
             'market': 'section-market', 'quests': 'section-quests', 
-            'news': 'section-news',
+            'news': 'section-news', 'shop': 'section-shop'
         };
+        
         const target = document.getElementById(map[section]);
         if (target) target.classList.add('active');
+        
         const navItem = document.querySelector(`.nav-item[data-section="${section}"]`);
         if (navItem) navItem.classList.add('active');
 
+        // ===== ЛОГИКА ПО СЕКЦИЯМ =====
         if (section === 'mycards') renderCollection();
         if (section === 'catalog') renderCatalog();
         if (section === 'sets') renderSets();
@@ -11293,9 +12076,8 @@
         if (section === 'event') updateEventUI();
         if (section === 'profile') { updateProfileUI(); updateProfileLinkUI(); }
         if (section === 'top') loadTopFromSupabase();
-        if (section === 'news') {
-            loadGameNews();
-        }
+        if (section === 'news') loadGameNews();
+        
         if (section === 'minigames') {
             setTimeout(() => {
                 fgInit();
@@ -11304,15 +12086,31 @@
                 fgUpdateDailyUI();
             }, 50);
         }
+        
         if (section === 'market') {
             setTimeout(() => { loadMarketData(); subscribeToMarket(); }, 100);
         }
+        
+        if (section === 'shop') { 
+            setTimeout(() => {
+                loadShopData();
+                if (typeof refreshGemsBalance === 'function') refreshGemsBalance();
+                if (typeof startShopAutoRefresh === 'function') startShopAutoRefresh();
+            }, 100); 
+        }
+        
         if (section === 'quests') {
             loadDailyQuests();
         }
+        
         if (section === 'trade') {
-            setTimeout(async () => { await loadTrades(); await renderSenderCards(); renderReceiverCards(); }, 100);
+            setTimeout(async () => { 
+                await loadTrades(); 
+                await renderSenderCards(); 
+                renderReceiverCards(); 
+            }, 100);
         }
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     window.switchSection = switchSection;
@@ -11501,7 +12299,13 @@
         setInterval(loadTrades, 30000);
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) loadGame();
+            if (!document.hidden) {
+                loadGame();
+                // Если мы в магазине — обновляем баланс
+                if (document.querySelector('#section-shop.active')) {
+                    refreshGemsBalance();
+                }
+            }
         });
 
         document.querySelectorAll('[data-news-filter]').forEach(btn => {
@@ -11512,6 +12316,20 @@
                 loadGameNews();
             });
         });
+
+        // ===== ОБРАБОТЧИК КНОПКИ ОПЛАТЫ =====
+        const buyBtn = document.getElementById('shopBuyConfirmBtn');
+        if (buyBtn) {
+            buyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                confirmShopBuy();
+            });
+            console.log('✅ Кнопка оплаты привязана');
+        } else {
+            console.warn('⚠️ Кнопка shopBuyConfirmBtn не найдена в DOM');
+        }
+
+        setTimeout(refreshGemsBalance, 5000);
     });
 
     window.deleteAllData = deleteAllData;
@@ -11555,6 +12373,10 @@
     window.claimQuestBonus = claimQuestBonus;
     window.addQuestProgress = addQuestProgress;
     window.loadGameNews = loadGameNews;
+    window.openShopBuyModal = openShopBuyModal;
+    window.closeShopBuyModal = closeShopBuyModal;
+    window.confirmShopBuy = confirmShopBuy;
+    window.copyShopPlayerId = copyShopPlayerId;
 
     console.log('⚡ Arcana Nexus — XP Edition загружен!');
 </script>
