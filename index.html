@@ -7850,11 +7850,11 @@
         }
     }
     window.copyPlayerId = copyPlayerId;
-
+    
     /* ============================================================
        КОПИРОВАНИЕ ID ИЗ ТОПа
        ============================================================ */
-    async function copyPlayerIdFromTop(playerId, playerName) {
+    async function copyPlayerIdFromTop(playerId, playerName, evt) {
         if (!playerId) {
             showToast('❌ ID не найден', '#ff6b6b');
             return;
@@ -7882,11 +7882,16 @@
             // Вибрация
             if (navigator.vibrate) navigator.vibrate(30);
 
-            // Анимация на кнопке
-            event.target.closest('.top-copy-id-btn')?.classList.add('copied');
-            setTimeout(() => {
-                event.target.closest('.top-copy-id-btn')?.classList.remove('copied');
-            }, 1000);
+            // ===== Анимация на кнопке (безопасно) =====
+            // Берём event из параметра или из window.event (для onclick)
+            const e = evt || window.event;
+            if (e && e.target) {
+                const btn = e.target.closest ? e.target.closest('.top-copy-id-btn') : null;
+                if (btn) {
+                    btn.classList.add('copied');
+                    setTimeout(() => btn.classList.remove('copied'), 1000);
+                }
+            }
 
         } catch(e) {
             console.warn('copyPlayerIdFromTop error:', e);
@@ -9385,7 +9390,7 @@
                                 <span>💠 ${p.diamonds || 0}</span>
                                 <span style="color:#ffcc66;font-weight:700;">🏆 ${rating}</span>
                                 <button class="top-copy-id-btn" 
-                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${p.player_id}', '${(p.username || 'Игрок').replace(/'/g, "\\'")}')"
+                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${p.player_id}', '${(p.username || 'Игрок').replace(/'/g, "\\'")}', event)"
                                         title="Скопировать ID">
                                     <i class="fas fa-copy"></i>
                                 </button>
@@ -9416,7 +9421,7 @@
                                 <span>💠 ${playerData.diamonds || 0}</span>
                                 <span style="color:#ffcc66;font-weight:700;">🏆 ${playerRating}</span>
                                 <button class="top-copy-id-btn" 
-                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${playerData.player_id}', '${(playerData.username || 'Игрок').replace(/'/g, "\\'")}')"
+                                        onclick="event.stopPropagation(); copyPlayerIdFromTop('${p.player_id}', '${(p.username || 'Игрок').replace(/'/g, "\\'")}', event)"
                                         title="Скопировать ID">
                                     <i class="fas fa-copy"></i>
                                 </button>
@@ -9458,7 +9463,7 @@
                     🆔 ${playerId}
                 </span>
                 <button class="copy-profile-id-btn" 
-                        onclick="copyPlayerIdFromTop('${playerId}', '${(playerName || 'Игрок').replace(/'/g, "\\'")}')">
+                        onclick="copyPlayerIdFromTop('${playerId}', '${(playerName || 'Игрок').replace(/'/g, "\\'")}', event)">
                     <i class="fas fa-copy"></i> Скопировать ID
                 </button>
             `;
