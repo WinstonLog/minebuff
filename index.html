@@ -7522,6 +7522,7 @@
         const weights = { "M": 1, "T": 2, "K": 3, "Y": 4, "U": 8, "Q": 10, "R": 15, "Z": 20, "O": 25 };
         const byRank = {};
         for (const c of ALL_CARDS) {
+            if (c.event) continue;
             if (!byRank[c.rank]) byRank[c.rank] = [];
             byRank[c.rank].push(c);
         }
