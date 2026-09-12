@@ -6936,7 +6936,6 @@
         if (!supabaseClient || !_playerId) return;
         
         try {
-            // Загружаем и эссенцию, и алмазы
             const { data: profile } = await supabaseClient
                 .from('leaderboard')
                 .select('essence, gems')
@@ -6944,14 +6943,20 @@
                 .single();
             
             if (profile) {
-                _essence = profile.essence || 0;
-                _gems = profile.gems || 0;
-
-                saveGame(true);        
+                // ✅ Берём из базы ТОЛЬКО если там реально есть значение
+                // (чтобы не затирать локальные данные нулём, если админ ещё не начислил)
+                if (typeof profile.essence === 'number' && profile.essence >= 0) {
+                    _essence = profile.essence;
+                }
+                if (typeof profile.gems === 'number' && profile.gems >= 0) {
+                    _gems = profile.gems;
+                }
+                
+                saveGame(true);   // не синхронизировать в БД
                 updateUI();
             }
             
-            // Загружаем заявки игрока
+            // заявки
             const { data: requests } = await supabaseClient
                 .from('donation_requests')
                 .select('*')
@@ -6960,7 +6965,6 @@
                 .limit(20);
             
             _donationRequests = requests || [];
-            
             renderShop();
         } catch(e) {
             console.warn('loadShopData error:', e);
@@ -10171,7 +10175,11 @@
 
     async function syncToSupabase() {
         if (!supabaseClient || !_playerId || !_playerName) return;
-
+        
+        // ✅ Защита: если эссенция подозрительно мала — не пишем её
+        // (например, во время загрузки из базы)
+        if (typeof _syncLock !== 'undefined' && _syncLock) return;
+        
         const cardsForDb = _cardHistory.map(card => ({
             cardId: card.cardId || card.id,
             rank: card.rank,
@@ -10185,7 +10193,8 @@
                     player_id: _playerId,
                     username: _playerName,
                     level: _level,
-                    diamonds: _essence,
+                    essence: _essence,
+                    gems: _gems,
                     ore: _ore,
                     cards_json: cardsForDb,
                     mb_link: _mbProfileLink || null,
@@ -10208,7 +10217,9 @@
             .then(({ data }) => {
                 if (data) {
                     _ore = data.ore || _ore;
-                    _essence = data.diamonds || _essence;
+                    // ✅ Читаем essence, а НЕ diamonds
+                    _essence = data.essence || _essence;
+                    _gems = data.gems || _gems;
                     _level = data.level || _level;
                     _mbProfileLink = data.mb_link || _mbProfileLink;
                     
