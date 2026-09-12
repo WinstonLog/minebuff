@@ -6680,40 +6680,147 @@
        НОВОСТИ / ЧТО НОВОГО
        ============================================================ */
 
-    let gameNews = [];
+    const GAME_NEWS = [
+        {
+            id: 1,
+            title: 'Магазин алмазов',
+            content: `В игре появился **магазин алмазов**! 🎉
+
+    Что нового:
+    • 💎 Пакеты алмазов от 50 до 5000
+    • 🎁 Бонусы за большие пакеты (до +25%)
+    • 💳 Оплата через ЮMoney
+    • 📱 Мгновенное зачисление после проверки чека
+
+    Как купить:
+    1. Открой раздел **Магазин** в боковом меню
+    2. Выбери пакет
+    3. Оплати через ЮMoney
+    4. Отправь чек в Telegram — алмазы будут начислены
+
+    ⚠️ Алмазы — премиум-валюта. Их можно обменять на эксклюзивные карты и бустеры.`,
+            type: 'update',
+            icon: '💎',
+            color: '#4a9eff',
+            version: '2.1',
+            important: true,
+            published_at: new Date('2026-01-15T12:00:00').toISOString()
+        },
+        {
+            id: 2,
+            title: 'Рынок карт',
+            content: `Открыт **рынок карт**! 🏪
+
+    Теперь вы можете:
+    • 📤 Выставлять свои карты на продажу
+    • 🛒 Создавать заявки на покупку нужных карт
+    • 🔄 Обмениваться картами с другими игроками
+    • 📊 Видеть все активные лоты и заявки
+
+    Как пользоваться:
+    1. Открой раздел **Рынок**
+    2. Выбери вкладку **Лоты** или **Заявки**
+    3. Создай свой лот или прими чужой
+    4. Карты перейдут мгновенно
+
+    💡 Совет: выставляй адекватные цены — редкие карты меняются на 2-5 карт низкого ранга.`,
+            type: 'update',
+            icon: '🏪',
+            color: '#ffcc66',
+            version: '2.0',
+            important: false,
+            published_at: new Date('2026-01-10T12:00:00').toISOString()
+        },
+        {
+            id: 3,
+            title: 'Ежедневные квесты',
+            content: `Добавлены **ежедневные квесты**! 🎯
+
+    Каждый день выполняй 5 заданий:
+    • ⛏️ Сделай удары в шахте
+    • 🎴 Открой паки
+    • 💬 Напиши сообщения в чате
+    • 🎮 Победи в мини-игре
+    • 🏪 Обменяйся на рынке
+
+    Награды:
+    • 💠 Эссенция
+    • ⛏️ Руда
+    • ✨ Опыт
+
+    🏆 **Бонус:** выполни все 5 квестов — получишь **+50 💠, +500 ⛏️ и +100 XP**!`,
+            type: 'update',
+            icon: '🎯',
+            color: '#44ff44',
+            version: '1.9',
+            important: false,
+            published_at: new Date('2026-01-05T12:00:00').toISOString()
+        },
+        {
+            id: 4,
+            title: 'Мини-игра «Аркана: Полёт»',
+            content: `В игре появилась **новая мини-игра**! 🐦
+
+    **Аркана: Полёт** — пролетай между рунными колоннами и собирай 💠 эссенцию.
+
+    Управление:
+    • 🖱️ **Клик мышью** или **пробел** — птица подпрыгивает
+    • 📱 На телефоне — **тап по экрану**
+
+    Награды:
+    • 🏆 Рекорд — **+10 ⛏️ руды**
+    • 💠 Собирай эссенцию по пути (до **50 💠 в день**)`,
+            type: 'event',
+            icon: '🐦',
+            color: '#b388ff',
+            version: '1.8',
+            important: false,
+            published_at: new Date('2025-12-25T12:00:00').toISOString()
+        },
+/*        {
+            id: 5,
+            title: 'Хэллоуин 2026',
+            content: `🎃 **Хэллоуинский ивент** стартовал!
+
+    Что вас ждёт:
+    • 🎴 Эксклюзивная карта ранга **H** (Тыква)
+    • 💰 Ивентовая валюта за активность
+    • 📦 Ивентовые паки со скидкой
+    • 🎁 Специальные награды в календаре
+
+    Период: **25 октября — 31 октября**.
+
+    Успей собрать эксклюзивную коллекцию! 🕸️`,
+            type: 'event',
+            icon: '🎃',
+            color: '#ff6600',
+            version: '1.7',
+            important: false,
+            published_at: new Date('2025-10-25T12:00:00').toISOString()
+        }*/
+    ];
+
+    let gameNews = [];  // будет заполнен из GAME_NEWS
     let newsFilter = 'all';
 
-    async function loadGameNews() {
-        if (!supabaseClient) return;
-
-        try {
-            let query = supabaseClient
-                .from('game_news')
-                .select('*')
-                .order('important', { ascending: false })
-                .order('published_at', { ascending: false })
-                .limit(50);
-
-            if (newsFilter !== 'all') {
-                query = query.eq('type', newsFilter);
-            }
-
-            const { data, error } = await query;
-            if (error) throw error;
-
-            gameNews = data || [];
-            renderNews();
-        } catch(e) {
-            console.warn('loadGameNews error:', e);
-            const listEl = document.getElementById('newsList');
-            if (listEl) {
-                listEl.innerHTML = `<div class="news-empty">
-                    <div class="icon">📰</div>
-                    <div class="title">Ошибка загрузки</div>
-                    <div class="desc">Попробуйте позже</div>
-                </div>`;
-            }
+    function loadGameNews() {
+        // Новости теперь локально в коде
+        let filtered = [...GAME_NEWS];
+        
+        // Фильтр по типу
+        if (newsFilter !== 'all') {
+            filtered = filtered.filter(n => n.type === newsFilter);
         }
+        
+        // Сортировка: важные сверху, потом по дате
+        filtered.sort((a, b) => {
+            if (a.important && !b.important) return -1;
+            if (!a.important && b.important) return 1;
+            return new Date(b.published_at) - new Date(a.published_at);
+        });
+        
+        gameNews = filtered;
+        renderNews();
     }
 
     function renderNews() {
