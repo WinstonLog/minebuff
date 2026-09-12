@@ -6863,16 +6863,16 @@
 
     // ===== РЕНДЕР =====
     function renderShop() {
-        // Баланс
+        // Баланс — показываем эссенцию
         const gemsEl = document.getElementById('shopGemsDisplay');
-        if (gemsEl) gemsEl.textContent = _essence;   // ← показываем эссенцию
+        if (gemsEl) gemsEl.textContent = Number(_essence) || 0;
         
         // Пакеты
         const grid = document.getElementById('shopPacksGrid');
         if (grid) {
             grid.innerHTML = DONATION_PACKAGES.map(pkg => {
-            const totalEssence = pkg.essence + (pkg.bonusEssence || 0);
-            const bonus = pkg.bonusEssence ? `+${pkg.bonusEssence} бонус` : '';
+                const totalEssence = (Number(pkg.essence) || 0) + (Number(pkg.bonusEssence) || 0);
+                const bonus = pkg.bonusEssence ? `+${pkg.bonusEssence} бонус` : '';
                 return `
                     <div class="shop-pack ${pkg.popular ? 'popular' : ''}" 
                          style="--pack-color: ${pkg.color};"
@@ -6898,7 +6898,17 @@
                 block.style.display = 'block';
                 list.innerHTML = _donationRequests.map(req => {
                     const pkg = DONATION_PACKAGES.find(p => p.id === req.package_id);
-                    const totalGems = req.package_gems;
+                    
+                    // ⚠️ ЗАЩИТА: читаем и package_essence, и package_gems, и пакет
+                    let totalEssence = 0;
+                    if (typeof req.package_essence === 'number') {
+                        totalEssence = req.package_essence;
+                    } else if (typeof req.package_gems === 'number') {
+                        totalEssence = req.package_gems;
+                    } else if (pkg && typeof pkg.essence === 'number') {
+                        totalEssence = pkg.essence + (pkg.bonusEssence || 0);
+                    }
+                    
                     const statusText = {
                         pending: '⏳ Ожидает',
                         approved: '✅ Начислено',
@@ -6909,7 +6919,7 @@
                         <div class="shop-request-item">
                             <div>
                                 <div style="font-weight:700;font-size:13px;">
-                                    ${pkg ? pkg.name : req.package_id} — ${totalGems} 💠
+                                    ${pkg ? pkg.name : req.package_id} — ${totalEssence} 💠
                                 </div>
                                 <div style="font-size:11px;color:#6b7084;">
                                     ${new Date(req.created_at).toLocaleString('ru-RU')} · ${req.price_rub} ₽
@@ -6931,13 +6941,13 @@
         if (!pkg) return;
         
         _currentPurchase = pkg;
-        const totalGems = pkg.gems + (pkg.bonusGems || 0);
+        const totalEssence = (Number(pkg.essence) || 0) + (Number(pkg.bonusEssence) || 0);
         
         const content = document.getElementById('shopBuyContent');
         content.innerHTML = `
             <div class="shop-buy-preview">
                 <span class="shop-buy-icon">${pkg.icon}</span>
-                <div class="shop-buy-gems">${totalGems} 💠</div>
+                <div class="shop-buy-gems">${totalEssence} 💠</div>
                 <div class="shop-buy-price">${pkg.price} ₽</div>
             </div>
             
