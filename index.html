@@ -498,39 +498,22 @@
             text-transform: uppercase;
         }
 
-        /* Цвета рангов */
-        .rank-M { --card-color: #ff0066; }
-        .rank-T { --card-color: #a8a8a8; }
-        .rank-K { --card-color: #f4d03f; }
-        .rank-Y { --card-color: #2ecc71; }
-        .rank-U { --card-color: #00ff88; }
-        .rank-Q { --card-color: #9b59b6; }
-        .rank-R { --card-color: #ff6b6b; }
-        .rank-Z { --card-color: #d4a373; }
-        .rank-O { --card-color: #7a8a9a; }
-        .rank-H { --card-color: #ff6600; }
-        .rank-N { --card-color: #4a9eff; }
-        .rank-V { --card-color: #ff6b9d; }
-        .rank-L { --card-color: #ffcc00; }
+        /* Цвета рангов (с RGB-переменными для свечения) */
+        .rank-M { --card-color: #ff0066; --card-color-rgb: 255, 0, 102; }
+        .rank-T { --card-color: #c0c0c0; --card-color-rgb: 192, 192, 192; }
+        .rank-K { --card-color: #f4d03f; --card-color-rgb: 244, 208, 63; }
+        .rank-Y { --card-color: #2ecc71; --card-color-rgb: 46, 204, 113; }
+        .rank-U { --card-color: #00ff88; --card-color-rgb: 0, 255, 136; }
+        .rank-Q { --card-color: #9b59b6; --card-color-rgb: 155, 89, 182; }
+        .rank-R { --card-color: #ff6b6b; --card-color-rgb: 255, 107, 107; }
+        .rank-Z { --card-color: #d4a373; --card-color-rgb: 212, 163, 115; }
+        .rank-O { --card-color: #7a8a9a; --card-color-rgb: 122, 138, 154; }
+        .rank-H { --card-color: #ff6600; --card-color-rgb: 255, 102, 0; }
+        .rank-N { --card-color: #4a9eff; --card-color-rgb: 74, 158, 255; }
+        .rank-V { --card-color: #ff6b9d; --card-color-rgb: 255, 107, 157; }
+        .rank-L { --card-color: #ffcc00; --card-color-rgb: 255, 204, 0; }
 
-        /* ============ НОВЫЙ ДИЗАЙН ОТКРЫТИЯ ПАКОВ (анимация) ============ */
-
-        /* Звёзды на картах */
-        .card-item .card-stars {
-            position: absolute;
-            top: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            display: flex;
-            gap: 1px;
-            filter: drop-shadow(0 0 4px var(--card-color));
-        }
-        .card-item .card-stars .star {
-            font-size: 9px;
-            color: var(--card-color);
-            text-shadow: 0 0 4px var(--card-color);
-        }
+        /* ============ НОВЫЙ ДИЗАЙН ОТКРЫТИЯ ПАКОВ ============ */
 
         /* Пак-модалка */
         .pack-opening-modal {
@@ -2887,9 +2870,11 @@
             .profile-banner .profile-stats-block .p-stat { flex: 1; min-width: 60px; padding: 8px 10px; }
             .profile-banner .profile-stats-block .p-stat .num { font-size: 16px; }
             .profile-banner .profile-stats-block .p-stat .lbl { font-size: 9px; }
-            .card-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 6px; }
-            .card-item { min-height: 125px; padding: 5px 4px; }
-            .card-item .card-image { height: 60px; font-size: 24px; }
+            .card-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; }
+            .card-item { min-height: 145px; padding: 6px 5px; }
+            .card-item .card-image { height: 75px; font-size: 28px; }
+            .card-item .card-stars .star { font-size: 8px; }
+            .card-item .card-rank { width: 22px; height: 22px; font-size: 10px; }
             .card-item .card-name { font-size: 9px; }
             .card-item .card-rarity { font-size: 7px; }
             .pickaxe-btn { width: 140px; height: 140px; }
@@ -2925,10 +2910,11 @@
             .profile-banner .profile-info-block .profile-rank-tag { font-size: 10px; padding: 3px 10px; }
             .profile-banner .profile-stats-block .p-stat { padding: 6px 8px; }
             .profile-banner .profile-stats-block .p-stat .num { font-size: 14px; }
-            .card-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
-            .card-item { min-height: 115px; padding: 4px 3px; border-radius: 8px; }
-            .card-item .card-image { height: 55px; font-size: 20px; border-radius: 6px; }
-            .card-item .card-rank { width: 16px; height: 16px; font-size: 8px; }
+            .card-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .card-item { min-height: 130px; padding: 5px 4px; border-radius: 10px; }
+            .card-item .card-image { height: 65px; font-size: 24px; border-radius: 7px; }
+            .card-item .card-stars .star { font-size: 7px; }
+            .card-item .card-rank { width: 18px; height: 18px; font-size: 9px; }
             .card-item .card-name { font-size: 8px; }
             .card-item .card-rarity { font-size: 7px; }
             .card-item .card-count { font-size: 8px; padding: 1px 4px; }
@@ -4484,36 +4470,44 @@
         { id: "Mmythic02", name: "Джейн Доу", rank: "M", color: "#ff0066", set: "ZZZ", image: "images/Mmythic02.png", rarity: "Мифическая", chance: "0.05%" },
         { id: "Mmythic03", name: "Райдэн", rank: "M", color: "#ff0066", set: "Genshin Impact", image: "images/Mmythic03.png", rarity: "Мифическая", chance: "0.05%" },
         { id: "Mmythic04", name: "Ризли", rank: "M", color: "#ff0066", set: "Genshin Impact", image: "images/Mmythic04.png", rarity: "Мифическая", chance: "0.05%" },
+       
         { id: "Ttitan01", name: "Девушка", rank: "T", color: "#a8a8a8", set: "Титан", image: "images/Ttitan01.png", rarity: "Титановая", chance: "0.2%" },
         { id: "Ttitan02", name: "Йорха 2Б", rank: "T", color: "#a8a8a8", set: "Nier: Automata", image: "images/Ttitan02.png", rarity: "Титановая", chance: "0.2%" },
         { id: "Ttitan03", name: "Мужчина", rank: "T", color: "#a8a8a8", set: "Титан", image: "images/Ttitan03.png", rarity: "Титановая", chance: "0.2%" },
         { id: "Ttitan04", name: "Годжо Сатору", rank: "T", color: "#a8a8a8", set: "Магическая Битва", image: "images/Ttitan04.png", rarity: "Титановая", chance: "0.2%" },
         { id: "Ttitan05", name: "Сано Манджиро", rank: "T", color: "#a8a8a8", set: "Токийские Мстители", image: "images/Ttitan05.png", rarity: "Титановая", chance: "0.2%" },
+       
         { id: "Kking01", name: "Мужчина", rank: "K", color: "#f4d03f", set: "Королевский", image: "images/Kking01.png", rarity: "Королевская", chance: "0.15%" },
         { id: "Kking02", name: "Мужчина", rank: "K", color: "#f4d03f", set: "Королевский", image: "images/Kking02.png", rarity: "Королевская", chance: "0.15%" },
         { id: "Kking03", name: "Годжо Сатору", rank: "K", color: "#f4d03f", set: "Магическая Битва", image: "images/Kking03.png", rarity: "Королевская", chance: "0.15%" },
+        
         { id: "Yyokai01", name: "Девушка", rank: "Y", color: "#2ecc71", set: "Йети", image: "images/Yyokai01.png", rarity: "Ледяная", chance: "0.3%" },
         { id: "Yyokai02", name: "Широко", rank: "Y", color: "#2ecc71", set: "Синий Архив", image: "images/Yyokai02.png", rarity: "Ледяная", chance: "0.3%" },
         { id: "Yyokai03", name: "Нанами Кенто", rank: "Y", color: "#2ecc71", set: "Магическая Битва", image: "images/Yyokai03.png", rarity: "Ледяная", chance: "0.3%" },
+       
         { id: "Uultra01", name: "Девушка", rank: "U", color: "#00ff88", set: "Ультра", image: "images/Uultra01.png", rarity: "Урановая", chance: "0.8%" },
         { id: "Uultra02", name: "Пара", rank: "U", color: "#00ff88", set: "Ультра", image: "images/Uultra02.png", rarity: "Урановая", chance: "0.8%" },
         { id: "Uultra03", name: "Девушка", rank: "U", color: "#00ff88", set: "Ультра", image: "images/Uultra03.png", rarity: "Урановая", chance: "0.8%" },
         { id: "Uultra04", name: "Пара", rank: "U", color: "#00ff88", set: "Ультра", image: "images/Uultra04.png", rarity: "Урановая", chance: "0.8%" },
         { id: "Uultra05", name: "Мияби", rank: "U", color: "#00ff88", set: "ZZZ", image: "images/Uultra05.png", rarity: "Урановая", chance: "0.8%" },
+        
         { id: "Qqueen01", name: "Девушка", rank: "Q", color: "#9b59b6", set: "Квантовый", image: "images/Qqueen01.png", rarity: "Квантовая", chance: "0.6%" },
         { id: "Qqueen02", name: "Девушка", rank: "Q", color: "#9b59b6", set: "Квантовый", image: "images/Qqueen02.png", rarity: "Квантовая", chance: "0.6%" },
         { id: "Qqueen03", name: "Сугуру Гето", rank: "Q", color: "#9b59b6", set: "Магическая Битва", image: "images/Qqueen03.png", rarity: "Квантовая", chance: "0.6%" },
         { id: "Qqueen04", name: "Мита", rank: "Q", color: "#9b59b6", set: "Квантовый", image: "images/Qqueen04.png", rarity: "Квантовая", chance: "0.6%" },
         { id: "Qqueen05", name: "Рёмэн Сукуна", rank: "Q", color: "#9b59b6", set: "Магическая Битва", image: "images/Qqueen05.png", rarity: "Квантовая", chance: "0.6%" },
+        
         { id: "Rrare01", name: "Девушка", rank: "R", color: "#ff6b6b", set: "Радужный", image: "images/Rrare01.png", rarity: "Радужная", chance: "0.5%" },
         { id: "Rrare02", name: "Девушка", rank: "R", color: "#ff6b6b", set: "Радужный", image: "images/Rrare02.png", rarity: "Радужная", chance: "0.5%" },
         { id: "Rrare03", name: "Арлекино", rank: "R", color: "#ff6b6b", set: "Genshin Impact", image: "images/Rrare03.png", rarity: "Радужная", chance: "0.5%" },
         { id: "Rrare04", name: "Макима", rank: "R", color: "#ff6b6b", set: "Человек Бензопила", image: "images/Rrare04.png", rarity: "Радужная", chance: "0.5%" },
         { id: "Rrare05", name: "Хуа Чэн", rank: "R", color: "#ff6b6b", set: "Благословение Небожителей", image: "images/Rrare05.png", rarity: "Радужная", chance: "0.5%" },
+        
         { id: "Zzeus01", name: "Девушка", rank: "Z", color: "#d4a373", set: "Загадочный", image: "images/Zzeus01.png", rarity: "Загадочная", chance: "4%" },
         { id: "Zzeus02", name: "Пара", rank: "Z", color: "#d4a373", set: "Загадочный", image: "images/Zzeus02.png", rarity: "Загадочная", chance: "4%" },
         { id: "Zzeus03", name: "Мияби", rank: "Z", color: "#d4a373", set: "ZZZ", image: "images/Zzeus03.png", rarity: "Загадочная", chance: "4%" },
         { id: "Zzeus04", name: "Леви", rank: "Z", color: "#d4a373", set: "Атака Титанов", image: "images/Zzeus04.png", rarity: "Загадочная", chance: "4%" },
+        
         { id: "Oobscure01", name: "Девушка", rank: "O", color: "#2d3436", set: "Ониксовый", image: "images/Oobscure01.png", rarity: "Ониксовая", chance: "3%" },
         { id: "Oobscure02", name: "Девушка и монстры", rank: "O", color: "#2d3436", set: "Ониксовый", image: "images/Oobscure02.png", rarity: "Ониксовая", chance: "3%" },
         { id: "Oobscure03", name: "Широко", rank: "O", color: "#2d3436", set: "Синий Архив", image: "images/Oobscure03.png", rarity: "Ониксовая", chance: "3%" },
@@ -4521,6 +4515,18 @@
         { id: "Oobscure05", name: "Попа Макимы", rank: "O", color: "#2d3436", set: "Человек Бензопила", image: "images/Oobscure05.png", rarity: "Ониксовая", chance: "3%" },
         { id: "Oobscure06", name: "Попа Арлекины", rank: "O", color: "#2d3436", set: "Genshin Impact", image: "images/Oobscure06.png", rarity: "Ониксовая", chance: "3%" },
         { id: "Oobscure07", name: "Гето Сугуру", rank: "O", color: "#2d3436", set: "Магическая Битва", image: "images/Oobscure07.png", rarity: "Ониксовая", chance: "3%" },
+
+        // 🎃 ХЭЛЛОУИН (октябрь, с 25 числа) — ранг H
+        { id: "Hhalloween01", name: "Тыква", rank: "H", color: "#ff6600", set: "Хэллоуин", image: "images/Hhalloween01.png", rarity: "Хэллоуинская", chance: "3%", event: "halloween", year: 2026 },
+
+        // ❄️ ЗИМА (декабрь–февраль) — ранг N
+        { id: "Nwinter01", name: "Снежинка", rank: "N", color: "#4a9eff", set: "Зима", image: "images/Nwinter01.png", rarity: "Зимняя", chance: "3%", event: "winter", year: 2026 },
+
+        // 🌸 ВЕСНА (март–май) — ранг V
+        { id: "Vspring01", name: "Цветочек", rank: "V", color: "#ff6b9d", set: "Весна", image: "images/Vspring01.png", rarity: "Весенняя", chance: "3%", event: "spring", year: 2026 },
+
+        // ☀️ ЛЕТО (июнь–август) — ранг L
+        { id: "Lsummer01", name: "Солнышко", rank: "L", color: "#ffcc00", set: "Лето", image: "images/Lsummer01.png", rarity: "Летняя", chance: "3%", event: "summer", year: 2026 },
     ];
 
     function getCardImage(card) {
@@ -5679,7 +5685,7 @@
         }
         pendingPack = { cards, selected: null };
         savePendingPack();
-        showPickModal(cards);
+        startPackOpeningAnimation(cards);
         updateUI(); updateEventUI(); updatePackButton(); saveGame();
     }
 
