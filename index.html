@@ -4555,7 +4555,7 @@
     
     <div class="nav-section-title">💬 Социальное</div>
     <button class="nav-item" data-section="chat"><i class="fas fa-comment-dots"></i><span>Чат</span></button>
-    <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button>
+<!--     <button class="nav-item" data-section="trade"><i class="fas fa-exchange-alt"></i><span>Обмен</span><span class="badge" id="tradeBadge">0</span></button> -->
     <button class="nav-item" data-section="market"><i class="fas fa-store"></i><span>Рынок</span><span class="badge new">NEW</span><span class="badge" id="marketBadge">0</span></button>    
     <button class="nav-item" data-section="shop">
         <i class="fas fa-gem"></i>
@@ -4855,7 +4855,7 @@
     </section>
 
     <!-- ОБМЕН -->
-    <section id="section-trade" class="section">
+<!--     <section id="section-trade" class="section">
         <div class="section-header">
             <h1><i class="fas fa-exchange-alt"></i> Обмен картами</h1>
             <div class="section-info">
@@ -4923,7 +4923,7 @@
                 <div style="text-align:center;padding:20px;color:#6b7084;font-size:14px;">📜 История пуста</div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- МИНИ-ИГРЫ -->
     <section id="section-minigames" class="section">
@@ -6158,8 +6158,8 @@
     // ============================================================
 
     const RANK_STARS = {
-        'M': 5, 'T': 5, 'K': 4, 'Y': 4, 'U': 4, 'Q': 3,
-        'R': 3, 'Z': 3, 'O': 2, 'H': 4, 'N': 4, 'V': 4, 'L': 4
+        'M': 9, 'T': 8, 'K': 7, 'Y': 6, 'U': 5, 'Q': 4,
+        'R': 3, 'Z': 2, 'O': 1, 'H': 1, 'N': 1, 'V': 1, 'L': 1
     };
 
     const RANK_GLOW = {
@@ -6682,12 +6682,40 @@
 
     const GAME_NEWS = [
         {
+            id: 0,
+            title: 'Обмен картами временно недоступен',
+            content: `⚠️ **Раздел "Обмен" временно убран из игры.**
+
+        Причина: технические неполадки синхронизации между устройствами — карты не всегда корректно списывались и добавлялись при обмене между игроками.
+
+        **Что это значит:**
+        • ❌ Раздел "Обмен" больше не доступен
+        • ✅ Все остальные функции работают как обычно
+        • ✅ Рынок карт работает в полном объёме
+        • ✅ Карты, которые были в активных обменах, вернутся в вашу коллекцию
+
+        **Что использовать вместо обмена:**
+        • 🏪 **Рынок карт** — выставляйте лоты и создавайте заявки
+        • 💰 Продавайте и покупайте карты за другие карты
+        • 🔄 Все сделки на рынке проходят мгновенно и безопасно
+
+        Приносим извинения за неудобства. Раздел "Обмен" вернётся, когда мы устраним проблемы синхронизации.
+
+        Спасибо за понимание! 💜`,
+            type: 'announcement',
+            icon: '🚫',
+            color: '#ff6b6b',
+            version: '2.2',
+            important: true,
+            published_at: new Date().toISOString()
+        },
+        {
             id: 1,
-            title: 'Магазин алмазов',
-            content: `В игре появился **магазин алмазов**! 🎉
+            title: 'Магазин эссенции',
+            content: `В игре появился **магазин эссенции**! 🎉
 
     Что нового:
-    • 💎 Пакеты алмазов от 50 до 5000
+    • 💠 Пакеты эссенции от 50 до 5000
     • 🎁 Бонусы за большие пакеты (до +25%)
     • 💳 Оплата через ЮMoney
     • 📱 Мгновенное зачисление после проверки чека
@@ -6698,9 +6726,9 @@
     3. Оплати через ЮMoney
     4. Отправь чек в Telegram — алмазы будут начислены
 
-    ⚠️ Алмазы — премиум-валюта. Их можно обменять на эксклюзивные карты и бустеры.`,
+    ⚠️ Эссенция — премиум-валюта. Их можно обменять на эксклюзивные карты и бустеры.`,
             type: 'update',
-            icon: '💎',
+            icon: '💠',
             color: '#4a9eff',
             version: '2.1',
             important: true,
@@ -10165,7 +10193,7 @@
             if (_playerId && _playerName) { syncToSupabase(); loadFromSupabase(); }
             loadTopFromSupabase();
             setTimeout(() => { subscribeToChatSection(); setupChatPollingSection(); }, 2000);
-            setTimeout(() => { subscribeToTrades(); loadTrades(); }, 3000);
+            /*setTimeout(() => { subscribeToTrades(); loadTrades(); }, 3000);*/
             setTimeout(() => { subscribeToMarket(); loadMarketData(); }, 3500);
             setTimeout(() => { initDailyQuests(); }, 4000);
             setTimeout(() => { loadGameNews(); }, 4500);
@@ -12182,7 +12210,7 @@
             'mine': 'section-mine', 'mycards': 'section-mycards',
             'catalog': 'section-catalog', 'sets': 'section-sets',
             'packs': 'section-packs', 'event': 'section-event',
-            'chat': 'section-chat', 'trade': 'section-trade',
+            'chat': 'section-chat', /*'trade': 'section-trade'*/
             'top': 'section-top', 'profile': 'section-profile',
             'settings': 'section-settings', 'minigames': 'section-minigames',
             'market': 'section-market', 'quests': 'section-quests', 
@@ -12230,13 +12258,13 @@
             loadDailyQuests();
         }
         
-        if (section === 'trade') {
+/*        if (section === 'trade') {
             setTimeout(async () => { 
                 await loadTrades(); 
                 await renderSenderCards(); 
                 renderReceiverCards(); 
             }, 100);
-        }
+        }*/
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -12423,7 +12451,7 @@
 
         setInterval(() => { checkDailyReset(); updateUI(); loadTopFromSupabase(); }, 60000);
         setInterval(updateChatOnlineCount, 30000);
-        setInterval(loadTrades, 30000);
+        /*setInterval(loadTrades, 30000);*/
 
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
