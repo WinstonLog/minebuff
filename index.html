@@ -6358,15 +6358,20 @@
 
     // ===== УТИЛИТЫ =====
     function questToday() {
-        return new Date().toISOString().split('T')[0];
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;  // ✅ локальная дата YYYY-MM-DD
     }
 
     function formatTimeLeft() {
         const now = new Date();
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setHours(0, 0, 0, 0);  // локальная полночь — уже правильно
         const diff = tomorrow - now;
+        if (diff <= 0) return '00:00:00';
         const h = Math.floor(diff / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
         const s = Math.floor((diff % 60000) / 1000);
@@ -6377,6 +6382,21 @@
     async function loadDailyQuests() {
         if (!supabaseClient || !_playerId) return;
         const today = questToday();
+
+        // ✅ Одноразовая очистка старых записей (можно удалить через день)
+        try {
+            await supabaseClient.from('daily_quest_progress')
+                .delete()
+                .eq('player_id', _playerId)
+                .lt('quest_date', today);
+        } catch(e) { /* игнорируем */ }
+
+        // ✅ Если дата сменилась — принудительно сбрасываем локальное состояние
+        if (_lastKnownQuestDate && _lastKnownQuestDate !== today) {
+            _questProgress = {};
+            _questBonusClaimed = false;
+            _lastKnownQuestDate = today;
+        }
 
         try {
             // Загружаем прогресс
@@ -6647,16 +6667,21 @@
     }
 
     // ===== ТАЙМЕР СБРОСА =====
+    let _lastKnownQuestDate = null;
+
     function startQuestTimer() {
         if (_questRefreshTimer) clearInterval(_questRefreshTimer);
+        _lastKnownQuestDate = questToday();  // запоминаем дату при старте
 
         function update() {
             const el = document.getElementById('questResetTimer');
             if (el) el.textContent = formatTimeLeft();
 
-            // Проверка на новый день — каждый час
-            const now = new Date();
-            if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2) {
+            // ✅ Проверка смены дня КАЖДУЮ СЕКУНДУ
+            const today = questToday();
+            if (today !== _lastKnownQuestDate) {
+                console.log('📅 Новый день! Сброс квестов:', _lastKnownQuestDate, '→', today);
+                _lastKnownQuestDate = today;
                 loadDailyQuests();
             }
         }
@@ -10650,12 +10675,29 @@
         if (_pickaxeLevel >= 10) { showToast('🔧 MAX!', '#ffaa88'); document.getElementById('pickaxeModal').classList.remove('show'); return; }
         if (_essence >= cost) {
             _essence -= cost;
+            logEssenceTransaction(-cost, 'spend_pickaxe', { level: _pickaxeLevel });
             _pickaxeLevel++;
             showToast(`🔧 Кирка → ${_pickaxeLevel} ур.!`, '#b388ff');
             saveGame(); updateUI();
             document.getElementById('pickaxeModal').classList.remove('show');
         } else { showToast(`❗ Нужно ${cost} 💠`, '#ffaa88'); document.getElementById('pickaxeModal').classList.remove('show'); }
     }
+
+    async function logEssenceTransaction(amount, reason, metadata = {}) {
+        if (!supabaseClient || !_playerId) return;
+        try {
+            await supabaseClient.from('essence_transactions').insert({
+                player_id: _playerId,
+                amount: amount,
+                balance_after: Math.round(_essence),
+                reason: reason,
+                metadata: metadata
+            });
+        } catch(e) {
+            console.warn('logEssenceTransaction error:', e);
+        }
+    }
+    window.logEssenceTransaction = logEssenceTransaction;
 
     // ---- РЕКЛАМА ----
     function openAdModal() {
@@ -11641,6 +11683,8 @@
         }
         
         _essence -= cost;
+        // Логируем списание
+        logEssenceTransaction(-cost, 'spend_pack', { pack: 'universal' });
         saveGame();
         const cards = [];
         const usedIds = new Set();
@@ -12457,7 +12501,12 @@
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 loadGame();
-                // Если мы в магазине — обновляем баланс
+                // ✅ Проверяем смену дня при возврате на вкладку
+                const today = questToday();
+                if (_lastKnownQuestDate && _lastKnownQuestDate !== today) {
+                    _lastKnownQuestDate = today;
+                    loadDailyQuests();
+                }
                 if (document.querySelector('#section-shop.active')) {
                     refreshGemsBalance();
                 }
